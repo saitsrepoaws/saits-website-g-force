@@ -9,20 +9,24 @@ import {
   type UploadProgress 
 } from '../../services/audioUpload'
 
-function Libery() {
+interface FileUploadItem {
+  file: File
+  title: string
+  artist: string
+  album: string
+  duration: number
+  progress: UploadProgress | null
+  status: 'pending' | 'uploading' | 'success' | 'error'
+  error?: string
+}
 
+function Libery() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoadingTracks, setIsLoadingTracks] = useState(false)
   const [showAddTrack, setShowAddTrack] = useState(false)
-  const [newTrack, setNewTrack] = useState({
-    title: '',
-    artist: '',
-    album: '',
-    duration: 0,
-  })
-  const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [coverFile, setCoverFile] = useState<File | null>(null)
-  const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null)
+  
+  // Multi-file upload state
+  const [uploadQueue, setUploadQueue] = useState<FileUploadItem[]>([])
   const [isUploading, setIsUploading] = useState(false)
 
   // Load tracks from database
@@ -37,71 +41,92 @@ function Libery() {
     setIsLoadingTracks(false)
   }
 
-  const handleAudioFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFilesSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
 
-    setAudioFile(file)
+    // Create upload items for each file
+    const newItems: FileUploadItem[] = await Promise.all(
+      files.map(async (file) => {
+        const metadata = await getAudioMetadata(file)
+        const filename = file.name.replace(/\.[^/.]+$/, '')
+        
+        return {
+          file,
+          title: filename,
+          artist: '',
+          album: '',
+          duration: metadata.duration || 0,
+          progress: null,
+          status: 'pending' as const,
+        }
+      })
+    )
 
-    // Auto-extract metadata
-    const metadata = await getAudioMetadata(file)
-    if (metadata.duration) {
-      setNewTrack({ ...newTrack, duration: metadata.duration })
-    }
-
-    // Auto-fill title from filename if empty
-    if (!newTrack.title) {
-      const filename = file.name.replace(/\.[^/.]+$/, '') // remove extension
-      setNewTrack({ ...newTrack, title: filename })
-    }
+    setUploadQueue([...uploadQueue, ...newItems])
   }
 
-  const handleAddTrack = async () => {
-    if (!newTrack.title || !audioFile) return
-
+  const handleStartUpload = async () => {
     setIsUploading(true)
-    setUploadProgress(null)
 
-    try {
-      // Upload audio file
-      const audioResult = await uploadAudioFile(audioFile, (progress) => {
-        setUploadProgress(progress)
-      })
+    for (let i = 0; i < uploadQueue.length; i++) {
+      const item = uploadQueue[i]
+      if (item.status !== 'pending') continue
 
-      // Upload cover art if provided
-      let coverUrl: string | undefined
-      if (coverFile) {
-        const coverResult = await uploadCoverArt(coverFile)
-        coverUrl = coverResult.url
+      // Update status to uploading
+      setUploadQueue(prev => prev.map((q, idx) => 
+        idx === i ? { ...q, status: 'uploading' as const } : q
+      ))
+
+      try {
+        // Upload audio file
+        const audioResult = await uploadAudioFile(item.file, (progress) => {
+          setUploadQueue(prev => prev.map((q, idx) => 
+            idx === i ? { ...q, progress } : q
+          ))
+        })
+
+        // Create track in database
+        const { data } = await createTrack({
+          title: item.title,
+          artist: item.artist || undefined,
+          album: item.album || undefined,
+          duration: item.duration || undefined,
+          fileUrl: audioResult.url,
+          fileSize: audioResult.size,
+          format: audioResult.format,
+          addedAt: new Date().toISOString(),
+        })
+
+        if (data) {
+          setTracks(prev => [...prev, data])
+          setUploadQueue(prev => prev.map((q, idx) => 
+            idx === i ? { ...q, status: 'success' as const } : q
+          ))
+        }
+      } catch (error) {
+        console.error('Failed to upload track:', error)
+        setUploadQueue(prev => prev.map((q, idx) => 
+          idx === i ? { ...q, status: 'error' as const, error: 'Upload failed' } : q
+        ))
       }
-
-      // Create track in database
-      const { data } = await createTrack({
-        title: newTrack.title,
-        artist: newTrack.artist || undefined,
-        album: newTrack.album || undefined,
-        duration: newTrack.duration || undefined,
-        fileUrl: audioResult.url,
-        fileSize: audioResult.size,
-        format: audioResult.format,
-        coverArtUrl: coverUrl,
-        addedAt: new Date().toISOString(),
-      })
-
-      if (data) {
-        setTracks([...tracks, data])
-        setNewTrack({ title: '', artist: '', album: '', duration: 0 })
-        setAudioFile(null)
-        setCoverFile(null)
-        setShowAddTrack(false)
-      }
-    } catch (error) {
-      console.error('Failed to add track:', error)
-      alert('Failed to upload track. Please try again.')
-    } finally {
-      setIsUploading(false)
-      setUploadProgress(null)
     }
+
+    setIsUploading(false)
+  }
+
+  const handleRemoveFromQueue = (index: number) => {
+    setUploadQueue(prev => prev.filter((_, idx) => idx !== index))
+  }
+
+  const handleClearCompleted = () => {
+    setUploadQueue(prev => prev.filter(item => item.status === 'pending' || item.status === 'uploading'))
+  }
+
+  const handleUpdateQueueItem = (index: number, field: keyof FileUploadItem, value: any) => {
+    setUploadQueue(prev => prev.map((item, idx) => 
+      idx === index ? { ...item, [field]: value } : item
+    ))
   }
 
   const handleDeleteTrack = async (id: string) => {
@@ -123,6 +148,144 @@ function Libery() {
           <p className="text-sm text-gray-600">Manage your audio tracks</p>
         </div>
 
+        {/* Upload Queue */}
+        {showAddTrack && (
+          <div className="bg-white border border-gray-300 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Upload Tracks</h3>
+            
+            {/* File Selector */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Audio Files (multiple files supported)
+              </label>
+              <input
+                type="file"
+                accept="audio/*"
+                multiple
+                onChange={handleFilesSelected}
+                disabled={isUploading}
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              />
+            </div>
+
+            {/* Upload Queue */}
+            {uploadQueue.length > 0 && (
+              <div className="space-y-3">
+                {uploadQueue.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`border rounded-lg p-4 ${
+                      item.status === 'success' ? 'bg-green-50 border-green-200' :
+                      item.status === 'error' ? 'bg-red-50 border-red-200' :
+                      item.status === 'uploading' ? 'bg-blue-50 border-blue-200' :
+                      'bg-gray-50 border-gray-200'
+                    }`}
+                  >
+                    {/* File Info & Status */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {item.status === 'success' && '✅'}
+                          {item.status === 'error' && '❌'}
+                          {item.status === 'uploading' && '⏳'}
+                          {item.status === 'pending' && '⏸️'}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.file.name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          ({formatFileSize(item.file.size)})
+                        </span>
+                      </div>
+                      {item.status === 'pending' && !isUploading && (
+                        <button
+                          onClick={() => handleRemoveFromQueue(index)}
+                          className="text-xs text-red-600 hover:text-red-800"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Editable Metadata (only for pending) */}
+                    {item.status === 'pending' && (
+                      <div className="grid grid-cols-3 gap-2 mb-2">
+                        <input
+                          type="text"
+                          placeholder="Title *"
+                          value={item.title}
+                          onChange={(e) => handleUpdateQueueItem(index, 'title', e.target.value)}
+                          className="px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Artist"
+                          value={item.artist}
+                          onChange={(e) => handleUpdateQueueItem(index, 'artist', e.target.value)}
+                          className="px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Album"
+                          value={item.album}
+                          onChange={(e) => handleUpdateQueueItem(index, 'album', e.target.value)}
+                          className="px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                      </div>
+                    )}
+
+                    {/* Progress Bar */}
+                    {item.progress && item.status === 'uploading' && (
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <span>Uploading...</span>
+                          <span>{item.progress.percentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            style={{ width: `${item.progress.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error Message */}
+                    {item.error && (
+                      <div className="text-xs text-red-600 mt-1">{item.error}</div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={handleStartUpload}
+                    disabled={isUploading || uploadQueue.every(i => i.status !== 'pending')}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    {isUploading ? 'Uploading...' : `Upload ${uploadQueue.filter(i => i.status === 'pending').length} Track(s)`}
+                  </button>
+                  <button
+                    onClick={handleClearCompleted}
+                    disabled={isUploading}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm font-medium"
+                  >
+                    Clear Completed
+                  </button>
+                  <button
+                    onClick={() => setShowAddTrack(false)}
+                    disabled={isUploading}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Track Library */}
         <div className="bg-white border border-gray-300 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
@@ -131,127 +294,9 @@ function Libery() {
                 onClick={() => setShowAddTrack(!showAddTrack)}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
               >
-                + Add Track
+                {showAddTrack ? 'Hide Upload' : '+ Add Tracks'}
               </button>
             </div>
-
-            {/* Add Track Form */}
-            {showAddTrack && (
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                {/* File Uploads */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Audio File * (MP3, WAV, FLAC, etc.)
-                    </label>
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      onChange={handleAudioFileChange}
-                      disabled={isUploading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                    />
-                    {audioFile && (
-                      <div className="text-xs text-gray-600 mt-1">
-                        {audioFile.name} ({formatFileSize(audioFile.size)})
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Cover Art (optional)
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
-                      disabled={isUploading}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-                    />
-                    {coverFile && (
-                      <div className="text-xs text-gray-600 mt-1">
-                        {coverFile.name} ({formatFileSize(coverFile.size)})
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Track Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
-                  <input
-                    type="text"
-                    placeholder="Title *"
-                    value={newTrack.title}
-                    onChange={(e) => setNewTrack({ ...newTrack, title: e.target.value })}
-                    disabled={isUploading}
-                    className="px-3 py-2 border border-gray-300 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Artist"
-                    value={newTrack.artist}
-                    onChange={(e) => setNewTrack({ ...newTrack, artist: e.target.value })}
-                    disabled={isUploading}
-                    className="px-3 py-2 border border-gray-300 rounded text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Album"
-                    value={newTrack.album}
-                    onChange={(e) => setNewTrack({ ...newTrack, album: e.target.value })}
-                    disabled={isUploading}
-                    className="px-3 py-2 border border-gray-300 rounded text-sm"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Duration (sec)"
-                    value={newTrack.duration || ''}
-                    onChange={(e) => setNewTrack({ ...newTrack, duration: Number(e.target.value) })}
-                    disabled={isUploading}
-                    className="px-3 py-2 border border-gray-300 rounded text-sm"
-                  />
-                </div>
-
-                {/* Upload Progress */}
-                {uploadProgress && (
-                  <div className="mb-3">
-                    <div className="flex justify-between text-xs text-gray-600 mb-1">
-                      <span>Uploading...</span>
-                      <span>{uploadProgress.percentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all"
-                        style={{ width: `${uploadProgress.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleAddTrack}
-                    disabled={!newTrack.title || !audioFile || isUploading}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                  >
-                    {isUploading ? 'Uploading...' : 'Upload & Save Track'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowAddTrack(false)
-                      setAudioFile(null)
-                      setCoverFile(null)
-                      setUploadProgress(null)
-                    }}
-                    disabled={isUploading}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm font-medium"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Track List */}
             {isLoadingTracks ? (
