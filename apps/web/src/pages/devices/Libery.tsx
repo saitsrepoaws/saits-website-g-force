@@ -33,6 +33,11 @@ function Libery() {
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [genreFilter, setGenreFilter] = useState<string>('all')
+  const [labelFilter, setLabelFilter] = useState<string>('all')
+  
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfo, setShowTrackInfo] = useState(false)
@@ -263,6 +268,30 @@ function Libery() {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  // Filter and search tracks
+  const filteredTracks = tracks.filter(track => {
+    // Search filter (artist, title, genre, label, version)
+    const searchLower = searchQuery.toLowerCase()
+    const matchesSearch = !searchQuery || 
+      track.artist?.toLowerCase().includes(searchLower) ||
+      track.title?.toLowerCase().includes(searchLower) ||
+      (track as any).genre?.toLowerCase().includes(searchLower) ||
+      track.label?.toLowerCase().includes(searchLower) ||
+      track.version?.toLowerCase().includes(searchLower)
+    
+    // Genre filter
+    const matchesGenre = genreFilter === 'all' || (track as any).genre === genreFilter
+    
+    // Label filter
+    const matchesLabel = labelFilter === 'all' || track.label === labelFilter
+    
+    return matchesSearch && matchesGenre && matchesLabel
+  })
+
+  // Get unique genres and labels for filter dropdowns
+  const uniqueGenres = Array.from(new Set(tracks.map(t => (t as any).genre).filter(Boolean)))
+  const uniqueLabels = Array.from(new Set(tracks.map(t => t.label).filter(Boolean)))
+
   return (
     <Layout title="Track Library" showBackButton backTo="/devices">
       <div className="max-w-5xl mx-auto">
@@ -419,13 +448,81 @@ function Libery() {
         {/* Track Library */}
         <div className="bg-white border border-gray-300 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Track Library</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Track Library 
+                <span className="ml-2 text-sm font-normal text-gray-500">
+                  ({filteredTracks.length} {filteredTracks.length === 1 ? 'track' : 'tracks'})
+                </span>
+              </h3>
               <button
                 onClick={() => setShowAddTrack(!showAddTrack)}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm font-medium"
               >
                 {showAddTrack ? 'Hide Upload' : '+ Add Tracks'}
               </button>
+            </div>
+
+            {/* Search and Filter Bar */}
+            <div className="bg-gray-50 p-4 rounded-lg mb-4 space-y-3">
+              {/* Search Input */}
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="🔍 Search tracks (artist, title, genre, label...)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+                {(searchQuery || genreFilter !== 'all' || labelFilter !== 'all') && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery('')
+                      setGenreFilter('all')
+                      setLabelFilter('all')
+                    }}
+                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-white"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Dropdowns */}
+              <div className="flex gap-3">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">Genre:</label>
+                  <select
+                    value={genreFilter}
+                    onChange={(e) => setGenreFilter(e.target.value)}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Genres ({tracks.length})</option>
+                    {uniqueGenres.map(genre => (
+                      <option key={genre} value={genre}>
+                        {genre} ({tracks.filter(t => (t as any).genre === genre).length})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700">Label:</label>
+                  <select
+                    value={labelFilter}
+                    onChange={(e) => setLabelFilter(e.target.value)}
+                    className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="all">All Labels ({tracks.length})</option>
+                    {uniqueLabels.map(label => (
+                      <option key={label} value={label}>
+                        {label} ({tracks.filter(t => t.label === label).length})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* Processing Indicator */}
@@ -443,9 +540,12 @@ function Libery() {
             {/* Track List */}
             {isLoadingTracks ? (
               <div className="text-center py-8 text-gray-500">Loading tracks...</div>
-            ) : tracks.length === 0 ? (
+            ) : filteredTracks.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {isProcessing ? 'Processing track...' : 'No tracks yet. Add your first track!'}
+                {isProcessing ? 'Processing track...' : 
+                 searchQuery || genreFilter !== 'all' || labelFilter !== 'all' ? 
+                 'No tracks match your filters. Try adjusting your search.' :
+                 'No tracks yet. Add your first track!'}
               </div>
             ) : (
               <div className="space-y-2">
@@ -462,7 +562,7 @@ function Libery() {
                 </div>
 
                 {/* Track Rows */}
-                {tracks.map((track) => (
+                {filteredTracks.map((track) => (
                   <div
                     key={track.id}
                     className="grid grid-cols-12 gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
