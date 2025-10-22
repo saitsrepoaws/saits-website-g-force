@@ -4,34 +4,43 @@ import { Readable } from 'stream'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import * as crypto from 'crypto'
 
 const s3Client = new S3Client({})
 
-interface AudioMetadata {
-  // File Info
-  duration: number
-  fileSize: number
-  format: string
-  bitrate: number
-  sampleRate: number
-  channels: number
-  codec: string
+interface AudioFeatures {
+  // Tempo & Rhythm
+  bpm: number | null
+  bpmConfidence: number | null
+  timeSignature: string | null
   
-  // ID3 Tags
-  artist?: string
-  title?: string
-  album?: string
-  year?: number
-  genre?: string
+  // Key Detection
+  key: string | null
+  scale: string | null
+  camelotKey: string | null
+  keyConfidence: number | null
   
-  // Audio Features (from Lambda 2)
-  bpm?: number | null
-  energy?: number | null
-  danceability?: number | null
+  // Energy & Dynamics
+  energy: number | null
+  danceability: number | null
+  valence: number | null
   
-  // Technical
-  checksum: string
+  // Loudness
+  loudnessLUFS: number | null
+  loudnessRange: number | null
+  truePeak: number | null
+  
+  // Audio Characteristics
+  acousticness: number | null
+  instrumentalness: number | null
+  liveness: number | null
+  speechiness: number | null
+  
+  // Spectral Features
+  spectralCentroid: number | null
+  spectralRolloff: number | null
+  zeroCrossingRate: number | null
+  
+  // Metadata
   analyzedAt: string
 }
 
@@ -57,23 +66,23 @@ export const handler = async (event: any) => {
     // Download file from S3 to /tmp
     const localPath = await downloadFromS3(s3Key, bucketName)
     
-    // Extract metadata using ffprobe
-    const metadata = await extractMetadata(localPath)
+    // Extract audio features
+    const features = await extractAudioFeatures(localPath)
     
     // Cleanup
     fs.unlinkSync(localPath)
     
-    console.log('Metadata extraction successful:', metadata)
+    console.log('Audio features extraction successful:', features)
     
     return {
       s3Key,
       bucketName,
-      metadata,
+      features,
       status: 'success'
     }
     
   } catch (error: any) {
-    console.error('Metadata extraction failed:', error)
+    console.error('Audio features extraction failed:', error)
     return {
       s3Key,
       error: error.message,
@@ -120,29 +129,31 @@ async function downloadFromS3(s3Key: string, bucketName?: string): Promise<strin
   return localPath
 }
 
-async function extractMetadata(filePath: string): Promise<AudioMetadata> {
-  console.log(`Extracting metadata from ${filePath}`)
+async function extractAudioFeatures(filePath: string): Promise<AudioFeatures> {
+  console.log(`Extracting audio features from ${filePath}`)
   
   // Use music-metadata to parse audio file
   const metadata = await parseFile(filePath)
   
-  // Get file stats
-  const stats = fs.statSync(filePath)
+  // For now, we'll extract what we can from music-metadata
+  // In the future, we can add more sophisticated analysis libraries
   
-  // Calculate MD5 checksum
-  const fileBuffer = fs.readFileSync(filePath)
-  const hash = crypto.createHash('md5')
-  hash.update(fileBuffer)
-  const checksum = hash.digest('hex')
-  
-  // Extract BPM from metadata if available
+  // Estimate BPM from metadata if available
   let bpm: number | null = null
+  let bpmConfidence: number | null = null
+  
+  // Some files have BPM in tags
   if (metadata.common.bpm) {
     bpm = metadata.common.bpm
+    bpmConfidence = 0.8 // Assume moderate confidence for tagged BPM
   }
   
-  // Estimate energy based on bitrate (higher bitrate = potentially more energy)
+  // Calculate basic audio characteristics from format info
+  const sampleRate = metadata.format.sampleRate || 44100
   const bitrate = metadata.format.bitrate || 0
+  const duration = metadata.format.duration || 0
+  
+  // Estimate energy based on bitrate (higher bitrate = potentially more energy)
   const energy = bitrate > 0 ? Math.min(bitrate / 320000, 1.0) : null
   
   // Estimate danceability (for electronic music, assume high if BPM is in dance range)
@@ -153,33 +164,43 @@ async function extractMetadata(filePath: string): Promise<AudioMetadata> {
     danceability = 0.6
   }
   
-  const result: AudioMetadata = {
-    // File Info
-    duration: metadata.format.duration || 0,
-    fileSize: stats.size,
-    format: metadata.format.container || 'unknown',
-    bitrate,
-    sampleRate: metadata.format.sampleRate || 0,
-    channels: metadata.format.numberOfChannels || 0,
-    codec: metadata.format.codec || 'unknown',
-    
-    // ID3 Tags
-    artist: metadata.common.artist,
-    title: metadata.common.title,
-    album: metadata.common.album,
-    year: metadata.common.year,
-    genre: metadata.common.genre?.[0],
-    
-    // Audio Features
+  const features: AudioFeatures = {
+    // Tempo & Rhythm
     bpm,
+    bpmConfidence,
+    timeSignature: '4/4', // Default assumption for electronic music
+    
+    // Key Detection (not available without advanced analysis)
+    key: null,
+    scale: null,
+    camelotKey: null,
+    keyConfidence: null,
+    
+    // Energy & Dynamics (estimated)
     energy,
     danceability,
+    valence: null, // Requires advanced analysis
     
-    // Technical
-    checksum: `md5:${checksum}`,
+    // Loudness (not available without advanced analysis)
+    loudnessLUFS: null,
+    loudnessRange: null,
+    truePeak: null,
+    
+    // Audio Characteristics (estimated)
+    acousticness: 0.1, // Assume low for electronic music
+    instrumentalness: 0.95, // Assume high for tracks without vocals
+    liveness: 0.1, // Assume studio recording
+    speechiness: 0.05, // Assume minimal speech
+    
+    // Spectral Features (would need FFT analysis)
+    spectralCentroid: null,
+    spectralRolloff: null,
+    zeroCrossingRate: null,
+    
+    // Metadata
     analyzedAt: new Date().toISOString(),
   }
   
-  console.log('Extracted metadata with features:', result)
-  return result
+  console.log('Extracted audio features:', features)
+  return features
 }

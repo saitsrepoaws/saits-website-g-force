@@ -3,6 +3,7 @@ import { auth } from './auth/resource'
 import { data } from './data/resource'
 import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
+// import { audioFeatures } from './functions/audio-features/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
@@ -13,6 +14,7 @@ export const backend = defineBackend({
   data,
   storage,
   audioMetadata,
+  // audioFeatures, // TODO: Combine with metadata or use SNS fanout
 })
 
 // Configure Lambda to trigger on S3 uploads
@@ -22,7 +24,7 @@ const metadataLambda = backend.audioMetadata.resources.lambda
 // Grant Lambda permission to read from S3
 storageBucket.grantRead(metadataLambda)
 
-// Add environment variable for bucket name using CDK escape hatch
+// Add environment variable for bucket name
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 
 // Add S3 notification to trigger Lambda on audio file uploads
