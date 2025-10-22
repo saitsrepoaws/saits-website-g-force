@@ -73,6 +73,13 @@
               "isRequired": false,
               "attributes": []
             },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "duration": {
               "name": "duration",
               "isArray": false,
