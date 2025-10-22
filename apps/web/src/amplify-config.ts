@@ -42,7 +42,7 @@ export async function configureAmplify(): Promise<{ configured: boolean }> {
         GraphQL: {
           endpoint: data.url,
           region: data.aws_region,
-          defaultAuthMode: data.default_authorization_type || 'userPool',
+          defaultAuthMode: 'userPool',
           modelIntrospection: data.model_introspection
         }
       }
