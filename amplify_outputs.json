@@ -45,13 +45,6 @@
               "isRequired": true,
               "attributes": []
             },
-            "title": {
-              "name": "title",
-              "isArray": false,
-              "type": "String",
-              "isRequired": true,
-              "attributes": []
-            },
             "artist": {
               "name": "artist",
               "isArray": false,
@@ -59,8 +52,22 @@
               "isRequired": false,
               "attributes": []
             },
-            "album": {
-              "name": "album",
+            "title": {
+              "name": "title",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "version": {
+              "name": "version",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "label": {
+              "name": "label",
               "isArray": false,
               "type": "String",
               "isRequired": false,
@@ -94,74 +101,10 @@
               "isRequired": false,
               "attributes": []
             },
-            "bitrate": {
-              "name": "bitrate",
-              "isArray": false,
-              "type": "Int",
-              "isRequired": false,
-              "attributes": []
-            },
-            "sampleRate": {
-              "name": "sampleRate",
-              "isArray": false,
-              "type": "Int",
-              "isRequired": false,
-              "attributes": []
-            },
-            "genre": {
-              "name": "genre",
-              "isArray": false,
-              "type": "String",
-              "isRequired": false,
-              "attributes": []
-            },
-            "year": {
-              "name": "year",
-              "isArray": false,
-              "type": "Int",
-              "isRequired": false,
-              "attributes": []
-            },
-            "coverArtUrl": {
-              "name": "coverArtUrl",
-              "isArray": false,
-              "type": "String",
-              "isRequired": false,
-              "attributes": []
-            },
             "addedAt": {
               "name": "addedAt",
               "isArray": false,
               "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": []
-            },
-            "lastPlayedAt": {
-              "name": "lastPlayedAt",
-              "isArray": false,
-              "type": "AWSDateTime",
-              "isRequired": false,
-              "attributes": []
-            },
-            "playCount": {
-              "name": "playCount",
-              "isArray": false,
-              "type": "Int",
-              "isRequired": false,
-              "attributes": []
-            },
-            "tags": {
-              "name": "tags",
-              "isArray": true,
-              "type": "String",
-              "isRequired": false,
-              "attributes": [],
-              "isArrayNullable": true
-            },
-            "metadata": {
-              "name": "metadata",
-              "isArray": false,
-              "type": "AWSJSON",
               "isRequired": false,
               "attributes": []
             },

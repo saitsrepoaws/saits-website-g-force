@@ -3,25 +3,18 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend'
 // Define the data schema
 const schema = a.schema({
   // Track model - audio tracks in the Libery system
+  // Format: Artist - Title (Version) [Label]
   Track: a
     .model({
-      title: a.string().required(),
-      artist: a.string(),
-      album: a.string(),
+      artist: a.string(), // Artist name (parsed from filename)
+      title: a.string().required(), // Track title (parsed from filename or fallback to filename)
+      version: a.string(), // Version/Mix info (parsed from filename, optional)
+      label: a.string(), // Record label (parsed from filename, optional)
       duration: a.integer(), // duration in seconds
       fileUrl: a.string(), // S3 URL or path to audio file
       fileSize: a.integer(), // file size in bytes
       format: a.string(), // mp3, flac, wav, etc.
-      bitrate: a.integer(), // bitrate in kbps
-      sampleRate: a.integer(), // sample rate in Hz
-      genre: a.string(),
-      year: a.integer(),
-      coverArtUrl: a.string(), // URL to cover art image
       addedAt: a.datetime(),
-      lastPlayedAt: a.datetime(),
-      playCount: a.integer().default(0),
-      tags: a.string().array(), // custom tags for organization
-      metadata: a.json(), // flexible field for additional metadata
     })
     .authorization((allow) => [allow.authenticated()]),
 })

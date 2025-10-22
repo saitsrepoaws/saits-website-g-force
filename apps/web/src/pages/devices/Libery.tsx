@@ -8,12 +8,14 @@ import {
   formatFileSize,
   type UploadProgress 
 } from '../../services/audioUpload'
+import { parseFilename } from '../../services/filenameParser'
 
 interface FileUploadItem {
   file: File
-  title: string
   artist: string
-  album: string
+  title: string
+  version: string
+  label: string
   duration: number
   progress: UploadProgress | null
   status: 'pending' | 'uploading' | 'success' | 'error'
@@ -49,13 +51,14 @@ function Libery() {
     const newItems: FileUploadItem[] = await Promise.all(
       files.map(async (file) => {
         const metadata = await getAudioMetadata(file)
-        const filename = file.name.replace(/\.[^/.]+$/, '')
+        const parsed = parseFilename(file.name)
         
         return {
           file,
-          title: filename,
-          artist: '',
-          album: '',
+          artist: parsed.artist || '',
+          title: parsed.title,
+          version: parsed.version || '',
+          label: parsed.label || '',
           duration: metadata.duration || 0,
           progress: null,
           status: 'pending' as const,
@@ -88,9 +91,10 @@ function Libery() {
 
         // Create track in database
         const { data } = await createTrack({
-          title: item.title,
           artist: item.artist || undefined,
-          album: item.album || undefined,
+          title: item.title,
+          version: item.version || undefined,
+          label: item.label || undefined,
           duration: item.duration || undefined,
           fileUrl: audioResult.url,
           fileSize: audioResult.size,
@@ -209,14 +213,7 @@ function Libery() {
 
                     {/* Editable Metadata (only for pending) */}
                     {item.status === 'pending' && (
-                      <div className="grid grid-cols-3 gap-2 mb-2">
-                        <input
-                          type="text"
-                          placeholder="Title *"
-                          value={item.title}
-                          onChange={(e) => handleUpdateQueueItem(index, 'title', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-xs"
-                        />
+                      <div className="grid grid-cols-4 gap-2 mb-2">
                         <input
                           type="text"
                           placeholder="Artist"
@@ -226,9 +223,23 @@ function Libery() {
                         />
                         <input
                           type="text"
-                          placeholder="Album"
-                          value={item.album}
-                          onChange={(e) => handleUpdateQueueItem(index, 'album', e.target.value)}
+                          placeholder="Title *"
+                          value={item.title}
+                          onChange={(e) => handleUpdateQueueItem(index, 'title', e.target.value)}
+                          className="px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Version"
+                          value={item.version}
+                          onChange={(e) => handleUpdateQueueItem(index, 'version', e.target.value)}
+                          className="px-2 py-1 border border-gray-300 rounded text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Label"
+                          value={item.label}
+                          onChange={(e) => handleUpdateQueueItem(index, 'label', e.target.value)}
                           className="px-2 py-1 border border-gray-300 rounded text-xs"
                         />
                       </div>
@@ -307,30 +318,45 @@ function Libery() {
               </div>
             ) : (
               <div className="space-y-2">
+                {/* Header Row */}
+                <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
+                  <div className="col-span-3">Artist</div>
+                  <div className="col-span-3">Title</div>
+                  <div className="col-span-2">Version</div>
+                  <div className="col-span-2">Label</div>
+                  <div className="col-span-1">Duration</div>
+                  <div className="col-span-1"></div>
+                </div>
+
+                {/* Track Rows */}
                 {tracks.map((track) => (
                   <div
                     key={track.id}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded hover:bg-gray-50"
+                    className="grid grid-cols-12 gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
                   >
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="flex-1">
-                        <div className="font-medium text-gray-900 text-sm">{track.title}</div>
-                        <div className="text-xs text-gray-500">
-                          {track.artist && <span>{track.artist}</span>}
-                          {track.artist && track.album && <span> • </span>}
-                          {track.album && <span>{track.album}</span>}
-                          {track.duration && (
-                            <span> • {formatDuration(track.duration)}</span>
-                          )}
-                        </div>
-                      </div>
+                    <div className="col-span-3 text-sm font-medium text-gray-900 truncate">
+                      {track.artist || '-'}
                     </div>
-                    <button
-                      onClick={() => handleDeleteTrack(track.id)}
-                      className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
-                    >
-                      Delete
-                    </button>
+                    <div className="col-span-3 text-sm text-gray-900 truncate">
+                      {track.title}
+                    </div>
+                    <div className="col-span-2 text-xs text-gray-600 truncate">
+                      {track.version || '-'}
+                    </div>
+                    <div className="col-span-2 text-xs text-gray-600 truncate">
+                      {track.label || '-'}
+                    </div>
+                    <div className="col-span-1 text-xs text-gray-600">
+                      {track.duration ? formatDuration(track.duration) : '-'}
+                    </div>
+                    <div className="col-span-1 text-right">
+                      <button
+                        onClick={() => handleDeleteTrack(track.id)}
+                        className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                      >
+                        Del
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -983,28 +983,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit0Function/MutationcreateTrackinit0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit1Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/11bb63caba792717108637f9afecc8cc6c70fada6805813725790c0ab0646000.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit1Function/MutationcreateTrackinit1Function.AppSyncFunction"
-   }
-  },
   "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
@@ -1092,12 +1070,6 @@
       {
        "Fn::GetAtt": [
         "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB",
         "FunctionId"
        ]
       },

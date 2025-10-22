@@ -1,0 +1,12 @@
+type Track @model @auth(rules: [{allow: private}])
+{
+  artist: String
+  title: String!
+  version: String
+  label: String
+  duration: Int
+  fileUrl: String
+  fileSize: Int
+  format: String
+  addedAt: AWSDateTime
+}
