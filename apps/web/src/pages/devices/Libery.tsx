@@ -555,9 +555,9 @@ function Libery() {
                   <div className="col-span-2">Artist</div>
                   <div className="col-span-2">Title</div>
                   <div className="col-span-2">Genre</div>
+                  <div className="col-span-1">Year</div>
                   <div className="col-span-1">Version</div>
                   <div className="col-span-2">Label</div>
-                  <div className="col-span-1">Duration</div>
                   <div className="col-span-1"></div>
                 </div>
 
@@ -590,14 +590,14 @@ function Libery() {
                     <div className="col-span-2 text-xs text-gray-600 truncate">
                       {(track as any).genre || '-'}
                     </div>
+                    <div className="col-span-1 text-xs text-gray-600">
+                      {(track as any).year || '-'}
+                    </div>
                     <div className="col-span-1 text-xs text-gray-600 truncate">
                       {track.version || '-'}
                     </div>
                     <div className="col-span-2 text-xs text-gray-600 truncate">
                       {track.label || '-'}
-                    </div>
-                    <div className="col-span-1 text-xs text-gray-600">
-                      {track.duration ? formatDuration(track.duration) : '-'}
                     </div>
                     <div className="col-span-1 text-right flex gap-1 justify-end">
                       <button
