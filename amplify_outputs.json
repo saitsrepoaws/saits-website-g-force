@@ -115,6 +115,13 @@
               "isRequired": false,
               "attributes": []
             },
+            "key": {
+              "name": "key",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "energy": {
               "name": "energy",
               "isArray": false,
@@ -124,6 +131,13 @@
             },
             "danceability": {
               "name": "danceability",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "valence": {
+              "name": "valence",
               "isArray": false,
               "type": "Float",
               "isRequired": false,

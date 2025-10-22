@@ -478,7 +478,7 @@ function Libery() {
               {/* Audio Features (Lambda Analysis) */}
               <div className="border-b pb-4">
                 <h4 className="text-sm font-semibold text-gray-700 mb-2">Audio Features 🎵</h4>
-                <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="grid grid-cols-3 gap-3 text-sm mb-3">
                   <div>
                     <span className="text-gray-500">BPM:</span>
                     <span className="ml-2 font-medium text-blue-600">
@@ -486,15 +486,29 @@ function Libery() {
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-500">Energy:</span>
-                    <span className="ml-2 font-medium text-green-600">
-                      {((selectedTrack as any).energy * 100).toFixed(0)}%
+                    <span className="text-gray-500">Key:</span>
+                    <span className="ml-2 font-medium text-indigo-600">
+                      {(selectedTrack as any).key || '-'}
                     </span>
                   </div>
+                  <div>
+                    <span className="text-gray-500">Energy:</span>
+                    <span className="ml-2 font-medium text-green-600">
+                      {(selectedTrack as any).energy ? `${((selectedTrack as any).energy * 100).toFixed(0)}%` : '-'}
+                    </span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <span className="text-gray-500">Danceability:</span>
                     <span className="ml-2 font-medium text-purple-600">
                       {(selectedTrack as any).danceability ? `${((selectedTrack as any).danceability * 100).toFixed(0)}%` : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Valence:</span>
+                    <span className="ml-2 font-medium text-pink-600">
+                      {(selectedTrack as any).valence ? `${((selectedTrack as any).valence * 100).toFixed(0)}%` : '-'}
                     </span>
                   </div>
                 </div>
