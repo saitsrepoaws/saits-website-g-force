@@ -226,6 +226,13 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "storage0EC3F24A",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -364,7 +371,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/578c410e68f84b642a735fc30a065e1696df124bda7a3e0fc96c7623e188a5d9.json"
+       "/2b91c08c463016a23c331ead8548a5a8e8d403645f9d36e7aec21a04c6b41cd7.json"
       ]
      ]
     }
@@ -426,7 +433,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/9a392fb04107c76f32de04f3da9082ab15d49291e0655d7dbded238a84c5eaf9.json"
+       "/fe06b18a9950483b3c996c5ff45ef96129200ec33aa90fd4eedcfa67368e5b3b.json"
       ]
      ]
     }
