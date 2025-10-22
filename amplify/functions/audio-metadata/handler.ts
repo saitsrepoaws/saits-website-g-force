@@ -1,4 +1,4 @@
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
 import * as fs from 'fs'
@@ -26,9 +26,12 @@ interface AudioMetadata {
   genre?: string
   
   // Audio Features (from Lambda 2)
-  bpm?: number | null
+  bpm?: number
   energy?: number | null
   danceability?: number | null
+  
+  // Cover Art
+  coverArtUrl?: string
   
   // Technical
   checksum: string
@@ -57,8 +60,8 @@ export const handler = async (event: any) => {
     // Download file from S3 to /tmp
     const localPath = await downloadFromS3(s3Key, bucketName)
     
-    // Extract metadata using ffprobe
-    const metadata = await extractMetadata(localPath)
+    // Extract metadata with cover art upload
+    const metadata = await extractMetadata(localPath, bucketName)
     
     // Cleanup
     fs.unlinkSync(localPath)
@@ -120,7 +123,7 @@ async function downloadFromS3(s3Key: string, bucketName?: string): Promise<strin
   return localPath
 }
 
-async function extractMetadata(filePath: string): Promise<AudioMetadata> {
+async function extractMetadata(filePath: string, bucketName?: string): Promise<AudioMetadata> {
   console.log(`Extracting metadata from ${filePath}`)
   
   // Use music-metadata to parse audio file
@@ -135,11 +138,8 @@ async function extractMetadata(filePath: string): Promise<AudioMetadata> {
   hash.update(fileBuffer)
   const checksum = hash.digest('hex')
   
-  // Extract BPM from metadata if available
-  let bpm: number | null = null
-  if (metadata.common.bpm) {
-    bpm = metadata.common.bpm
-  }
+  // Extract BPM from metadata if available, default to 0
+  let bpm: number = metadata.common.bpm || 0
   
   // Estimate energy based on bitrate (higher bitrate = potentially more energy)
   const bitrate = metadata.format.bitrate || 0
@@ -151,6 +151,34 @@ async function extractMetadata(filePath: string): Promise<AudioMetadata> {
     danceability = 0.85 // High danceability for typical techno/house BPM
   } else if (bpm) {
     danceability = 0.6
+  }
+  
+  // Extract and upload cover art if available
+  let coverArtUrl: string | undefined
+  if (metadata.common.picture && metadata.common.picture.length > 0) {
+    const picture = metadata.common.picture[0]
+    const bucket = bucketName || process.env.STORAGE_BUCKET_NAME
+    
+    if (bucket) {
+      // Generate unique filename for cover art
+      const coverFileName = `${checksum}.${picture.format || 'jpg'}`
+      const coverKey = `public/covers/${coverFileName}`
+      
+      try {
+        // Upload cover art to S3
+        await s3Client.send(new PutObjectCommand({
+          Bucket: bucket,
+          Key: coverKey,
+          Body: picture.data,
+          ContentType: `image/${picture.format || 'jpeg'}`,
+        }))
+        
+        coverArtUrl = coverKey
+        console.log(`Uploaded cover art to ${coverKey}`)
+      } catch (error) {
+        console.error('Failed to upload cover art:', error)
+      }
+    }
   }
   
   const result: AudioMetadata = {
@@ -174,6 +202,9 @@ async function extractMetadata(filePath: string): Promise<AudioMetadata> {
     bpm,
     energy,
     danceability,
+    
+    // Cover Art
+    coverArtUrl,
     
     // Technical
     checksum: `md5:${checksum}`,

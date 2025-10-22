@@ -21,8 +21,9 @@ export const backend = defineBackend({
 const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
 
-// Grant Lambda permission to read from S3
+// Grant Lambda permission to read from S3 and write cover art
 storageBucket.grantRead(metadataLambda)
+storageBucket.grantPut(metadataLambda)
 
 // Add environment variable for bucket name
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
