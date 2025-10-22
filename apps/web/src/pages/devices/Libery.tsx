@@ -178,13 +178,37 @@ function Libery() {
           setTimeout(async () => {
             try {
               // Reload tracks to get Lambda-extracted features
+              console.log('🔄 Reloading tracks after Lambda processing...')
               const updated = await listTracks()
+              console.log('📊 Reload result:', updated)
               if (updated.data) {
+                console.log(`🎵 Got ${updated.data.length} tracks from DB`)
                 setTracks(updated.data)
-                console.log('🎵 Track list updated with Lambda features')
+                
+                // Load cover art URLs
+                const urls: Record<string, string> = {}
+                await Promise.all(
+                  updated.data.map(async (track: any) => {
+                    if (track.coverArtUrl) {
+                      try {
+                        const result = await getUrl({
+                          path: track.coverArtUrl,
+                          options: { expiresIn: 3600 },
+                        })
+                        urls[track.id] = result.url.toString()
+                      } catch (error) {
+                        console.error(`Failed to load cover art for ${track.id}:`, error)
+                      }
+                    }
+                  })
+                )
+                setCoverArtUrls(urls)
+                console.log('✅ Track list and cover art updated!')
+              } else {
+                console.warn('⚠️ No data returned from listTracks')
               }
             } catch (error) {
-              console.error('Failed to reload tracks after Lambda processing:', error)
+              console.error('❌ Failed to reload tracks after Lambda processing:', error)
             } finally {
               setIsProcessing(false)
             }
@@ -419,9 +443,9 @@ function Libery() {
             {/* Track List */}
             {isLoadingTracks ? (
               <div className="text-center py-8 text-gray-500">Loading tracks...</div>
-            ) : tracks.length === 0 && !isProcessing ? (
+            ) : tracks.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                No tracks yet. Add your first track!
+                {isProcessing ? 'Processing track...' : 'No tracks yet. Add your first track!'}
               </div>
             ) : (
               <div className="space-y-2">
