@@ -13,6 +13,8 @@ function getClient() {
     // @ts-ignore - Amplify Gen 2 client will have models at runtime
     client = generateClient()
     console.log('[Tracks] Client generated:', client)
+    console.log('[Tracks] Client.models:', client.models)
+    console.log('[Tracks] Available models:', Object.keys(client.models || {}))
   }
   return client
 }
