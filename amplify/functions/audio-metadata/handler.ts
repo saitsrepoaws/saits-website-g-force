@@ -1,12 +1,11 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
+import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
-import { promisify } from 'util'
-import { exec } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import * as crypto from 'crypto'
 
-const execAsync = promisify(exec)
 const s3Client = new S3Client({})
 
 interface AudioMetadata {
@@ -119,49 +118,40 @@ async function downloadFromS3(s3Key: string, bucketName?: string): Promise<strin
 async function extractMetadata(filePath: string): Promise<AudioMetadata> {
   console.log(`Extracting metadata from ${filePath}`)
   
-  // Use ffprobe to get metadata
-  const command = `ffprobe -v quiet -print_format json -show_format -show_streams "${filePath}"`
+  // Use music-metadata to parse audio file
+  const metadata = await parseFile(filePath)
   
-  const { stdout } = await execAsync(command)
-  const data = JSON.parse(stdout)
+  // Get file stats
+  const stats = fs.statSync(filePath)
   
-  const format = data.format
-  const audioStream = data.streams.find((s: any) => s.codec_type === 'audio')
+  // Calculate MD5 checksum
+  const fileBuffer = fs.readFileSync(filePath)
+  const hash = crypto.createHash('md5')
+  hash.update(fileBuffer)
+  const checksum = hash.digest('hex')
   
-  if (!audioStream) {
-    throw new Error('No audio stream found in file')
-  }
-  
-  // Extract ID3 tags
-  const tags = format.tags || {}
-  
-  // Calculate checksum
-  const checksumCommand = `md5sum "${filePath}" | awk '{print $1}'`
-  const { stdout: checksumOutput } = await execAsync(checksumCommand)
-  const checksum = checksumOutput.trim()
-  
-  const metadata: AudioMetadata = {
+  const result: AudioMetadata = {
     // File Info
-    duration: parseFloat(format.duration) || 0,
-    fileSize: parseInt(format.size) || 0,
-    format: format.format_name || 'unknown',
-    bitrate: parseInt(format.bit_rate) || 0,
-    sampleRate: parseInt(audioStream.sample_rate) || 0,
-    channels: audioStream.channels || 0,
-    codec: audioStream.codec_name || 'unknown',
+    duration: metadata.format.duration || 0,
+    fileSize: stats.size,
+    format: metadata.format.container || 'unknown',
+    bitrate: metadata.format.bitrate || 0,
+    sampleRate: metadata.format.sampleRate || 0,
+    channels: metadata.format.numberOfChannels || 0,
+    codec: metadata.format.codec || 'unknown',
     
-    // ID3 Tags (case-insensitive)
-    artist: tags.artist || tags.ARTIST || tags.Artist,
-    title: tags.title || tags.TITLE || tags.Title,
-    album: tags.album || tags.ALBUM || tags.Album,
-    year: tags.date ? parseInt(tags.date.substring(0, 4)) : undefined,
-    genre: tags.genre || tags.GENRE || tags.Genre,
+    // ID3 Tags
+    artist: metadata.common.artist,
+    title: metadata.common.title,
+    album: metadata.common.album,
+    year: metadata.common.year,
+    genre: metadata.common.genre?.[0],
     
     // Technical
     checksum: `md5:${checksum}`,
     analyzedAt: new Date().toISOString(),
   }
   
-  console.log('Extracted metadata:', metadata)
-  return metadata
+  console.log('Extracted metadata:', result)
+  return result
 }

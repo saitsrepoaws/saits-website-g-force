@@ -30,6 +30,10 @@ function Libery() {
   // Multi-file upload state
   const [uploadQueue, setUploadQueue] = useState<FileUploadItem[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  
+  // Track info modal
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  const [showTrackInfo, setShowTrackInfo] = useState(false)
 
   // Load tracks from database
   useEffect(() => {
@@ -362,12 +366,23 @@ function Libery() {
                     <div className="col-span-1 text-xs text-gray-600">
                       {track.duration ? formatDuration(track.duration) : '-'}
                     </div>
-                    <div className="col-span-1 text-right">
+                    <div className="col-span-1 text-right flex gap-1 justify-end">
+                      <button
+                        onClick={() => {
+                          setSelectedTrack(track)
+                          setShowTrackInfo(true)
+                        }}
+                        className="px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded"
+                        title="Track Info"
+                      >
+                        ℹ️
+                      </button>
                       <button
                         onClick={() => handleDeleteTrack(track.id)}
                         className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                        title="Delete Track"
                       >
-                        Del
+                        🗑️
                       </button>
                     </div>
                   </div>
@@ -376,6 +391,108 @@ function Libery() {
             )}
           </div>
       </div>
+
+      {/* Track Info Modal */}
+      {showTrackInfo && selectedTrack && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowTrackInfo(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-gray-900">Track Information</h3>
+              <button
+                onClick={() => setShowTrackInfo(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Basic Info */}
+              <div className="border-b pb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Basic Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Artist:</span>
+                    <span className="ml-2 font-medium">{selectedTrack.artist || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Title:</span>
+                    <span className="ml-2 font-medium">{selectedTrack.title}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Version:</span>
+                    <span className="ml-2 font-medium">{selectedTrack.version || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Label:</span>
+                    <span className="ml-2 font-medium">{selectedTrack.label || '-'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* File Info */}
+              <div className="border-b pb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">File Information</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">Duration:</span>
+                    <span className="ml-2 font-medium">
+                      {selectedTrack.duration ? formatDuration(selectedTrack.duration) : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Format:</span>
+                    <span className="ml-2 font-medium">{selectedTrack.format || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">File Size:</span>
+                    <span className="ml-2 font-medium">
+                      {selectedTrack.fileSize ? formatFileSize(selectedTrack.fileSize) : '-'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Added:</span>
+                    <span className="ml-2 font-medium">
+                      {selectedTrack.addedAt ? new Date(selectedTrack.addedAt).toLocaleString() : '-'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Technical Details */}
+              <div className="border-b pb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Technical Details</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">File URL:</span>
+                    <span className="ml-2 font-mono text-xs break-all">{selectedTrack.fileUrl || '-'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* IDs */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Identifiers</h4>
+                <div className="text-sm">
+                  <div>
+                    <span className="text-gray-500">Track ID:</span>
+                    <span className="ml-2 font-mono text-xs">{selectedTrack.id}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowTrackInfo(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }
