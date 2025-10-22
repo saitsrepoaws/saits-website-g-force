@@ -134,8 +134,21 @@ function Libery() {
   }
 
   const handleDeleteTrack = async (id: string) => {
-    await deleteTrack(id)
-    setTracks(tracks.filter((t) => t.id !== id))
+    if (!confirm('Are you sure you want to delete this track?')) return
+    
+    try {
+      const result = await deleteTrack(id)
+      if (result.data || !result.errors) {
+        setTracks(tracks.filter((t) => t.id !== id))
+        console.log('Track deleted successfully')
+      } else {
+        console.error('Failed to delete track:', result.errors)
+        alert('Failed to delete track. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error deleting track:', error)
+      alert('Failed to delete track. Please try again.')
+    }
   }
 
   const formatDuration = (seconds: number) => {
