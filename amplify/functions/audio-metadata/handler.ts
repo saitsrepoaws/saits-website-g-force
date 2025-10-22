@@ -2,6 +2,7 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
 import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
 import * as fs from 'fs'
@@ -11,6 +12,7 @@ import * as crypto from 'crypto'
 
 const s3Client = new S3Client({})
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+const lambdaClient = new LambdaClient({})
 
 interface AudioMetadata {
   // File Info
@@ -81,6 +83,15 @@ export const handler = async (event: any) => {
     } catch (error) {
       console.error('Failed to update track in database:', error)
       // Don't fail the whole Lambda if DB update fails
+    }
+    
+    // Invoke Lambda 3 (waveform generator) asynchronously
+    try {
+      await invokeLambda3(event)
+      console.log('Lambda 3 (waveform) invoked successfully')
+    } catch (error) {
+      console.error('Failed to invoke Lambda 3:', error)
+      // Don't fail if waveform generation fails
     }
     
     return {
@@ -342,4 +353,25 @@ function estimateValence(genre?: string): number | null {
   }
   
   return 0.5 // Neutral
+}
+
+async function invokeLambda3(event: any) {
+  const waveformFunctionName = process.env.WAVEFORM_LAMBDA_NAME
+  
+  if (!waveformFunctionName) {
+    console.log('WAVEFORM_LAMBDA_NAME not set, skipping waveform generation')
+    return
+  }
+  
+  console.log(`Invoking Lambda 3: ${waveformFunctionName}`)
+  
+  // Invoke asynchronously (Event type) - don't wait for response
+  const command = new InvokeCommand({
+    FunctionName: waveformFunctionName,
+    InvocationType: 'Event', // Async invocation
+    Payload: JSON.stringify(event), // Pass same S3 event
+  })
+  
+  await lambdaClient.send(command)
+  console.log('Lambda 3 invocation request sent (async)')
 }

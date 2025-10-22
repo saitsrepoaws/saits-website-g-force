@@ -37,9 +37,13 @@ trackTable.grantReadWriteData(waveformLambda)
 storageBucket.grantRead(waveformLambda)
 storageBucket.grantPut(waveformLambda)
 
+// Grant Lambda 1 permission to invoke Lambda 3
+waveformLambda.grantInvoke(metadataLambda)
+
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.audioMetadata.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+backend.audioMetadata.addEnvironment('WAVEFORM_LAMBDA_NAME', waveformLambda.functionName)
 
 backend.waveformGenerator.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
