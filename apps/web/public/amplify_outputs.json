@@ -80,6 +80,13 @@
               "isRequired": false,
               "attributes": []
             },
+            "year": {
+              "name": "year",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
             "duration": {
               "name": "duration",
               "isArray": false,

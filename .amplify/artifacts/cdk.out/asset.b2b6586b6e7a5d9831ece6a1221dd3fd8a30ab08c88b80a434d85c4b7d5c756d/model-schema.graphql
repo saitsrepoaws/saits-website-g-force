@@ -1,0 +1,24 @@
+type Track @model @auth(rules: [{allow: private}])
+{
+  artist: String
+  title: String!
+  version: String
+  label: String
+  genre: String
+  year: Int
+  duration: Int
+  fileUrl: String
+  fileSize: Int
+  format: String
+  addedAt: AWSDateTime
+  bpm: Int
+  key: String
+  energy: Float
+  danceability: Float
+  valence: Float
+  coverArtUrl: String
+  waveformUrl: String
+  peaks: String
+  trimStart: Float
+  trimEnd: Float
+}
