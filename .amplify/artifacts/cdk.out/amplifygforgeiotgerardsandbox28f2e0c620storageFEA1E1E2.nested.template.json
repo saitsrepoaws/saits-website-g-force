@@ -754,6 +754,32 @@
          "Ref": "AWS::NoValue"
         }
        ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "waveformgeneratorlambdaD07307E8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "waveformgeneratorlambdaD07307E8",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -781,7 +807,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "5eb95d7d749dd154578874d2d9930443fb2475906ba09d0188bd816fff258178.zip"
+     "S3Key": "f8f6972cf3b6d91b7d525d026987339f62bbff1cfcd911af92cb776a58f4bfbc.zip"
     },
     "Environment": {
      "Variables": {
@@ -811,6 +837,9 @@
          ]
         }
        ]
+      },
+      "WAVEFORM_LAMBDA_NAME": {
+       "Ref": "waveformgeneratorlambdaD07307E8"
       }
      }
     },
@@ -850,7 +879,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/Resource",
-    "aws:asset:path": "asset.5eb95d7d749dd154578874d2d9930443fb2475906ba09d0188bd816fff258178",
+    "aws:asset:path": "asset.f8f6972cf3b6d91b7d525d026987339f62bbff1cfcd911af92cb776a58f4bfbc",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

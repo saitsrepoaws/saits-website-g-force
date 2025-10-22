@@ -84,4 +84,5 @@ type LambdaProvidedEnvVars = {
 type AmplifyBackendEnvVars = {
   STORAGE_BUCKET_NAME: string;
   TRACK_TABLE_NAME: string;
+  WAVEFORM_LAMBDA_NAME: string;
 };
