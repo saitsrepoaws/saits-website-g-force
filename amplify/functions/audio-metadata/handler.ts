@@ -1,4 +1,6 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
 import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
 import * as fs from 'fs'
@@ -7,6 +9,7 @@ import * as os from 'os'
 import * as crypto from 'crypto'
 
 const s3Client = new S3Client({})
+const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 interface AudioMetadata {
   // File Info
@@ -68,8 +71,14 @@ export const handler = async (event: any) => {
     
     console.log('Metadata extraction successful:', metadata)
     
-    // TODO: Update track in DynamoDB with extracted metadata
-    // For now, just return the metadata - frontend will poll for updates
+    // Update track in DynamoDB with extracted metadata
+    try {
+      await updateTrackInDatabase(s3Key, metadata)
+      console.log('Track updated in database successfully')
+    } catch (error) {
+      console.error('Failed to update track in database:', error)
+      // Don't fail the whole Lambda if DB update fails
+    }
     
     return {
       s3Key,
@@ -216,4 +225,50 @@ async function extractMetadata(filePath: string, bucketName?: string): Promise<A
   
   console.log('Extracted metadata with features:', result)
   return result
+}
+
+async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
+  const tableName = process.env.TRACK_TABLE_NAME
+  
+  if (!tableName) {
+    throw new Error('TRACK_TABLE_NAME environment variable not set')
+  }
+  
+  console.log(`Finding track with fileUrl containing: ${s3Key}`)
+  
+  // Find track by fileUrl (contains s3Key)
+  const scanResult = await dynamoClient.send(new ScanCommand({
+    TableName: tableName,
+    FilterExpression: 'contains(fileUrl, :s3Key)',
+    ExpressionAttributeValues: {
+      ':s3Key': s3Key,
+    },
+  }))
+  
+  if (!scanResult.Items || scanResult.Items.length === 0) {
+    console.log('No track found with matching fileUrl')
+    return
+  }
+  
+  const track = scanResult.Items[0]
+  console.log(`Found track: ${track.id} - ${track.title}`)
+  
+  // Update track with metadata
+  await dynamoClient.send(new UpdateCommand({
+    TableName: tableName,
+    Key: { id: track.id },
+    UpdateExpression: 'SET bpm = :bpm, energy = :energy, danceability = :danceability, coverArtUrl = :coverArtUrl, #dur = :duration',
+    ExpressionAttributeNames: {
+      '#dur': 'duration', // 'duration' might be a reserved word
+    },
+    ExpressionAttributeValues: {
+      ':bpm': metadata.bpm || 0,
+      ':energy': metadata.energy,
+      ':danceability': metadata.danceability,
+      ':coverArtUrl': metadata.coverArtUrl,
+      ':duration': Math.floor(metadata.duration), // Convert to integer
+    },
+  }))
+  
+  console.log('Track updated with audio features')
 }

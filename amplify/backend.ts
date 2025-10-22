@@ -20,13 +20,18 @@ export const backend = defineBackend({
 // Configure Lambda to trigger on S3 uploads
 const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
+const trackTable = backend.data.resources.tables['Track']
 
 // Grant Lambda permission to read from S3 and write cover art
 storageBucket.grantRead(metadataLambda)
 storageBucket.grantPut(metadataLambda)
 
-// Add environment variable for bucket name
+// Grant Lambda permission to read/write DynamoDB Track table
+trackTable.grantReadWriteData(metadataLambda)
+
+// Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
+backend.audioMetadata.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 
 // Add S3 notification to trigger Lambda on audio file uploads
 storageBucket.addEventNotification(
