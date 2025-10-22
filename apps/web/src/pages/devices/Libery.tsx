@@ -36,6 +36,7 @@ function Libery() {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfo, setShowTrackInfo] = useState(false)
   const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
+  const [coverArtUrls, setCoverArtUrls] = useState<Record<string, string>>({})
 
   // Load tracks from database
   useEffect(() => {
@@ -80,6 +81,26 @@ function Libery() {
       valence: data[0].valence
     } : 'No tracks')
     setTracks(data)
+    
+    // Load cover art URLs for all tracks
+    const urls: Record<string, string> = {}
+    await Promise.all(
+      data.map(async (track: any) => {
+        if (track.coverArtUrl) {
+          try {
+            const result = await getUrl({
+              path: (track as any).coverArtUrl,
+              options: { expiresIn: 3600 },
+            })
+            urls[track.id] = result.url.toString()
+          } catch (error) {
+            console.error(`Failed to load cover art for ${track.id}:`, error)
+          }
+        }
+      })
+    )
+    setCoverArtUrls(urls)
+    
     setIsLoadingTracks(false)
   }
 
@@ -389,7 +410,8 @@ function Libery() {
               <div className="space-y-2">
                 {/* Header Row */}
                 <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
-                  <div className="col-span-3">Artist</div>
+                  <div className="col-span-1"></div>
+                  <div className="col-span-2">Artist</div>
                   <div className="col-span-3">Title</div>
                   <div className="col-span-2">Version</div>
                   <div className="col-span-2">Label</div>
@@ -403,7 +425,21 @@ function Libery() {
                     key={track.id}
                     className="grid grid-cols-12 gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
                   >
-                    <div className="col-span-3 text-sm font-medium text-gray-900 truncate">
+                    {/* Cover Art */}
+                    <div className="col-span-1">
+                      {coverArtUrls[track.id] ? (
+                        <img
+                          src={coverArtUrls[track.id]}
+                          alt={track.title}
+                          className="w-12 h-12 object-cover rounded shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                          <span className="text-gray-400 text-xs">🎵</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-span-2 text-sm font-medium text-gray-900 truncate">
                       {track.artist || '-'}
                     </div>
                     <div className="col-span-3 text-sm text-gray-900 truncate">
