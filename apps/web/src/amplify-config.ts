@@ -15,10 +15,16 @@ export async function configureAmplify(): Promise<{ configured: boolean }> {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const outputs = await res.json()
 
-    // Normalize Gen 2 outputs to Amplify JS v6 category shape (Auth)
+    // Normalize Gen 2 outputs to Amplify JS v6 category shape
     const auth = outputs?.auth
-    const authConfig = auth ? {
-      Auth: {
+    const data = outputs?.data
+    const storage = outputs?.storage
+
+    const config: any = {}
+
+    // Auth configuration
+    if (auth) {
+      config.Auth = {
         Cognito: {
           userPoolId: auth.user_pool_id,
           userPoolClientId: auth.user_pool_client_id,
@@ -28,13 +34,35 @@ export async function configureAmplify(): Promise<{ configured: boolean }> {
           loginWith: { email: (auth.username_attributes || []).includes('email') }
         }
       }
-    } : {}
+    }
 
-    // Configure Auth only - PubSub is instantiated directly in pubsub.ts
+    // Data (GraphQL API) configuration
+    if (data) {
+      config.API = {
+        GraphQL: {
+          endpoint: data.url,
+          region: data.aws_region,
+          defaultAuthMode: data.default_authorization_type || 'userPool'
+        }
+      }
+    }
+
+    // Storage (S3) configuration
+    if (storage) {
+      config.Storage = {
+        S3: {
+          bucket: storage.bucket_name,
+          region: storage.aws_region
+        }
+      }
+    }
+
+    // Configure Amplify with all resources
     try {
-      Amplify.configure(authConfig)
+      Amplify.configure(config)
+      console.log('[Amplify] Configured successfully with Auth, Data, and Storage')
     } catch (configErr) {
-      console.error('[Amplify] configure() failed with config:', authConfig, configErr)
+      console.error('[Amplify] configure() failed with config:', config, configErr)
       throw configErr
     }
     return { configured: true }
