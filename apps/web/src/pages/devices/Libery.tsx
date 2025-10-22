@@ -43,6 +43,14 @@ function Libery() {
   const loadTracksFromDB = async () => {
     setIsLoadingTracks(true)
     const { data } = await listTracks()
+    console.log('📊 Loaded tracks from DB:', data)
+    console.log('📊 First track audio features:', data[0] ? {
+      bpm: data[0].bpm,
+      key: data[0].key,
+      energy: data[0].energy,
+      danceability: data[0].danceability,
+      valence: data[0].valence
+    } : 'No tracks')
     setTracks(data)
     setIsLoadingTracks(false)
   }
@@ -385,6 +393,14 @@ function Libery() {
                     <div className="col-span-1 text-right flex gap-1 justify-end">
                       <button
                         onClick={() => {
+                          console.log('🎵 Opening track info for:', track.title)
+                          console.log('🎵 Track audio features:', {
+                            bpm: track.bpm,
+                            key: (track as any).key,
+                            energy: (track as any).energy,
+                            danceability: (track as any).danceability,
+                            valence: (track as any).valence
+                          })
                           setSelectedTrack(track)
                           setShowTrackInfo(true)
                         }}
