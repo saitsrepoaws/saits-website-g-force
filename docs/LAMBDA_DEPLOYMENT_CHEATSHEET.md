@@ -228,6 +228,9 @@ npm list
 8. **DynamoDB Access**: Use `backend.data.resources.tables['ModelName']`
 9. **Environment Variables**: Set AFTER `defineBackend()`
 10. **Permissions**: Grant before adding triggers
+11. **Reserved Words**: DynamoDB has reserved keywords (`key`, `duration`, `data`, etc.) - use `ExpressionAttributeNames`
+12. **GraphQL Schema Sync**: Always re-deploy after schema changes or frontend gets `undefined`
+13. **Frontend Timing**: Lambda takes 500-1000ms - add polling delay or use subscriptions
 
 ## 🎨 Complete Working Example
 
