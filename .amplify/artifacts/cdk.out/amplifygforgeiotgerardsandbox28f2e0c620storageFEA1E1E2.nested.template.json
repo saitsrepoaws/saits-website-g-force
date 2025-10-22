@@ -1045,7 +1045,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "b04ecd650ab44e1d33d0d67be35ec72426e8bcf0b70e6a72ef7604fa04e4b003.zip"
+     "S3Key": "55539cbf6bfbd2b169b1e193af57f2f4d76c6f64deac970a5e9b37ce3ec98f1e.zip"
     },
     "Environment": {
      "Variables": {
@@ -1114,7 +1114,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/waveform-generator-lambda/Resource",
-    "aws:asset:path": "asset.b04ecd650ab44e1d33d0d67be35ec72426e8bcf0b70e6a72ef7604fa04e4b003",
+    "aws:asset:path": "asset.55539cbf6bfbd2b169b1e193af57f2f4d76c6f64deac970a5e9b37ce3ec98f1e",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

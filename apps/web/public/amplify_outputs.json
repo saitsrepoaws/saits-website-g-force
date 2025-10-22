@@ -164,6 +164,20 @@
               "isRequired": false,
               "attributes": []
             },
+            "trimStart": {
+              "name": "trimStart",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "trimEnd": {
+              "name": "trimEnd",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
             "createdAt": {
               "name": "createdAt",
               "isArray": false,
