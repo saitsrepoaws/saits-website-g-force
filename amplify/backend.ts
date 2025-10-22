@@ -1,10 +1,12 @@
 import { defineBackend } from '@aws-amplify/backend'
 import { auth } from './auth/resource'
+import { data } from './data/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
   auth,
+  data,
 })
 
 // Add IoT policy to authenticated role for PubSub access

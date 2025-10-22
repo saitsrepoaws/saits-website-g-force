@@ -1,0 +1,20 @@
+type Track @model @auth(rules: [{allow: private}])
+{
+  title: String!
+  artist: String
+  album: String
+  duration: Int
+  fileUrl: String
+  fileSize: Int
+  format: String
+  bitrate: Int
+  sampleRate: Int
+  genre: String
+  year: Int
+  coverArtUrl: String
+  addedAt: AWSDateTime
+  lastPlayedAt: AWSDateTime
+  playCount: Int @default(value: "0")
+  tags: [String]
+  metadata: AWSJSON
+}
