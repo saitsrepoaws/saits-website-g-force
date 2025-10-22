@@ -8,6 +8,7 @@ import {
   formatFileSize,
   type UploadProgress 
 } from '../../services/audioUpload'
+import { getUrl } from 'aws-amplify/storage'
 import { parseFilename } from '../../services/filenameParser'
 
 interface FileUploadItem {
@@ -34,11 +35,38 @@ function Libery() {
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfo, setShowTrackInfo] = useState(false)
+  const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
 
   // Load tracks from database
   useEffect(() => {
     loadTracksFromDB()
   }, [])
+
+  // Load waveform URL when modal opens
+  useEffect(() => {
+    const loadWaveformUrl = async () => {
+      if (selectedTrack && (selectedTrack as any).waveformUrl) {
+        try {
+          const result = await getUrl({
+            path: (selectedTrack as any).waveformUrl,
+            options: {
+              expiresIn: 3600, // 1 hour
+            },
+          })
+          setWaveformUrl(result.url.toString())
+        } catch (error) {
+          console.error('Failed to load waveform URL:', error)
+          setWaveformUrl(null)
+        }
+      } else {
+        setWaveformUrl(null)
+      }
+    }
+
+    if (showTrackInfo) {
+      loadWaveformUrl()
+    }
+  }, [showTrackInfo, selectedTrack])
 
   const loadTracksFromDB = async () => {
     setIsLoadingTracks(true)
@@ -531,15 +559,26 @@ function Libery() {
               </div>
 
               {/* Waveform */}
-              {(selectedTrack as any).waveformUrl && (
+              {waveformUrl && (
                 <div className="border-b pb-4">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2">Waveform 🌊</h4>
                   <div className="bg-gray-900 p-2 rounded">
                     <img 
-                      src={(selectedTrack as any).waveformUrl} 
+                      src={waveformUrl} 
                       alt="Waveform" 
                       className="w-full h-24 object-contain"
                     />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    200 sample points • SVG format
+                  </p>
+                </div>
+              )}
+              {(selectedTrack as any).waveformUrl && !waveformUrl && (
+                <div className="border-b pb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Waveform 🌊</h4>
+                  <div className="bg-gray-100 p-4 rounded text-center">
+                    <p className="text-sm text-gray-500">Loading waveform...</p>
                   </div>
                 </div>
               )}
