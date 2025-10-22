@@ -27,7 +27,15 @@ export async function listTracks() {
     // @ts-ignore - Track model exists at runtime
     const { data, errors } = await getClient().models.Track.list()
     if (errors) {
-      console.error('Error listing tracks:', errors)
+      console.error('❌ GraphQL Errors listing tracks:', errors)
+      errors.forEach((err: any, i: number) => {
+        console.error(`  Error ${i + 1}:`, {
+          message: err.message,
+          path: err.path,
+          errorType: err.errorType,
+          errorInfo: err.errorInfo,
+        })
+      })
       return { data: [], errors }
     }
     return { data: data || [], errors: null }
