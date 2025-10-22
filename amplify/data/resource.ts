@@ -23,6 +23,10 @@ const schema = a.schema({
       danceability: a.float(), // Danceability 0-1
       valence: a.float(), // Musical positiveness 0-1
       coverArtUrl: a.string(), // S3 path to cover art
+      
+      // Waveform (from Lambda 3)
+      waveformUrl: a.string(), // S3 path to waveform PNG
+      peaks: a.string(), // JSON array of peak values for visualization
     })
     .authorization((allow) => [allow.authenticated()]),
 })

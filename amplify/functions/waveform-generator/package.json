@@ -1,0 +1,19 @@
+{
+  "name": "waveform-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.914.0",
+    "@aws-sdk/client-s3": "^3.914.0",
+    "@aws-sdk/lib-dynamodb": "^3.914.0",
+    "music-metadata": "^11.9.0",
+    "sharp": "^0.34.4"
+  }
+}

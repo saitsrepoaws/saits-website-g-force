@@ -3,6 +3,7 @@ import { auth } from './auth/resource'
 import { data } from './data/resource'
 import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
+import { waveformGenerator } from './functions/waveform-generator/resource'
 // import { audioFeatures } from './functions/audio-features/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
@@ -14,12 +15,14 @@ export const backend = defineBackend({
   data,
   storage,
   audioMetadata,
+  waveformGenerator,
   // audioFeatures, // TODO: Combine with metadata or use SNS fanout
 })
 
-// Configure Lambda to trigger on S3 uploads
+// Configure Lambdas to trigger on S3 uploads
 const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
+const waveformLambda = backend.waveformGenerator.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
 
 // Grant Lambda permission to read from S3 and write cover art
@@ -28,10 +31,18 @@ storageBucket.grantPut(metadataLambda)
 
 // Grant Lambda permission to read/write DynamoDB Track table
 trackTable.grantReadWriteData(metadataLambda)
+trackTable.grantReadWriteData(waveformLambda)
+
+// Grant waveform Lambda S3 permissions
+storageBucket.grantRead(waveformLambda)
+storageBucket.grantPut(waveformLambda)
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.audioMetadata.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+
+backend.waveformGenerator.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
+backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 
 // Add S3 notification to trigger Lambda on audio file uploads
 storageBucket.addEventNotification(
