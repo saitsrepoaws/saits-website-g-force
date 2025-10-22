@@ -6,6 +6,12 @@ import './index.css'
 import './styles/theme.css'
 import App from './App.tsx'
 import IotTestPage from './pages/IotTestPage'
+import DeviceManagement from './pages/DeviceManagement'
+import Libery from './pages/devices/Libery'
+import Playlist from './pages/devices/Playlist'
+import Players from './pages/devices/Players'
+import Planner from './pages/devices/Planner'
+import AudioSettings from './pages/devices/AudioSettings'
 import { configureAmplify } from './amplify-config'
 import Login from './pages/Login'
 import AuthGate from './routes/AuthGate'
@@ -25,6 +31,54 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <IotTestPage />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices', 
+    element: (
+      <AuthGate>
+        <DeviceManagement />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/libery', 
+    element: (
+      <AuthGate>
+        <Libery />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/playlist', 
+    element: (
+      <AuthGate>
+        <Playlist />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/players', 
+    element: (
+      <AuthGate>
+        <Players />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/planner', 
+    element: (
+      <AuthGate>
+        <Planner />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/audio-settings', 
+    element: (
+      <AuthGate>
+        <AudioSettings />
       </AuthGate>
     )
   },
