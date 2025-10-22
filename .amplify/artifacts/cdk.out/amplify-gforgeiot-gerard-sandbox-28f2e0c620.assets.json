@@ -435,16 +435,30 @@
         }
       }
     },
-    "39253fb14b63bf2a6ab1d47d2678552d7df669e75cf6aa0def0990bd79cbc8d1": {
+    "e3da49c8d27733641893f15162842e7b6384eb4653777dc202311b658e2a8e9f": {
+      "displayName": "storage Nested Stack Template",
+      "source": {
+        "path": "amplifygforgeiotgerardsandbox28f2e0c620storageFEA1E1E2.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region-ee2d9a2a": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "e3da49c8d27733641893f15162842e7b6384eb4653777dc202311b658e2a8e9f.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "ce507deefe85f1d0c3287e08b34061294e524326c6f85967f302af77db686caa": {
       "displayName": "amplify-gforgeiot-gerard-sandbox-28f2e0c620 Template",
       "source": {
         "path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "current_account-current_region-2a19487c": {
+        "current_account-current_region-ff99c2ab": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "39253fb14b63bf2a6ab1d47d2678552d7df669e75cf6aa0def0990bd79cbc8d1.json",
+          "objectKey": "ce507deefe85f1d0c3287e08b34061294e524326c6f85967f302af77db686caa.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

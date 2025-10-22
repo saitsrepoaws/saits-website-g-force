@@ -217,5 +217,34 @@
       "nonModels": {}
     }
   },
+  "storage": {
+    "aws_region": "eu-west-1",
+    "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-rzbnwdrzhtzq",
+    "buckets": [
+      {
+        "name": "gforgeIotStorage",
+        "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-rzbnwdrzhtzq",
+        "aws_region": "eu-west-1",
+        "paths": {
+          "audio/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ]
+          },
+          "covers/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ]
+          }
+        }
+      }
+    ]
+  },
   "version": "1.4"
 }
