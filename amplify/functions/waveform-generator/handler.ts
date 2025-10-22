@@ -7,7 +7,7 @@ import { Readable } from 'stream'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import sharp from 'sharp'
+// import sharp from 'sharp' // Removed: requires platform-specific binary
 
 const s3Client = new S3Client({})
 const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
@@ -162,29 +162,26 @@ async function createWaveformImage(peaks: number[], duration: number): Promise<s
   
   svg += '</svg>'
   
-  // Convert SVG to PNG using Sharp
-  const outputPath = path.join(os.tmpdir(), `waveform-${Date.now()}.png`)
+  // Save SVG directly (no PNG conversion needed)
+  const outputPath = path.join(os.tmpdir(), `waveform-${Date.now()}.svg`)
+  fs.writeFileSync(outputPath, svg)
   
-  await sharp(Buffer.from(svg))
-    .png()
-    .toFile(outputPath)
-  
-  console.log(`Created waveform image: ${outputPath}`)
+  console.log(`Created waveform SVG: ${outputPath}`)
   return outputPath
 }
 
 async function uploadWaveformToS3(imagePath: string, bucketName: string, originalS3Key: string): Promise<string> {
-  const imageBuffer = fs.readFileSync(imagePath)
+  const svgContent = fs.readFileSync(imagePath, 'utf-8')
   
   // Generate waveform S3 key
   const basename = path.basename(originalS3Key, path.extname(originalS3Key))
-  const waveformKey = `public/waveforms/${basename}.png`
+  const waveformKey = `public/waveforms/${basename}.svg`
   
   await s3Client.send(new PutObjectCommand({
     Bucket: bucketName,
     Key: waveformKey,
-    Body: imageBuffer,
-    ContentType: 'image/png',
+    Body: svgContent,
+    ContentType: 'image/svg+xml',
   }))
   
   console.log(`Uploaded waveform to ${waveformKey}`)
