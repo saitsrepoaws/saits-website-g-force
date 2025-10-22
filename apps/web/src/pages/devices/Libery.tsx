@@ -530,6 +530,20 @@ function Libery() {
                 </div>
               </div>
 
+              {/* Waveform */}
+              {(selectedTrack as any).waveformUrl && (
+                <div className="border-b pb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Waveform 🌊</h4>
+                  <div className="bg-gray-900 p-2 rounded">
+                    <img 
+                      src={(selectedTrack as any).waveformUrl} 
+                      alt="Waveform" 
+                      className="w-full h-24 object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Cover Art */}
               {(selectedTrack as any).coverArtUrl && (
                 <div className="border-b pb-4">
