@@ -31,6 +31,7 @@ function Libery() {
   // Multi-file upload state
   const [uploadQueue, setUploadQueue] = useState<FileUploadItem[]>([])
   const [isUploading, setIsUploading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
@@ -164,26 +165,30 @@ function Libery() {
         })
 
         if (data) {
-          setTracks(prev => [...prev, data])
+          // Don't add to local state immediately - will reload after Lambda
           setUploadQueue(prev => prev.map((q, idx) => 
             idx === i ? { ...q, status: 'success' as const } : q
           ))
           
           // Wait for Lambda to process and update track with audio features
           // Lambda triggers on S3 upload and extracts metadata
-          console.log('Waiting for Lambda to process audio features...')
+          console.log('✅ Track uploaded! Waiting for Lambda to process metadata...')
+          setIsProcessing(true)
+          
           setTimeout(async () => {
             try {
               // Reload tracks to get Lambda-extracted features
               const updated = await listTracks()
               if (updated.data) {
                 setTracks(updated.data)
-                console.log('Track updated with Lambda features')
+                console.log('🎵 Track list updated with Lambda features')
               }
             } catch (error) {
               console.error('Failed to reload tracks after Lambda processing:', error)
+            } finally {
+              setIsProcessing(false)
             }
-          }, 5000) // Wait 5 seconds for Lambda to process
+          }, 6000) // Wait 6 seconds for Lambda to process
         }
       } catch (error) {
         console.error('Failed to upload track:', error)
@@ -399,10 +404,22 @@ function Libery() {
               </button>
             </div>
 
+            {/* Processing Indicator */}
+            {isProcessing && (
+              <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                  <span className="text-sm text-blue-700">
+                    Processing track... Lambda is extracting metadata, BPM, and generating waveform. Track will appear in ~6 seconds.
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Track List */}
             {isLoadingTracks ? (
               <div className="text-center py-8 text-gray-500">Loading tracks...</div>
-            ) : tracks.length === 0 ? (
+            ) : tracks.length === 0 && !isProcessing ? (
               <div className="text-center py-8 text-gray-500">
                 No tracks yet. Add your first track!
               </div>
