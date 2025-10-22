@@ -1,12 +1,21 @@
 // Service layer for Track data operations
 import { generateClient } from 'aws-amplify/data'
 
-// @ts-ignore - Amplify Gen 2 client will have models at runtime
-const client = generateClient()
-
 export type Track = any
 export type CreateTrackInput = any
 export type UpdateTrackInput = any
+
+// Lazy client - only create after Amplify.configure()
+let client: any = null
+
+function getClient() {
+  if (!client) {
+    // @ts-ignore - Amplify Gen 2 client will have models at runtime
+    client = generateClient()
+    console.log('[Tracks] Client generated:', client)
+  }
+  return client
+}
 
 /**
  * List all tracks
@@ -14,7 +23,7 @@ export type UpdateTrackInput = any
 export async function listTracks() {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await client.models.Track.list()
+    const { data, errors } = await getClient().models.Track.list()
     if (errors) {
       console.error('Error listing tracks:', errors)
       return { data: [], errors }
@@ -32,7 +41,7 @@ export async function listTracks() {
 export async function getTrack(id: string) {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await client.models.Track.get({ id })
+    const { data, errors } = await getClient().models.Track.get({ id })
     if (errors) {
       console.error('Error getting track:', errors)
       return { data: null, errors }
@@ -50,7 +59,7 @@ export async function getTrack(id: string) {
 export async function createTrack(input: CreateTrackInput) {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await client.models.Track.create(input)
+    const { data, errors } = await getClient().models.Track.create(input)
     if (errors) {
       console.error('Error creating track:', errors)
       return { data: null, errors }
@@ -68,7 +77,7 @@ export async function createTrack(input: CreateTrackInput) {
 export async function updateTrack(input: UpdateTrackInput) {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await client.models.Track.update(input)
+    const { data, errors } = await getClient().models.Track.update(input)
     if (errors) {
       console.error('Error updating track:', errors)
       return { data: null, errors }
@@ -86,7 +95,7 @@ export async function updateTrack(input: UpdateTrackInput) {
 export async function deleteTrack(id: string) {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await client.models.Track.delete({ id })
+    const { data, errors } = await getClient().models.Track.delete({ id })
     if (errors) {
       console.error('Error deleting track:', errors)
       return { data: null, errors }
@@ -110,7 +119,7 @@ export function subscribeToTracks(
 
   if (onCreate) {
     // @ts-ignore - Track model exists at runtime
-    const sub = client.models.Track.onCreate().subscribe({
+    const sub = getClient().models.Track.onCreate().subscribe({
       next: (data: any) => onCreate(data),
       error: (error: any) => console.error('onCreate subscription error:', error),
     })
@@ -119,7 +128,7 @@ export function subscribeToTracks(
 
   if (onUpdate) {
     // @ts-ignore - Track model exists at runtime
-    const sub = client.models.Track.onUpdate().subscribe({
+    const sub = getClient().models.Track.onUpdate().subscribe({
       next: (data: any) => onUpdate(data),
       error: (error: any) => console.error('onUpdate subscription error:', error),
     })
@@ -128,7 +137,7 @@ export function subscribeToTracks(
 
   if (onDelete) {
     // @ts-ignore - Track model exists at runtime
-    const sub = client.models.Track.onDelete().subscribe({
+    const sub = getClient().models.Track.onDelete().subscribe({
       next: (data: any) => onDelete(data),
       error: (error: any) => console.error('onDelete subscription error:', error),
     })
