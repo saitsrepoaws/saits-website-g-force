@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a813faae79f32ec35d72173634d8a52675bf83b73a33c2a978941c43c28e0a89.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/05addbaa94c1ce1ac1d271ca024004f9a97249b36b35b4cd47fd63c798237a2d.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -99,6 +99,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyAuthIdentityPoolRoleAttachment045F17C8"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IotPubSubPolicy43AD4595"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default": [
@@ -877,6 +883,12 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track.NestedStack/Track.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -1111,6 +1123,12 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiBED5CBE86DestinationBucketArn"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data.NestedStack/data.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -1171,6 +1189,18 @@
             "data": "gforgeIotStorageBucketAutoDeleteObjectsCustomResourceB68015C2"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/gforgeIotStorage/Bucket/Notifications/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gforgeIotStorageBucketNotificationsBBBD6BA0"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/gforgeIotStorage/Bucket/AllowBucketNotificationsToamplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambda47FFBE22": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "gforgeIotStorageBucketAllowBucketNotificationsToamplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambda47FFBE222FBA0F43"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/LatestNodeRuntimeMap": [
           {
             "type": "aws:cdk:logicalId",
@@ -1219,6 +1249,36 @@
             "data": "audiometadatalambdaServiceRole451DEF97"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "audiometadatalambdaServiceRoleDefaultPolicyDC4857CF"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "audiometadatalambdaA2764F23"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -1243,6 +1303,18 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": [
           {
             "type": "aws:cdk:logicalId",
@@ -1253,6 +1325,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "storage0EC3F24A"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/definedFunctions": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "definedFunctions"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storageRegion": [
