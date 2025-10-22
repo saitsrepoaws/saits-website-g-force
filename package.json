@@ -18,6 +18,7 @@
   "devDependencies": {
     "@aws-amplify/backend": "^1.16.1",
     "aws-cdk-lib": "^2.220.0",
+    "esbuild": "^0.25.11",
     "eslint": "^9.38.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.8",

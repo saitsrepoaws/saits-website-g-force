@@ -5,7 +5,5 @@ export const audioMetadata = defineFunction({
   entry: './handler.ts',
   timeoutSeconds: 60,
   memoryMB: 1024,
-  environment: {
-    STORAGE_BUCKET_NAME: process.env.STORAGE_BUCKET_NAME || '',
-  },
+  resourceGroupName: 'storage', // Assign to storage stack to avoid circular dependency
 })

@@ -4,9 +4,8 @@ import { data } from './data/resource'
 import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
-import { StartingPosition } from 'aws-cdk-lib/aws-lambda'
-import { S3EventSource } from 'aws-cdk-lib/aws-lambda-event-sources'
 import { EventType } from 'aws-cdk-lib/aws-s3'
+import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -20,19 +19,18 @@ export const backend = defineBackend({
 const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
 
-// Add S3 event trigger for audio files
-metadataLambda.addEventSource(
-  new S3EventSource(storageBucket as any, {
-    events: [EventType.OBJECT_CREATED],
-    filters: [{ prefix: 'public/audio/' }],
-  })
-)
-
 // Grant Lambda permission to read from S3
 storageBucket.grantRead(metadataLambda)
 
-// Pass bucket name to Lambda via environment variable
-;(metadataLambda as any).addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
+// Add environment variable for bucket name using CDK escape hatch
+backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
+
+// Add S3 notification to trigger Lambda on audio file uploads
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new LambdaDestination(metadataLambda),
+  { prefix: 'public/audio/' }
+)
 
 // Add IoT policy to authenticated role for PubSub access
 const authenticatedRole = backend.auth.resources.authenticatedUserIamRole

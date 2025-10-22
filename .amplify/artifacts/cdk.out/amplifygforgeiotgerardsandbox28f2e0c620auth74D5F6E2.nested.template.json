@@ -299,10 +299,49 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/amplifyAuth/IdentityPoolRoleAttachment"
    }
   },
+  "IotPubSubPolicy43AD4595": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "iot:Connect",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:eu-west-1:*:client/*"
+      },
+      {
+       "Action": "iot:Subscribe",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:eu-west-1:*:topicfilter/*"
+      },
+      {
+       "Action": [
+        "iot:Publish",
+        "iot:Receive"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:eu-west-1:*:topic/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "IotPubSubPolicy43AD4595",
+    "Roles": [
+     {
+      "Ref": "amplifyAuthauthenticatedUserRoleD8DA3689"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicy/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LwQ6CMBBEv4V7WbF/YDh5MQbD2dR21YXSTegiMU3/3RCDcpqZNzMatK6gKswcS+v60tMN0gmjoLuIsb0yc7wmy49AwpDaiOOZ2av6Hn5+NbUnDLKt/uToMAjJez1vc8MeDyLGPgcMkhWZAdICl+GiOasGI0+jxawCO4Qu7l5ag95DVXSRqBynIDQgNF/9AL41c8DXAAAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LTQ6CMBCFz+K+jNgbGFZuDMG4NrUddaB0EjpICOndDRKU1fvenwatc8h3ZoiZdU3m6Q7TGaOgu4ixjTJDvE2Wn4GEYbpG7Epmr4pH+PEKhScMsq3+yclhEJJxPW99xR6PIsa+WgySFJkWpjmch18t2ZMdZ7tQSqrCyH1nManADqGO+7fWoA+Q7+pIlHV9EGoRqkU/0mNTzOgAAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default"

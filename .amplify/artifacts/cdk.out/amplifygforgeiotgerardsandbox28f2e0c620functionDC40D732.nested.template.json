@@ -36,6 +36,10 @@
       "Value": "sandbox"
      },
      {
+      "Key": "amplify:friendly-name",
+      "Value": "audio-metadata"
+     },
+     {
       "Key": "created-by",
       "Value": "amplify"
      }
@@ -47,10 +51,116 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/audio-metadata-lambda/ServiceRole/Resource"
    }
   },
+  "audiometadatalambdaServiceRoleDefaultPolicyDC4857CF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "audiometadatalambdaServiceRoleDefaultPolicyDC4857CF",
+    "Roles": [
+     {
+      "Ref": "audiometadatalambdaServiceRole451DEF97"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/audio-metadata-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "audiometadatalambdaA2764F23": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "4a7d34d67083583b49b85a16938d57a428fb9f57675f65915d430986cd0f1588.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "STORAGE_BUCKET_NAME": {
+       "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
+      }
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "audiometadatalambdaServiceRole451DEF97",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "audio-metadata"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "audiometadatalambdaServiceRoleDefaultPolicyDC4857CF",
+    "audiometadatalambdaServiceRole451DEF97"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/audio-metadata-lambda/Resource",
+    "aws:asset:path": "asset.4a7d34d67083583b49b85a16938d57a428fb9f57675f65915d430986cd0f1588",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/yXMPQ6DMAxA4bOwOy5NT1BV6sgQDhCZxEXmJ5FwKAPi7hV0+vSWZ9HaGuuKNjUhjmaSDveGtXBsC4URaFO/TzR3kXzKkQfF5uK9plAkJxCacXd5Ynh90ukB+vCkykXxeXKAY83rEhiubgv1kvoDziEOevtai/aOdTWoiFnWVGRmdH9/XLee46MAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWOTQqDMBCFz9L9OLXxBFXoUooeQMZklPiTgJNUinj3otLV997ifTyFSqWY3miVRJsxmWyLW8kS2NSB9Ai0SrNNNLeGGucND4LliVd0OljvwNKMW+UnhqJzJ99+svp71CvtIFlDIhwEnwdAMsyjHjnkJAyXHovO/aU7VCw+LprhHNSBeuv6HY4LOMj9oxSqB6a3QaxNluiCnRmriz8pbZ6m1QAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default"
@@ -322,6 +432,29 @@
      ]
     }
    ]
+  }
+ },
+ "Outputs": {
+  "amplifygforgeiotgerardsandbox28f2e0c620functionaudiometadatalambda4CED9416Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "audiometadatalambdaA2764F23",
+     "Arn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionaudiometadatalambda4CED9416Ref": {
+   "Value": {
+    "Ref": "audiometadatalambdaA2764F23"
+   }
+  }
+ },
+ "Parameters": {
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
+   "Type": "String"
   }
  }
 }

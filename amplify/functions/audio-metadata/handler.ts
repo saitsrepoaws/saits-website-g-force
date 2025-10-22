@@ -34,15 +34,24 @@ interface AudioMetadata {
 export const handler = async (event: any) => {
   console.log('Event:', JSON.stringify(event, null, 2))
   
-  const { s3Key, trackId } = event
+  // Handle S3 event structure
+  const record = event.Records?.[0]
+  if (!record) {
+    throw new Error('No S3 record found in event')
+  }
+  
+  const s3Key = record.s3?.object?.key
+  const bucketName = record.s3?.bucket?.name
   
   if (!s3Key) {
-    throw new Error('Missing s3Key in event')
+    throw new Error('Missing s3Key in S3 event')
   }
+  
+  console.log(`Processing file: ${s3Key} from bucket: ${bucketName}`)
   
   try {
     // Download file from S3 to /tmp
-    const localPath = await downloadFromS3(s3Key)
+    const localPath = await downloadFromS3(s3Key, bucketName)
     
     // Extract metadata using ffprobe
     const metadata = await extractMetadata(localPath)
@@ -50,8 +59,11 @@ export const handler = async (event: any) => {
     // Cleanup
     fs.unlinkSync(localPath)
     
+    console.log('Metadata extraction successful:', metadata)
+    
     return {
-      trackId,
+      s3Key,
+      bucketName,
       metadata,
       status: 'success'
     }
@@ -59,24 +71,24 @@ export const handler = async (event: any) => {
   } catch (error: any) {
     console.error('Metadata extraction failed:', error)
     return {
-      trackId,
+      s3Key,
       error: error.message,
       status: 'failed'
     }
   }
 }
 
-async function downloadFromS3(s3Key: string): Promise<string> {
-  const bucketName = process.env.STORAGE_BUCKET_NAME
+async function downloadFromS3(s3Key: string, bucketName?: string): Promise<string> {
+  const bucket = bucketName || process.env.STORAGE_BUCKET_NAME
   
-  if (!bucketName) {
+  if (!bucket) {
     throw new Error('STORAGE_BUCKET_NAME not set')
   }
   
-  console.log(`Downloading ${s3Key} from bucket ${bucketName}`)
+  console.log(`Downloading ${s3Key} from bucket ${bucket}`)
   
   const command = new GetObjectCommand({
-    Bucket: bucketName,
+    Bucket: bucket,
     Key: s3Key,
   })
   
