@@ -11,6 +11,7 @@ const schema = a.schema({
       version: a.string(), // Version/Mix info (parsed from filename, optional)
       label: a.string(), // Record label (parsed from filename, optional)
       genre: a.string(), // Genre from ID3 tags
+      year: a.integer(), // Release year from ID3 tags
       duration: a.integer(), // duration in seconds
       fileUrl: a.string(), // S3 URL or path to audio file
       fileSize: a.integer(), // file size in bytes

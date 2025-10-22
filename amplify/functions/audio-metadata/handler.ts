@@ -290,10 +290,11 @@ async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
   await dynamoClient.send(new UpdateCommand({
     TableName: tableName,
     Key: { id: track.id },
-    UpdateExpression: 'SET bpm = :bpm, #key = :key, energy = :energy, danceability = :danceability, valence = :valence, coverArtUrl = :coverArtUrl, #dur = :duration, genre = :genre',
+    UpdateExpression: 'SET bpm = :bpm, #key = :key, energy = :energy, danceability = :danceability, valence = :valence, coverArtUrl = :coverArtUrl, #dur = :duration, genre = :genre, #yr = :year',
     ExpressionAttributeNames: {
       '#dur': 'duration', // 'duration' is a reserved word
       '#key': 'key', // 'key' is a reserved word
+      '#yr': 'year', // 'year' is a reserved word
     },
     ExpressionAttributeValues: {
       ':bpm': metadata.bpm || null,
@@ -304,6 +305,7 @@ async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
       ':coverArtUrl': metadata.coverArtUrl || null,
       ':duration': metadata.duration || null,
       ':genre': metadata.genre || null,
+      ':year': metadata.year || null,
     },
   }))
   
