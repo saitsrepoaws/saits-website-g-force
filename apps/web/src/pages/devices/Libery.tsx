@@ -453,8 +453,9 @@ function Libery() {
                 <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
                   <div className="col-span-1"></div>
                   <div className="col-span-2">Artist</div>
-                  <div className="col-span-3">Title</div>
-                  <div className="col-span-2">Version</div>
+                  <div className="col-span-2">Title</div>
+                  <div className="col-span-2">Genre</div>
+                  <div className="col-span-1">Version</div>
                   <div className="col-span-2">Label</div>
                   <div className="col-span-1">Duration</div>
                   <div className="col-span-1"></div>
@@ -483,10 +484,13 @@ function Libery() {
                     <div className="col-span-2 text-sm font-medium text-gray-900 truncate">
                       {track.artist || '-'}
                     </div>
-                    <div className="col-span-3 text-sm text-gray-900 truncate">
+                    <div className="col-span-2 text-sm text-gray-900 truncate">
                       {track.title}
                     </div>
                     <div className="col-span-2 text-xs text-gray-600 truncate">
+                      {(track as any).genre || '-'}
+                    </div>
+                    <div className="col-span-1 text-xs text-gray-600 truncate">
                       {track.version || '-'}
                     </div>
                     <div className="col-span-2 text-xs text-gray-600 truncate">
