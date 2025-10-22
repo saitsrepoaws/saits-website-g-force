@@ -248,6 +248,18 @@
               "get",
               "list"
             ]
+          },
+          "public/waveforms/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
           }
         }
       }

@@ -267,7 +267,7 @@
       {
        "Ref": "AWS::Region"
       },
-      "\\\",\\\"paths\\\":{\\\"public/audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]}}}\"]"
+      "\\\",\\\"paths\\\":{\\\"public/audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/waveforms/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]}}}\"]"
      ]
     ]
    }
@@ -433,7 +433,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/a75aded33bd5fb37f9f3c365030aa56530cb81c4f581250b7bf7b0be40f70d37.json"
+       "/0a744b11f02824647111c033546c15779159ec73d256a7b63a37dda4e537dd85.json"
       ]
      ]
     }

@@ -378,6 +378,20 @@
            "/public/covers/*"
           ]
          ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/waveforms/*"
+          ]
+         ]
         }
        ]
       },
@@ -389,7 +403,9 @@
           "public/audio/*",
           "public/audio/",
           "public/covers/*",
-          "public/covers/"
+          "public/covers/",
+          "public/waveforms/*",
+          "public/waveforms/"
          ]
         }
        },
@@ -432,6 +448,20 @@
            "/public/covers/*"
           ]
          ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/waveforms/*"
+          ]
+         ]
         }
        ]
       },
@@ -464,6 +494,20 @@
             ]
            },
            "/public/covers/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/waveforms/*"
           ]
          ]
         }
@@ -521,6 +565,20 @@
            "/public/covers/*"
           ]
          ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/waveforms/*"
+          ]
+         ]
         }
        ]
       },
@@ -532,7 +590,9 @@
           "public/audio/*",
           "public/audio/",
           "public/covers/*",
-          "public/covers/"
+          "public/covers/",
+          "public/waveforms/*",
+          "public/waveforms/"
          ]
         }
        },
