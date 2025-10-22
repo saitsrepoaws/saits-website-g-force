@@ -148,8 +148,8 @@ async function createWaveformImage(peaks: number[], duration: number): Promise<s
   const height = 120
   const barWidth = width / peaks.length
   
-  // Create SVG
-  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`
+  // Create SVG with viewBox for perfect scaling
+  let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">`
   svg += `<rect width="${width}" height="${height}" fill="#1a1a1a"/>`
   
   peaks.forEach((peak, i) => {
@@ -157,7 +157,8 @@ async function createWaveformImage(peaks: number[], duration: number): Promise<s
     const x = i * barWidth
     const y = (height - barHeight) / 2
     
-    svg += `<rect x="${x}" y="${y}" width="${barWidth - 1}" height="${barHeight}" fill="#3b82f6" opacity="0.8"/>`
+    // No gap between bars - fill the full width
+    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="#3b82f6" opacity="0.8"/>`
   })
   
   svg += '</svg>'
