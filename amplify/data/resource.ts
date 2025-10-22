@@ -27,6 +27,8 @@ const schema = a.schema({
       // Waveform (from Lambda 3)
       waveformUrl: a.string(), // S3 path to waveform PNG
       peaks: a.string(), // JSON array of peak values for visualization
+      trimStart: a.float(), // Time in seconds where audio actually starts
+      trimEnd: a.float(), // Time in seconds where audio actually ends
     })
     .authorization((allow) => [allow.authenticated()]),
 })

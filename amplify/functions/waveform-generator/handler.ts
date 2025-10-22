@@ -16,6 +16,8 @@ interface WaveformData {
   peaks: number[]
   duration: number
   waveformUrl?: string
+  trimStart?: number  // Time in seconds where audio actually starts
+  trimEnd?: number    // Time in seconds where audio actually ends
 }
 
 export const handler = async (event: any) => {
@@ -98,10 +100,12 @@ async function generateWaveform(filePath: string, bucketName: string, s3Key: str
   const metadata = await parseFile(filePath)
   const duration = metadata.format.duration || 0
   
-  // Generate simplified waveform peaks
-  // For production: use proper audio decoding with ffmpeg or web-audio-api
-  // For now: generate peaks based on file chunks
+  // Generate simplified peaks based on file structure
+  // In production, you'd decode audio and analyze actual samples
   const peaks = await extractSimplifiedPeaks(filePath, 200) // 200 data points
+  
+  // Detect silence boundaries
+  const { trimStart, trimEnd } = detectSilenceBoundaries(peaks, duration)
   
   // Generate waveform image
   const waveformImagePath = await createWaveformImage(peaks, duration)
@@ -116,6 +120,8 @@ async function generateWaveform(filePath: string, bucketName: string, s3Key: str
     peaks,
     duration,
     waveformUrl,
+    trimStart,
+    trimEnd,
   }
 }
 
@@ -141,6 +147,35 @@ async function extractSimplifiedPeaks(filePath: string, sampleCount: number): Pr
   }
   
   return peaks
+}
+
+function detectSilenceBoundaries(peaks: number[], duration: number, threshold: number = 0.05): { trimStart: number, trimEnd: number } {
+  // Find first significant peak (where audio starts)
+  let startIdx = 0
+  for (let i = 0; i < peaks.length; i++) {
+    if (peaks[i] > threshold) {
+      startIdx = i
+      break
+    }
+  }
+  
+  // Find last significant peak (where audio ends)
+  let endIdx = peaks.length - 1
+  for (let i = peaks.length - 1; i >= 0; i--) {
+    if (peaks[i] > threshold) {
+      endIdx = i
+      break
+    }
+  }
+  
+  // Convert index to time
+  const timePerPeak = duration / peaks.length
+  const trimStart = startIdx * timePerPeak
+  const trimEnd = endIdx * timePerPeak
+  
+  console.log(`🔇 Silence detection: start=${trimStart.toFixed(2)}s, end=${trimEnd.toFixed(2)}s (threshold=${threshold})`)
+  
+  return { trimStart, trimEnd }
 }
 
 async function createWaveformImage(peaks: number[], duration: number): Promise<string> {
@@ -219,12 +254,14 @@ async function updateTrackInDatabase(s3Key: string, waveformData: WaveformData) 
   await dynamoClient.send(new UpdateCommand({
     TableName: tableName,
     Key: { id: track.id },
-    UpdateExpression: 'SET waveformUrl = :waveformUrl, peaks = :peaks',
+    UpdateExpression: 'SET waveformUrl = :waveformUrl, peaks = :peaks, trimStart = :trimStart, trimEnd = :trimEnd',
     ExpressionAttributeValues: {
       ':waveformUrl': waveformData.waveformUrl,
       ':peaks': waveformData.peaks,
+      ':trimStart': waveformData.trimStart || 0,
+      ':trimEnd': waveformData.trimEnd || 0,
     },
   }))
   
-  console.log('Track updated with waveform data')
+  console.log(`Track updated with waveform data (trim: ${waveformData.trimStart?.toFixed(2)}s - ${waveformData.trimEnd?.toFixed(2)}s)`)
 }
