@@ -3,11 +3,13 @@ import { defineStorage } from '@aws-amplify/backend'
 export const storage = defineStorage({
   name: 'gforgeIotStorage',
   access: (allow) => ({
-    'audio/*': [
+    'public/audio/*': [
       allow.authenticated.to(['read', 'write', 'delete']),
+      allow.guest.to(['read']),
     ],
-    'covers/*': [
+    'public/covers/*': [
       allow.authenticated.to(['read', 'write', 'delete']),
+      allow.guest.to(['read']),
     ],
   }),
 })

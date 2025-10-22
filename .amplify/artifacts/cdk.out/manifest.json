@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ce507deefe85f1d0c3287e08b34061294e524326c6f85967f302af77db686caa.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1db77ef73888fd6f84622fc2c83f0e24aebf23463730dc86aa03fa42f64ba9a1.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1223,6 +1223,12 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620storageAccess4E8359120"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplify-gforgeiot-gerard-sandbox-28f2e0c620--storageAccess5/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620storageAccess5D2312D68"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -1239,6 +1245,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": [

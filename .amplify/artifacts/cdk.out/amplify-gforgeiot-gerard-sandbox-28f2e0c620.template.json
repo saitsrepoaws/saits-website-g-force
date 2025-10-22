@@ -237,7 +237,7 @@
       {
        "Ref": "AWS::Region"
       },
-      "\\\",\\\"paths\\\":{\\\"audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"]},\\\"covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"]}}}\"]"
+      "\\\",\\\"paths\\\":{\\\"public/audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]}}}\"]"
      ]
     ]
    }
@@ -363,6 +363,12 @@
        "auth179371D7",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
+      "Fn::GetAtt": [
+       "auth179371D7",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+      ]
      }
     },
     "Tags": [
@@ -391,7 +397,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/e3da49c8d27733641893f15162842e7b6384eb4653777dc202311b658e2a8e9f.json"
+       "/5feff62fc5dfce88064face595653a96a32058fbf7e7809f0905acf7d9ea538c.json"
       ]
      ]
     }

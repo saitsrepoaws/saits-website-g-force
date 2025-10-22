@@ -284,7 +284,7 @@
              "Arn"
             ]
            },
-           "/audio/*"
+           "/public/audio/*"
           ]
          ]
         },
@@ -298,7 +298,7 @@
              "Arn"
             ]
            },
-           "/covers/*"
+           "/public/covers/*"
           ]
          ]
         }
@@ -309,10 +309,10 @@
        "Condition": {
         "StringLike": {
          "s3:prefix": [
-          "audio/*",
-          "audio/",
-          "covers/*",
-          "covers/"
+          "public/audio/*",
+          "public/audio/",
+          "public/covers/*",
+          "public/covers/"
          ]
         }
        },
@@ -338,7 +338,7 @@
              "Arn"
             ]
            },
-           "/audio/*"
+           "/public/audio/*"
           ]
          ]
         },
@@ -352,7 +352,7 @@
              "Arn"
             ]
            },
-           "/covers/*"
+           "/public/covers/*"
           ]
          ]
         }
@@ -372,7 +372,7 @@
              "Arn"
             ]
            },
-           "/audio/*"
+           "/public/audio/*"
           ]
          ]
         },
@@ -386,7 +386,7 @@
              "Arn"
             ]
            },
-           "/covers/*"
+           "/public/covers/*"
           ]
          ]
         }
@@ -406,6 +406,81 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplify-gforgeiot-gerard-sandbox-28f2e0c620--storageAccess4/Resource"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620storageAccess5D2312D68": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/audio/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/covers/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "s3:ListBucket",
+       "Condition": {
+        "StringLike": {
+         "s3:prefix": [
+          "public/audio/*",
+          "public/audio/",
+          "public/covers/*",
+          "public/covers/"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "gforgeIotStorageBucketEED00516",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "amplifygforgeiotgerardsandbox28f2e0c620storageAccess5D2312D68",
+    "Roles": [
+     {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplify-gforgeiot-gerard-sandbox-28f2e0c620--storageAccess5/Resource"
    }
   },
   "CDKMetadata": {
@@ -829,6 +904,9 @@
  },
  "Parameters": {
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
    "Type": "String"
   }
  },

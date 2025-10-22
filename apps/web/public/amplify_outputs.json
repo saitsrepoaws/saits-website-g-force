@@ -226,20 +226,28 @@
         "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-rzbnwdrzhtzq",
         "aws_region": "eu-west-1",
         "paths": {
-          "audio/*": {
+          "public/audio/*": {
             "authenticated": [
               "get",
               "list",
               "write",
               "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
             ]
           },
-          "covers/*": {
+          "public/covers/*": {
             "authenticated": [
               "get",
               "list",
               "write",
               "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
             ]
           }
         }
