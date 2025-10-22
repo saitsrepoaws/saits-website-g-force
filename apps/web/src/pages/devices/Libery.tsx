@@ -459,6 +459,42 @@ function Libery() {
                 </div>
               </div>
 
+              {/* Audio Features (Lambda Analysis) */}
+              <div className="border-b pb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Audio Features 🎵</h4>
+                <div className="grid grid-cols-3 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">BPM:</span>
+                    <span className="ml-2 font-medium text-blue-600">
+                      {(selectedTrack as any).bpm || 0}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Energy:</span>
+                    <span className="ml-2 font-medium text-green-600">
+                      {((selectedTrack as any).energy * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">Danceability:</span>
+                    <span className="ml-2 font-medium text-purple-600">
+                      {(selectedTrack as any).danceability ? `${((selectedTrack as any).danceability * 100).toFixed(0)}%` : '-'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cover Art */}
+              {(selectedTrack as any).coverArtUrl && (
+                <div className="border-b pb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Cover Art 🎨</h4>
+                  <div className="text-sm">
+                    <span className="text-gray-500">URL:</span>
+                    <span className="ml-2 font-mono text-xs break-all">{(selectedTrack as any).coverArtUrl}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Technical Details */}
               <div className="border-b pb-4">
                 <h4 className="text-sm font-semibold text-gray-700 mb-2">Technical Details</h4>
