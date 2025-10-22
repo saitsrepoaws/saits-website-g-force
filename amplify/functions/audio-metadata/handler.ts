@@ -226,7 +226,7 @@ async function extractMetadata(filePath: string, bucketName?: string): Promise<A
   
   const result: AudioMetadata = {
     // File Info
-    duration: metadata.format.duration || 0,
+    duration: Math.round(metadata.format.duration || 0), // Round to whole seconds for GraphQL Int type
     fileSize: stats.size,
     format: metadata.format.container || 'unknown',
     bitrate,
