@@ -1,0 +1,38 @@
+{
+  "name": "g-forge-iot",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "description": "Monorepo for Forge IoT with Turborepo, React, Tailwind, Amplify Gen 2",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "format": "prettier -w .",
+    "typecheck": "tsc -v && turbo run typecheck",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier -w"
+    ],
+    "*.{json,md,css}": [
+      "prettier -w"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.16.1",
+    "aws-cdk-lib": "^2.220.0",
+    "eslint": "^9.38.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.5",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3"
+  }
+}

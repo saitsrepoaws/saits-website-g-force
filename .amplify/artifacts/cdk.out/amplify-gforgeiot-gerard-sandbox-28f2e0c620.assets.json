@@ -1,0 +1,34 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "2c3fd0e804cde95d8030dcbf3d3ded7708058c22a4cdc7c6bb66576f20faf01a": {
+      "displayName": "auth Nested Stack Template",
+      "source": {
+        "path": "amplifygforgeiotgerardsandbox28f2e0c620auth74D5F6E2.nested.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region-bd928ad2": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "2c3fd0e804cde95d8030dcbf3d3ded7708058c22a4cdc7c6bb66576f20faf01a.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "03aa887ba0f6e453279c8bb58fcdd4aab6b36d83a09dc32375db5d530b555ec6": {
+      "displayName": "amplify-gforgeiot-gerard-sandbox-28f2e0c620 Template",
+      "source": {
+        "path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region-9bdffce6": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "03aa887ba0f6e453279c8bb58fcdd4aab6b36d83a09dc32375db5d530b555ec6.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
