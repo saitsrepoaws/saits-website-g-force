@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
-import { listTracks, createTrack, deleteTrack, type Track } from '../../services/tracks'
+import { listTracks, createTrack, deleteTrack, updateTrack, type Track } from '../../services/tracks'
 import { 
   uploadAudioFile, 
   uploadCoverArt, 
@@ -111,6 +111,22 @@ function Libery() {
           setUploadQueue(prev => prev.map((q, idx) => 
             idx === i ? { ...q, status: 'success' as const } : q
           ))
+          
+          // Wait for Lambda to process and update track with audio features
+          // Lambda triggers on S3 upload and extracts metadata
+          console.log('Waiting for Lambda to process audio features...')
+          setTimeout(async () => {
+            try {
+              // Reload tracks to get Lambda-extracted features
+              const updated = await listTracks()
+              if (updated.data) {
+                setTracks(updated.data)
+                console.log('Track updated with Lambda features')
+              }
+            } catch (error) {
+              console.error('Failed to reload tracks after Lambda processing:', error)
+            }
+          }, 5000) // Wait 5 seconds for Lambda to process
         }
       } catch (error) {
         console.error('Failed to upload track:', error)

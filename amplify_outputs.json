@@ -108,6 +108,34 @@
               "isRequired": false,
               "attributes": []
             },
+            "bpm": {
+              "name": "bpm",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "energy": {
+              "name": "energy",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "danceability": {
+              "name": "danceability",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "coverArtUrl": {
+              "name": "coverArtUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "createdAt": {
               "name": "createdAt",
               "isArray": false,

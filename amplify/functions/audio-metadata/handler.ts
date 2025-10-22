@@ -68,6 +68,9 @@ export const handler = async (event: any) => {
     
     console.log('Metadata extraction successful:', metadata)
     
+    // TODO: Update track in DynamoDB with extracted metadata
+    // For now, just return the metadata - frontend will poll for updates
+    
     return {
       s3Key,
       bucketName,

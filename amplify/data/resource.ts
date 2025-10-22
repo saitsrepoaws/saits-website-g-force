@@ -15,6 +15,12 @@ const schema = a.schema({
       fileSize: a.integer(), // file size in bytes
       format: a.string(), // mp3, flac, wav, etc.
       addedAt: a.datetime(),
+      
+      // Audio Features (from Lambda analysis)
+      bpm: a.integer(), // Beats per minute
+      energy: a.float(), // Energy level 0-1
+      danceability: a.float(), // Danceability 0-1
+      coverArtUrl: a.string(), // S3 path to cover art
     })
     .authorization((allow) => [allow.authenticated()]),
 })
