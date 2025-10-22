@@ -18,8 +18,10 @@ const schema = a.schema({
       
       // Audio Features (from Lambda analysis)
       bpm: a.integer(), // Beats per minute
+      key: a.string(), // Musical key (e.g. "Am", "C#")
       energy: a.float(), // Energy level 0-1
       danceability: a.float(), // Danceability 0-1
+      valence: a.float(), // Musical positiveness 0-1
       coverArtUrl: a.string(), // S3 path to cover art
     })
     .authorization((allow) => [allow.authenticated()]),
