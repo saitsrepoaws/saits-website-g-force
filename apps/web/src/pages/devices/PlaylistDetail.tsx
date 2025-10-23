@@ -359,7 +359,12 @@ function PlaylistDetail() {
               {/* Modal Header */}
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold">Add Tracks to Playlist</h3>
+                  <div>
+                    <h3 className="text-lg font-bold">Add Tracks to Playlist</h3>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {filteredAllTracks.length} available · {playlistTracks.length} already in playlist
+                    </p>
+                  </div>
                   <button
                     onClick={() => {
                       setShowAddTracks(false)
