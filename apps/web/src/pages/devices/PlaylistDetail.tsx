@@ -1,12 +1,120 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
-import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist, deletePlaylist, updatePlaylist } from '../../services/playlists'
+import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist, deletePlaylist, updatePlaylist, reorderPlaylistTracks } from '../../services/playlists'
 import { listTracks } from '../../services/tracks'
 import { playlistIoT } from '../../services/playlistIoT'
 import { getUrl } from 'aws-amplify/storage'
 import type { Playlist, PlaylistTrackItem } from '../../types/playlist'
 import type { Track } from '../../services/tracks'
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+// Sortable Track Row Component
+interface SortableTrackRowProps {
+  track: PlaylistTrackItem
+  index: number
+  coverArtUrl?: string
+  trackToggles: Record<string, boolean>
+  onToggleArrow: (trackId: string) => void
+  onRemove: (trackId: string) => void
+  formatDuration: (seconds: number) => string
+}
+
+function SortableTrackRow({ 
+  track, 
+  index, 
+  coverArtUrl,
+  trackToggles,
+  onToggleArrow,
+  onRemove,
+  formatDuration
+}: SortableTrackRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: track.trackId })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 items-center p-3 border border-gray-200 rounded ${
+        isDragging ? 'bg-blue-50 shadow-lg z-10' : 'hover:bg-gray-50'
+      }`}
+    >
+      <div className="text-sm text-gray-500 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
+        ⋮⋮ {index + 1}
+      </div>
+      
+      {/* Cover Art */}
+      <div>
+        {coverArtUrl ? (
+          <img
+            src={coverArtUrl}
+            alt={track.trackTitle}
+            className="w-10 h-10 rounded object-cover"
+          />
+        ) : (
+          <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+            <span className="text-gray-400 text-xs">🎵</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="text-sm font-medium text-gray-900 truncate">
+        {track.trackTitle || 'Unknown'}
+      </div>
+      <div className="text-sm text-gray-600 truncate">
+        {track.trackArtist || '-'}
+      </div>
+      <div className="text-xs text-gray-600 truncate">
+        {track.trackGenre || '-'}
+      </div>
+      <div className="text-xs text-gray-600">
+        {track.trackBpm || '-'}
+      </div>
+      <div className="text-xs text-gray-600">
+        {track.trackDuration ? formatDuration(track.trackDuration) : '-'}
+      </div>
+      
+      {/* Toggle Arrow */}
+      <div className="text-center">
+        <button
+          onClick={() => onToggleArrow(track.trackId)}
+          className="text-gray-500 hover:text-blue-600 transition-transform"
+          style={{
+            transform: trackToggles[track.trackId] ? 'rotate(90deg)' : 'rotate(0deg)',
+          }}
+        >
+          ▶️
+        </button>
+      </div>
+      
+      {/* Delete */}
+      <div className="text-right">
+        <button
+          onClick={() => onRemove(track.trackId)}
+          className="text-red-600 hover:text-red-700 text-sm"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function PlaylistDetail() {
   const { id } = useParams<{ id: string }>()
@@ -15,6 +123,15 @@ function PlaylistDetail() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px movement before drag starts
+      },
+    })
+  )
   
   // Add tracks modal
   const [showAddTracks, setShowAddTracks] = useState(false)
@@ -282,6 +399,39 @@ function PlaylistDetail() {
     }
   }
   
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    
+    if (!over || active.id === over.id || !id) return
+    
+    const oldIndex = playlistTracks.findIndex(t => t.trackId === active.id)
+    const newIndex = playlistTracks.findIndex(t => t.trackId === over.id)
+    
+    if (oldIndex === -1 || newIndex === -1) return
+    
+    // Optimistic UI update
+    const newTracks = [...playlistTracks]
+    const [movedTrack] = newTracks.splice(oldIndex, 1)
+    newTracks.splice(newIndex, 0, movedTrack)
+    setPlaylistTracks(newTracks)
+    
+    try {
+      // Update order in database
+      const trackIds = newTracks.map(t => t.trackId)
+      await reorderPlaylistTracks(id, trackIds)
+      
+      // Notify via IoT
+      await playlistIoT.tracksReordered(id, trackIds)
+      
+      console.log('✅ Tracks reordered successfully')
+    } catch (error) {
+      console.error('Failed to reorder tracks:', error)
+      // Revert on error
+      await loadPlaylist()
+      alert('Failed to reorder tracks')
+    }
+  }
+  
   function formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -457,69 +607,30 @@ function PlaylistDetail() {
                 </div>
               </div>
               
-              {/* Tracks */}
-              {playlistTracks.map((track, index) => (
-                <div
-                  key={track.trackId}
-                  className="grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
+              {/* Tracks - Drag and Drop */}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={playlistTracks.map(t => t.trackId)}
+                  strategy={verticalListSortingStrategy}
                 >
-                  <div className="text-sm text-gray-500">{index + 1}</div>
-                  
-                  {/* Cover Art */}
-                  <div>
-                    {coverArtUrls[track.trackId] ? (
-                      <img
-                        src={coverArtUrls[track.trackId]}
-                        alt={track.trackTitle}
-                        className="w-10 h-10 rounded object-cover"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                        <span className="text-gray-400 text-xs">🎵</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="text-sm font-medium text-gray-900 truncate">
-                    {track.trackTitle || 'Unknown'}
-                  </div>
-                  <div className="text-sm text-gray-600 truncate">
-                    {track.trackArtist || '-'}
-                  </div>
-                  <div className="text-xs text-gray-600 truncate">
-                    {track.trackGenre || '-'}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {track.trackBpm || '-'}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {track.trackDuration ? formatDuration(track.trackDuration) : '-'}
-                  </div>
-                  
-                  {/* Toggle Arrow */}
-                  <div className="text-center">
-                    <button
-                      onClick={() => toggleTrackArrow(track.trackId)}
-                      className="text-gray-500 hover:text-blue-600 transition-transform"
-                      style={{
-                        transform: trackToggles[track.trackId] ? 'rotate(90deg)' : 'rotate(0deg)',
-                      }}
-                    >
-                      ▶️
-                    </button>
-                  </div>
-                  
-                  {/* Delete */}
-                  <div className="text-right">
-                    <button
-                      onClick={() => handleRemoveTrack(track.trackId)}
-                      className="text-red-600 hover:text-red-700 text-sm"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              ))}
+                  {playlistTracks.map((track, index) => (
+                    <SortableTrackRow
+                      key={track.trackId}
+                      track={track}
+                      index={index}
+                      coverArtUrl={coverArtUrls[track.trackId]}
+                      trackToggles={trackToggles}
+                      onToggleArrow={toggleTrackArrow}
+                      onRemove={handleRemoveTrack}
+                      formatDuration={formatDuration}
+                    />
+                  ))}
+                </SortableContext>
+              </DndContext>
             </div>
           )}
         </div>
