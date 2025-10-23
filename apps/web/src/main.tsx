@@ -9,6 +9,7 @@ import IotTestPage from './pages/IotTestPage'
 import DeviceManagement from './pages/DeviceManagement'
 import Libery from './pages/devices/Libery'
 import Playlist from './pages/devices/Playlist'
+import PlaylistDetail from './pages/devices/PlaylistDetail'
 import Players from './pages/devices/Players'
 import Planner from './pages/devices/Planner'
 import AudioSettings from './pages/devices/AudioSettings'
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <Playlist />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/playlist/:id', 
+    element: (
+      <AuthGate>
+        <PlaylistDetail />
       </AuthGate>
     )
   },
