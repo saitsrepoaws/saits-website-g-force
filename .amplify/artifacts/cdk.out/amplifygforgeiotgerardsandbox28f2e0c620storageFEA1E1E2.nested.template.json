@@ -1323,6 +1323,9 @@
      "Size": 512
     },
     "Handler": "index.handler",
+    "Layers": [
+     "arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7"
+    ],
     "MemorySize": 3008,
     "Role": {
      "Fn::GetAtt": [

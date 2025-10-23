@@ -8,7 +8,8 @@ export const audioAnalyzer = defineFunction({
   resourceGroupName: 'storage',
   environment: {
     // FFmpeg will be in /opt/bin from Lambda Layer
-    PATH: '/opt/bin:/usr/local/bin:/usr/bin/:/bin',
-    LD_LIBRARY_PATH: '/opt/lib',
+    PATH: '/opt/bin:/usr/local/bin:/usr/bin/:/bin:/opt/ffmpeg/bin',
+    LD_LIBRARY_PATH: '/opt/lib:/opt/ffmpeg/lib',
+    FFMPEG_PATH: '/opt/bin/ffmpeg',
   },
 })

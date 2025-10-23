@@ -10,6 +10,7 @@ import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
+import { LayerVersion, Function as LambdaFunction } from 'aws-cdk-lib/aws-lambda'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -55,6 +56,19 @@ audioAnalyzerLambda.grantInvoke(metadataLambda)
 // Grant Lambda 5 (audio analyzer) permissions
 storageBucket.grantRead(audioAnalyzerLambda)
 trackTable.grantReadWriteData(audioAnalyzerLambda)
+
+// Add FFmpeg Lambda Layer to audio analyzer
+// Public FFmpeg Layer for eu-west-1 (Node.js 20)
+// ARN: arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7
+const ffmpegLayer = LayerVersion.fromLayerVersionArn(
+  audioAnalyzerLambda.stack,
+  'FFmpegLayer',
+  'arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7'
+)
+
+// Cast to LambdaFunction to add layers
+const analyzerFunction = audioAnalyzerLambda.node.defaultChild as LambdaFunction
+analyzerFunction.addLayers(ffmpegLayer)
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
