@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
 import { listPlaylists, createPlaylist, deletePlaylist } from '../../services/playlists'
 import { playlistIoT } from '../../services/playlistIoT'
+import { listTracks } from '../../services/tracks'
 import type { Playlist as PlaylistType } from '../../types/playlist'
 
 function Playlist() {
@@ -10,6 +11,7 @@ function Playlist() {
   const [playlists, setPlaylists] = useState<PlaylistType[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [availableGenres, setAvailableGenres] = useState<string[]>([])
   
   // Create playlist form
   const [newPlaylistName, setNewPlaylistName] = useState('')
@@ -21,9 +23,10 @@ function Playlist() {
   const [newPlaylistTags, setNewPlaylistTags] = useState('')
   const [newPlaylistOccasion, setNewPlaylistOccasion] = useState('')
   
-  // Load playlists
+  // Load playlists and genres
   useEffect(() => {
     loadPlaylists()
+    loadGenres()
     
     // Connect to IoT
     playlistIoT.connect()
@@ -46,6 +49,33 @@ function Playlist() {
     }
   }
   
+  async function loadGenres() {
+    try {
+      const { data } = await listTracks()
+      if (data) {
+        // Extract unique genres from tracks
+        const genres = Array.from(
+          new Set(
+            data
+              .map((track: any) => track.genre)
+              .filter((genre: any): genre is string => Boolean(genre))
+          )
+        ).sort() as string[]
+        
+        setAvailableGenres(genres)
+        console.log('🎵 Loaded genres from tracks:', genres)
+      }
+    } catch (error) {
+      console.error('Failed to load genres:', error)
+      // Fallback to hardcoded genres if track loading fails
+      setAvailableGenres([
+        'Techno', 'House', 'Tech House', 'Deep House', 'Minimal', 
+        'Progressive', 'Trance', 'Drum & Bass', 'Dubstep', 'Ambient', 
+        'Electronica'
+      ])
+    }
+  }
+  
   async function handleCreatePlaylist() {
     if (!newPlaylistName.trim()) {
       alert('Please enter a playlist name')
@@ -53,7 +83,7 @@ function Playlist() {
     }
     
     try {
-      const { data } = await createPlaylist({
+      const playlistData = {
         name: newPlaylistName,
         description: newPlaylistDescription || undefined,
         genre: newPlaylistGenre || undefined,
@@ -62,7 +92,17 @@ function Playlist() {
         bpmMax: newPlaylistBpmMax ? parseInt(newPlaylistBpmMax) : undefined,
         tags: newPlaylistTags || undefined,
         occasion: newPlaylistOccasion || undefined,
-      })
+      }
+      
+      console.log('🎵 Creating playlist with data:', playlistData)
+      
+      const { data, errors } = await createPlaylist(playlistData)
+      
+      if (errors) {
+        console.error('❌ GraphQL errors:', errors)
+        alert(`Failed to create playlist: ${JSON.stringify(errors)}`)
+        return
+      }
       
       if (data) {
         console.log('✅ Playlist created:', data)
@@ -78,9 +118,10 @@ function Playlist() {
         setNewPlaylistTags('')
         setNewPlaylistOccasion('')
       }
-    } catch (error) {
-      console.error('Failed to create playlist:', error)
-      alert('Failed to create playlist')
+    } catch (error: any) {
+      console.error('❌ Error creating playlist:', error)
+      console.error('Error details:', error?.errors || error?.message || error)
+      alert(`Failed to create playlist: ${error?.message || 'Unknown error'}`)
     }
   }
   
@@ -278,17 +319,9 @@ function Playlist() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select genre...</option>
-                        <option value="Techno">Techno</option>
-                        <option value="House">House</option>
-                        <option value="Tech House">Tech House</option>
-                        <option value="Deep House">Deep House</option>
-                        <option value="Minimal">Minimal</option>
-                        <option value="Progressive">Progressive</option>
-                        <option value="Trance">Trance</option>
-                        <option value="Drum & Bass">Drum & Bass</option>
-                        <option value="Dubstep">Dubstep</option>
-                        <option value="Ambient">Ambient</option>
-                        <option value="Electronica">Electronica</option>
+                        {availableGenres.map(genre => (
+                          <option key={genre} value={genre}>{genre}</option>
+                        ))}
                         <option value="Mixed">Mixed</option>
                       </select>
                     </div>
