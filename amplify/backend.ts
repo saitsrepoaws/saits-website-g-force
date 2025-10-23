@@ -61,14 +61,14 @@ trackTable.grantReadWriteData(audioAnalyzerLambda)
 // Public FFmpeg Layer for eu-west-1 (Node.js 20)
 // ARN: arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7
 const ffmpegLayer = LayerVersion.fromLayerVersionArn(
-  audioAnalyzerLambda.stack,
+  backend.audioAnalyzer.resources.lambda.stack,
   'FFmpegLayer',
   'arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7'
 )
 
-// Cast to LambdaFunction to add layers
-const analyzerFunction = audioAnalyzerLambda.node.defaultChild as LambdaFunction
-analyzerFunction.addLayers(ffmpegLayer)
+// Add layer to Lambda function via CDK
+const analyzerCfnFunction = backend.audioAnalyzer.resources.lambda.node.defaultChild as any
+analyzerCfnFunction.addPropertyOverride('Layers', [ffmpegLayer.layerVersionArn])
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
