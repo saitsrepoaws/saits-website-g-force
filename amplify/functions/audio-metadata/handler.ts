@@ -330,14 +330,107 @@ async function detectBPM(filePath: string): Promise<number> {
 }
 
 function detectKey(metadata: any): string | null {
-  // Check if key is in ID3 tags
+  // 1. Check if key is in ID3 tags (TKEY frame)
   if (metadata.common.key) {
-    return metadata.common.key
+    const key = normalizeKey(metadata.common.key)
+    console.log(`Key found in ID3 tags: ${key}`)
+    return key
   }
   
-  // Placeholder for advanced key detection
-  // In production, use: essentia.js, Spotify API, or AcoustID
-  console.log('Key detection: not in tags, would need audio analysis')
+  // 2. Check in comments/description for key notation
+  const comment = metadata.common.comment?.[0]?.text || ''
+  const keyMatch = comment.match(/\b([A-G][#b]?m?)\b/i)
+  if (keyMatch) {
+    const key = normalizeKey(keyMatch[1])
+    console.log(`Key found in comments: ${key}`)
+    return key
+  }
+  
+  // 3. Check filename for key patterns
+  const title = metadata.common.title || ''
+  const keyInTitle = extractKeyFromText(title)
+  if (keyInTitle) {
+    console.log(`Key found in title: ${keyInTitle}`)
+    return keyInTitle
+  }
+  
+  console.log('Key detection: not found in tags or filename')
+  return null
+}
+
+/**
+ * Normalize key notation to consistent format
+ * Input: "Cm", "c-minor", "C Minor", "8A" (Camelot)
+ * Output: "C", "Cm", "C#", "D#/Eb", etc.
+ */
+function normalizeKey(key: string): string {
+  if (!key) return ''
+  
+  const keyStr = key.trim()
+  
+  // Camelot notation (1A-12A for minor, 1B-12B for major)
+  const camelotMatch = keyStr.match(/^(\d+)([AB])$/i)
+  if (camelotMatch) {
+    const num = parseInt(camelotMatch[1])
+    const type = camelotMatch[2].toUpperCase()
+    return camelotToKey(num, type)
+  }
+  
+  // Standard notation: C, Cm, C#, C# Minor, etc.
+  const stdMatch = keyStr.match(/^([A-G][#b]?)\s*(m|min|minor)?/i)
+  if (stdMatch) {
+    const root = stdMatch[1].toUpperCase()
+    const isMinor = stdMatch[2] ? 'm' : ''
+    
+    // Convert flats to sharps for consistency (with both notations)
+    const normalized = root
+      .replace('DB', 'C#/Db')
+      .replace('EB', 'D#/Eb')
+      .replace('GB', 'F#/Gb')
+      .replace('AB', 'G#/Ab')
+      .replace('BB', 'A#/Bb')
+    
+    return normalized + isMinor
+  }
+  
+  return keyStr
+}
+
+/**
+ * Convert Camelot wheel notation to standard key
+ */
+function camelotToKey(num: number, type: string): string {
+  const majorKeys = ['', 'B', 'F#/Gb', 'C#/Db', 'G#/Ab', 'D#/Eb', 'A#/Bb', 'F', 'C', 'G', 'D', 'A', 'E']
+  const minorKeys = ['', 'G#/Abm', 'D#/Ebm', 'A#/Bbm', 'Fm', 'Cm', 'Gm', 'Dm', 'Am', 'Em', 'Bm', 'F#/Gbm', 'C#/Dbm']
+  
+  if (type === 'B') {
+    return majorKeys[num] || ''
+  } else {
+    return minorKeys[num] || ''
+  }
+}
+
+/**
+ * Extract key from text (title, filename, etc.)
+ * Looks for patterns like "Track Name (Am)" or "Track Name - Cm"
+ */
+function extractKeyFromText(text: string): string | null {
+  if (!text) return null
+  
+  // Match patterns: (Am), [Cm], - D#m, etc.
+  const patterns = [
+    /[\(\[]([A-G][#b]?m?)[\)\]]/i,  // (Am) or [Cm]
+    /\s-\s([A-G][#b]?m?)\b/i,         // - Am
+    /\s([A-G][#b]?m?)\s*$/i,          // Am at end
+  ]
+  
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match) {
+      return normalizeKey(match[1])
+    }
+  }
+  
   return null
 }
 
