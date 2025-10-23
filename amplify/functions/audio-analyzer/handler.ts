@@ -1,11 +1,14 @@
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { parseMetadata } from 'music-metadata'
+import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import Essentia from 'essentia.js'
+import ffmpeg from 'fluent-ffmpeg'
+import wav from 'node-wav'
 
 const s3Client = new S3Client({})
 const dynamoClient = new DynamoDBClient({})
@@ -86,41 +89,59 @@ async function downloadFromS3(bucket: string, key: string): Promise<string> {
 
 /**
  * Analyze audio file for BPM and Key using Essentia.js
- * 
- * Note: This is a simplified implementation
- * For production, use real Essentia.js extractors:
- * - RhythmExtractor2013 for BPM
- * - KeyExtractor for musical key
+ * Full implementation with WASM and audio decoding
  */
 async function analyzeAudio(filePath: string): Promise<AudioAnalysis> {
-  console.log('🎵 Running audio analysis...')
+  console.log('🎵 Running Essentia.js audio analysis...')
   
-  // For now, use metadata parsing + intelligent detection
-  // Full Essentia.js requires WASM initialization which is complex
+  // 1. Get basic metadata first
+  const metadata = await parseFile(filePath)
   
-  const fileStream = fs.createReadStream(filePath)
-  const metadata = await parseMetadata(fileStream)
-  
-  // Extract what we can from metadata first
+  // 2. Check if BPM and Key are in tags
   let bpm = metadata.common.bpm || 0
   let key = metadata.common.key || null
   
-  console.log(`Metadata: BPM=${bpm}, Key=${key}`)
+  console.log(`Metadata tags: BPM=${bpm}, Key=${key}`)
   
-  // If no metadata, use advanced pattern detection
-  if (!bpm) {
-    bpm = await detectBPMFromAudio(filePath)
+  // 3. If missing, use Essentia.js for real audio analysis
+  if (!bpm || !key) {
+    console.log('⚡ Running Essentia.js audio analysis...')
+    
+    try {
+      // Decode audio to WAV PCM
+      const audioBuffer = await decodeAudioToWav(filePath)
+      
+      // Initialize Essentia.js WASM
+      const essentia = await Essentia()
+      console.log('✅ Essentia.js WASM initialized')
+      
+      // Analyze with Essentia.js
+      const analysis = await analyzeWithEssentia(essentia, audioBuffer)
+      
+      if (!bpm && analysis.bpm) {
+        bpm = analysis.bpm
+        console.log(`✅ BPM detected: ${bpm}`)
+      }
+      
+      if (!key && analysis.key) {
+        key = analysis.key
+        console.log(`✅ Key detected: ${key}`)
+      }
+      
+    } catch (error) {
+      console.error('⚠️ Essentia.js analysis failed:', error)
+      // Fallback to filename detection
+      if (!bpm) bpm = await detectBPMFromFilename(filePath)
+      if (!key) key = await detectKeyFromFilename(filePath)
+    }
   }
   
-  if (!key) {
-    key = await detectKeyFromAudio(filePath)
-  }
-  
-  // Audio features estimation
+  // 4. Estimate audio features
   const duration = metadata.format.duration || 0
   const energy = estimateEnergy(metadata)
   const danceability = estimateDanceability(bpm)
-  const valence = estimateValence(metadata.common.genre)
+  const genre = Array.isArray(metadata.common.genre) ? metadata.common.genre[0] : metadata.common.genre
+  const valence = estimateValence(genre)
   
   return {
     bpm: bpm || 0,
@@ -142,21 +163,111 @@ interface AudioAnalysis {
 }
 
 /**
- * BPM Detection using audio analysis
- * 
- * TODO: Implement with Essentia.js RhythmExtractor2013
- * For now, uses intelligent estimation
+ * Decode audio file to WAV PCM format using FFmpeg
+ * Essentia.js requires mono 44.1kHz PCM audio
  */
-async function detectBPMFromAudio(filePath: string): Promise<number> {
-  console.log('⚡ Detecting BPM from audio...')
+async function decodeAudioToWav(filePath: string): Promise<Float32Array> {
+  console.log('🔊 Decoding audio to WAV...')
   
-  // Placeholder - real implementation would use Essentia.js:
-  // const essentia = new Essentia();
-  // const audio = await loadAudioBuffer(filePath);
-  // const rhythm = essentia.RhythmExtractor2013(audio);
-  // return rhythm.bpm;
+  const outputPath = filePath + '.wav'
   
-  // For now, analyze filename patterns as fallback
+  // Use FFmpeg to convert to mono 44.1kHz WAV
+  await new Promise<void>((resolve, reject) => {
+    ffmpeg(filePath)
+      .outputOptions([
+        '-f', 'wav',        // WAV format
+        '-acodec', 'pcm_s16le', // PCM 16-bit
+        '-ar', '44100',     // 44.1kHz sample rate
+        '-ac', '1'          // Mono
+      ])
+      .output(outputPath)
+      .on('end', () => resolve())
+      .on('error', (err) => reject(err))
+      .run()
+  })
+  
+  console.log('✅ Audio decoded to WAV')
+  
+  // Read WAV file and decode to Float32Array
+  const wavBuffer = fs.readFileSync(outputPath)
+  const decoded = wav.decode(wavBuffer)
+  
+  // Convert to Float32Array (normalize to -1.0 to 1.0)
+  const float32Data = new Float32Array(decoded.channelData[0].length)
+  for (let i = 0; i < decoded.channelData[0].length; i++) {
+    float32Data[i] = decoded.channelData[0][i] / 32768.0
+  }
+  
+  // Cleanup
+  fs.unlinkSync(outputPath)
+  
+  console.log(`✅ Audio buffer ready: ${float32Data.length} samples`)
+  return float32Data
+}
+
+/**
+ * Analyze audio with Essentia.js extractors
+ */
+async function analyzeWithEssentia(essentia: any, audioBuffer: Float32Array): Promise<{ bpm?: number, key?: string }> {
+  const result: { bpm?: number, key?: string } = {}
+  
+  // BPM Detection using RhythmExtractor2013
+  try {
+    console.log('🎵 Running BPM detection...')
+    
+    // Essentia.js RhythmExtractor2013
+    const rhythm = essentia.RhythmExtractor2013(
+      audioBuffer,
+      44100, // sample rate
+      false  // do not use onset
+    )
+    
+    if (rhythm && rhythm.bpm) {
+      result.bpm = Math.round(rhythm.bpm)
+      console.log(`✅ Essentia BPM: ${result.bpm}`)
+    }
+  } catch (error) {
+    console.error('⚠️ BPM detection failed:', error)
+  }
+  
+  // Key Detection using KeyExtractor
+  try {
+    console.log('🎹 Running Key detection...')
+    
+    // Essentia.js KeyExtractor
+    const keyData = essentia.KeyExtractor(
+      audioBuffer,
+      44100,  // sample rate
+      true,   // use polyphonic key detection
+      0.5,    // threshold
+      'edma'  // algorithm (edma, temperley, krumhansl)
+    )
+    
+    if (keyData && keyData.key && keyData.scale) {
+      // Convert to standard notation
+      result.key = normalizeKeyFromEssentia(keyData.key, keyData.scale)
+      console.log(`✅ Essentia Key: ${result.key}`)
+    }
+  } catch (error) {
+    console.error('⚠️ Key detection failed:', error)
+  }
+  
+  return result
+}
+
+/**
+ * Normalize key from Essentia.js output
+ * Essentia outputs: key (C, C#, D, etc.) and scale (major, minor)
+ */
+function normalizeKeyFromEssentia(key: string, scale: string): string {
+  const isMinor = scale.toLowerCase() === 'minor'
+  return key + (isMinor ? 'm' : '')
+}
+
+/**
+ * BPM Detection from filename (fallback)
+ */
+async function detectBPMFromFilename(filePath: string): Promise<number> {
   const fileName = path.basename(filePath)
   const bpmPatterns = [
     /(\d{2,3})\s*bpm/i,
@@ -171,32 +282,19 @@ async function detectBPMFromAudio(filePath: string): Promise<number> {
     if (match) {
       const bpm = parseInt(match[1])
       if (bpm >= 60 && bpm <= 200) {
-        console.log(`✅ BPM detected from filename: ${bpm}`)
+        console.log(`✅ BPM from filename: ${bpm}`)
         return bpm
       }
     }
   }
   
-  console.log('⚠️ BPM not detected, using 0')
   return 0
 }
 
 /**
- * Key Detection using audio analysis
- * 
- * TODO: Implement with Essentia.js KeyExtractor
- * For now, uses intelligent estimation
+ * Key Detection from filename (fallback)
  */
-async function detectKeyFromAudio(filePath: string): Promise<string | null> {
-  console.log('🎹 Detecting key from audio...')
-  
-  // Placeholder - real implementation would use Essentia.js:
-  // const essentia = new Essentia();
-  // const audio = await loadAudioBuffer(filePath);
-  // const keyData = essentia.KeyExtractor(audio);
-  // return normalizeKey(keyData.key, keyData.scale);
-  
-  // For now, analyze filename patterns as fallback
+async function detectKeyFromFilename(filePath: string): Promise<string | null> {
   const fileName = path.basename(filePath)
   const keyPatterns = [
     /[\(\[]([A-G][#b]?m?)[\)\]]/i,  // (Am) or [Cm]
@@ -208,12 +306,11 @@ async function detectKeyFromAudio(filePath: string): Promise<string | null> {
     const match = fileName.match(pattern)
     if (match) {
       const key = normalizeKey(match[1])
-      console.log(`✅ Key detected from filename: ${key}`)
+      console.log(`✅ Key from filename: ${key}`)
       return key
     }
   }
   
-  console.log('⚠️ Key not detected')
   return null
 }
 

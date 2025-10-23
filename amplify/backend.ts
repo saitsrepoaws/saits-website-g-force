@@ -5,6 +5,7 @@ import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
 import { waveformGenerator } from './functions/waveform-generator/resource'
 import { playlistGenerator } from './functions/playlist-generator/resource'
+import { audioAnalyzer } from './functions/audio-analyzer/resource'
 // import { audioFeatures } from './functions/audio-features/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
@@ -18,6 +19,7 @@ export const backend = defineBackend({
   audioMetadata,
   waveformGenerator,
   playlistGenerator,
+  audioAnalyzer,
   // audioFeatures, // TODO: Combine with metadata or use SNS fanout
 })
 
@@ -26,6 +28,7 @@ const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
 const waveformLambda = backend.waveformGenerator.resources.lambda
 const playlistGeneratorLambda = backend.playlistGenerator.resources.lambda
+const audioAnalyzerLambda = backend.audioAnalyzer.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
 const playlistTable = backend.data.resources.tables['Playlist']
 
@@ -45,19 +48,28 @@ playlistTable.grantReadWriteData(playlistGeneratorLambda)
 storageBucket.grantRead(waveformLambda)
 storageBucket.grantPut(waveformLambda)
 
-// Grant Lambda 1 permission to invoke Lambda 3
+// Grant Lambda 1 permission to invoke Lambda 3 and Lambda 5
 waveformLambda.grantInvoke(metadataLambda)
+audioAnalyzerLambda.grantInvoke(metadataLambda)
+
+// Grant Lambda 5 (audio analyzer) permissions
+storageBucket.grantRead(audioAnalyzerLambda)
+trackTable.grantReadWriteData(audioAnalyzerLambda)
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.audioMetadata.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 backend.audioMetadata.addEnvironment('WAVEFORM_LAMBDA_NAME', waveformLambda.functionName)
+backend.audioMetadata.addEnvironment('AUDIO_ANALYZER_LAMBDA_NAME', audioAnalyzerLambda.functionName)
 
 backend.waveformGenerator.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 
 backend.playlistGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 backend.playlistGenerator.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
+
+backend.audioAnalyzer.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
+backend.audioAnalyzer.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 
 // Add S3 notification to trigger Lambda on audio file uploads
 storageBucket.addEventNotification(
