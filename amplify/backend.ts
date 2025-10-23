@@ -57,18 +57,8 @@ audioAnalyzerLambda.grantInvoke(metadataLambda)
 storageBucket.grantRead(audioAnalyzerLambda)
 trackTable.grantReadWriteData(audioAnalyzerLambda)
 
-// Add FFmpeg Lambda Layer to audio analyzer
-// Public FFmpeg Layer for eu-west-1 (Node.js 20)
-// ARN: arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7
-const ffmpegLayer = LayerVersion.fromLayerVersionArn(
-  backend.audioAnalyzer.resources.lambda.stack,
-  'FFmpegLayer',
-  'arn:aws:lambda:eu-west-1:654654156625:layer:ffmpeg-lambda-layer:7'
-)
-
-// Add layer to Lambda function via CDK
-const analyzerCfnFunction = backend.audioAnalyzer.resources.lambda.node.defaultChild as any
-analyzerCfnFunction.addPropertyOverride('Layers', [ffmpegLayer.layerVersionArn])
+// Note: FFmpeg binary will be bundled with Lambda deployment
+// No Lambda Layer needed - ffmpeg-static provides the binary
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
