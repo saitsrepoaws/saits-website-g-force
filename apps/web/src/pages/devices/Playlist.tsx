@@ -175,7 +175,7 @@ function Playlist() {
       
       if (data && data.success && data.playlist) {
         console.log('✅ Playlist auto-generated:', data)
-        alert(`✅ Playlist generated!\n\n${data.tracksMatched} tracks matched your criteria\n${data.tracksSelected} tracks selected\n\nTotal duration: ${Math.floor(data.playlist.totalDuration / 60)}:${(data.playlist.totalDuration % 60).toString().padStart(2, '0')}`)
+        alert(`✅ Playlist Generated!\n\n📊 ${data.tracksMatched} tracks matched your criteria\n🎵 ${data.tracksSelected} tracks selected\n⏱️ Total duration: ${Math.floor(data.playlist.totalDuration / 60)}:${(data.playlist.totalDuration % 60).toString().padStart(2, '0')}`)
         
         // Reload playlists
         await loadPlaylists()
@@ -191,7 +191,16 @@ function Playlist() {
         setNewPlaylistKey('')
         setNewPlaylistTags('')
       } else {
-        alert(data?.error || 'Failed to generate playlist')
+        // Show specific error message
+        const errorMsg = data?.error || 'Failed to generate playlist'
+        
+        if (errorMsg.includes('No tracks match')) {
+          alert(`❌ No Tracks Found\n\nNo tracks in your library match the criteria:\n\n${newPlaylistGenre ? `• Genre: ${newPlaylistGenre}\n` : ''}${newPlaylistMood ? `• Mood: ${newPlaylistMood}\n` : ''}${newPlaylistBpmMin || newPlaylistBpmMax ? `• BPM: ${newPlaylistBpmMin || '?'}-${newPlaylistBpmMax || '?'}\n` : ''}${newPlaylistKey ? `• Key: ${newPlaylistKey}\n` : ''}\n💡 Try:\n• Removing some filters\n• Using broader criteria\n• Adding more tracks to your library`)
+        } else if (errorMsg.includes('No tracks found in library')) {
+          alert(`❌ Empty Track Library\n\nYour track library is empty!\n\n💡 Please upload some tracks first:\n1. Go to Libery\n2. Upload audio files\n3. Come back and generate playlist`)
+        } else {
+          alert(`❌ Generation Failed\n\n${errorMsg}`)
+        }
       }
     } catch (error: any) {
       console.error('❌ Error generating playlist:', error)
