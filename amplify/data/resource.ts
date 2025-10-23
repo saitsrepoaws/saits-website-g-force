@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend'
+import { playlistGenerator } from '../functions/playlist-generator/resource'
 
 // Define the data schema
 const schema = a.schema({
@@ -78,7 +79,7 @@ const schema = a.schema({
     })
     .returns(a.json())
     .authorization((allow) => [allow.authenticated()])
-    .handler(a.handler.function('playlistGenerator')),
+    .handler(a.handler.function(playlistGenerator)),
 })
 
 export type Schema = ClientSchema<typeof schema>

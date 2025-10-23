@@ -309,9 +309,29 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
   try {
     console.log('🤖 Generating playlist:', input)
     
+    const client = getClient()
+    
+    // Check if queries object exists
+    if (!client.queries) {
+      console.error('❌ Client queries not available. Schema may not be deployed.')
+      return { 
+        data: null, 
+        errors: [{ message: 'GraphQL schema not deployed. Please run: npx ampx sandbox' }] 
+      }
+    }
+    
+    // Check if generatePlaylist query exists
+    if (!client.queries.generatePlaylist) {
+      console.error('❌ generatePlaylist query not found. Available queries:', Object.keys(client.queries || {}))
+      return { 
+        data: null, 
+        errors: [{ message: 'generatePlaylist query not found. Schema update needed.' }] 
+      }
+    }
+    
     // Call the GraphQL query
     // @ts-ignore - Custom query exists at runtime
-    const { data, errors } = await getClient().queries.generatePlaylist(input)
+    const { data, errors } = await client.queries.generatePlaylist(input)
     
     if (errors) {
       console.error('Error generating playlist:', errors)
