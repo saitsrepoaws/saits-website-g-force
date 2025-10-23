@@ -51,7 +51,7 @@ function SortableTrackRow({
     <div
       ref={setNodeRef}
       style={style}
-      className={`grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 items-center p-3 border border-gray-200 rounded ${
+      className={`grid grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,50px,50px] gap-2 items-center p-3 border border-gray-200 rounded ${
         isDragging ? 'bg-blue-50 shadow-lg z-10' : 'hover:bg-gray-50'
       }`}
     >
@@ -82,6 +82,13 @@ function SortableTrackRow({
       </div>
       <div className="text-xs text-gray-600 truncate">
         {track.trackGenre || '-'}
+      </div>
+      <div className="text-xs text-gray-600 text-center">
+        {(track as any).trackKey ? (
+          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">
+            {(track as any).trackKey}
+          </span>
+        ) : '-'}
       </div>
       <div className="text-xs text-gray-600">
         {track.trackBpm || '-'}
@@ -234,6 +241,7 @@ function PlaylistDetail() {
         trackArtist: track.artist,
         trackDuration: track.duration,
         trackBpm: track.bpm,
+        trackKey: (track as any).key, // Include musical key
         trackGenre: (track as any).genre,
         trackCoverArtUrl: track.coverArtUrl,
       }
@@ -605,12 +613,13 @@ function PlaylistDetail() {
           ) : (
             <div className="space-y-2">
               {/* Header */}
-              <div className="grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
+              <div className="grid grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,50px,50px] gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
                 <div>#</div>
                 <div></div>
                 <div>Title</div>
                 <div>Artist</div>
                 <div>Genre</div>
+                <div className="text-center">Key</div>
                 <div>BPM</div>
                 <div>Duration</div>
                 <div className="text-center">

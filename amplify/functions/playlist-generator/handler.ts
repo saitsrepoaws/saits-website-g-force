@@ -84,6 +84,7 @@ interface PlaylistTrackItem {
   trackArtist?: string
   trackDuration?: number
   trackBpm?: number
+  trackKey?: string // Musical key
   trackGenre?: string
   trackCoverArtUrl?: string
 }
@@ -360,6 +361,7 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       trackArtist: track.artist,
       trackDuration: track.duration,
       trackBpm: track.bpm,
+      trackKey: track.key, // Include key for display
       trackGenre: track.genre,
       trackCoverArtUrl: track.coverArtUrl,
     }))

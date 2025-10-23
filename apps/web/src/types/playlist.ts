@@ -10,6 +10,7 @@ export interface PlaylistTrackItem {
   trackArtist?: string
   trackDuration?: number
   trackBpm?: number
+  trackKey?: string // Musical key (C, C#, Dm, etc.)
   trackGenre?: string
   trackCoverArtUrl?: string
 }
