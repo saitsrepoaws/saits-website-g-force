@@ -162,6 +162,23 @@ export async function addTracksToPlaylist(playlistId: string, tracksToAdd: Playl
       return { data: playlist, errors: null }
     }
     
+    // Check duration limit (max 59 minutes = 3540 seconds)
+    const MAX_DURATION = 59 * 60 // 3540 seconds
+    const currentDuration = currentTracks.reduce((sum, t) => sum + (t.trackDuration || 0), 0)
+    const newTracksDuration = uniqueTracksToAdd.reduce((sum, t) => sum + (t.trackDuration || 0), 0)
+    const projectedDuration = currentDuration + newTracksDuration
+    
+    if (projectedDuration > MAX_DURATION) {
+      const remaining = MAX_DURATION - currentDuration
+      const remainingMin = Math.floor(remaining / 60)
+      const remainingSec = remaining % 60
+      throw new Error(
+        `Playlist duration limit exceeded! Maximum 59 minutes allowed. ` +
+        `Current: ${Math.floor(currentDuration / 60)}:${(currentDuration % 60).toString().padStart(2, '0')}, ` +
+        `Remaining: ${remainingMin}:${remainingSec.toString().padStart(2, '0')}`
+      )
+    }
+    
     // Add new tracks with incremented order
     const maxOrder = currentTracks.length > 0 
       ? Math.max(...currentTracks.map(t => t.order))

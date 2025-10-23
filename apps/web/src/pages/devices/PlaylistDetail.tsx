@@ -154,9 +154,10 @@ function PlaylistDetail() {
       if (addedCount < tracksToAdd.length) {
         alert(`✅ Added ${addedCount} track(s). ${tracksToAdd.length - addedCount} duplicate(s) skipped.`)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to add tracks:', error)
-      alert('Failed to add tracks to playlist')
+      // Show specific error message (e.g., duration limit exceeded)
+      alert(error?.message || 'Failed to add tracks to playlist')
     }
   }
   
@@ -345,11 +346,43 @@ function PlaylistDetail() {
               {playlist.description && (
                 <p className="text-gray-600 mb-4">{playlist.description}</p>
               )}
-              <div className="text-sm text-gray-500">
-                {playlist.trackCount} {playlist.trackCount === 1 ? 'track' : 'tracks'}
-                {playlist.totalDuration > 0 && (
-                  <> · {Math.floor(playlist.totalDuration / 60)} min</>
-                )}
+              <div className="text-sm text-gray-500 space-y-1">
+                <div>
+                  {playlist.trackCount} {playlist.trackCount === 1 ? 'track' : 'tracks'}
+                  {playlist.totalDuration > 0 && (
+                    <> · {Math.floor(playlist.totalDuration / 60)}:{(playlist.totalDuration % 60).toString().padStart(2, '0')} min</>
+                  )}
+                </div>
+                {/* Duration limit indicator */}
+                {(() => {
+                  const MAX_DURATION = 59 * 60 // 3540 seconds
+                  const remaining = MAX_DURATION - (playlist.totalDuration || 0)
+                  const remainingMin = Math.floor(remaining / 60)
+                  const remainingSec = remaining % 60
+                  const percentUsed = ((playlist.totalDuration || 0) / MAX_DURATION) * 100
+                  
+                  return (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className={`h-full transition-all ${
+                            percentUsed > 90 ? 'bg-red-500' : 
+                            percentUsed > 75 ? 'bg-yellow-500' : 
+                            'bg-blue-500'
+                          }`}
+                          style={{ width: `${Math.min(percentUsed, 100)}%` }}
+                        />
+                      </div>
+                      <span className={`text-xs font-medium ${
+                        percentUsed > 90 ? 'text-red-600' : 
+                        percentUsed > 75 ? 'text-yellow-600' : 
+                        'text-gray-600'
+                      }`}>
+                        {remainingMin}:{remainingSec.toString().padStart(2, '0')} left (max 59:00)
+                      </span>
+                    </div>
+                  )
+                })()}
               </div>
             </div>
             
