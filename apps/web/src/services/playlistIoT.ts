@@ -32,8 +32,15 @@ class PlaylistIoTService {
   subscribeToPlaylist(playlistId: string, callback: (event: PlaylistEvent) => void) {
     const topic = `playlist/${playlistId}/events`
     
-    console.log(`📡 Subscribing to: ${topic}`)
+    console.log(`📡 Subscribing to: ${topic} (IoT Core not configured - using local state only)`)
     
+    // TODO: Enable when IoT Core is configured in Amplify
+    // For now, return a no-op unsubscribe function
+    return () => {
+      console.log(`📡 Unsubscribe (no-op): ${topic}`)
+    }
+    
+    /* Uncomment when IoT Core is configured:
     const subscription = (PubSub as any).subscribe({ topics: [topic] }).subscribe({
       next: (data: any) => {
         console.log('📩 Playlist event received:', data)
@@ -54,12 +61,12 @@ class PlaylistIoTService {
     
     this.subscriptions.set(playlistId, subscription)
     
-    // Return unsubscribe function
     return () => {
       console.log(`📡 Unsubscribing from: ${topic}`)
       subscription.unsubscribe()
       this.subscriptions.delete(playlistId)
     }
+    */
   }
   
   /**
@@ -68,8 +75,12 @@ class PlaylistIoTService {
   private async publishEvent(playlistId: string, event: PlaylistEvent) {
     const topic = `playlist/${playlistId}/events`
     
-    console.log(`📤 Publishing to ${topic}:`, event)
+    console.log(`📤 Publishing to ${topic} (IoT Core not configured - skipping):`, event.type)
     
+    // TODO: Enable when IoT Core is configured
+    return
+    
+    /* Uncomment when IoT Core is configured:
     try {
       await (PubSub as any).publish({
         topics: [topic],
@@ -80,6 +91,7 @@ class PlaylistIoTService {
       console.error('❌ Failed to publish event:', error)
       throw error
     }
+    */
   }
   
   /**
