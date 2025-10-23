@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
-import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist } from '../../services/playlists'
+import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist, deletePlaylist } from '../../services/playlists'
 import { listTracks } from '../../services/tracks'
 import { playlistIoT } from '../../services/playlistIoT'
 import { getUrl } from 'aws-amplify/storage'
@@ -177,6 +177,28 @@ function PlaylistDetail() {
     }
   }
   
+  async function handleDeletePlaylist() {
+    if (!id || !playlist) return
+    
+    if (!confirm(`Are you sure you want to delete "${playlist.name}"?\n\nThis action cannot be undone.`)) {
+      return
+    }
+    
+    try {
+      await deletePlaylist(id)
+      console.log('✅ Playlist deleted:', id)
+      
+      // Notify via IoT
+      await playlistIoT.playlistDeleted(id)
+      
+      // Navigate back to playlist overview
+      navigate('/devices/playlist')
+    } catch (error) {
+      console.error('Failed to delete playlist:', error)
+      alert('Failed to delete playlist')
+    }
+  }
+  
   function toggleTrackSelection(trackId: string) {
     const newSelection = new Set(selectedTrackIds)
     if (newSelection.has(trackId)) {
@@ -267,6 +289,13 @@ function PlaylistDetail() {
               >
                 <span>+</span>
                 Add Tracks
+              </button>
+              <button
+                onClick={handleDeletePlaylist}
+                className="px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 flex items-center gap-2 justify-center"
+              >
+                <span>🗑️</span>
+                Delete Playlist
               </button>
             </div>
           </div>
