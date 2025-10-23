@@ -60,6 +60,25 @@ const schema = a.schema({
       trimEnd: a.float(), // Time in seconds where audio actually ends
     })
     .authorization((allow) => [allow.authenticated()]),
+  
+  // Custom query to generate playlist via Lambda
+  generatePlaylist: a
+    .query()
+    .arguments({
+      name: a.string().required(),
+      description: a.string(),
+      genre: a.string(),
+      mood: a.string(),
+      bpmMin: a.integer(),
+      bpmMax: a.integer(),
+      key: a.string(),
+      tags: a.string(),
+      maxTracks: a.integer(),
+      maxDuration: a.integer(),
+    })
+    .returns(a.json())
+    .authorization((allow) => [allow.authenticated()])
+    .handler(a.handler.function('playlistGenerator')),
 })
 
 export type Schema = ClientSchema<typeof schema>

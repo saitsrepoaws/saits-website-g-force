@@ -4,6 +4,7 @@ import { data } from './data/resource'
 import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
 import { waveformGenerator } from './functions/waveform-generator/resource'
+import { playlistGenerator } from './functions/playlist-generator/resource'
 // import { audioFeatures } from './functions/audio-features/resource'
 import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
@@ -16,6 +17,7 @@ export const backend = defineBackend({
   storage,
   audioMetadata,
   waveformGenerator,
+  playlistGenerator,
   // audioFeatures, // TODO: Combine with metadata or use SNS fanout
 })
 
@@ -23,7 +25,9 @@ export const backend = defineBackend({
 const storageBucket = backend.storage.resources.bucket
 const metadataLambda = backend.audioMetadata.resources.lambda
 const waveformLambda = backend.waveformGenerator.resources.lambda
+const playlistGeneratorLambda = backend.playlistGenerator.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
+const playlistTable = backend.data.resources.tables['Playlist']
 
 // Grant Lambda permission to read from S3 and write cover art
 storageBucket.grantRead(metadataLambda)
@@ -32,6 +36,10 @@ storageBucket.grantPut(metadataLambda)
 // Grant Lambda permission to read/write DynamoDB Track table
 trackTable.grantReadWriteData(metadataLambda)
 trackTable.grantReadWriteData(waveformLambda)
+
+// Grant playlist generator Lambda permissions
+trackTable.grantReadData(playlistGeneratorLambda)
+playlistTable.grantReadWriteData(playlistGeneratorLambda)
 
 // Grant waveform Lambda S3 permissions
 storageBucket.grantRead(waveformLambda)
@@ -47,6 +55,9 @@ backend.audioMetadata.addEnvironment('WAVEFORM_LAMBDA_NAME', waveformLambda.func
 
 backend.waveformGenerator.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)
 backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+
+backend.playlistGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+backend.playlistGenerator.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
 
 // Add S3 notification to trigger Lambda on audio file uploads
 storageBucket.addEventNotification(
