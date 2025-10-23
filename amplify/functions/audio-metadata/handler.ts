@@ -77,8 +77,9 @@ export const handler = async (event: any) => {
     console.log('Metadata extraction successful:', metadata)
     
     // Update track in DynamoDB with extracted metadata
+    let trackId: string | null = null
     try {
-      await updateTrackInDatabase(s3Key, metadata)
+      trackId = await updateTrackInDatabase(s3Key, metadata)
       console.log('Track updated in database successfully')
     } catch (error) {
       console.error('Failed to update track in database:', error)
@@ -92,6 +93,19 @@ export const handler = async (event: any) => {
     } catch (error) {
       console.error('Failed to invoke Lambda 3:', error)
       // Don't fail if waveform generation fails
+    }
+    
+    // Invoke Lambda 5 (audio analyzer) for BPM and Key detection
+    if (trackId) {
+      try {
+        await invokeLambda5(trackId, s3Key, bucketName)
+        console.log('Lambda 5 (audio analyzer) invoked successfully')
+      } catch (error) {
+        console.error('Failed to invoke Lambda 5:', error)
+        // Don't fail if analysis fails
+      }
+    } else {
+      console.log('No trackId found, skipping Lambda 5 invocation')
     }
     
     return {
@@ -291,7 +305,7 @@ async function extractMetadata(filePath: string, bucketName?: string): Promise<A
   return result
 }
 
-async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
+async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata): Promise<string | null> {
   const tableName = process.env.TRACK_TABLE_NAME
   
   if (!tableName) {
@@ -311,11 +325,12 @@ async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
   
   if (!scanResult.Items || scanResult.Items.length === 0) {
     console.log('No track found with matching fileUrl')
-    return
+    return null
   }
   
   const track = scanResult.Items[0]
-  console.log(`Found track: ${track.id} - ${track.title}`)
+  const trackId = track.id as string
+  console.log(`Found track: ${trackId} - ${track.title}`)
   
   // Update track with metadata
   await dynamoClient.send(new UpdateCommand({
@@ -341,6 +356,7 @@ async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
   }))
   
   console.log('Track updated with audio features')
+  return trackId
 }
 
 async function detectBPM(filePath: string): Promise<number> {
@@ -524,4 +540,31 @@ async function invokeLambda3(event: any) {
   
   await lambdaClient.send(command)
   console.log('Lambda 3 invocation request sent (async)')
+}
+
+async function invokeLambda5(trackId: string, s3Key: string, bucket: string) {
+  const analyzerFunctionName = process.env.AUDIO_ANALYZER_LAMBDA_NAME
+  
+  if (!analyzerFunctionName) {
+    console.log('AUDIO_ANALYZER_LAMBDA_NAME not set, skipping audio analysis')
+    return
+  }
+  
+  console.log(`Invoking Lambda 5: ${analyzerFunctionName}`)
+  
+  // Invoke asynchronously for BPM and Key detection
+  const payload = {
+    trackId,
+    s3Key,
+    bucket,
+  }
+  
+  const command = new InvokeCommand({
+    FunctionName: analyzerFunctionName,
+    InvocationType: 'Event', // Async invocation
+    Payload: JSON.stringify(payload),
+  })
+  
+  await lambdaClient.send(command)
+  console.log('Lambda 5 invocation request sent (async)')
 }
