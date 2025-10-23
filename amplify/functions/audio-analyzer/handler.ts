@@ -120,38 +120,24 @@ async function analyzeAudio(filePath: string): Promise<AudioAnalysis> {
   
   console.log(`Metadata tags: BPM=${bpm}, Key=${key}`)
   
-  // 3. If missing, use Essentia.js for real audio analysis
+  // 3. If missing, try filename detection (fast fallback)
   if (!bpm || !key) {
-    console.log('⚡ Running Essentia.js audio analysis...')
+    console.log('⚡ Running filename pattern detection...')
     
-    try {
-      // Decode audio to WAV PCM
-      const audioBuffer = await decodeAudioToWav(filePath)
-      
-      // Initialize Essentia.js WASM
-      const essentia = await Essentia()
-      console.log('✅ Essentia.js WASM initialized')
-      
-      // Analyze with Essentia.js
-      const analysis = await analyzeWithEssentia(essentia, audioBuffer)
-      
-      if (!bpm && analysis.bpm) {
-        bpm = analysis.bpm
-        console.log(`✅ BPM detected: ${bpm}`)
-      }
-      
-      if (!key && analysis.key) {
-        key = analysis.key
-        console.log(`✅ Key detected: ${key}`)
-      }
-      
-    } catch (error) {
-      console.error('⚠️ Essentia.js analysis failed:', error)
-      // Fallback to filename detection
-      if (!bpm) bpm = await detectBPMFromFilename(filePath)
-      if (!key) key = await detectKeyFromFilename(filePath)
+    if (!bpm) {
+      bpm = await detectBPMFromFilename(filePath)
+      if (bpm) console.log(`✅ BPM from filename: ${bpm}`)
+    }
+    
+    if (!key) {
+      key = await detectKeyFromFilename(filePath)
+      if (key) console.log(`✅ Key from filename: ${key}`)
     }
   }
+  
+  // 4. TODO: Real Essentia.js analysis (requires working FFmpeg in Lambda)
+  // For now, disabled due to FFmpeg bundling issues
+  // Future: Use Lambda Layer with FFmpeg or alternative approach
   
   // 4. Estimate audio features
   const duration = metadata.format.duration || 0
