@@ -9,6 +9,19 @@ import type {
   serializePlaylistTracks 
 } from '../types/playlist'
 
+interface GeneratePlaylistInput {
+  name: string
+  description?: string
+  genre?: string
+  mood?: string
+  bpmMin?: number
+  bpmMax?: number
+  key?: string
+  tags?: string
+  maxTracks?: number
+  maxDuration?: number
+}
+
 // Lazy client - only create after Amplify.configure()
 let client: any = null
 
@@ -285,6 +298,33 @@ export async function reorderPlaylistTracks(playlistId: string, trackIds: string
     return { data, errors }
   } catch (error) {
     console.error('Failed to reorder playlist tracks:', error)
+    return { data: null, errors: [error] }
+  }
+}
+
+/**
+ * Generate a playlist automatically based on criteria
+ */
+export async function generatePlaylist(input: GeneratePlaylistInput) {
+  try {
+    console.log('🤖 Generating playlist:', input)
+    
+    // Call the GraphQL query
+    // @ts-ignore - Custom query exists at runtime
+    const { data, errors } = await getClient().queries.generatePlaylist(input)
+    
+    if (errors) {
+      console.error('Error generating playlist:', errors)
+      return { data: null, errors }
+    }
+    
+    // Parse the JSON response
+    const result = typeof data === 'string' ? JSON.parse(data) : data
+    
+    console.log('✅ Playlist generated:', result)
+    return { data: result, errors: null }
+  } catch (error) {
+    console.error('Failed to generate playlist:', error)
     return { data: null, errors: [error] }
   }
 }

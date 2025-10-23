@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
-import { listPlaylists, createPlaylist, deletePlaylist } from '../../services/playlists'
+import { listPlaylists, createPlaylist, deletePlaylist, generatePlaylist } from '../../services/playlists'
 import { playlistIoT } from '../../services/playlistIoT'
 import { listTracks } from '../../services/tracks'
 import type { Playlist as PlaylistType } from '../../types/playlist'
@@ -11,6 +11,8 @@ function Playlist() {
   const [playlists, setPlaylists] = useState<PlaylistType[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showAutoGenerateModal, setShowAutoGenerateModal] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [availableGenres, setAvailableGenres] = useState<string[]>([])
   
   // Create playlist form
@@ -143,6 +145,62 @@ function Playlist() {
     }
   }
   
+  async function handleAutoGeneratePlaylist() {
+    if (!newPlaylistName.trim()) {
+      alert('Please enter a playlist name')
+      return
+    }
+    
+    setIsGenerating(true)
+    
+    try {
+      const { data, errors } = await generatePlaylist({
+        name: newPlaylistName,
+        description: newPlaylistDescription || undefined,
+        genre: newPlaylistGenre || undefined,
+        mood: newPlaylistMood || undefined,
+        bpmMin: newPlaylistBpmMin ? parseInt(newPlaylistBpmMin) : undefined,
+        bpmMax: newPlaylistBpmMax ? parseInt(newPlaylistBpmMax) : undefined,
+        key: newPlaylistKey || undefined,
+        tags: newPlaylistTags || undefined,
+        maxTracks: 20,
+        maxDuration: 59 * 60, // 59 minutes
+      })
+      
+      if (errors) {
+        console.error('❌ Error generating playlist:', errors)
+        alert(`Failed to generate playlist: ${JSON.stringify(errors)}`)
+        return
+      }
+      
+      if (data && data.success && data.playlist) {
+        console.log('✅ Playlist auto-generated:', data)
+        alert(`✅ Playlist generated!\n\n${data.tracksMatched} tracks matched your criteria\n${data.tracksSelected} tracks selected\n\nTotal duration: ${Math.floor(data.playlist.totalDuration / 60)}:${(data.playlist.totalDuration % 60).toString().padStart(2, '0')}`)
+        
+        // Reload playlists
+        await loadPlaylists()
+        
+        setShowAutoGenerateModal(false)
+        // Reset form
+        setNewPlaylistName('')
+        setNewPlaylistDescription('')
+        setNewPlaylistGenre('')
+        setNewPlaylistMood('')
+        setNewPlaylistBpmMin('')
+        setNewPlaylistBpmMax('')
+        setNewPlaylistKey('')
+        setNewPlaylistTags('')
+      } else {
+        alert(data?.error || 'Failed to generate playlist')
+      }
+    } catch (error: any) {
+      console.error('❌ Error generating playlist:', error)
+      alert(`Failed to generate playlist: ${error?.message || 'Unknown error'}`)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+  
   function formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600)
     const minutes = Math.floor((seconds % 3600) / 60)
@@ -163,13 +221,22 @@ function Playlist() {
               Create and manage your audio playlists
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
-          >
-            <span>+</span>
-            New Playlist
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowAutoGenerateModal(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium flex items-center gap-2"
+            >
+              <span>🤖</span>
+              Auto Generate
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
+            >
+              <span>+</span>
+              New Playlist
+            </button>
+          </div>
         </div>
         
         {/* Playlists Grid */}
@@ -470,6 +537,235 @@ function Playlist() {
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Create Playlist
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Auto Generate Playlist Modal */}
+        {showAutoGenerateModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">🤖</span>
+                <h3 className="text-lg font-bold">Auto Generate Playlist</h3>
+              </div>
+              
+              <p className="text-sm text-gray-600 mb-4">
+                Let AI create a playlist for you based on your criteria! Tracks will be automatically selected from your library.
+              </p>
+              
+              {/* Use same form as create modal */}
+              <div className="space-y-4">
+                {/* Basic Info */}
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Playlist Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={newPlaylistName}
+                      onChange={(e) => setNewPlaylistName(e.target.value)}
+                      placeholder="Dark Techno Mix"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={newPlaylistDescription}
+                      onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                      placeholder="Auto-generated based on criteria"
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+                
+                {/* Metadata (Criteria) */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">🎯 Selection Criteria</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Genre
+                      </label>
+                      <select
+                        value={newPlaylistGenre}
+                        onChange={(e) => setNewPlaylistGenre(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="">All genres...</option>
+                        {availableGenres.map(genre => (
+                          <option key={genre} value={genre}>{genre}</option>
+                        ))}
+                        <option value="Mixed">Mixed</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Mood/Vibe
+                      </label>
+                      <select
+                        value={newPlaylistMood}
+                        onChange={(e) => setNewPlaylistMood(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                      >
+                        <option value="">Any mood...</option>
+                        <option value="Energetic">Energetic</option>
+                        <option value="Chill">Chill</option>
+                        <option value="Dark">Dark</option>
+                        <option value="Uplifting">Uplifting</option>
+                        <option value="Groovy">Groovy</option>
+                        <option value="Melodic">Melodic</option>
+                        <option value="Driving">Driving</option>
+                        <option value="Atmospheric">Atmospheric</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* BPM Range */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">BPM Range</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Min BPM
+                      </label>
+                      <input
+                        type="number"
+                        value={newPlaylistBpmMin}
+                        onChange={(e) => setNewPlaylistBpmMin(e.target.value)}
+                        placeholder="120"
+                        min="60"
+                        max="200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Max BPM
+                      </label>
+                      <input
+                        type="number"
+                        value={newPlaylistBpmMax}
+                        onChange={(e) => setNewPlaylistBpmMax(e.target.value)}
+                        placeholder="135"
+                        min="60"
+                        max="200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Musical Key */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Musical Key (Optional)</h4>
+                  <div className="grid grid-cols-6 gap-2">
+                    {[
+                      'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 
+                      'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
+                    ].map(key => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setNewPlaylistKey(key)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                          newPlaylistKey === key
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {key}
+                      </button>
+                    ))}
+                  </div>
+                  {newPlaylistKey && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Selected:</span>
+                      <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                        🎹 {newPlaylistKey}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setNewPlaylistKey('')}
+                        className="text-xs text-gray-500 hover:text-red-600"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Tags */}
+                <div className="border-t pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tags (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={newPlaylistTags}
+                      onChange={(e) => setNewPlaylistTags(e.target.value)}
+                      placeholder="summer, peak-time, warm-up"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+                
+                {/* Info Box */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm text-green-800">
+                    <strong>🤖 Auto Generation:</strong> AI will scan your track library, filter by criteria, 
+                    sort by BPM for smooth transitions, and select up to 20 tracks within 59 minutes.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 mt-6">
+                <button
+                  onClick={() => {
+                    setShowAutoGenerateModal(false)
+                    setNewPlaylistName('')
+                    setNewPlaylistDescription('')
+                    setNewPlaylistGenre('')
+                    setNewPlaylistMood('')
+                    setNewPlaylistBpmMin('')
+                    setNewPlaylistBpmMax('')
+                    setNewPlaylistKey('')
+                    setNewPlaylistTags('')
+                  }}
+                  disabled={isGenerating}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAutoGeneratePlaylist}
+                  disabled={isGenerating}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <span>🤖</span>
+                      Generate Playlist
+                    </>
+                  )}
                 </button>
               </div>
             </div>
