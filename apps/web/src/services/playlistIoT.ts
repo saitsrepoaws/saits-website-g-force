@@ -1,6 +1,5 @@
 // IoT/PubSub service for real-time playlist updates
-import { PubSub } from 'aws-amplify/pubsub'
-import { CONNECTION_STATE_CHANGE, ConnectionState } from 'aws-amplify/pubsub'
+import { PubSub } from '@aws-amplify/pubsub'
 import { Hub } from 'aws-amplify/utils'
 import type { PlaylistEvent, PlaylistTrackItem } from '../types/playlist'
 
@@ -13,15 +12,15 @@ class PlaylistIoTService {
    * Auto-configured via amplify_outputs.json
    */
   async connect() {
-    console.log('🔌 Connecting to IoT Core...')
+    console.log('🔌 Connecting to IoT Core via PubSub...')
     
     // Listen for connection state changes
     Hub.listen('pubsub', (data: any) => {
       const { payload } = data
-      if (payload.event === CONNECTION_STATE_CHANGE) {
-        const connectionState = payload.data.connectionState as ConnectionState
+      if (payload.event === 'CONNECTION_STATE_CHANGE') {
+        const connectionState = payload.data.connectionState
         console.log('📡 IoT Connection State:', connectionState)
-        this.isConnected = connectionState === ConnectionState.Connected
+        this.isConnected = connectionState === 'Connected'
       }
     })
   }
@@ -35,8 +34,8 @@ class PlaylistIoTService {
     
     console.log(`📡 Subscribing to: ${topic}`)
     
-    const subscription = PubSub.subscribe({ topics: [topic] }).subscribe({
-      next: (data) => {
+    const subscription = (PubSub as any).subscribe({ topics: [topic] }).subscribe({
+      next: (data: any) => {
         console.log('📩 Playlist event received:', data)
         try {
           const event = data.value as PlaylistEvent
@@ -45,7 +44,7 @@ class PlaylistIoTService {
           console.error('Failed to parse playlist event:', error)
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('❌ IoT subscription error:', error)
       },
       complete: () => {
@@ -72,7 +71,7 @@ class PlaylistIoTService {
     console.log(`📤 Publishing to ${topic}:`, event)
     
     try {
-      await PubSub.publish({
+      await (PubSub as any).publish({
         topics: [topic],
         message: event,
       })
