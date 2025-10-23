@@ -82,9 +82,7 @@ type LambdaProvidedEnvVars = {
 
 /** Amplify backend environment variables available at runtime, this includes environment variables defined in `defineFunction` and by cross resource mechanisms */
 type AmplifyBackendEnvVars = {
-  PATH: string;
-  LD_LIBRARY_PATH: string;
-  FFMPEG_PATH: string;
+  FORCE_DEPLOY: string;
   STORAGE_BUCKET_NAME: string;
   TRACK_TABLE_NAME: string;
 };

@@ -1284,13 +1284,11 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "1c1c3f8555b97aaa9503f7c3d6de4b50cff243d0a4b59f3de78a660cc31731a5.zip"
+     "S3Key": "912fac5de6e8ee07b0fd66604421d210dc9176c70e8e019f2fcb2a0bce6c9416.zip"
     },
     "Environment": {
      "Variables": {
-      "PATH": "/opt/bin:/usr/local/bin:/usr/bin/:/bin:/opt/ffmpeg/bin",
-      "LD_LIBRARY_PATH": "/opt/lib:/opt/ffmpeg/lib",
-      "FFMPEG_PATH": "/opt/bin/ffmpeg",
+      "FORCE_DEPLOY": "2",
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
       "STORAGE_BUCKET_NAME": {
        "Ref": "gforgeIotStorageBucketEED00516"
@@ -1356,7 +1354,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/Resource",
-    "aws:asset:path": "asset.1c1c3f8555b97aaa9503f7c3d6de4b50cff243d0a4b59f3de78a660cc31731a5",
+    "aws:asset:path": "asset.912fac5de6e8ee07b0fd66604421d210dc9176c70e8e019f2fcb2a0bce6c9416",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
