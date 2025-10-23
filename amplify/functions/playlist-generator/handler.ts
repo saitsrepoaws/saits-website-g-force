@@ -195,10 +195,10 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       }
     }
     
-    // 3. Sort tracks using harmonic mixing logic
+    // 3. Sort tracks intelligently
     if (input.keys && input.keys.length > 0 && filteredTracks.length > 0) {
+      // HARMONIC MIXING: Use Camelot Wheel
       console.log('🎹 Applying harmonic mixing sort...')
-      // Build optimal track order using greedy algorithm
       const sorted: Track[] = []
       const remaining = [...filteredTracks]
       
@@ -234,13 +234,93 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       filteredTracks = sorted
       console.log('✅ Harmonic mix created with optimal key transitions')
     } else {
-      // Fallback: Sort by BPM for smooth energy flow
-      filteredTracks.sort((a, b) => {
-        if (a.bpm && b.bpm) return a.bpm - b.bpm
-        if (a.energy && b.energy) return a.energy - b.energy
-        return 0
+      // ENERGY FLOW: Create smooth progression based on mood
+      console.log('✨ Creating energy flow playlist...')
+      
+      // Determine energy progression style based on mood
+      const moodProgressions: Record<string, 'build' | 'constant' | 'wave'> = {
+        'Energetic': 'constant', // Keep energy high
+        'Chill': 'constant', // Keep energy low
+        'Dark': 'build', // Build tension
+        'Uplifting': 'build', // Build to peak
+        'Groovy': 'wave', // Up and down groove
+        'Melodic': 'wave', // Musical journey
+        'Driving': 'constant', // Steady drive
+        'Atmospheric': 'wave', // Evolving soundscape
+      }
+      
+      const progression = input.mood ? moodProgressions[input.mood] || 'build' : 'build'
+      
+      // Sort tracks by energy to prepare
+      const energySorted = [...filteredTracks].sort((a, b) => {
+        const energyA = a.energy || 0.5
+        const energyB = b.energy || 0.5
+        return energyA - energyB
       })
-      console.log('⚡ Sorted by BPM/energy (no key criteria)')
+      
+      // Build optimal order based on progression type
+      let ordered: Track[] = []
+      
+      if (progression === 'build') {
+        // Warm-up → Peak: Low to high energy
+        ordered = energySorted
+        console.log('📈 Energy progression: Warm-up → Peak')
+      } else if (progression === 'constant') {
+        // Constant energy: Group similar energy levels, slight variations
+        const avgEnergy = energySorted.reduce((sum, t) => sum + (t.energy || 0.5), 0) / energySorted.length
+        ordered = energySorted.sort((a, b) => {
+          const diffA = Math.abs((a.energy || 0.5) - avgEnergy)
+          const diffB = Math.abs((b.energy || 0.5) - avgEnergy)
+          return diffA - diffB // Prefer tracks near average
+        })
+        console.log(`➡️ Energy progression: Constant (${avgEnergy.toFixed(2)})`)
+      } else {
+        // Wave: Low → Mid → High → Mid → Low
+        const third = Math.floor(energySorted.length / 3)
+        const low = energySorted.slice(0, third)
+        const mid = energySorted.slice(third, third * 2)
+        const high = energySorted.slice(third * 2)
+        
+        ordered = [
+          ...low.slice(0, Math.ceil(low.length / 2)),
+          ...mid,
+          ...high,
+          ...mid.reverse(),
+          ...low.slice(Math.ceil(low.length / 2)).reverse()
+        ]
+        console.log('🌊 Energy progression: Wave (Low → Peak → Low)')
+      }
+      
+      // Apply BPM smoothing: Avoid large BPM jumps
+      const smoothed: Track[] = [ordered[0]]
+      const remaining = ordered.slice(1)
+      
+      while (remaining.length > 0) {
+        const currentBpm = smoothed[smoothed.length - 1].bpm || 120
+        
+        // Find next track with closest BPM (within ±5 preferred)
+        let bestIdx = 0
+        let bestScore = Infinity
+        
+        for (let i = 0; i < remaining.length; i++) {
+          const trackBpm = remaining[i].bpm || 120
+          const bpmDiff = Math.abs(trackBpm - currentBpm)
+          
+          // Prefer tracks within ±5 BPM, otherwise pick closest
+          const score = bpmDiff <= 5 ? bpmDiff : bpmDiff * 2
+          
+          if (score < bestScore) {
+            bestScore = score
+            bestIdx = i
+          }
+        }
+        
+        smoothed.push(remaining[bestIdx])
+        remaining.splice(bestIdx, 1)
+      }
+      
+      filteredTracks = smoothed
+      console.log('✅ Energy flow playlist created with BPM smoothing')
     }
     
     // 4. Select tracks (respect maxTracks and maxDuration)
