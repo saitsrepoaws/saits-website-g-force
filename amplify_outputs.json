@@ -424,11 +424,12 @@
               "type": "Int",
               "isRequired": false
             },
-            "key": {
-              "name": "key",
-              "isArray": false,
+            "keys": {
+              "name": "keys",
+              "isArray": true,
               "type": "String",
-              "isRequired": false
+              "isRequired": false,
+              "isArrayNullable": true
             },
             "tags": {
               "name": "tags",

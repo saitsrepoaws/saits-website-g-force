@@ -5,6 +5,49 @@ import type { Schema } from '../../data/resource'
 const client = new DynamoDBClient({})
 const docClient = DynamoDBDocumentClient.from(client)
 
+// Camelot Wheel mapping for harmonic mixing
+// Each key maps to its Camelot code and compatible keys
+const CAMELOT_WHEEL: Record<string, { code: string, compatible: string[] }> = {
+  'C': { code: '8B', compatible: ['C', 'G', 'F', 'Am'] },
+  'C#/Db': { code: '3B', compatible: ['C#/Db', 'G#/Ab', 'F#/Gb', 'A#/Bb'] },
+  'D': { code: '10B', compatible: ['D', 'A', 'G', 'Bm'] },
+  'D#/Eb': { code: '5B', compatible: ['D#/Eb', 'A#/Bb', 'G#/Ab', 'Cm'] },
+  'E': { code: '12B', compatible: ['E', 'B', 'A', 'C#/Dbm'] },
+  'F': { code: '7B', compatible: ['F', 'C', 'A#/Bb', 'Dm'] },
+  'F#/Gb': { code: '2B', compatible: ['F#/Gb', 'C#/Db', 'B', 'D#/Ebm'] },
+  'G': { code: '9B', compatible: ['G', 'D', 'C', 'Em'] },
+  'G#/Ab': { code: '4B', compatible: ['G#/Ab', 'D#/Eb', 'C#/Db', 'Fm'] },
+  'A': { code: '11B', compatible: ['A', 'E', 'D', 'F#/Gbm'] },
+  'A#/Bb': { code: '6B', compatible: ['A#/Bb', 'F', 'D#/Eb', 'Gm'] },
+  'B': { code: '1B', compatible: ['B', 'F#/Gb', 'E', 'G#/Abm'] },
+}
+
+/**
+ * Calculate harmonic compatibility score between two keys
+ * Returns 0-3 (3 = perfect match, 0 = incompatible)
+ */
+function getHarmonicScore(key1: string | undefined, key2: string | undefined): number {
+  if (!key1 || !key2) return 0
+  if (key1 === key2) return 3 // Same key = perfect
+  
+  const key1Data = CAMELOT_WHEEL[key1]
+  const key2Data = CAMELOT_WHEEL[key2]
+  
+  if (!key1Data || !key2Data) return 0
+  
+  // Check if keys are compatible
+  if (key1Data.compatible.includes(key2)) return 2 // Compatible
+  
+  // Check adjacent on Camelot Wheel (±1 step)
+  const key1Code = parseInt(key1Data.code)
+  const key2Code = parseInt(key2Data.code)
+  const diff = Math.abs(key1Code - key2Code)
+  
+  if (diff === 1 || diff === 11) return 1 // Adjacent
+  
+  return 0 // Not compatible
+}
+
 interface GeneratePlaylistInput {
   name: string
   description?: string
@@ -12,7 +55,7 @@ interface GeneratePlaylistInput {
   mood?: string
   bpmMin?: number
   bpmMax?: number
-  key?: string
+  keys?: string[] // Multi-select keys for harmonic mixing
   tags?: string
   maxTracks?: number
   minDuration?: number
@@ -105,10 +148,18 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       console.log(`⚡ BPM filter (${input.bpmMin}-${input.bpmMax}): ${filteredTracks.length} tracks`)
     }
     
-    // Key filter
-    if (input.key) {
-      filteredTracks = filteredTracks.filter(t => t.key === input.key)
-      console.log(`🎹 Key filter (${input.key}): ${filteredTracks.length} tracks`)
+    // Keys filter (multi-select)
+    if (input.keys && input.keys.length > 0) {
+      filteredTracks = filteredTracks.filter(t => {
+        if (!t.key) return false
+        // Check if track key matches any selected key OR is compatible
+        return input.keys!.some(selectedKey => {
+          if (t.key === selectedKey) return true // Exact match
+          const score = getHarmonicScore(t.key, selectedKey)
+          return score >= 2 // Include compatible keys (score 2 or 3)
+        })
+      })
+      console.log(`🎹 Keys filter (${input.keys.join(', ')}): ${filteredTracks.length} tracks`)
     }
     
     // Mood filter (map to energy/valence)
@@ -144,18 +195,53 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       }
     }
     
-    // 3. Sort tracks (by BPM or energy for smooth flow)
-    filteredTracks.sort((a, b) => {
-      // Primary: BPM (if available)
-      if (a.bpm && b.bpm) {
-        return a.bpm - b.bpm
+    // 3. Sort tracks using harmonic mixing logic
+    if (input.keys && input.keys.length > 0 && filteredTracks.length > 0) {
+      console.log('🎹 Applying harmonic mixing sort...')
+      // Build optimal track order using greedy algorithm
+      const sorted: Track[] = []
+      const remaining = [...filteredTracks]
+      
+      // Start with first track (preferably matching first selected key)
+      const startTrack = remaining.find(t => t.key === input.keys![0]) || remaining[0]
+      sorted.push(startTrack)
+      remaining.splice(remaining.indexOf(startTrack), 1)
+      
+      // Greedily pick next track with best harmonic match
+      while (remaining.length > 0 && sorted.length < (input.maxTracks || 20)) {
+        const currentKey = sorted[sorted.length - 1].key
+        
+        // Find track with best harmonic score
+        let bestTrack = remaining[0]
+        let bestScore = getHarmonicScore(currentKey, bestTrack.key)
+        
+        for (const track of remaining) {
+          const score = getHarmonicScore(currentKey, track.key)
+          // Also consider BPM proximity as tiebreaker
+          const bpmDiff = Math.abs((track.bpm || 0) - (sorted[sorted.length - 1].bpm || 0))
+          const adjustedScore = score - (bpmDiff > 10 ? 0.5 : 0)
+          
+          if (adjustedScore > bestScore) {
+            bestScore = adjustedScore
+            bestTrack = track
+          }
+        }
+        
+        sorted.push(bestTrack)
+        remaining.splice(remaining.indexOf(bestTrack), 1)
       }
-      // Secondary: Energy
-      if (a.energy && b.energy) {
-        return a.energy - b.energy
-      }
-      return 0
-    })
+      
+      filteredTracks = sorted
+      console.log('✅ Harmonic mix created with optimal key transitions')
+    } else {
+      // Fallback: Sort by BPM for smooth energy flow
+      filteredTracks.sort((a, b) => {
+        if (a.bpm && b.bpm) return a.bpm - b.bpm
+        if (a.energy && b.energy) return a.energy - b.energy
+        return 0
+      })
+      console.log('⚡ Sorted by BPM/energy (no key criteria)')
+    }
     
     // 4. Select tracks (respect maxTracks and maxDuration)
     const maxTracks = input.maxTracks || 20
@@ -210,12 +296,12 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     const playlist = {
       id: playlistId,
       name: input.name,
-      description: input.description || `Auto-generated playlist with ${selectedTracks.length} tracks`,
+      description: input.description || `Auto-generated harmonic mix with ${selectedTracks.length} tracks`,
       genre: input.genre,
       mood: input.mood,
       bpmMin: input.bpmMin,
       bpmMax: input.bpmMax,
-      key: input.key,
+      key: input.keys && input.keys.length > 0 ? input.keys.join(', ') : undefined, // Store keys as comma-separated
       tags: input.tags,
       tracks: JSON.stringify(playlistTracks),
       trackCount: selectedTracks.length,

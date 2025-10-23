@@ -72,7 +72,7 @@ const schema = a.schema({
       mood: a.string(),
       bpmMin: a.integer(),
       bpmMax: a.integer(),
-      key: a.string(),
+      keys: a.string().array(), // Multi-select keys for harmonic mixing
       tags: a.string(),
       maxTracks: a.integer(),
       maxDuration: a.integer(),

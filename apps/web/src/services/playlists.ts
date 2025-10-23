@@ -16,7 +16,7 @@ interface GeneratePlaylistInput {
   mood?: string
   bpmMin?: number
   bpmMax?: number
-  key?: string
+  keys?: string[] // Multi-select keys for harmonic mixing
   tags?: string
   maxTracks?: number
   maxDuration?: number

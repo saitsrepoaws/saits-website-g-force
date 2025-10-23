@@ -23,6 +23,7 @@ function Playlist() {
   const [newPlaylistBpmMin, setNewPlaylistBpmMin] = useState('')
   const [newPlaylistBpmMax, setNewPlaylistBpmMax] = useState('')
   const [newPlaylistKey, setNewPlaylistKey] = useState('')
+  const [newPlaylistKeys, setNewPlaylistKeys] = useState<string[]>([]) // Multi-select keys
   const [newPlaylistTags, setNewPlaylistTags] = useState('')
   
   // Load playlists and genres
@@ -161,7 +162,7 @@ function Playlist() {
         mood: newPlaylistMood || undefined,
         bpmMin: newPlaylistBpmMin ? parseInt(newPlaylistBpmMin) : undefined,
         bpmMax: newPlaylistBpmMax ? parseInt(newPlaylistBpmMax) : undefined,
-        key: newPlaylistKey || undefined,
+        keys: newPlaylistKeys.length > 0 ? newPlaylistKeys : undefined, // Multi-select keys
         tags: newPlaylistTags || undefined,
         maxTracks: 20,
         maxDuration: 59 * 60, // 59 minutes
@@ -188,14 +189,14 @@ function Playlist() {
         setNewPlaylistMood('')
         setNewPlaylistBpmMin('')
         setNewPlaylistBpmMax('')
-        setNewPlaylistKey('')
+        setNewPlaylistKeys([])
         setNewPlaylistTags('')
       } else {
         // Show specific error message
         const errorMsg = data?.error || 'Failed to generate playlist'
         
         if (errorMsg.includes('No tracks match')) {
-          alert(`❌ No Tracks Found\n\nNo tracks in your library match the criteria:\n\n${newPlaylistGenre ? `• Genre: ${newPlaylistGenre}\n` : ''}${newPlaylistMood ? `• Mood: ${newPlaylistMood}\n` : ''}${newPlaylistBpmMin || newPlaylistBpmMax ? `• BPM: ${newPlaylistBpmMin || '?'}-${newPlaylistBpmMax || '?'}\n` : ''}${newPlaylistKey ? `• Key: ${newPlaylistKey}\n` : ''}\n💡 Try:\n• Removing some filters\n• Using broader criteria\n• Adding more tracks to your library`)
+          alert(`❌ No Tracks Found\n\nNo tracks in your library match the criteria:\n\n${newPlaylistGenre ? `• Genre: ${newPlaylistGenre}\n` : ''}${newPlaylistMood ? `• Mood: ${newPlaylistMood}\n` : ''}${newPlaylistBpmMin || newPlaylistBpmMax ? `• BPM: ${newPlaylistBpmMin || '?'}-${newPlaylistBpmMax || '?'}\n` : ''}${newPlaylistKeys.length > 0 ? `• Keys: ${newPlaylistKeys.join(', ')}\n` : ''}\n💡 Try:\n• Removing some filters\n• Using broader criteria\n• Adding more tracks to your library`)
         } else if (errorMsg.includes('No tracks found in library')) {
           alert(`❌ Empty Track Library\n\nYour track library is empty!\n\n💡 Please upload some tracks first:\n1. Go to Libery\n2. Upload audio files\n3. Come back and generate playlist`)
         } else {
@@ -677,41 +678,76 @@ function Playlist() {
                   </div>
                 </div>
                 
-                {/* Musical Key */}
+                {/* Musical Keys (Multi-Select) */}
                 <div className="border-t pt-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Musical Key (Optional)</h4>
+                  <div className="mb-2">
+                    <h4 className="text-sm font-semibold text-gray-900">🎹 Musical Keys (Multi-Select)</h4>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Select multiple keys for harmonic mixing. Tracks will be sorted using Camelot Wheel logic.
+                    </p>
+                  </div>
                   <div className="grid grid-cols-6 gap-2">
                     {[
                       'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 
                       'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
-                    ].map(key => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => setNewPlaylistKey(key)}
-                        className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                          newPlaylistKey === key
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {key}
-                      </button>
-                    ))}
+                    ].map(key => {
+                      const isSelected = newPlaylistKeys.includes(key)
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => {
+                            if (isSelected) {
+                              setNewPlaylistKeys(newPlaylistKeys.filter(k => k !== key))
+                            } else {
+                              setNewPlaylistKeys([...newPlaylistKeys, key])
+                            }
+                          }}
+                          className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                            isSelected
+                              ? 'bg-green-600 text-white ring-2 ring-green-400'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {key}
+                        </button>
+                      )
+                    })}
                   </div>
-                  {newPlaylistKey && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Selected:</span>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                        🎹 {newPlaylistKey}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setNewPlaylistKey('')}
-                        className="text-xs text-gray-500 hover:text-red-600"
-                      >
-                        Clear
-                      </button>
+                  {newPlaylistKeys.length > 0 && (
+                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-green-800">
+                          Selected Keys ({newPlaylistKeys.length}):
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setNewPlaylistKeys([])}
+                          className="text-xs text-green-600 hover:text-red-600 font-medium"
+                        >
+                          Clear All
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {newPlaylistKeys.map(key => (
+                          <span 
+                            key={key}
+                            className="px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full flex items-center gap-1"
+                          >
+                            🎹 {key}
+                            <button
+                              type="button"
+                              onClick={() => setNewPlaylistKeys(newPlaylistKeys.filter(k => k !== key))}
+                              className="ml-1 hover:text-red-200"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-xs text-green-700 mt-2">
+                        💡 Tracks will be ordered for smooth harmonic transitions
+                      </p>
                     </div>
                   )}
                 </div>
@@ -736,7 +772,8 @@ function Playlist() {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <p className="text-sm text-green-800">
                     <strong>🤖 Auto Generation:</strong> AI will scan your track library, filter by criteria, 
-                    sort by BPM for smooth transitions, and select up to 20 tracks within 59 minutes.
+                    and create a harmonic mix using Camelot Wheel logic for smooth key transitions. 
+                    Selects up to 20 tracks within 59 minutes.
                   </p>
                 </div>
               </div>
@@ -751,7 +788,7 @@ function Playlist() {
                     setNewPlaylistMood('')
                     setNewPlaylistBpmMin('')
                     setNewPlaylistBpmMax('')
-                    setNewPlaylistKey('')
+                    setNewPlaylistKeys([])
                     setNewPlaylistTags('')
                   }}
                   disabled={isGenerating}
