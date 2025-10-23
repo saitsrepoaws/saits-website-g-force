@@ -8,13 +8,23 @@ import path from 'path'
 import os from 'os'
 import Essentia from 'essentia.js'
 import ffmpeg from 'fluent-ffmpeg'
-import ffmpegPath from 'ffmpeg-static'
+import ffmpegStatic from 'ffmpeg-static'
 import wav from 'node-wav'
 
 // Set FFmpeg binary path
-if (ffmpegPath) {
+// ffmpeg-static returns a string path to the binary
+const ffmpegPath = ffmpegStatic as string
+if (ffmpegPath && fs.existsSync(ffmpegPath)) {
   ffmpeg.setFfmpegPath(ffmpegPath)
-  console.log(`FFmpeg binary: ${ffmpegPath}`)
+  console.log(`✅ FFmpeg binary found: ${ffmpegPath}`)
+} else {
+  console.error(`❌ FFmpeg binary not found at: ${ffmpegPath}`)
+  // Try to find it in node_modules
+  const altPath = path.join(process.cwd(), 'node_modules', 'ffmpeg-static', 'ffmpeg')
+  if (fs.existsSync(altPath)) {
+    ffmpeg.setFfmpegPath(altPath)
+    console.log(`✅ FFmpeg binary found (alt): ${altPath}`)
+  }
 }
 
 const s3Client = new S3Client({})
