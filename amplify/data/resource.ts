@@ -2,6 +2,25 @@ import { type ClientSchema, a, defineData } from '@aws-amplify/backend'
 
 // Define the data schema
 const schema = a.schema({
+  // Playlist model - playlist management with IoT sync
+  Playlist: a
+    .model({
+      name: a.string().required(),
+      description: a.string(),
+      coverImageUrl: a.string(),
+      
+      // Embedded tracks as JSON string (no join table!)
+      tracks: a.string().default('[]'), // JSON.stringify(PlaylistTrackItem[])
+      
+      // Computed fields
+      trackCount: a.integer().default(0),
+      totalDuration: a.integer().default(0),
+      
+      createdAt: a.datetime(),
+      updatedAt: a.datetime(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
   // Track model - audio tracks in the Libery system
   // Format: Artist - Title (Version) [Label]
   Track: a
