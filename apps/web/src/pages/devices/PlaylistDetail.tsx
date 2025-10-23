@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Layout from '../../components/Layout'
-import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist, deletePlaylist } from '../../services/playlists'
+import { getPlaylist, addTracksToPlaylist, removeTrackFromPlaylist, deletePlaylist, updatePlaylist } from '../../services/playlists'
 import { listTracks } from '../../services/tracks'
 import { playlistIoT } from '../../services/playlistIoT'
 import { getUrl } from 'aws-amplify/storage'
@@ -245,6 +245,42 @@ function PlaylistDetail() {
     }
   }
   
+  async function handleDeleteAllTracks() {
+    if (!id || playlistTracks.length === 0) return
+    
+    if (!confirm(`Are you sure you want to remove ALL ${playlistTracks.length} tracks from this playlist?\n\nThis cannot be undone.`)) {
+      return
+    }
+    
+    try {
+      // Remove all tracks by setting empty tracks array
+      const { errors } = await updatePlaylist({
+        id,
+        // @ts-ignore
+        tracks: '[]',
+        trackCount: 0,
+        totalDuration: 0,
+      })
+      
+      if (errors) {
+        throw new Error('Failed to clear playlist')
+      }
+      
+      console.log('✅ All tracks removed from playlist')
+      
+      // Notify via IoT for each track
+      for (const track of playlistTracks) {
+        await playlistIoT.trackRemoved(id, track.trackId)
+      }
+      
+      // Reload playlist
+      await loadPlaylist()
+    } catch (error) {
+      console.error('Failed to delete all tracks:', error)
+      alert('Failed to remove all tracks')
+    }
+  }
+  
   function formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -376,7 +412,16 @@ function PlaylistDetail() {
                     ▶️
                   </button>
                 </div>
-                <div></div>
+                <div className="text-center">
+                  <button
+                    onClick={handleDeleteAllTracks}
+                    disabled={playlistTracks.length === 0}
+                    className="text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Remove all tracks"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
               
               {/* Tracks */}
