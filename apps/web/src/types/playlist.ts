@@ -25,8 +25,8 @@ export interface Playlist {
   mood?: string
   bpmMin?: number
   bpmMax?: number
+  key?: string
   tags?: string
-  occasion?: string
   
   // JSON string of PlaylistTrackItem[]
   tracks: string
@@ -95,8 +95,8 @@ export interface CreatePlaylistInput {
   mood?: string
   bpmMin?: number
   bpmMax?: number
+  key?: string
   tags?: string
-  occasion?: string
 }
 
 export interface UpdatePlaylistInput {
@@ -108,6 +108,6 @@ export interface UpdatePlaylistInput {
   mood?: string
   bpmMin?: number
   bpmMax?: number
+  key?: string
   tags?: string
-  occasion?: string
 }

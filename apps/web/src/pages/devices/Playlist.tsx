@@ -20,8 +20,8 @@ function Playlist() {
   const [newPlaylistMood, setNewPlaylistMood] = useState('')
   const [newPlaylistBpmMin, setNewPlaylistBpmMin] = useState('')
   const [newPlaylistBpmMax, setNewPlaylistBpmMax] = useState('')
+  const [newPlaylistKey, setNewPlaylistKey] = useState('')
   const [newPlaylistTags, setNewPlaylistTags] = useState('')
-  const [newPlaylistOccasion, setNewPlaylistOccasion] = useState('')
   
   // Load playlists and genres
   useEffect(() => {
@@ -90,8 +90,8 @@ function Playlist() {
         mood: newPlaylistMood || undefined,
         bpmMin: newPlaylistBpmMin ? parseInt(newPlaylistBpmMin) : undefined,
         bpmMax: newPlaylistBpmMax ? parseInt(newPlaylistBpmMax) : undefined,
+        key: newPlaylistKey || undefined,
         tags: newPlaylistTags || undefined,
-        occasion: newPlaylistOccasion || undefined,
       }
       
       console.log('🎵 Creating playlist with data:', playlistData)
@@ -115,8 +115,8 @@ function Playlist() {
         setNewPlaylistMood('')
         setNewPlaylistBpmMin('')
         setNewPlaylistBpmMax('')
+        setNewPlaylistKey('')
         setNewPlaylistTags('')
-        setNewPlaylistOccasion('')
       }
     } catch (error: any) {
       console.error('❌ Error creating playlist:', error)
@@ -212,7 +212,7 @@ function Playlist() {
                 )}
                 
                 {/* Metadata Tags */}
-                {(playlist.genre || playlist.mood || playlist.occasion) && (
+                {(playlist.genre || playlist.mood || playlist.key) && (
                   <div className="flex flex-wrap gap-1 mb-2">
                     {playlist.genre && (
                       <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
@@ -224,9 +224,9 @@ function Playlist() {
                         {playlist.mood}
                       </span>
                     )}
-                    {playlist.occasion && (
+                    {playlist.key && (
                       <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                        {playlist.occasion}
+                        🎹 {playlist.key}
                       </span>
                     )}
                   </div>
@@ -385,43 +385,65 @@ function Playlist() {
                   </div>
                 </div>
                 
-                {/* Tags & Occasion */}
+                {/* Musical Key Selector */}
                 <div className="border-t pt-4">
-                  <div className="grid grid-cols-1 gap-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Musical Key</h4>
+                  <div className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tags
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select Key (Camelot Wheel / Standard Notation)
                       </label>
-                      <input
-                        type="text"
-                        value={newPlaylistTags}
-                        onChange={(e) => setNewPlaylistTags(e.target.value)}
-                        placeholder="summer, peak-time, warm-up (comma separated)"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                      />
+                      <div className="grid grid-cols-6 gap-2">
+                        {[
+                          'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 
+                          'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
+                        ].map(key => (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setNewPlaylistKey(key)}
+                            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                              newPlaylistKey === key
+                                ? 'bg-green-600 text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {key}
+                          </button>
+                        ))}
+                      </div>
+                      {newPlaylistKey && (
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Selected:</span>
+                          <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                            🎹 {newPlaylistKey}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setNewPlaylistKey('')}
+                            className="text-xs text-gray-500 hover:text-red-600"
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Occasion
-                      </label>
-                      <select
-                        value={newPlaylistOccasion}
-                        onChange={(e) => setNewPlaylistOccasion(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="">Select occasion...</option>
-                        <option value="Club Set">Club Set</option>
-                        <option value="Radio Show">Radio Show</option>
-                        <option value="Live Stream">Live Stream</option>
-                        <option value="Festival">Festival</option>
-                        <option value="Warm-up">Warm-up</option>
-                        <option value="Peak Time">Peak Time</option>
-                        <option value="Closing">Closing</option>
-                        <option value="Mix/Recording">Mix/Recording</option>
-                        <option value="Practice">Practice</option>
-                      </select>
-                    </div>
+                  </div>
+                </div>
+                
+                {/* Tags */}
+                <div className="border-t pt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tags
+                    </label>
+                    <input
+                      type="text"
+                      value={newPlaylistTags}
+                      onChange={(e) => setNewPlaylistTags(e.target.value)}
+                      placeholder="summer, peak-time, warm-up (comma separated)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
               </div>
@@ -436,8 +458,8 @@ function Playlist() {
                     setNewPlaylistMood('')
                     setNewPlaylistBpmMin('')
                     setNewPlaylistBpmMax('')
+                    setNewPlaylistKey('')
                     setNewPlaylistTags('')
-                    setNewPlaylistOccasion('')
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >

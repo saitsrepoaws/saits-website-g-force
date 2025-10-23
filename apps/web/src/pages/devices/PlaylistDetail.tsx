@@ -498,7 +498,7 @@ function PlaylistDetail() {
               )}
               
               {/* Metadata Tags */}
-              {(playlist.genre || playlist.mood || playlist.occasion || playlist.bpmMin || playlist.tags) && (
+              {(playlist.genre || playlist.mood || playlist.key || playlist.bpmMin || playlist.tags) && (
                 <div className="flex flex-wrap gap-2 mb-3">
                   {playlist.genre && (
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
@@ -510,9 +510,9 @@ function PlaylistDetail() {
                       ✨ {playlist.mood}
                     </span>
                   )}
-                  {playlist.occasion && (
+                  {playlist.key && (
                     <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
-                      🎧 {playlist.occasion}
+                      🎹 {playlist.key}
                     </span>
                   )}
                   {playlist.bpmMin && playlist.bpmMax && (

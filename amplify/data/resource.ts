@@ -14,8 +14,8 @@ const schema = a.schema({
       mood: a.string(), // Mood/vibe (Energetic, Chill, Dark, etc.)
       bpmMin: a.integer(), // Minimum BPM range
       bpmMax: a.integer(), // Maximum BPM range
+      key: a.string(), // Musical key (C, C#, Dm, Am, etc.)
       tags: a.string(), // Comma-separated tags (summer, peak-time, etc.)
-      occasion: a.string(), // Use case (Club Set, Radio Show, etc.)
       
       // Embedded tracks as JSON string (no join table!)
       tracks: a.string().default('[]'), // JSON.stringify(PlaylistTrackItem[])
