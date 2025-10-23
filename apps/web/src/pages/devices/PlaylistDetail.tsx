@@ -26,6 +26,9 @@ function PlaylistDetail() {
   const [searchQuery, setSearchQuery] = useState('')
   const [genreFilter, setGenreFilter] = useState<string>('all')
   
+  // Track toggles (arrow state per track)
+  const [trackToggles, setTrackToggles] = useState<Record<string, boolean>>({})
+  
   // Load playlist
   useEffect(() => {
     if (id) {
@@ -218,6 +221,13 @@ function PlaylistDetail() {
     setSelectedTrackIds(new Set())
   }
   
+  function toggleTrackArrow(trackId: string) {
+    setTrackToggles(prev => ({
+      ...prev,
+      [trackId]: !prev[trackId]
+    }))
+  }
+  
   function formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -327,27 +337,28 @@ function PlaylistDetail() {
           ) : (
             <div className="space-y-2">
               {/* Header */}
-              <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
-                <div className="col-span-1">#</div>
-                <div className="col-span-1"></div>
-                <div className="col-span-3">Title</div>
-                <div className="col-span-2">Artist</div>
-                <div className="col-span-2">Genre</div>
-                <div className="col-span-1">BPM</div>
-                <div className="col-span-1">Duration</div>
-                <div className="col-span-1"></div>
+              <div className="grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
+                <div>#</div>
+                <div></div>
+                <div>Title</div>
+                <div>Artist</div>
+                <div>Genre</div>
+                <div>BPM</div>
+                <div>Duration</div>
+                <div></div>
+                <div></div>
               </div>
               
               {/* Tracks */}
               {playlistTracks.map((track, index) => (
                 <div
                   key={track.trackId}
-                  className="grid grid-cols-12 gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
+                  className="grid grid-cols-[auto,auto,2fr,2fr,1.5fr,80px,80px,50px,50px] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
                 >
-                  <div className="col-span-1 text-sm text-gray-500">{index + 1}</div>
+                  <div className="text-sm text-gray-500">{index + 1}</div>
                   
                   {/* Cover Art */}
-                  <div className="col-span-1">
+                  <div>
                     {coverArtUrls[track.trackId] ? (
                       <img
                         src={coverArtUrls[track.trackId]}
@@ -361,22 +372,37 @@ function PlaylistDetail() {
                     )}
                   </div>
                   
-                  <div className="col-span-3 text-sm font-medium text-gray-900 truncate">
+                  <div className="text-sm font-medium text-gray-900 truncate">
                     {track.trackTitle || 'Unknown'}
                   </div>
-                  <div className="col-span-2 text-sm text-gray-600 truncate">
+                  <div className="text-sm text-gray-600 truncate">
                     {track.trackArtist || '-'}
                   </div>
-                  <div className="col-span-2 text-xs text-gray-600 truncate">
+                  <div className="text-xs text-gray-600 truncate">
                     {track.trackGenre || '-'}
                   </div>
-                  <div className="col-span-1 text-xs text-gray-600">
+                  <div className="text-xs text-gray-600">
                     {track.trackBpm || '-'}
                   </div>
-                  <div className="col-span-1 text-xs text-gray-600">
+                  <div className="text-xs text-gray-600">
                     {track.trackDuration ? formatDuration(track.trackDuration) : '-'}
                   </div>
-                  <div className="col-span-1 text-right">
+                  
+                  {/* Toggle Arrow */}
+                  <div className="text-center">
+                    <button
+                      onClick={() => toggleTrackArrow(track.trackId)}
+                      className="text-gray-500 hover:text-blue-600 transition-transform"
+                      style={{
+                        transform: trackToggles[track.trackId] ? 'rotate(90deg)' : 'rotate(0deg)',
+                      }}
+                    >
+                      ▶️
+                    </button>
+                  </div>
+                  
+                  {/* Delete */}
+                  <div className="text-right">
                     <button
                       onClick={() => handleRemoveTrack(track.trackId)}
                       className="text-red-600 hover:text-red-700 text-sm"
