@@ -66,6 +66,48 @@
               "isRequired": false,
               "attributes": []
             },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "mood": {
+              "name": "mood",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bpmMin": {
+              "name": "bpmMin",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bpmMax": {
+              "name": "bpmMax",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "key": {
+              "name": "key",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "tags": {
+              "name": "tags",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "tracks": {
               "name": "tracks",
               "isArray": false,
@@ -338,7 +380,77 @@
         }
       },
       "enums": {},
-      "nonModels": {}
+      "nonModels": {},
+      "queries": {
+        "generatePlaylist": {
+          "name": "generatePlaylist",
+          "isArray": false,
+          "type": "AWSJSON",
+          "isRequired": false,
+          "arguments": {
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "mood": {
+              "name": "mood",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "bpmMin": {
+              "name": "bpmMin",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "bpmMax": {
+              "name": "bpmMax",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "key": {
+              "name": "key",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "tags": {
+              "name": "tags",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "maxTracks": {
+              "name": "maxTracks",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "maxDuration": {
+              "name": "maxDuration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            }
+          }
+        }
+      }
     }
   },
   "storage": {

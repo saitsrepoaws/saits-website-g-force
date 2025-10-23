@@ -33,6 +33,12 @@
     "groups"
    ]
   },
+  "AWS::Amplify::Function": {
+   "version": "1",
+   "stackOutputs": [
+    "definedFunctions"
+   ]
+  },
   "AWS::Amplify::GraphQL": {
    "version": "1",
    "stackOutputs": [
@@ -42,12 +48,6 @@
     "awsAppsyncRegion",
     "amplifyApiModelSchemaS3Uri",
     "awsAppsyncAdditionalAuthenticationTypes"
-   ]
-  },
-  "AWS::Amplify::Function": {
-   "version": "1",
-   "stackOutputs": [
-    "definedFunctions"
    ]
   },
   "AWS::Amplify::Storage": {
@@ -150,6 +150,37 @@
   "groups": {
    "Value": "[]"
   },
+  "definedFunctions": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "[\"",
+      {
+       "Fn::GetAtt": [
+        "data7552DF31",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataplaylistgeneratorlambda089A3058Ref"
+       ]
+      },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "storage0EC3F24A",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref"
+       ]
+      },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "storage0EC3F24A",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref"
+       ]
+      },
+      "\"]"
+     ]
+    ]
+   }
+  },
   "awsAppsyncApiId": {
    "Value": {
     "Fn::GetAtt": [
@@ -213,30 +244,6 @@
   },
   "awsAppsyncAdditionalAuthenticationTypes": {
    "Value": "AWS_IAM"
-  },
-  "definedFunctions": {
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "[\"",
-      {
-       "Fn::GetAtt": [
-        "storage0EC3F24A",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref"
-       ]
-      },
-      "\",\"",
-      {
-       "Fn::GetAtt": [
-        "storage0EC3F24A",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref"
-       ]
-      },
-      "\"]"
-     ]
-    ]
-   }
   },
   "storageRegion": {
    "Value": {
@@ -371,7 +378,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/9df2059dc1c67f7ec4030f42f85a080eb56f5c48f37ab12f2b16bd714b939dd2.json"
+       "/495fc8644c99d9c282002730e353928ac03f0bc6658df879d6278ad527ab9856.json"
       ]
      ]
     }
@@ -433,7 +440,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/9697e3d8459b1f0e95d3c9a21e55eda5cf9e0e24596b765da90809930837d429.json"
+       "/59e28160f75e16b5862fc6f110bddae0474792f1146dfd0bd1a50d35aa8b6ba8.json"
       ]
      ]
     }
