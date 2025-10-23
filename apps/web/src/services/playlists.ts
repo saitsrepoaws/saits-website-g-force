@@ -347,14 +347,26 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     const { data, errors } = await client.queries.generatePlaylist(input)
     
     if (errors) {
-      console.error('Error generating playlist:', errors)
+      console.error('❌ GraphQL errors:', errors)
       return { data: null, errors }
     }
     
-    // Parse the JSON response
-    const result = typeof data === 'string' ? JSON.parse(data) : data
+    console.log('📦 Raw response data:', data, 'type:', typeof data)
     
-    console.log('✅ Playlist generated:', result)
+    // AppSync returns JSON as object already
+    let result = data
+    
+    // If it's still stringified (shouldn't happen but just in case)
+    if (typeof data === 'string') {
+      try {
+        result = JSON.parse(data)
+      } catch (e) {
+        console.error('Failed to parse response:', e)
+        return { data: null, errors: [{ message: 'Invalid response format' }] }
+      }
+    }
+    
+    console.log('✅ Parsed result:', result)
     return { data: result, errors: null }
   } catch (error) {
     console.error('Failed to generate playlist:', error)

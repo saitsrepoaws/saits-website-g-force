@@ -52,7 +52,8 @@ export const handler: Schema['generatePlaylist']['functionHandler'] = async (eve
   const input = event.arguments as GeneratePlaylistInput
   const result = await generatePlaylist(input)
   
-  return JSON.stringify(result)
+  // Return the object directly - AppSync will handle JSON serialization
+  return result as any
 }
 
 /**
