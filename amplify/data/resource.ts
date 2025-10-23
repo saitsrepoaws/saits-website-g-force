@@ -9,6 +9,14 @@ const schema = a.schema({
       description: a.string(),
       coverImageUrl: a.string(),
       
+      // Metadata for organization and filtering
+      genre: a.string(), // Main genre (Techno, House, etc.)
+      mood: a.string(), // Mood/vibe (Energetic, Chill, Dark, etc.)
+      bpmMin: a.integer(), // Minimum BPM range
+      bpmMax: a.integer(), // Maximum BPM range
+      tags: a.string(), // Comma-separated tags (summer, peak-time, etc.)
+      occasion: a.string(), // Use case (Club Set, Radio Show, etc.)
+      
       // Embedded tracks as JSON string (no join table!)
       tracks: a.string().default('[]'), // JSON.stringify(PlaylistTrackItem[])
       

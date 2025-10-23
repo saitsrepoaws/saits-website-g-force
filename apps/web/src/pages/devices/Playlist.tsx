@@ -14,6 +14,12 @@ function Playlist() {
   // Create playlist form
   const [newPlaylistName, setNewPlaylistName] = useState('')
   const [newPlaylistDescription, setNewPlaylistDescription] = useState('')
+  const [newPlaylistGenre, setNewPlaylistGenre] = useState('')
+  const [newPlaylistMood, setNewPlaylistMood] = useState('')
+  const [newPlaylistBpmMin, setNewPlaylistBpmMin] = useState('')
+  const [newPlaylistBpmMax, setNewPlaylistBpmMax] = useState('')
+  const [newPlaylistTags, setNewPlaylistTags] = useState('')
+  const [newPlaylistOccasion, setNewPlaylistOccasion] = useState('')
   
   // Load playlists
   useEffect(() => {
@@ -50,14 +56,27 @@ function Playlist() {
       const { data } = await createPlaylist({
         name: newPlaylistName,
         description: newPlaylistDescription || undefined,
+        genre: newPlaylistGenre || undefined,
+        mood: newPlaylistMood || undefined,
+        bpmMin: newPlaylistBpmMin ? parseInt(newPlaylistBpmMin) : undefined,
+        bpmMax: newPlaylistBpmMax ? parseInt(newPlaylistBpmMax) : undefined,
+        tags: newPlaylistTags || undefined,
+        occasion: newPlaylistOccasion || undefined,
       })
       
       if (data) {
         console.log('✅ Playlist created:', data)
         setPlaylists(prev => [...prev, data as PlaylistType])
         setShowCreateModal(false)
+        // Reset form
         setNewPlaylistName('')
         setNewPlaylistDescription('')
+        setNewPlaylistGenre('')
+        setNewPlaylistMood('')
+        setNewPlaylistBpmMin('')
+        setNewPlaylistBpmMax('')
+        setNewPlaylistTags('')
+        setNewPlaylistOccasion('')
       }
     } catch (error) {
       console.error('Failed to create playlist:', error)
@@ -187,36 +206,167 @@ function Playlist() {
         
         {/* Create Playlist Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold mb-4">Create New Playlist</h3>
               
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Playlist Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={newPlaylistName}
-                    onChange={(e) => setNewPlaylistName(e.target.value)}
-                    placeholder="My Awesome Playlist"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                    autoFocus
-                  />
+                {/* Basic Info */}
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Playlist Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={newPlaylistName}
+                      onChange={(e) => setNewPlaylistName(e.target.value)}
+                      placeholder="My Awesome Playlist"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={newPlaylistDescription}
+                      onChange={(e) => setNewPlaylistDescription(e.target.value)}
+                      placeholder="What's this playlist about?"
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description (optional)
-                  </label>
-                  <textarea
-                    value={newPlaylistDescription}
-                    onChange={(e) => setNewPlaylistDescription(e.target.value)}
-                    placeholder="What's this playlist about?"
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  />
+                {/* Metadata */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Metadata</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Genre
+                      </label>
+                      <select
+                        value={newPlaylistGenre}
+                        onChange={(e) => setNewPlaylistGenre(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select genre...</option>
+                        <option value="Techno">Techno</option>
+                        <option value="House">House</option>
+                        <option value="Tech House">Tech House</option>
+                        <option value="Deep House">Deep House</option>
+                        <option value="Minimal">Minimal</option>
+                        <option value="Progressive">Progressive</option>
+                        <option value="Trance">Trance</option>
+                        <option value="Drum & Bass">Drum & Bass</option>
+                        <option value="Dubstep">Dubstep</option>
+                        <option value="Ambient">Ambient</option>
+                        <option value="Electronica">Electronica</option>
+                        <option value="Mixed">Mixed</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Mood/Vibe
+                      </label>
+                      <select
+                        value={newPlaylistMood}
+                        onChange={(e) => setNewPlaylistMood(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select mood...</option>
+                        <option value="Energetic">Energetic</option>
+                        <option value="Chill">Chill</option>
+                        <option value="Dark">Dark</option>
+                        <option value="Uplifting">Uplifting</option>
+                        <option value="Groovy">Groovy</option>
+                        <option value="Melodic">Melodic</option>
+                        <option value="Driving">Driving</option>
+                        <option value="Atmospheric">Atmospheric</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* BPM Range */}
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">BPM Range</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Min BPM
+                      </label>
+                      <input
+                        type="number"
+                        value={newPlaylistBpmMin}
+                        onChange={(e) => setNewPlaylistBpmMin(e.target.value)}
+                        placeholder="120"
+                        min="60"
+                        max="200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Max BPM
+                      </label>
+                      <input
+                        type="number"
+                        value={newPlaylistBpmMax}
+                        onChange={(e) => setNewPlaylistBpmMax(e.target.value)}
+                        placeholder="135"
+                        min="60"
+                        max="200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tags & Occasion */}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tags
+                      </label>
+                      <input
+                        type="text"
+                        value={newPlaylistTags}
+                        onChange={(e) => setNewPlaylistTags(e.target.value)}
+                        placeholder="summer, peak-time, warm-up (comma separated)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Occasion
+                      </label>
+                      <select
+                        value={newPlaylistOccasion}
+                        onChange={(e) => setNewPlaylistOccasion(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select occasion...</option>
+                        <option value="Club Set">Club Set</option>
+                        <option value="Radio Show">Radio Show</option>
+                        <option value="Live Stream">Live Stream</option>
+                        <option value="Festival">Festival</option>
+                        <option value="Warm-up">Warm-up</option>
+                        <option value="Peak Time">Peak Time</option>
+                        <option value="Closing">Closing</option>
+                        <option value="Mix/Recording">Mix/Recording</option>
+                        <option value="Practice">Practice</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -226,6 +376,12 @@ function Playlist() {
                     setShowCreateModal(false)
                     setNewPlaylistName('')
                     setNewPlaylistDescription('')
+                    setNewPlaylistGenre('')
+                    setNewPlaylistMood('')
+                    setNewPlaylistBpmMin('')
+                    setNewPlaylistBpmMax('')
+                    setNewPlaylistTags('')
+                    setNewPlaylistOccasion('')
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
                 >
@@ -235,7 +391,7 @@ function Playlist() {
                   onClick={handleCreatePlaylist}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  Create
+                  Create Playlist
                 </button>
               </div>
             </div>

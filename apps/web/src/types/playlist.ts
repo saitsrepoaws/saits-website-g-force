@@ -20,6 +20,14 @@ export interface Playlist {
   description?: string
   coverImageUrl?: string
   
+  // Metadata
+  genre?: string
+  mood?: string
+  bpmMin?: number
+  bpmMax?: number
+  tags?: string
+  occasion?: string
+  
   // JSON string of PlaylistTrackItem[]
   tracks: string
   
@@ -83,6 +91,12 @@ export interface CreatePlaylistInput {
   name: string
   description?: string
   coverImageUrl?: string
+  genre?: string
+  mood?: string
+  bpmMin?: number
+  bpmMax?: number
+  tags?: string
+  occasion?: string
 }
 
 export interface UpdatePlaylistInput {
@@ -90,4 +104,10 @@ export interface UpdatePlaylistInput {
   name?: string
   description?: string
   coverImageUrl?: string
+  genre?: string
+  mood?: string
+  bpmMin?: number
+  bpmMax?: number
+  tags?: string
+  occasion?: string
 }
