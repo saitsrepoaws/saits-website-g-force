@@ -164,18 +164,49 @@ async function extractMetadata(filePath: string, bucketName?: string): Promise<A
   hash.update(fileBuffer)
   const checksum = hash.digest('hex')
   
-  // Extract BPM from metadata if available
-  let bpm: number = metadata.common.bpm || 0
+  // Extract BPM from multiple sources
+  let bpm: number = 0
   
-  // If no BPM in tags, try to detect it from audio
+  // 1. Check ID3 tags (most reliable)
+  if (metadata.common.bpm) {
+    bpm = metadata.common.bpm
+    console.log(`BPM found in ID3 tags: ${bpm}`)
+  }
+  
+  // 2. Check comments for BPM
+  if (!bpm) {
+    const comment = metadata.common.comment?.[0]?.text || ''
+    const bpmFromComment = extractBPMFromText(comment)
+    if (bpmFromComment) {
+      bpm = bpmFromComment
+      console.log(`BPM found in comments: ${bpm}`)
+    }
+  }
+  
+  // 3. Check title/filename for BPM patterns
+  if (!bpm) {
+    const title = metadata.common.title || ''
+    const bpmFromTitle = extractBPMFromText(title)
+    if (bpmFromTitle) {
+      bpm = bpmFromTitle
+      console.log(`BPM found in title: ${bpm}`)
+    }
+  }
+  
+  // 4. Fallback: try audio analysis (currently placeholder)
   if (!bpm) {
     try {
       bpm = await detectBPM(filePath)
-      console.log(`Detected BPM from audio analysis: ${bpm}`)
+      if (bpm) {
+        console.log(`BPM detected from audio analysis: ${bpm}`)
+      }
     } catch (error) {
-      console.log('BPM detection failed, using 0:', error)
-      bpm = 0
+      console.log('BPM detection failed:', error)
     }
+  }
+  
+  if (!bpm) {
+    console.log('⚠️ BPM not found in tags or filename')
   }
   
   // Estimate energy based on bitrate (higher bitrate = potentially more energy)
@@ -313,20 +344,43 @@ async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata) {
 }
 
 async function detectBPM(filePath: string): Promise<number> {
-  console.log('Starting BPM detection from audio analysis...')
+  console.log('Starting BPM detection...')
   
-  // music-tempo requires decoded audio buffer
-  // For Lambda, we'll use a simpler approach: analyze the audio file directly
-  // This is a placeholder - real BPM detection needs audio decoding
+  // For now, return 0 - will be extracted from metadata or filename
+  // Real-time audio analysis requires audio decoding which is heavy for Lambda
+  // Most DJ software tags BPM in metadata anyway
   
-  // For now, estimate BPM based on file characteristics
-  // In production, you'd use: music-tempo, essentia.js, or external API
+  return 0
+}
+
+/**
+ * Extract BPM from filename or text
+ * Looks for patterns like "128 BPM", "128bpm", "-128-", etc.
+ */
+function extractBPMFromText(text: string): number | null {
+  if (!text) return null
   
-  // Typical techno/house BPM range
-  const estimatedBPM = 128 // Default for electronic music
+  // Common BPM patterns in filenames
+  const patterns = [
+    /(\d{2,3})\s*bpm/i,           // "128 BPM" or "128bpm"
+    /bpm\s*(\d{2,3})/i,           // "BPM 128"
+    /[-_\s](\d{2,3})[-_\s]/,      // "-128-" or "_128_"
+    /\[(\d{2,3})\]/,              // "[128]"
+    /\((\d{2,3})\)/,              // "(128)"
+  ]
   
-  console.log(`Estimated BPM: ${estimatedBPM} (placeholder - needs audio decoding)`)
-  return estimatedBPM
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match) {
+      const bpm = parseInt(match[1])
+      // Validate BPM range (60-200 is reasonable)
+      if (bpm >= 60 && bpm <= 200) {
+        return bpm
+      }
+    }
+  }
+  
+  return null
 }
 
 function detectKey(metadata: any): string | null {
