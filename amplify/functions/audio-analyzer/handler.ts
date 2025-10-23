@@ -8,7 +8,14 @@ import path from 'path'
 import os from 'os'
 import Essentia from 'essentia.js'
 import ffmpeg from 'fluent-ffmpeg'
+import ffmpegPath from 'ffmpeg-static'
 import wav from 'node-wav'
+
+// Set FFmpeg binary path
+if (ffmpegPath) {
+  ffmpeg.setFfmpegPath(ffmpegPath)
+  console.log(`FFmpeg binary: ${ffmpegPath}`)
+}
 
 const s3Client = new S3Client({})
 const dynamoClient = new DynamoDBClient({})

@@ -780,6 +780,32 @@
          ]
         }
        ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "audioanalyzerlambda2BE3CCBC",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "audioanalyzerlambda2BE3CCBC",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -807,7 +833,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "132cab0e9e475faa8ab663bbf9e882b54860b9981b17944b850f8d06b90edcdb.zip"
+     "S3Key": "ad2b2c18404c5c27fe28c3daeba0e1423a1d1fa421d7aa784d8fd4b37d8525b1.zip"
     },
     "Environment": {
      "Variables": {
@@ -840,6 +866,9 @@
       },
       "WAVEFORM_LAMBDA_NAME": {
        "Ref": "waveformgeneratorlambdaD07307E8"
+      },
+      "AUDIO_ANALYZER_LAMBDA_NAME": {
+       "Ref": "audioanalyzerlambda2BE3CCBC"
       }
      }
     },
@@ -879,7 +908,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/Resource",
-    "aws:asset:path": "asset.132cab0e9e475faa8ab663bbf9e882b54860b9981b17944b850f8d06b90edcdb",
+    "aws:asset:path": "asset.ad2b2c18404c5c27fe28c3daeba0e1423a1d1fa421d7aa784d8fd4b37d8525b1",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1115,6 +1144,216 @@
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/waveform-generator-lambda/Resource",
     "aws:asset:path": "asset.55539cbf6bfbd2b169b1e193af57f2f4d76c6f64deac970a5e9b37ce3ec98f1e",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "audioanalyzerlambdaServiceRoleDA68F1F6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "audio-analyzer"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/ServiceRole/Resource"
+   }
+  },
+  "audioanalyzerlambdaServiceRoleDefaultPolicy6AB5272A": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "gforgeIotStorageBucketEED00516",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "audioanalyzerlambdaServiceRoleDefaultPolicy6AB5272A",
+    "Roles": [
+     {
+      "Ref": "audioanalyzerlambdaServiceRoleDA68F1F6"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "audioanalyzerlambda2BE3CCBC": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "c791367cad16e4fe34a916ef213a96259e190d148d4ca2954212e6258011d4ee.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "STORAGE_BUCKET_NAME": {
+       "Ref": "gforgeIotStorageBucketEED00516"
+      },
+      "TRACK_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 3008,
+    "Role": {
+     "Fn::GetAtt": [
+      "audioanalyzerlambdaServiceRoleDA68F1F6",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "audio-analyzer"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "audioanalyzerlambdaServiceRoleDefaultPolicy6AB5272A",
+    "audioanalyzerlambdaServiceRoleDA68F1F6"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/Resource",
+    "aws:asset:path": "asset.c791367cad16e4fe34a916ef213a96259e190d148d4ca2954212e6258011d4ee",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1661,6 +1900,11 @@
   "amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref": {
    "Value": {
     "Ref": "waveformgeneratorlambdaD07307E8"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620storageaudioanalyzerlambda34F3F518Ref": {
+   "Value": {
+    "Ref": "audioanalyzerlambda2BE3CCBC"
    }
   },
   "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {

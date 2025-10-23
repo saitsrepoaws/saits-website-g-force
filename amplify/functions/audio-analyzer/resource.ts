@@ -6,4 +6,9 @@ export const audioAnalyzer = defineFunction({
   timeoutSeconds: 300, // 5 min for audio analysis
   memoryMB: 3008, // Max memory for audio processing
   resourceGroupName: 'storage',
+  environment: {
+    // FFmpeg will be in /opt/bin from Lambda Layer
+    PATH: '/opt/bin:/usr/local/bin:/usr/bin/:/bin',
+    LD_LIBRARY_PATH: '/opt/lib',
+  },
 })
