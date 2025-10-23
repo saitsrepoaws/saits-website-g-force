@@ -209,6 +209,15 @@ function PlaylistDetail() {
     setSelectedTrackIds(newSelection)
   }
   
+  function selectAllTracks() {
+    const allTrackIds = new Set(filteredAllTracks.map(t => t.id))
+    setSelectedTrackIds(allTrackIds)
+  }
+  
+  function deselectAllTracks() {
+    setSelectedTrackIds(new Set())
+  }
+  
   function formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -428,11 +437,31 @@ function PlaylistDetail() {
                   </select>
                 </div>
                 
-                {selectedTrackIds.size > 0 && (
-                  <div className="mt-3 text-sm text-blue-600">
-                    {selectedTrackIds.size} {selectedTrackIds.size === 1 ? 'track' : 'tracks'} selected
+                {/* Selection Controls */}
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={selectAllTracks}
+                      disabled={filteredAllTracks.length === 0}
+                      className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      ☑️ Select All ({filteredAllTracks.length})
+                    </button>
+                    <button
+                      onClick={deselectAllTracks}
+                      disabled={selectedTrackIds.size === 0}
+                      className="px-3 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      ☐ Deselect All
+                    </button>
                   </div>
-                )}
+                  
+                  {selectedTrackIds.size > 0 && (
+                    <div className="text-sm text-blue-600 font-medium">
+                      {selectedTrackIds.size} {selectedTrackIds.size === 1 ? 'track' : 'tracks'} selected
+                    </div>
+                  )}
+                </div>
               </div>
               
               {/* Track List */}
