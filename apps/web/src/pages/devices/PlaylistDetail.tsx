@@ -494,8 +494,40 @@ function PlaylistDetail() {
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{playlist.name}</h1>
               {playlist.description && (
-                <p className="text-gray-600 mb-4">{playlist.description}</p>
+                <p className="text-gray-600 mb-3">{playlist.description}</p>
               )}
+              
+              {/* Metadata Tags */}
+              {(playlist.genre || playlist.mood || playlist.occasion || playlist.bpmMin || playlist.tags) && (
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {playlist.genre && (
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full">
+                      🎵 {playlist.genre}
+                    </span>
+                  )}
+                  {playlist.mood && (
+                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                      ✨ {playlist.mood}
+                    </span>
+                  )}
+                  {playlist.occasion && (
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                      🎧 {playlist.occasion}
+                    </span>
+                  )}
+                  {playlist.bpmMin && playlist.bpmMax && (
+                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-sm font-medium rounded-full">
+                      ⚡ {playlist.bpmMin}-{playlist.bpmMax} BPM
+                    </span>
+                  )}
+                  {playlist.tags && playlist.tags.split(',').map((tag, i) => (
+                    <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                      #{tag.trim()}
+                    </span>
+                  ))}
+                </div>
+              )}
+              
               <div className="text-sm text-gray-500 space-y-1">
                 <div>
                   {playlist.trackCount} {playlist.trackCount === 1 ? 'track' : 'tracks'}

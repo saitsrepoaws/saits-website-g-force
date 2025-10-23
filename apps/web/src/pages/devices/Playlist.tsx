@@ -165,16 +165,39 @@ function Playlist() {
                   {playlist.name}
                 </h3>
                 {playlist.description && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                     {playlist.description}
                   </p>
                 )}
                 
-                {/* Stats */}
-                <div className="text-xs text-gray-500 mb-4">
+                {/* Metadata Tags */}
+                {(playlist.genre || playlist.mood || playlist.occasion) && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {playlist.genre && (
+                      <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                        {playlist.genre}
+                      </span>
+                    )}
+                    {playlist.mood && (
+                      <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">
+                        {playlist.mood}
+                      </span>
+                    )}
+                    {playlist.occasion && (
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                        {playlist.occasion}
+                      </span>
+                    )}
+                  </div>
+                )}
+                
+                <div className="text-sm text-gray-500 mb-4">
                   {playlist.trackCount} {playlist.trackCount === 1 ? 'track' : 'tracks'}
                   {playlist.totalDuration > 0 && (
                     <> · {formatDuration(playlist.totalDuration)}</>
+                  )}
+                  {playlist.bpmMin && playlist.bpmMax && (
+                    <> · {playlist.bpmMin}-{playlist.bpmMax} BPM</>
                   )}
                 </div>
                 
