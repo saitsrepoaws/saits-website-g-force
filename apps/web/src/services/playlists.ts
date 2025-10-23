@@ -144,12 +144,30 @@ export async function addTracksToPlaylist(playlistId: string, tracksToAdd: Playl
     // Parse current tracks
     const currentTracks: PlaylistTrackItem[] = JSON.parse(playlist.tracks || '[]')
     
+    // Get existing track IDs to prevent duplicates
+    const existingTrackIds = new Set(currentTracks.map(t => t.trackId))
+    
+    // Filter out duplicates
+    const uniqueTracksToAdd = tracksToAdd.filter(track => {
+      if (existingTrackIds.has(track.trackId)) {
+        console.warn(`⚠️ Skipping duplicate track: ${track.trackId}`)
+        return false
+      }
+      return true
+    })
+    
+    // If no unique tracks to add, return early
+    if (uniqueTracksToAdd.length === 0) {
+      console.log('ℹ️ No new tracks to add (all duplicates)')
+      return { data: playlist, errors: null }
+    }
+    
     // Add new tracks with incremented order
     const maxOrder = currentTracks.length > 0 
       ? Math.max(...currentTracks.map(t => t.order))
       : -1
     
-    const newTracks = tracksToAdd.map((track, index) => ({
+    const newTracks = uniqueTracksToAdd.map((track, index) => ({
       ...track,
       order: maxOrder + 1 + index,
       addedAt: new Date().toISOString(),

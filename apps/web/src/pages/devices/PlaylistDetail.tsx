@@ -120,8 +120,18 @@ function PlaylistDetail() {
     }).filter(Boolean) as PlaylistTrackItem[]
     
     try {
-      await addTracksToPlaylist(id, tracksToAdd)
-      console.log('✅ Tracks added to playlist')
+      const result = await addTracksToPlaylist(id, tracksToAdd)
+      
+      // Check if any tracks were actually added
+      const currentPlaylistTracks: PlaylistTrackItem[] = JSON.parse((result.data as any)?.tracks || '[]')
+      const addedCount = currentPlaylistTracks.length - playlistTracks.length
+      
+      if (addedCount === 0) {
+        alert('⚠️ No tracks added - all selected tracks are already in this playlist')
+        return
+      }
+      
+      console.log(`✅ ${addedCount} track(s) added to playlist`)
       
       // Notify via IoT
       for (const track of tracksToAdd) {
@@ -136,6 +146,11 @@ function PlaylistDetail() {
       setSelectedTrackIds(new Set())
       setSearchQuery('')
       setGenreFilter('all')
+      
+      // Show success message
+      if (addedCount < tracksToAdd.length) {
+        alert(`✅ Added ${addedCount} track(s). ${tracksToAdd.length - addedCount} duplicate(s) skipped.`)
+      }
     } catch (error) {
       console.error('Failed to add tracks:', error)
       alert('Failed to add tracks to playlist')
