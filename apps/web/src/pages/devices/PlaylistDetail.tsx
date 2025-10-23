@@ -228,6 +228,23 @@ function PlaylistDetail() {
     }))
   }
   
+  function toggleAllTracks() {
+    // Check if all are currently toggled
+    const allToggled = playlistTracks.every(t => trackToggles[t.trackId])
+    
+    if (allToggled) {
+      // Turn all off
+      setTrackToggles({})
+    } else {
+      // Turn all on
+      const newToggles: Record<string, boolean> = {}
+      playlistTracks.forEach(t => {
+        newToggles[t.trackId] = true
+      })
+      setTrackToggles(newToggles)
+    }
+  }
+  
   function formatDuration(seconds: number): string {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -345,7 +362,20 @@ function PlaylistDetail() {
                 <div>Genre</div>
                 <div>BPM</div>
                 <div>Duration</div>
-                <div></div>
+                <div className="text-center">
+                  <button
+                    onClick={toggleAllTracks}
+                    className="text-gray-600 hover:text-blue-600 transition-transform inline-block"
+                    style={{
+                      transform: playlistTracks.length > 0 && playlistTracks.every(t => trackToggles[t.trackId]) 
+                        ? 'rotate(90deg)' 
+                        : 'rotate(0deg)',
+                    }}
+                    title="Toggle all tracks"
+                  >
+                    ▶️
+                  </button>
+                </div>
                 <div></div>
               </div>
               
