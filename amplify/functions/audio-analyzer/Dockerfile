@@ -1,5 +1,5 @@
-# AWS Lambda Node.js 20 with FFmpeg
-FROM public.ecr.aws/lambda/nodejs:20
+# AWS Lambda Python 3.12 with audio analysis libraries
+FROM public.ecr.aws/lambda/python:3.12
 
 # Install FFmpeg - AWS Lambda images use microdnf
 RUN microdnf install -y wget tar xz && \
@@ -21,29 +21,25 @@ RUN ffmpeg -version
 # Set working directory
 WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Copy package files
-COPY package*.json ./
-COPY tsconfig.json* ./
+# Install system dependencies for aubio
+RUN microdnf install -y gcc python3-devel
 
-# Install ALL dependencies (including devDependencies for build)
-RUN npm ci
+# Install Python audio analysis libraries (aubio instead of librosa - no numba!)
+RUN pip install --no-cache-dir \
+    aubio==0.4.9 \
+    numpy==1.26.4 \
+    boto3==1.34.44 \
+    pydub==0.25.1
 
-# Copy source code
-COPY *.ts ./
+# Copy Python handler
+COPY handler.py ${LAMBDA_TASK_ROOT}/
 
-# Build TypeScript to JavaScript using node_modules/.bin/tsc
-RUN ./node_modules/.bin/tsc handler.ts --outDir . --module commonjs --target es2020 --esModuleInterop --skipLibCheck --resolveJsonModule
-
-# Verify handler.js was created
-RUN ls -la handler.js
-
-# Remove devDependencies to reduce size
-RUN npm prune --production
-
-# Set FFmpeg path for runtime
+# Set environment variables
 ENV FFMPEG_PATH=/usr/local/bin/ffmpeg
 ENV PATH=/usr/local/bin:$PATH
-ENV NODE_ENV=production
+ENV PYTHONUNBUFFERED=1
+ENV NUMBA_CACHE_DIR=/tmp
+ENV NUMBA_DISABLE_JIT=1
 
-# Set the CMD to your handler (handler.js exports handler function)
-CMD [ "handler.handler" ]
+# Set the CMD to Python handler
+CMD [ "handler.lambda_handler" ]

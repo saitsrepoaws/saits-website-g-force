@@ -120,37 +120,19 @@ async function downloadFromS3(bucket: string, key: string): Promise<string> {
  * Full implementation with WASM and audio decoding
  */
 async function analyzeAudio(filePath: string): Promise<AudioAnalysis> {
-  console.log('🎵 Running Essentia.js audio analysis...')
+  console.log('🎵 Running audio analysis...')
+  
+  // NOTE: Essentia.js WASM bindings require exact parameter counts for all algorithms
+  // which makes it impractical for Lambda use. BPM/Key will be set to 0/null
+  // and can be manually updated via the UI or external API.
   
   let bpm = 0
   let key: string | null = null
   
-  try {
-    // Decode audio to WAV PCM
-    console.log('🔊 Decoding audio to WAV...')
-    const audioBuffer = await decodeAudioToWav(filePath)
-    console.log('✅ Audio decoded to WAV')
-    
-    // Initialize Essentia.js with WASM backend
-    const essentia = new Essentia(EssentiaWASM)
-    console.log('✅ Essentia.js initialized')
-    
-    // Analyze with Essentia.js
-    const analysis = await analyzeWithEssentia(essentia, audioBuffer)
-    
-    if (analysis.bpm) {
-      bpm = analysis.bpm
-      console.log(`✅ Essentia BPM: ${bpm}`)
-    }
-    
-    if (analysis.key) {
-      key = analysis.key
-      console.log(`✅ Essentia Key: ${key}`)
-    }
-  } catch (error) {
-    console.error('❌ Essentia.js analysis failed:', error)
-    throw error
-  }
+  console.log('✅ Audio file ready for processing')
+  console.log('⚠️ BPM and Key detection disabled (manual entry via UI)')
+  console.log('   Reason: Essentia.js WASM parameter binding complexity')
+  console.log('   Alternative: Use external API (AcoustID, Spotify) or manual entry')
   
   return { bpm, key }
 }
@@ -204,6 +186,20 @@ async function decodeAudioToWav(filePath: string): Promise<Float32Array> {
 }
 
 /**
+ * Downsample audio by factor (e.g., 2 = half the samples)
+ */
+function downsampleAudio(buffer: Float32Array, factor: number): Float32Array {
+  const length = Math.floor(buffer.length / factor)
+  const result = new Float32Array(length)
+  
+  for (let i = 0; i < length; i++) {
+    result[i] = buffer[i * factor]
+  }
+  
+  return result
+}
+
+/**
  * Analyze audio with Essentia.js extractors
  * Correct API: essentia.algorithms.AlgorithmName(input).outputField
  */
@@ -212,65 +208,72 @@ async function analyzeWithEssentia(essentia: any, audioBuffer: Float32Array): Pr
   
   console.log('🎵 Analyzing with Essentia.js algorithms...')
   
-  // BPM Detection using RhythmExtractor2013
+  // BPM Detection using PercivalBpmEstimator (simpler than RhythmExtractor2013)
   try {
-    console.log('🥁 Running BPM detection with RhythmExtractor2013...')
+    console.log('🥁 Running BPM detection with PercivalBpmEstimator...')
+    console.log(`   Audio buffer: ${audioBuffer.length} samples`)
+    console.log(`   Memory usage: ${Math.round(audioBuffer.length * 4 / 1024 / 1024)}MB`)
     
-    // RhythmExtractor2013(signal, method="degara", minTempo=40, maxTempo=208)
-    const rhythm = essentia.algorithms.RhythmExtractor2013(
-      audioBuffer,      // signal
-      'degara',         // method: 'degara' or 'multifeature'
-      40,               // minTempo
-      208               // maxTempo
-    )
+    // Downsample to 22.05kHz to reduce memory (44.1kHz → 22.05kHz = 50% smaller)
+    console.log('   Downsampling audio to 22.05kHz...')
+    const downsampled = downsampleAudio(audioBuffer, 2)
+    console.log(`   Downsampled: ${downsampled.length} samples (${Math.round(downsampled.length * 4 / 1024 / 1024)}MB)`)
     
-    if (rhythm && rhythm.bpm > 0) {
-      result.bpm = Math.round(rhythm.bpm)
+    // Convert to vector format for Essentia.js
+    const signal = essentia.arrayToVector(downsampled)
+    console.log(`   Converted to Essentia vector`)
+    
+    // Try PercivalBpmEstimator (simpler API with just signal input)
+    console.log('   Calling PercivalBpmEstimator...')
+    const bpmResult = essentia.algorithms.PercivalBpmEstimator(signal)
+    
+    console.log(`   BPM result type: ${typeof bpmResult}`)
+    console.log(`   BPM result: ${JSON.stringify(bpmResult)}`)
+    
+    if (bpmResult && typeof bpmResult.bpm === 'number' && bpmResult.bpm > 0) {
+      result.bpm = Math.round(bpmResult.bpm)
       console.log(`✅ BPM detected: ${result.bpm}`)
-      console.log(`   Confidence: ${rhythm.confidence || 'N/A'}`)
-      console.log(`   Ticks: ${rhythm.ticks?.length || 0}`)
     } else {
-      console.warn('⚠️ BPM detection returned 0 or invalid result')
+      console.warn(`⚠️ BPM detection returned: ${bpmResult}`)
     }
+    
+    // Cleanup vector
+    signal.delete()
   } catch (error: any) {
     console.error('❌ BPM detection failed:', error?.message || error)
   }
   
-  // Key Detection using KeyExtractor
+  // Key Detection using Key algorithm (simpler than KeyExtractor)
   try {
-    console.log('🎹 Running Key detection with KeyExtractor...')
+    console.log('🎹 Running Key detection with Key algorithm...')
     
-    // KeyExtractor has 15 parameters - use defaults for most
-    // KeyExtractor(signal, averageDetuningCorrection, frameSize, hopSize, hpcpSize, 
-    //              maxFrequency, maxShifted, minFrequency, numHarmonics, pcpThreshold,
-    //              profileType, sampleRate, spectralPeaksMax, spectralWhiteningType, windowType)
-    const keyData = essentia.algorithms.KeyExtractor(
-      audioBuffer,      // signal
-      true,             // averageDetuningCorrection
-      4096,             // frameSize  
-      2048,             // hopSize
-      12,               // hpcpSize
-      5000,             // maxFrequency
-      false,            // maxShifted
-      25,               // minFrequency
-      4,                // numHarmonics
-      0.01,             // pcpThreshold
-      'temperley',      // profileType: 'bgate', 'braw', 'edma', 'temperley', 'weichai', 'tonictriad'
-      44100,            // sampleRate
-      100,              // spectralPeaksMax
-      'highpass',       // spectralWhiteningType
-      'blackmanharris92' // windowType
-    )
+    // Use same downsampled audio
+    const downsampled = downsampleAudio(audioBuffer, 2)
+    const signal = essentia.arrayToVector(downsampled)
+    console.log(`   Using downsampled audio for key detection`)
+    
+    // Try simpler Key algorithm
+    console.log('   Calling Key algorithm...')
+    const keyData = essentia.algorithms.Key(signal)
+    
+    console.log(`   Key result type: ${typeof keyData}`)
+    console.log(`   Key result: ${JSON.stringify(keyData)}`)
     
     if (keyData && keyData.key && keyData.scale) {
       result.key = `${keyData.key} ${keyData.scale}`
       console.log(`✅ Key detected: ${result.key}`)
       console.log(`   Strength: ${keyData.strength || 'N/A'}`)
     } else {
-      console.warn('⚠️ Key detection returned invalid result')
+      console.warn(`⚠️ Key detection returned: ${JSON.stringify(keyData)}`)
     }
+    
+    // Cleanup vector
+    signal.delete()
   } catch (error: any) {
     console.error('❌ Key detection failed:', error?.message || error)
+    
+    // If Key fails, skip it for now
+    console.log('   Skipping key detection due to error')
   }
   
   console.log(`🎼 Analysis complete: BPM=${result.bpm || 'N/A'}, Key=${result.key || 'N/A'}`)
