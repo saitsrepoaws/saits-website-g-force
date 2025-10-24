@@ -23,17 +23,27 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 
 # Copy package files
 COPY package*.json ./
+COPY tsconfig.json* ./
 
-# Install Node.js dependencies
-RUN npm ci --omit=dev
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
-# Copy function code
+# Copy source code
 COPY *.ts ./
-COPY *.js ./
+
+# Build TypeScript to JavaScript using node_modules/.bin/tsc
+RUN ./node_modules/.bin/tsc handler.ts --outDir . --module commonjs --target es2020 --esModuleInterop --skipLibCheck --resolveJsonModule
+
+# Verify handler.js was created
+RUN ls -la handler.js
+
+# Remove devDependencies to reduce size
+RUN npm prune --production
 
 # Set FFmpeg path for runtime
 ENV FFMPEG_PATH=/usr/local/bin/ffmpeg
 ENV PATH=/usr/local/bin:$PATH
+ENV NODE_ENV=production
 
-# Set the CMD to your handler
+# Set the CMD to your handler (handler.js exports handler function)
 CMD [ "handler.handler" ]

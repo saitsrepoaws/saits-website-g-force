@@ -5,12 +5,12 @@ process.env.FFMPEG_PATH = process.env.FFMPEG_PATH || '/usr/local/bin/ffmpeg'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
-import { parseFile } from 'music-metadata'
 import { Readable } from 'stream'
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
-import Essentia from 'essentia.js'
+// CommonJS require for Essentia.js - need both modules
+const { Essentia, EssentiaWASM } = require('essentia.js')
 import ffmpeg from 'fluent-ffmpeg'
 import wav from 'node-wav'
 
@@ -105,9 +105,9 @@ async function downloadFromS3(bucket: string, key: string): Promise<string> {
   const writeStream = fs.createWriteStream(filePath)
   const readStream = response.Body as Readable
   
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     readStream.pipe(writeStream)
-    writeStream.on('finish', resolve)
+    writeStream.on('finish', () => resolve())
     writeStream.on('error', reject)
   })
   
@@ -122,78 +122,42 @@ async function downloadFromS3(bucket: string, key: string): Promise<string> {
 async function analyzeAudio(filePath: string): Promise<AudioAnalysis> {
   console.log('🎵 Running Essentia.js audio analysis...')
   
-  // 1. Get basic metadata first
-  const metadata = await parseFile(filePath)
+  let bpm = 0
+  let key: string | null = null
   
-  // 2. Check if BPM and Key are in tags
-  let bpm = metadata.common.bpm || 0
-  let key = metadata.common.key || null
-  
-  console.log(`Metadata tags: BPM=${bpm}, Key=${key}`)
-  
-  // 3. If missing, use Essentia.js for real audio analysis
-  if (!bpm || !key) {
-    console.log('⚡ Running Essentia.js audio analysis...')
+  try {
+    // Decode audio to WAV PCM
+    console.log('🔊 Decoding audio to WAV...')
+    const audioBuffer = await decodeAudioToWav(filePath)
+    console.log('✅ Audio decoded to WAV')
     
-    try {
-      // Decode audio to WAV PCM
-      const audioBuffer = await decodeAudioToWav(filePath)
-      
-      // Initialize Essentia.js WASM
-      const essentia = await Essentia()
-      console.log('✅ Essentia.js WASM initialized')
-      
-      // Analyze with Essentia.js
-      const analysis = await analyzeWithEssentia(essentia, audioBuffer)
-      
-      if (!bpm && analysis.bpm) {
-        bpm = analysis.bpm
-        console.log(`✅ BPM detected: ${bpm}`)
-      }
-      
-      if (!key && analysis.key) {
-        key = analysis.key
-        console.log(`✅ Key detected: ${key}`)
-      }
-      
-    } catch (error) {
-      console.error('⚠️ Essentia.js analysis failed:', error)
-      // Fallback to filename detection
-      if (!bpm) {
-        bpm = await detectBPMFromFilename(filePath)
-        if (bpm) console.log(`✅ BPM from filename: ${bpm}`)
-      }
-      if (!key) {
-        key = await detectKeyFromFilename(filePath)
-        if (key) console.log(`✅ Key from filename: ${key}`)
-      }
+    // Initialize Essentia.js with WASM backend
+    const essentia = new Essentia(EssentiaWASM)
+    console.log('✅ Essentia.js initialized')
+    
+    // Analyze with Essentia.js
+    const analysis = await analyzeWithEssentia(essentia, audioBuffer)
+    
+    if (analysis.bpm) {
+      bpm = analysis.bpm
+      console.log(`✅ Essentia BPM: ${bpm}`)
     }
+    
+    if (analysis.key) {
+      key = analysis.key
+      console.log(`✅ Essentia Key: ${key}`)
+    }
+  } catch (error) {
+    console.error('❌ Essentia.js analysis failed:', error)
+    throw error
   }
   
-  // 4. Estimate audio features
-  const duration = metadata.format.duration || 0
-  const energy = estimateEnergy(metadata)
-  const danceability = estimateDanceability(bpm)
-  const genre = Array.isArray(metadata.common.genre) ? metadata.common.genre[0] : metadata.common.genre
-  const valence = estimateValence(genre)
-  
-  return {
-    bpm: bpm || 0,
-    key: key || null,
-    energy,
-    danceability,
-    valence,
-    duration: Math.floor(duration),
-  }
+  return { bpm, key }
 }
 
 interface AudioAnalysis {
   bpm: number
   key: string | null
-  energy: number | null
-  danceability: number | null
-  valence: number | null
-  duration: number
 }
 
 /**
@@ -241,51 +205,75 @@ async function decodeAudioToWav(filePath: string): Promise<Float32Array> {
 
 /**
  * Analyze audio with Essentia.js extractors
+ * Correct API: essentia.algorithms.AlgorithmName(input).outputField
  */
 async function analyzeWithEssentia(essentia: any, audioBuffer: Float32Array): Promise<{ bpm?: number, key?: string }> {
   const result: { bpm?: number, key?: string } = {}
   
+  console.log('🎵 Analyzing with Essentia.js algorithms...')
+  
   // BPM Detection using RhythmExtractor2013
   try {
-    console.log('🎵 Running BPM detection...')
+    console.log('🥁 Running BPM detection with RhythmExtractor2013...')
     
-    // Essentia.js RhythmExtractor2013
-    const rhythm = essentia.RhythmExtractor2013(
-      audioBuffer,
-      44100, // sample rate
-      false  // do not use onset
+    // RhythmExtractor2013(signal, method="degara", minTempo=40, maxTempo=208)
+    const rhythm = essentia.algorithms.RhythmExtractor2013(
+      audioBuffer,      // signal
+      'degara',         // method: 'degara' or 'multifeature'
+      40,               // minTempo
+      208               // maxTempo
     )
     
-    if (rhythm && rhythm.bpm) {
+    if (rhythm && rhythm.bpm > 0) {
       result.bpm = Math.round(rhythm.bpm)
-      console.log(`✅ Essentia BPM: ${result.bpm}`)
+      console.log(`✅ BPM detected: ${result.bpm}`)
+      console.log(`   Confidence: ${rhythm.confidence || 'N/A'}`)
+      console.log(`   Ticks: ${rhythm.ticks?.length || 0}`)
+    } else {
+      console.warn('⚠️ BPM detection returned 0 or invalid result')
     }
-  } catch (error) {
-    console.error('⚠️ BPM detection failed:', error)
+  } catch (error: any) {
+    console.error('❌ BPM detection failed:', error?.message || error)
   }
   
   // Key Detection using KeyExtractor
   try {
-    console.log('🎹 Running Key detection...')
+    console.log('🎹 Running Key detection with KeyExtractor...')
     
-    // Essentia.js KeyExtractor
-    const keyData = essentia.KeyExtractor(
-      audioBuffer,
-      44100,  // sample rate
-      true,   // use polyphonic key detection
-      0.5,    // threshold
-      'edma'  // algorithm (edma, temperley, krumhansl)
+    // KeyExtractor has 15 parameters - use defaults for most
+    // KeyExtractor(signal, averageDetuningCorrection, frameSize, hopSize, hpcpSize, 
+    //              maxFrequency, maxShifted, minFrequency, numHarmonics, pcpThreshold,
+    //              profileType, sampleRate, spectralPeaksMax, spectralWhiteningType, windowType)
+    const keyData = essentia.algorithms.KeyExtractor(
+      audioBuffer,      // signal
+      true,             // averageDetuningCorrection
+      4096,             // frameSize  
+      2048,             // hopSize
+      12,               // hpcpSize
+      5000,             // maxFrequency
+      false,            // maxShifted
+      25,               // minFrequency
+      4,                // numHarmonics
+      0.01,             // pcpThreshold
+      'temperley',      // profileType: 'bgate', 'braw', 'edma', 'temperley', 'weichai', 'tonictriad'
+      44100,            // sampleRate
+      100,              // spectralPeaksMax
+      'highpass',       // spectralWhiteningType
+      'blackmanharris92' // windowType
     )
     
     if (keyData && keyData.key && keyData.scale) {
-      // Convert to standard notation
-      result.key = normalizeKeyFromEssentia(keyData.key, keyData.scale)
-      console.log(`✅ Essentia Key: ${result.key}`)
+      result.key = `${keyData.key} ${keyData.scale}`
+      console.log(`✅ Key detected: ${result.key}`)
+      console.log(`   Strength: ${keyData.strength || 'N/A'}`)
+    } else {
+      console.warn('⚠️ Key detection returned invalid result')
     }
-  } catch (error) {
-    console.error('⚠️ Key detection failed:', error)
+  } catch (error: any) {
+    console.error('❌ Key detection failed:', error?.message || error)
   }
   
+  console.log(`🎼 Analysis complete: BPM=${result.bpm || 'N/A'}, Key=${result.key || 'N/A'}`)
   return result
 }
 
@@ -434,18 +422,13 @@ async function updateTrack(trackId: string, analysis: AudioAnalysis) {
   const updateCommand = new UpdateCommand({
     TableName: tableName,
     Key: { id: trackId },
-    UpdateExpression: 'SET bpm = :bpm, #key = :key, energy = :energy, danceability = :danceability, valence = :valence, #duration = :duration, updatedAt = :updatedAt',
+    UpdateExpression: 'SET bpm = :bpm, #key = :key, updatedAt = :updatedAt',
     ExpressionAttributeNames: {
       '#key': 'key',
-      '#duration': 'duration',
     },
     ExpressionAttributeValues: {
       ':bpm': analysis.bpm,
       ':key': analysis.key,
-      ':energy': analysis.energy,
-      ':danceability': analysis.danceability,
-      ':valence': analysis.valence,
-      ':duration': analysis.duration,
       ':updatedAt': new Date().toISOString(),
     },
   })
