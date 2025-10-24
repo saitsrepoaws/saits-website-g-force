@@ -7,7 +7,8 @@ export const audioAnalyzer = defineFunction({
   memoryMB: 3008, // Max memory for audio processing
   resourceGroupName: 'storage',
   environment: {
-    // FFmpeg from @ffmpeg-installer package
-    FORCE_DEPLOY: '2', // Force redeploy to clear Lambda cache
+    // FFmpeg from Lambda Layer at /opt/bin/ffmpeg
+    FFMPEG_PATH: '/opt/bin/ffmpeg',
+    PATH: '/opt/bin:/usr/local/bin:/usr/bin:/bin',
   },
 })

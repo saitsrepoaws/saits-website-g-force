@@ -9,19 +9,25 @@ import os from 'os'
 import Essentia from 'essentia.js'
 import ffmpeg from 'fluent-ffmpeg'
 import wav from 'node-wav'
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg'
 
-// Set FFmpeg binary path from @ffmpeg-installer
-// This package provides platform-specific FFmpeg binaries
-const ffmpegPath = ffmpegInstaller.path
+// Set FFmpeg binary path from Lambda Layer
+// Lambda Layer places FFmpeg at /opt/bin/ffmpeg
+const ffmpegPath = '/opt/bin/ffmpeg'
 
-console.log(`🔍 FFmpeg path: ${ffmpegPath}`)
+console.log(`🔍 Checking FFmpeg at: ${ffmpegPath}`)
 
 if (fs.existsSync(ffmpegPath)) {
   ffmpeg.setFfmpegPath(ffmpegPath)
-  console.log(`✅ FFmpeg binary found and configured`)
+  console.log(`✅ FFmpeg binary found and configured from Lambda Layer`)
 } else {
   console.error(`❌ FFmpeg binary not found at: ${ffmpegPath}`)
+  console.log(`📂 Checking /opt/bin contents...`)
+  try {
+    const optBinContents = fs.readdirSync('/opt/bin')
+    console.log(`/opt/bin contents: ${JSON.stringify(optBinContents)}`)
+  } catch (e) {
+    console.log(`/opt/bin not accessible: ${e}`)
+  }
 }
 
 const s3Client = new S3Client({})
