@@ -176,13 +176,6 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref"
        ]
       },
-      "\",\"",
-      {
-       "Fn::GetAtt": [
-        "storage0EC3F24A",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storageaudioanalyzerlambda34F3F518Ref"
-       ]
-      },
       "\"]"
      ]
     ]
@@ -447,7 +440,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/c02a16d7d9958896c6a7cb6037cba9f10c5b34be61308c7044cc6be9fa0aabdf.json"
+       "/4137ca45b753b55137e107dfb680c215aa8b7ecee6b3f2a659dba8eda49375fe.json"
       ]
      ]
     }

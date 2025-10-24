@@ -1,6 +1,6 @@
-// CRITICAL: Set FFMPEG_PATH before any imports that might use FFmpeg
-// This prevents fluent-ffmpeg from looking for @ffmpeg-installer during import
-process.env.FFMPEG_PATH = process.env.FFMPEG_PATH || '/opt/bin/ffmpeg'
+// Docker Lambda Container - FFmpeg is installed at /usr/local/bin/ffmpeg
+// Set path before imports to prevent @ffmpeg-installer lookup
+process.env.FFMPEG_PATH = process.env.FFMPEG_PATH || '/usr/local/bin/ffmpeg'
 
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
@@ -14,27 +14,28 @@ import Essentia from 'essentia.js'
 import ffmpeg from 'fluent-ffmpeg'
 import wav from 'node-wav'
 
-// Set FFmpeg binary path from Lambda Layer
-// Lambda Layer places FFmpeg at /opt/bin/ffmpeg
+// Configure FFmpeg path for Docker container
 const ffmpegPath = process.env.FFMPEG_PATH!
+console.log(`🐳 Docker Lambda - FFmpeg path: ${ffmpegPath}`)
 
-console.log(`🔍 FFmpeg configured from env: ${ffmpegPath}`)
-
-// Explicitly set the path for fluent-ffmpeg
+// Set FFmpeg path for fluent-ffmpeg
 ffmpeg.setFfmpegPath(ffmpegPath)
 
-// Verify FFmpeg binary exists
+// Verify FFmpeg binary
 if (fs.existsSync(ffmpegPath)) {
   console.log(`✅ FFmpeg binary verified at: ${ffmpegPath}`)
+  
+  // Test FFmpeg
+  try {
+    const { execSync } = require('child_process')
+    const version = execSync(`${ffmpegPath} -version`).toString().split('\n')[0]
+    console.log(`📹 ${version}`)
+  } catch (e) {
+    console.error(`⚠️  FFmpeg test failed: ${e}`)
+  }
 } else {
   console.error(`❌ FFmpeg binary not found at: ${ffmpegPath}`)
-  console.log(`📂 PATH: ${process.env.PATH}`)
-  try {
-    const optBinContents = fs.readdirSync('/opt/bin')
-    console.log(`/opt/bin contents: ${JSON.stringify(optBinContents)}`)
-  } catch (e) {
-    console.error(`/opt/bin not accessible: ${e}`)
-  }
+  console.error(`📂 PATH: ${process.env.PATH}`)
 }
 
 const s3Client = new S3Client({})

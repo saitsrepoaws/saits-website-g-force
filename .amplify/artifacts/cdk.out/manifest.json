@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/8a5844f00df916fd10024ca01a2a6550c36b03daf5dd5512ebeb7b6e0077f3a8.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/97b37dd1d04bdfcd47a61eab3230eacbf031249a5b9fbf9836a197fe8313de28.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1951,28 +1951,22 @@
             "data": "waveformgeneratorlambdaD07307E8"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/ServiceRole/Resource": [
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "audioanalyzerlambdaServiceRoleDA68F1F6"
+            "data": "AudioAnalyzerDockerLambdaServiceRole96C96C6C"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/ServiceRole/DefaultPolicy/Resource": [
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/ServiceRole/DefaultPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "audioanalyzerlambdaServiceRoleDefaultPolicy6AB5272A"
+            "data": "AudioAnalyzerDockerLambdaServiceRoleDefaultPolicy96C37984"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-analyzer-lambda/Resource": [
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "audioanalyzerlambda2BE3CCBC"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/FFmpegLayer/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "FFmpegLayer65FCD2A8"
+            "data": "AudioAnalyzerDockerLambda15411CA8"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [
@@ -2015,12 +2009,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storageaudioanalyzerlambda34F3F518Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620storageaudioanalyzerlambda34F3F518Ref"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": [
