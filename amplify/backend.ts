@@ -60,17 +60,11 @@ trackTable.grantReadWriteData(audioAnalyzerLambda)
 
 // Create and attach FFmpeg Lambda Layer
 const ffmpegLayer = createFFmpegLayer(backend.audioAnalyzer.resources.lambda.stack)
-const analyzerCfnFunction = backend.audioAnalyzer.resources.lambda.node.defaultChild as LambdaFunction
-if (analyzerCfnFunction.addLayers) {
-  analyzerCfnFunction.addLayers(ffmpegLayer)
-  console.log('✅ FFmpeg Layer attached to audio-analyzer Lambda')
-} else {
-  // Fallback: use CDK property override
-  const cfnFunction = analyzerCfnFunction.node.defaultChild as any
-  const existingLayers = cfnFunction.layers || []
-  cfnFunction.addPropertyOverride('Layers', [...existingLayers, ffmpegLayer.layerVersionArn])
-  console.log('✅ FFmpeg Layer attached via property override')
-}
+
+// Attach layer via CDK L1 construct (CfnFunction)
+const analyzerCfnFunction = backend.audioAnalyzer.resources.lambda.node.defaultChild as any
+analyzerCfnFunction.addPropertyOverride('Layers', [ffmpegLayer.layerVersionArn])
+console.log('✅ FFmpeg Layer attached to audio-analyzer Lambda')
 
 // Add environment variables
 backend.audioMetadata.addEnvironment('STORAGE_BUCKET_NAME', storageBucket.bucketName)

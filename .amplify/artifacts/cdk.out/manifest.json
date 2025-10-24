@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b4ab2cd3b4d9621e1e27631de5de17f26a0c44699dee8ad998924beeb5b69e4e.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f78d0b6efb13340e68d974ad99f549cd5b5f77c45983832f377256132b538a55.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1967,6 +1967,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "audioanalyzerlambda2BE3CCBC"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/FFmpegLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FFmpegLayer65FCD2A8"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [

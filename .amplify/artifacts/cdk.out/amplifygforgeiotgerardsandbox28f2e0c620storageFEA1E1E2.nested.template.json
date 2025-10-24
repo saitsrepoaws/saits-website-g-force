@@ -1288,7 +1288,8 @@
     },
     "Environment": {
      "Variables": {
-      "FORCE_DEPLOY": "2",
+      "FFMPEG_PATH": "/opt/bin/ffmpeg",
+      "PATH": "/opt/bin:/usr/local/bin:/usr/bin:/bin",
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
       "STORAGE_BUCKET_NAME": {
        "Ref": "gforgeIotStorageBucketEED00516"
@@ -1322,6 +1323,11 @@
      "Size": 512
     },
     "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "FFmpegLayer65FCD2A8"
+     }
+    ],
     "MemorySize": 3008,
     "Role": {
      "Fn::GetAtt": [
@@ -1357,6 +1363,30 @@
     "aws:asset:path": "asset.da557308fc02b205bcea04603ac16afb4282b3624d26d6d09a1d182a93e38e12",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
+   }
+  },
+  "FFmpegLayer65FCD2A8": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "CompatibleRuntimes": [
+     "nodejs20.x"
+    ],
+    "Content": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "4647a6d8302980ea08b883775a5379675cf560e14f5bca86dede0ba852443e84.zip"
+    },
+    "Description": "FFmpeg static binary for audio processing",
+    "LayerName": "ffmpeg-static"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/FFmpegLayer/Resource",
+    "aws:asset:path": "asset.4647a6d8302980ea08b883775a5379675cf560e14f5bca86dede0ba852443e84",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
    }
   },
   "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC": {
@@ -1476,7 +1506,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12P0W6DMAxFv6XvwWPpF6xIe1uF4AOQG1xkIEkVh1YT4t+nFFinPZ17rWtfWYPWOeQHfEhm2iEb+QLzmSRSW0c0g8KHNLMcYT5NZqCoiqvb1IrSj2y+X+PNr+aEQosa0V5ahLm4upKCZRH2Lm18Ts5E9m5RIhbmOgZ2XYkBLUUKKfFrFsVoYX61baryIyWbuDc1zrfUC5yf2EuUHBsUoSjwkbCoYpLobUXip2DWK3/0F95u7Lp/qTL4O7cU0mfqeaeO2KXcnlhUqode3u5ag36H/NALcxYmF9kSVCt/ADrDBhR5AQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12PwW6DMBBEvyV3Z0udL2iQemojBFKuaGM2yIDtyGsSRRb/XjlAEvU08+zx7liClBlkG7zxVjX9dtAniAfiQE0VUPUCb1xH3kHcj6qnIPKzXdwshRu0ur+OF55hj0yTGNCcGoSYn21B3mhm7Wx68T1aFZL/wTv5I/n14p0nwWwgVsFr2xbo0VAgn1JPmIRGA/FVZXGlGyhh0rVGbV1DHcPhIc8GvKuRmQLDV5JJ5CMHZ0piN3o1T3nzv3i5aNv+SxXeXXVDPn1bPOZUAduUWxOTSOuh44+rlCA/Idt0rPXWjzZoQ1DO+gcoTAcMlgEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default"
