@@ -84,6 +84,7 @@ type LambdaProvidedEnvVars = {
 type AmplifyBackendEnvVars = {
   FFMPEG_PATH: string;
   PATH: string;
+  DEPLOYMENT_VERSION: string;
   STORAGE_BUCKET_NAME: string;
   TRACK_TABLE_NAME: string;
 };

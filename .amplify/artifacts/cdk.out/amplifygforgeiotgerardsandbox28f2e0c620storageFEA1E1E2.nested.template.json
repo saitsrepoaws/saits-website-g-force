@@ -1290,6 +1290,7 @@
      "Variables": {
       "FFMPEG_PATH": "/opt/bin/ffmpeg",
       "PATH": "/opt/bin:/usr/local/bin:/usr/bin:/bin",
+      "DEPLOYMENT_VERSION": "3",
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
       "STORAGE_BUCKET_NAME": {
        "Ref": "gforgeIotStorageBucketEED00516"

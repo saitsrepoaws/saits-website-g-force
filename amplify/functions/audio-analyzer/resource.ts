@@ -10,5 +10,7 @@ export const audioAnalyzer = defineFunction({
     // FFmpeg from Lambda Layer at /opt/bin/ffmpeg
     FFMPEG_PATH: '/opt/bin/ffmpeg',
     PATH: '/opt/bin:/usr/local/bin:/usr/bin:/bin',
+    // Force new deployment to clear Lambda cache
+    DEPLOYMENT_VERSION: '3',
   },
 })

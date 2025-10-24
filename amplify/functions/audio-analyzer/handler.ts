@@ -1,3 +1,7 @@
+// CRITICAL: Set FFMPEG_PATH before any imports that might use FFmpeg
+// This prevents fluent-ffmpeg from looking for @ffmpeg-installer during import
+process.env.FFMPEG_PATH = process.env.FFMPEG_PATH || '/opt/bin/ffmpeg'
+
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb'
@@ -12,21 +16,24 @@ import wav from 'node-wav'
 
 // Set FFmpeg binary path from Lambda Layer
 // Lambda Layer places FFmpeg at /opt/bin/ffmpeg
-const ffmpegPath = '/opt/bin/ffmpeg'
+const ffmpegPath = process.env.FFMPEG_PATH!
 
-console.log(`🔍 Checking FFmpeg at: ${ffmpegPath}`)
+console.log(`🔍 FFmpeg configured from env: ${ffmpegPath}`)
 
+// Explicitly set the path for fluent-ffmpeg
+ffmpeg.setFfmpegPath(ffmpegPath)
+
+// Verify FFmpeg binary exists
 if (fs.existsSync(ffmpegPath)) {
-  ffmpeg.setFfmpegPath(ffmpegPath)
-  console.log(`✅ FFmpeg binary found and configured from Lambda Layer`)
+  console.log(`✅ FFmpeg binary verified at: ${ffmpegPath}`)
 } else {
   console.error(`❌ FFmpeg binary not found at: ${ffmpegPath}`)
-  console.log(`📂 Checking /opt/bin contents...`)
+  console.log(`📂 PATH: ${process.env.PATH}`)
   try {
     const optBinContents = fs.readdirSync('/opt/bin')
     console.log(`/opt/bin contents: ${JSON.stringify(optBinContents)}`)
   } catch (e) {
-    console.log(`/opt/bin not accessible: ${e}`)
+    console.error(`/opt/bin not accessible: ${e}`)
   }
 }
 
