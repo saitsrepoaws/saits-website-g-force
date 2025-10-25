@@ -225,40 +225,76 @@ function Players() {
   }
 
   async function handlePlay() {
-    console.log('handlePlay called', {
+    console.log('🎵 handlePlay called', {
       hasAudioRef: !!audioRef.current,
       isLoaded,
       hasCurrentTrack: !!currentTrack,
-      audioUrl: currentTrack?.audioUrl?.substring(0, 50)
+      audioUrl: currentTrack?.audioUrl?.substring(0, 80),
+      readyState: audioRef.current?.readyState,
+      networkState: audioRef.current?.networkState
     })
     
     if (!audioRef.current) {
-      console.error('No audio element reference!')
+      console.error('❌ No audio element reference!')
       alert('⚠️ Audio player not initialized')
       return
     }
     
     if (!isLoaded) {
-      console.warn('Track not loaded')
+      console.warn('⚠️ Track not loaded')
       alert('⚠️ Please load a track first (click LOAD button)')
       return
     }
     
     if (!currentTrack?.audioUrl) {
-      console.error('No audio URL available')
+      console.error('❌ No audio URL available')
       alert('⚠️ No audio file available for this track')
       return
     }
     
     try {
-      console.log('Attempting to play audio from:', currentTrack.audioUrl.substring(0, 100))
-      await audioRef.current.play()
-      setIsPlaying(true)
-      setIsPaused(false)
-      console.log('✅ Playback started successfully')
-    } catch (error) {
+      const audio = audioRef.current
+      
+      console.log('🎵 Audio element state:', {
+        src: audio.src,
+        readyState: audio.readyState,
+        paused: audio.paused,
+        currentTime: audio.currentTime,
+        duration: audio.duration,
+        error: audio.error
+      })
+      
+      // Check for errors
+      if (audio.error) {
+        throw new Error(`Audio error code ${audio.error.code}: ${audio.error.message}`)
+      }
+      
+      console.log('▶️ Attempting to play audio from:', currentTrack.audioUrl.substring(0, 100))
+      
+      // Try to play
+      const playPromise = audio.play()
+      
+      if (playPromise !== undefined) {
+        await playPromise
+        setIsPlaying(true)
+        setIsPaused(false)
+        console.log('✅ Playback started successfully!')
+      }
+    } catch (error: any) {
       console.error('❌ Playback failed:', error)
-      alert(`⚠️ Playback failed: ${error}`)
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      
+      let errorMsg = 'Playback failed'
+      if (error.name === 'NotAllowedError') {
+        errorMsg = 'Browser blocked autoplay. Try clicking play again.'
+      } else if (error.name === 'NotSupportedError') {
+        errorMsg = 'Audio format not supported'
+      } else if (error.message) {
+        errorMsg = error.message
+      }
+      
+      alert(`⚠️ ${errorMsg}`)
     }
   }
 
@@ -604,24 +640,39 @@ function Players() {
             <audio
               ref={audioRef}
               src={currentTrack.audioUrl}
+              preload="auto"
+              crossOrigin="anonymous"
               onTimeUpdate={handleTimeUpdate}
               onEnded={() => {
                 setIsPlaying(false)
                 setIsPaused(false)
-                console.log('Track ended')
+                console.log('✅ Track ended')
               }}
               onLoadedMetadata={() => {
-                console.log('Audio metadata loaded, duration:', audioRef.current?.duration)
+                console.log('✅ Audio metadata loaded, duration:', audioRef.current?.duration)
                 if (audioRef.current) {
                   audioRef.current.volume = volume
                 }
               }}
-              onError={(e) => {
-                console.error('Audio error:', e)
-                alert('⚠️ Failed to load audio file')
+              onLoadedData={() => {
+                console.log('✅ Audio data loaded, can play')
+              }}
+              onError={(e: any) => {
+                console.error('❌ Audio error:', e)
+                console.error('Audio element error code:', audioRef.current?.error)
+                alert('⚠️ Failed to load audio file. Check console for details.')
               }}
               onCanPlay={() => {
-                console.log('Audio ready to play')
+                console.log('✅ Audio ready to play (canPlay event)')
+              }}
+              onCanPlayThrough={() => {
+                console.log('✅ Audio can play through (buffered)')
+              }}
+              onLoadStart={() => {
+                console.log('⏳ Audio loading started...')
+              }}
+              onProgress={() => {
+                console.log('📥 Audio buffering...')
               }}
             />
           )}
