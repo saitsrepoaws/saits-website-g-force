@@ -160,13 +160,24 @@ function Players() {
       const { getPlaylist } = await import('../../services/playlists')
       const { data: playlist } = await getPlaylist(currentPlaylistId)
       
-      if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
+      console.log('Playlist data:', playlist)
+      
+      if (!playlist) {
+        alert('⚠️ Playlist not found')
+        return
+      }
+
+      // Parse tracks JSON string to array
+      const tracksData = JSON.parse((playlist as any).tracks || '[]')
+      console.log('Parsed tracks:', tracksData)
+      
+      if (!tracksData || tracksData.length === 0) {
         alert('⚠️ Playlist is empty')
         return
       }
 
       // Sort by position and get first track
-      const sortedTracks = [...playlist.tracks].sort((a: any, b: any) => a.position - b.position)
+      const sortedTracks = [...tracksData].sort((a: any, b: any) => a.position - b.position)
       const firstPlaylistTrack = sortedTracks[0]
 
       console.log('Loading track #1 from playlist:', firstPlaylistTrack)
@@ -180,12 +191,12 @@ function Players() {
           await loadTrackIntoPlayer(track)
           alert(`✅ Track #1 loaded from playlist: ${track.title}`)
         } else {
-          alert('⚠️ Track not found')
+          alert('⚠️ Track not found in library')
         }
       }
     } catch (error) {
       console.error('Failed to load track from playlist:', error)
-      alert('❌ Failed to load track from playlist')
+      alert(`❌ Failed to load track: ${error}`)
     }
   }
 
