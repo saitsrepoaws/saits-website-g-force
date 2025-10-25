@@ -47,12 +47,22 @@ function Players() {
   const [volume, setVolume] = useState(0.7)
   const [coverArtUrl, setCoverArtUrl] = useState<string | null>(null)
   const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
+  const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     loadPlaylists()
     loadSampleTrack()
     determineCurrentPlaylist()
+  }, [])
+
+  // Update clock every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTimeDisplay(new Date())
+    }, 1000)
+
+    return () => clearInterval(interval)
   }, [])
 
   async function loadPlaylists() {
@@ -222,14 +232,48 @@ function Players() {
                 <h2 className="text-3xl font-bold text-white mb-2">🎵 Now Playing</h2>
                 <p className="text-blue-200">Live Audio Player</p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
-                  <span className="text-white font-mono text-sm">
-                    {new Date().toLocaleTimeString()}
-                  </span>
-                </div>
+              <div className="flex items-center gap-3">
+                {/* Track Remaining Time (Countdown) */}
+                {isPlaying && duration > 0 && (
+                  <div className="px-4 py-2 bg-red-500/20 backdrop-blur-sm rounded-lg border border-red-500/50">
+                    <div className="text-xs text-red-300 font-semibold mb-1">REMAINING</div>
+                    <div className="text-white font-mono text-lg font-bold">
+                      -{formatTime(duration - currentTime)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Track Elapsed Time */}
                 {isPlaying && (
-                  <div className="flex items-center gap-2">
+                  <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm rounded-lg border border-blue-500/50">
+                    <div className="text-xs text-blue-300 font-semibold mb-1">ELAPSED</div>
+                    <div className="text-white font-mono text-lg font-bold">
+                      {formatTime(currentTime)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Track Duration */}
+                {currentTrack && (
+                  <div className="px-4 py-2 bg-purple-500/20 backdrop-blur-sm rounded-lg border border-purple-500/50">
+                    <div className="text-xs text-purple-300 font-semibold mb-1">DURATION</div>
+                    <div className="text-white font-mono text-lg font-bold">
+                      {formatTime(duration)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Current Time */}
+                <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                  <div className="text-xs text-gray-400 font-semibold mb-1">TIME</div>
+                  <div className="text-white font-mono text-lg font-bold">
+                    {currentTimeDisplay.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </div>
+                </div>
+
+                {/* Live Indicator */}
+                {isPlaying && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-red-500/20 rounded-lg border border-red-500/50">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                     <span className="text-red-400 text-sm font-semibold">LIVE</span>
                   </div>
