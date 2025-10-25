@@ -33,6 +33,8 @@ function Planner() {
   const [bulkPlaylistId, setBulkPlaylistId] = useState<string>('')
   const [bulkDays, setBulkDays] = useState<string[]>([])
   const [bulkSlots, setBulkSlots] = useState<string[]>([])
+  const [bulkTimes, setBulkTimes] = useState<string[]>([])
+  const [bulkMode, setBulkMode] = useState<'existing' | 'create'>('existing')
 
   useEffect(() => {
     loadPlaylists()
@@ -102,28 +104,58 @@ function Planner() {
 
   // Bulk Edit Functions
   function applyBulkEdit() {
-    if (!bulkPlaylistId || bulkSlots.length === 0 || bulkDays.length === 0) {
-      alert('Please select playlist, time slots, and days')
+    if (!bulkPlaylistId || bulkDays.length === 0) {
+      alert('Please select playlist and days')
       return
     }
 
-    setTimeSlots(slots => slots.map(slot => {
-      if (bulkSlots.includes(slot.id)) {
-        return {
-          ...slot,
-          playlistId: bulkPlaylistId,
-          days: bulkDays,
-          active: true
-        }
+    if (bulkMode === 'existing') {
+      // Update existing slots
+      if (bulkSlots.length === 0) {
+        alert('Please select at least one time slot')
+        return
       }
-      return slot
-    }))
+
+      setTimeSlots(slots => slots.map(slot => {
+        if (bulkSlots.includes(slot.id)) {
+          return {
+            ...slot,
+            playlistId: bulkPlaylistId,
+            days: bulkDays,
+            active: true
+          }
+        }
+        return slot
+      }))
+
+      alert(`✅ Bulk edit applied to ${bulkSlots.length} slots!`)
+    } else {
+      // Create new slots from selected times
+      if (bulkTimes.length === 0) {
+        alert('Please select at least one time')
+        return
+      }
+
+      const newSlots: TimeSlot[] = bulkTimes.map((time, index) => ({
+        id: `${Date.now()}-${index}`,
+        time,
+        name: `Slot ${time}`,
+        playlistId: bulkPlaylistId,
+        days: bulkDays,
+        duration: 60,
+        active: true
+      }))
+
+      setTimeSlots([...timeSlots, ...newSlots])
+      alert(`✅ Created ${newSlots.length} new slots!`)
+    }
 
     setShowBulkEdit(false)
     setBulkPlaylistId('')
     setBulkDays([])
     setBulkSlots([])
-    alert(`✅ Bulk edit applied to ${bulkSlots.length} slots!`)
+    setBulkTimes([])
+    setBulkMode('existing')
   }
 
   function quickFillWeekdays(playlistId: string) {
@@ -189,6 +221,25 @@ function Planner() {
         : [...prev, day]
     )
   }
+
+  function toggleBulkTime(time: string) {
+    setBulkTimes(prev =>
+      prev.includes(time)
+        ? prev.filter(t => t !== time)
+        : [...prev, time]
+    )
+  }
+
+  // Generate all hours from 00:00 to 23:00
+  const allHours = Array.from({ length: 24 }, (_, i) => 
+    `${String(i).padStart(2, '0')}:00`
+  )
+
+  // Common time presets
+  const businessHours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+  const morningSlots = ['06:00', '07:00', '08:00', '09:00', '10:00', '11:00']
+  const afternoonSlots = ['12:00', '13:00', '14:00', '15:00', '16:00', '17:00']
+  const eveningSlots = ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 
   const filteredSlots = timeSlots
     .filter(slot => slot.days.includes(currentDay))
@@ -545,60 +596,169 @@ function Planner() {
                   </select>
                 </div>
 
-                {/* Step 2: Select Time Slots */}
+                {/* Mode Toggle */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    2️⃣ Select Time Slots
+                    2️⃣ Choose Mode
                   </label>
-                  <div className="grid grid-cols-2 gap-2 p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
-                    {timeSlots.map(slot => (
-                      <button
-                        key={slot.id}
-                        onClick={() => toggleBulkSlot(slot.id)}
-                        className={`text-left p-3 rounded-lg border-2 transition-all ${
-                          bulkSlots.includes(slot.id)
-                            ? 'border-purple-600 bg-purple-50'
-                            : 'border-gray-200 bg-white hover:border-purple-300'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                            bulkSlots.includes(slot.id)
-                              ? 'border-purple-600 bg-purple-600'
-                              : 'border-gray-300'
-                          }`}>
-                            {bulkSlots.includes(slot.id) && (
-                              <span className="text-white text-xs">✓</span>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="font-semibold text-sm">{slot.time} - {slot.name}</div>
-                            <div className="text-xs text-gray-600">{slot.duration}m</div>
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-2 flex gap-2">
+                  <div className="flex gap-2">
                     <button
-                      onClick={() => setBulkSlots(timeSlots.map(s => s.id))}
-                      className="text-sm text-purple-600 hover:text-purple-700"
+                      onClick={() => {
+                        setBulkMode('existing')
+                        setBulkTimes([])
+                      }}
+                      className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+                        bulkMode === 'existing'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
                     >
-                      Select All
+                      📝 Update Existing Slots
                     </button>
                     <button
-                      onClick={() => setBulkSlots([])}
-                      className="text-sm text-gray-600 hover:text-gray-700"
+                      onClick={() => {
+                        setBulkMode('create')
+                        setBulkSlots([])
+                      }}
+                      className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
+                        bulkMode === 'create'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
                     >
-                      Clear All
+                      ➕ Create New Slots
                     </button>
                   </div>
                 </div>
 
-                {/* Step 3: Select Days */}
+                {/* Step 2: Select Time Slots OR Times */}
+                {bulkMode === 'existing' ? (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      3️⃣ Select Existing Time Slots
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
+                      {timeSlots.map(slot => (
+                        <button
+                          key={slot.id}
+                          onClick={() => toggleBulkSlot(slot.id)}
+                          className={`text-left p-3 rounded-lg border-2 transition-all ${
+                            bulkSlots.includes(slot.id)
+                              ? 'border-purple-600 bg-purple-50'
+                              : 'border-gray-200 bg-white hover:border-purple-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                              bulkSlots.includes(slot.id)
+                                ? 'border-purple-600 bg-purple-600'
+                                : 'border-gray-300'
+                            }`}>
+                              {bulkSlots.includes(slot.id) && (
+                                <span className="text-white text-xs">✓</span>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-semibold text-sm">{slot.time} - {slot.name}</div>
+                              <div className="text-xs text-gray-600">{slot.duration}m</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        onClick={() => setBulkSlots(timeSlots.map(s => s.id))}
+                        className="text-sm text-purple-600 hover:text-purple-700"
+                      >
+                        Select All
+                      </button>
+                      <button
+                        onClick={() => setBulkSlots([])}
+                        className="text-sm text-gray-600 hover:text-gray-700"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      3️⃣ Select Times (00:00 - 23:00)
+                    </label>
+                    
+                    {/* Time Presets */}
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setBulkTimes(allHours)}
+                        className="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
+                      >
+                        🌍 All Hours (24)
+                      </button>
+                      <button
+                        onClick={() => setBulkTimes(businessHours)}
+                        className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                      >
+                        💼 Business (9-17)
+                      </button>
+                      <button
+                        onClick={() => setBulkTimes(morningSlots)}
+                        className="text-xs px-3 py-1 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200"
+                      >
+                        🌅 Morning (6-11)
+                      </button>
+                      <button
+                        onClick={() => setBulkTimes(afternoonSlots)}
+                        className="text-xs px-3 py-1 bg-orange-100 text-orange-700 rounded hover:bg-orange-200"
+                      >
+                        ☀️ Afternoon (12-17)
+                      </button>
+                      <button
+                        onClick={() => setBulkTimes(eveningSlots)}
+                        className="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200"
+                      >
+                        🌙 Evening (18-23)
+                      </button>
+                      <button
+                        onClick={() => setBulkTimes([])}
+                        className="text-xs px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                      >
+                        Clear
+                      </button>
+                    </div>
+
+                    {/* All Hours Grid */}
+                    <div className="grid grid-cols-8 gap-2 p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
+                      {allHours.map(time => (
+                        <button
+                          key={time}
+                          onClick={() => toggleBulkTime(time)}
+                          className={`py-2 px-3 rounded-lg font-mono text-sm font-medium transition-all ${
+                            bulkTimes.includes(time)
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white text-gray-700 hover:bg-purple-100 border border-gray-200'
+                          }`}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-2 text-sm text-gray-600">
+                      {bulkTimes.length > 0 ? (
+                        <span className="font-medium text-purple-600">
+                          {bulkTimes.length} times selected
+                        </span>
+                      ) : (
+                        'Click times or use presets above'
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4: Select Days */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    3️⃣ Select Days
+                    4️⃣ Select Days
                   </label>
                   <div className="flex gap-2">
                     {DAYS.map(day => (
@@ -644,19 +804,28 @@ function Planner() {
                 </div>
 
                 {/* Summary */}
-                {(bulkPlaylistId || bulkSlots.length > 0 || bulkDays.length > 0) && (
+                {(bulkPlaylistId || bulkSlots.length > 0 || bulkTimes.length > 0 || bulkDays.length > 0) && (
                   <div className="mb-6 p-4 bg-blue-50 rounded-lg">
                     <h5 className="font-semibold text-blue-900 mb-2">Summary:</h5>
                     <ul className="text-sm text-blue-800 space-y-1">
+                      <li>
+                        <strong>Mode:</strong> {bulkMode === 'existing' ? '📝 Update Existing Slots' : '➕ Create New Slots'}
+                      </li>
                       <li>
                         <strong>Playlist:</strong>{' '}
                         {bulkPlaylistId
                           ? playlists.find(p => p.id === bulkPlaylistId)?.name || 'Unknown'
                           : 'Not selected'}
                       </li>
-                      <li>
-                        <strong>Time Slots:</strong> {bulkSlots.length} selected
-                      </li>
+                      {bulkMode === 'existing' ? (
+                        <li>
+                          <strong>Existing Slots:</strong> {bulkSlots.length} selected
+                        </li>
+                      ) : (
+                        <li>
+                          <strong>Times:</strong> {bulkTimes.length > 0 ? `${bulkTimes.length} times (${bulkTimes.join(', ')})` : 'None'}
+                        </li>
+                      )}
                       <li>
                         <strong>Days:</strong> {bulkDays.length > 0 ? bulkDays.join(', ') : 'None'}
                       </li>
@@ -668,10 +837,15 @@ function Planner() {
                 <div className="flex gap-3">
                   <button
                     onClick={applyBulkEdit}
-                    disabled={!bulkPlaylistId || bulkSlots.length === 0 || bulkDays.length === 0}
+                    disabled={
+                      !bulkPlaylistId || 
+                      bulkDays.length === 0 || 
+                      (bulkMode === 'existing' && bulkSlots.length === 0) ||
+                      (bulkMode === 'create' && bulkTimes.length === 0)
+                    }
                     className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
                   >
-                    Apply Bulk Fill
+                    {bulkMode === 'existing' ? 'Apply Bulk Fill' : `Create ${bulkTimes.length} New Slots`}
                   </button>
                   <button
                     onClick={() => {
@@ -679,6 +853,8 @@ function Planner() {
                       setBulkPlaylistId('')
                       setBulkDays([])
                       setBulkSlots([])
+                      setBulkTimes([])
+                      setBulkMode('existing')
                     }}
                     className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                   >
