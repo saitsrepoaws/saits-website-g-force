@@ -11,8 +11,11 @@ import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
 import { DockerImageFunction, DockerImageCode, Architecture } from 'aws-cdk-lib/aws-lambda'
-import { Duration } from 'aws-cdk-lib'
+import { Duration, CfnOutput } from 'aws-cdk-lib'
 import * as ecr from 'aws-cdk-lib/aws-ecr'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
+import * as s3 from 'aws-cdk-lib/aws-s3'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -143,3 +146,50 @@ authenticatedRole.attachInlinePolicy(
     ],
   })
 )
+
+// CloudFront Distribution for S3 Storage
+// This provides faster access and shorter URLs for audio/images
+const cloudFrontDistribution = new cloudfront.Distribution(
+  backend.storage.stack,
+  'StorageDistribution',
+  {
+    defaultBehavior: {
+      origin: new origins.S3Origin(storageBucket),
+      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+      cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+      cachePolicy: new cloudfront.CachePolicy(
+        backend.storage.stack,
+        'AudioCachePolicy',
+        {
+          cachePolicyName: 'AudioFilesCache',
+          comment: 'Cache policy for audio files and images',
+          defaultTtl: Duration.hours(24), // Cache for 24 hours
+          maxTtl: Duration.days(365), // Max 1 year
+          minTtl: Duration.seconds(0),
+          enableAcceptEncodingGzip: true,
+          enableAcceptEncodingBrotli: true,
+          queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(), // Include query params in cache key
+        }
+      ),
+      originRequestPolicy: cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN,
+      responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS,
+    },
+    comment: 'CDN for audio files, cover art, and waveforms',
+    enableLogging: false, // Disable access logs to reduce costs
+    priceClass: cloudfront.PriceClass.PRICE_CLASS_100, // Use only North America & Europe edge locations
+  }
+)
+
+// Export CloudFront domain for use in frontend
+new CfnOutput(backend.storage.stack, 'CloudFrontDomain', {
+  value: cloudFrontDistribution.distributionDomainName,
+  description: 'CloudFront distribution domain for storage assets',
+  exportName: 'StorageCloudFrontDomain',
+})
+
+new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
+  value: cloudFrontDistribution.distributionId,
+  description: 'CloudFront distribution ID',
+  exportName: 'StorageCloudFrontDistributionId',
+})

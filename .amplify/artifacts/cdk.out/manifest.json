@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4c3a38a89823179e47e7d25a9449106bb5266875a0e3ba16095c7afc23d8260a.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/27df21d1b87e4bcebc6cff3556cfdb23f018875b335d9bc2ebc89ba6ca8c78f0.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1985,6 +1985,36 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioCachePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AudioCachePolicy1975B062"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Origin1/S3Origin/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StorageDistributionOrigin1S3Origin4569DD08"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StorageDistributionE9D21ABB"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CloudFrontDomain": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontDomain"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CloudFrontDistributionId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudFrontDistributionId"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default": [
