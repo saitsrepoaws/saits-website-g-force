@@ -93,7 +93,15 @@ function Libery() {
 
   const loadTracksFromDB = async () => {
     setIsLoadingTracks(true)
+    console.log('🔄 Loading tracks from DB...')
+    
     const { data, errors } = await listTracks()
+    
+    console.log('📊 Raw data received:', {
+      dataLength: data?.length || 0,
+      hasErrors: !!errors,
+      firstTrack: data?.[0]
+    })
     
     if (errors && errors.length > 0) {
       console.warn('⚠️ GraphQL errors occurred, but got', data.length, 'tracks')
@@ -101,6 +109,7 @@ function Libery() {
     }
     
     console.log('📊 Loaded tracks from DB:', data)
+    console.log('📊 Total tracks loaded:', data?.length || 0)
     console.log('📊 First track audio features:', data[0] ? {
       bpm: data[0].bpm,
       key: data[0].key,
@@ -108,7 +117,9 @@ function Libery() {
       danceability: data[0].danceability,
       valence: data[0].valence
     } : 'No tracks')
+    
     setTracks(data)
+    console.log('✅ Tracks set in state')
     
     // Load cover art URLs for all tracks
     const urls: Record<string, string> = {}
@@ -580,6 +591,15 @@ This action cannot be undone!`
     const matchesLabel = labelFilter === 'all' || track.label === labelFilter
     
     return matchesSearch && matchesGenre && matchesLabel
+  })
+
+  // DEBUG: Log filtering
+  console.log('🔍 Filter status:', {
+    totalTracks: tracks.length,
+    filteredTracks: filteredTracks.length,
+    searchQuery,
+    genreFilter,
+    labelFilter
   })
 
   // Get unique genres and labels for filter dropdowns
