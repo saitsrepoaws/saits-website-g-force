@@ -70,6 +70,8 @@ interface Track {
   bpm?: number
   key?: string
   duration?: number
+  trimStart?: number
+  trimEnd?: number
   coverArtUrl?: string
   energy?: number
   danceability?: number
@@ -83,6 +85,11 @@ interface PlaylistTrackItem {
   trackTitle?: string
   trackArtist?: string
   trackDuration?: number
+  trackActualDuration?: number // Duration using trim points (for accurate mixing)
+  trackTrimStart?: number
+  trackTrimEnd?: number
+  trackMixOutPoint?: number // Recommended time to start mixing to next track (seconds)
+  trackMixInPoint?: number // Recommended time to start this track when mixing in (seconds)
   trackBpm?: number
   trackKey?: string // Musical key
   trackGenre?: string
@@ -330,12 +337,17 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     
     const selectedTracks: Track[] = []
     let totalDuration = 0
+    let totalActualDuration = 0 // Duration without silence (using trim points)
     
     for (const track of filteredTracks) {
       if (selectedTracks.length >= maxTracks) break
       
-      const trackDuration = track.duration || 0
-      if (totalDuration + trackDuration > maxDuration) {
+      // Use actual duration (trim points) if available, otherwise use full duration
+      const trackDuration = track.trimStart !== undefined && track.trimEnd !== undefined
+        ? (track.trimEnd - track.trimStart)
+        : (track.duration || 0)
+      
+      if (totalActualDuration + trackDuration > maxDuration) {
         // Check if we should stop or skip this track
         if (selectedTracks.length < 5) {
           // Too few tracks, skip this one
@@ -347,24 +359,57 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       }
       
       selectedTracks.push(track)
-      totalDuration += trackDuration
+      totalDuration += (track.duration || 0) // Full duration with silence
+      totalActualDuration += trackDuration // Actual playable duration
     }
     
-    console.log(`✅ Selected ${selectedTracks.length} tracks, total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+    console.log(`✅ Selected ${selectedTracks.length} tracks`)
+    console.log(`   Total duration (with silence): ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+    console.log(`   Actual mix duration (trimmed): ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
     
-    // 5. Create PlaylistTrackItems
-    const playlistTracks: PlaylistTrackItem[] = selectedTracks.map((track, index) => ({
-      trackId: track.id,
-      order: index,
-      addedAt: new Date().toISOString(),
-      trackTitle: track.title,
-      trackArtist: track.artist,
-      trackDuration: track.duration,
-      trackBpm: track.bpm,
-      trackKey: track.key, // Include key for display
-      trackGenre: track.genre,
-      trackCoverArtUrl: track.coverArtUrl,
-    }))
+    // 5. Create PlaylistTrackItems with auto-mix points
+    const playlistTracks: PlaylistTrackItem[] = selectedTracks.map((track, index) => {
+      // Calculate actual duration using trim points
+      const actualDuration = track.trimStart !== undefined && track.trimEnd !== undefined
+        ? (track.trimEnd - track.trimStart)
+        : track.duration
+      
+      // Calculate auto-mix points for DJ mixing
+      let mixOutPoint: number | undefined
+      let mixInPoint: number | undefined
+      
+      if (track.bpm && track.trimEnd !== undefined) {
+        // Mix out: Start mixing 8 bars before trim end
+        // 8 bars = 32 beats = 32 * (60 / BPM) seconds
+        const eightBarsInSeconds = (32 * 60) / track.bpm
+        mixOutPoint = Math.max(track.trimStart || 0, track.trimEnd - eightBarsInSeconds)
+      }
+      
+      if (track.trimStart !== undefined) {
+        // Mix in: Start this track at trim start (skip intro silence)
+        mixInPoint = track.trimStart
+      }
+      
+      return {
+        trackId: track.id,
+        order: index,
+        addedAt: new Date().toISOString(),
+        trackTitle: track.title,
+        trackArtist: track.artist,
+        trackDuration: track.duration,
+        trackActualDuration: actualDuration, // Duration without silence for accurate mixing
+        trackTrimStart: track.trimStart,
+        trackTrimEnd: track.trimEnd,
+        trackMixOutPoint: mixOutPoint, // Time to start mixing to next track
+        trackMixInPoint: mixInPoint, // Time to start playing when mixing in
+        trackBpm: track.bpm,
+        trackKey: track.key, // Include key for display
+        trackGenre: track.genre,
+        trackCoverArtUrl: track.coverArtUrl,
+      }
+    })
+    
+    console.log('🎛️ Auto-mix points calculated for seamless transitions')
     
     // 6. Create playlist in DynamoDB
     const playlistTableName = process.env.PLAYLIST_TABLE_NAME
