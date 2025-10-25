@@ -10,6 +10,7 @@ import {
 } from '../../services/audioUpload'
 import { getUrl } from 'aws-amplify/storage'
 import { parseFilename } from '../../services/filenameParser'
+import { getCloudFrontUrl } from '../../utils/cloudfront'
 
 interface FileUploadItem {
   file: File
@@ -57,29 +58,15 @@ function Libery() {
     loadTracksFromDB()
   }, [])
 
-  // Load waveform URL when modal opens
+  // Load waveform URL when modal opens (via CloudFront)
   useEffect(() => {
-    const loadWaveformUrl = async () => {
-      if (selectedTrack && (selectedTrack as any).waveformUrl) {
-        try {
-          const result = await getUrl({
-            path: (selectedTrack as any).waveformUrl,
-            options: {
-              expiresIn: 3600, // 1 hour
-            },
-          })
-          setWaveformUrl(result.url.toString())
-        } catch (error) {
-          console.error('Failed to load waveform URL:', error)
-          setWaveformUrl(null)
-        }
-      } else {
-        setWaveformUrl(null)
-      }
-    }
-
-    if (showTrackInfo) {
-      loadWaveformUrl()
+    if (showTrackInfo && selectedTrack && (selectedTrack as any).waveformUrl) {
+      // Use CloudFront for instant waveform loading
+      const url = getCloudFrontUrl((selectedTrack as any).waveformUrl)
+      setWaveformUrl(url)
+      console.log('🌊 Waveform loaded via CloudFront:', url)
+    } else {
+      setWaveformUrl(null)
     }
   }, [showTrackInfo, selectedTrack])
 
@@ -102,24 +89,16 @@ function Libery() {
     } : 'No tracks')
     setTracks(data)
     
-    // Load cover art URLs for all tracks
+    // Load cover art URLs via CloudFront (instant, no async needed!)
     const urls: Record<string, string> = {}
-    await Promise.all(
-      data.map(async (track: any) => {
-        if (track.coverArtUrl) {
-          try {
-            const result = await getUrl({
-              path: (track as any).coverArtUrl,
-              options: { expiresIn: 3600 },
-            })
-            urls[track.id] = result.url.toString()
-          } catch (error) {
-            console.error(`Failed to load cover art for ${track.id}:`, error)
-          }
-        }
-      })
-    )
+    data.forEach((track: any) => {
+      if (track.coverArtUrl) {
+        // Use CloudFront for instant, cached cover art
+        urls[track.id] = getCloudFrontUrl(track.coverArtUrl)
+      }
+    })
     setCoverArtUrls(urls)
+    console.log('🖼️ Cover art loaded via CloudFront CDN')
     
     setIsLoadingTracks(false)
   }
@@ -456,18 +435,19 @@ This action cannot be undone!`
         audioElement.currentTime = 0
       }
       
-      // Get S3 URL for the track
-      console.log('🎵 Loading track:', track.title)
-      const url = await getUrl({ path: track.fileUrl })
-      setAudioUrl(url.url.toString())
+      // Get CloudFront URL for fast loading (no async needed!)
+      console.log('🎵 Loading track via CloudFront:', track.title)
+      const url = getCloudFrontUrl(track.fileUrl)
+      console.log('⚡ CloudFront URL:', url)
+      setAudioUrl(url)
       
       // Create new audio element
-      const audio = new Audio(url.url.toString())
+      const audio = new Audio(url)
       
       // Event listeners
       audio.addEventListener('loadedmetadata', () => {
         setDuration(audio.duration)
-        console.log(`✅ Loaded: ${track.title} (${audio.duration}s)`)
+        console.log(`✅ Loaded from CDN: ${track.title} (${audio.duration}s)`)
       })
       
       audio.addEventListener('timeupdate', () => {
@@ -481,7 +461,8 @@ This action cannot be undone!`
       
       audio.addEventListener('error', (e) => {
         console.error('❌ Audio error:', e)
-        alert('Failed to load audio file')
+        console.error('Failed URL:', url)
+        alert('Failed to load audio file from CDN')
         setPlayingTrackId(null)
         setIsPlaying(false)
       })
