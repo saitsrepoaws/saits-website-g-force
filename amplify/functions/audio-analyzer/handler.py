@@ -8,6 +8,7 @@ import tempfile
 import boto3
 import aubio
 import numpy as np
+from decimal import Decimal
 from pydub import AudioSegment
 from typing import Dict, Optional, Tuple
 
@@ -325,14 +326,14 @@ def update_track_metadata(track_id: str, bpm: int, key: Optional[str], trim_star
     attr_names = {'#key': 'key'}
     attr_values = {':bpm': bpm, ':key': key}
     
-    # Add trim points if available
+    # Add trim points if available (convert float to Decimal for DynamoDB)
     if trim_start is not None:
         update_parts.append('trimStart = :trimStart')
-        attr_values[':trimStart'] = trim_start
+        attr_values[':trimStart'] = Decimal(str(trim_start))  # Convert float to Decimal
     
     if trim_end is not None:
         update_parts.append('trimEnd = :trimEnd')
-        attr_values[':trimEnd'] = trim_end
+        attr_values[':trimEnd'] = Decimal(str(trim_end))  # Convert float to Decimal
     
     update_expression = 'SET ' + ', '.join(update_parts)
     
