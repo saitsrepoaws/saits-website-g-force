@@ -827,6 +827,99 @@ This action cannot be undone!`
                 </div>
               </div>
 
+              {/* DJ Cue Points (Trim Detection) */}
+              {((selectedTrack as any).trimStart !== undefined || (selectedTrack as any).trimEnd !== undefined) && (
+                <div className="border-b pb-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">DJ Cue Points ✂️</h4>
+                  <div className="space-y-2">
+                    {/* Visual Timeline */}
+                    <div className="relative h-12 bg-gray-100 rounded-lg overflow-hidden">
+                      {/* Full duration bar */}
+                      <div className="absolute inset-0 flex items-center px-2">
+                        <div className="w-full h-2 bg-gray-300 rounded-full relative">
+                          {/* Actual audio region (between trim points) */}
+                          {(selectedTrack as any).trimStart !== undefined && (selectedTrack as any).trimEnd !== undefined && selectedTrack.duration && (
+                            <>
+                              {/* Active audio region */}
+                              <div
+                                className="absolute h-full bg-gradient-to-r from-green-400 to-blue-500 rounded-full"
+                                style={{
+                                  left: `${((selectedTrack as any).trimStart / selectedTrack.duration) * 100}%`,
+                                  width: `${(((selectedTrack as any).trimEnd - (selectedTrack as any).trimStart) / selectedTrack.duration) * 100}%`,
+                                }}
+                              />
+                              {/* Trim Start Marker */}
+                              <div
+                                className="absolute top-1/2 -translate-y-1/2 w-1 h-6 bg-green-500 shadow-lg"
+                                style={{
+                                  left: `${((selectedTrack as any).trimStart / selectedTrack.duration) * 100}%`,
+                                }}
+                                title={`Start: ${(selectedTrack as any).trimStart?.toFixed(2)}s`}
+                              />
+                              {/* Trim End Marker */}
+                              <div
+                                className="absolute top-1/2 -translate-y-1/2 w-1 h-6 bg-red-500 shadow-lg"
+                                style={{
+                                  left: `${((selectedTrack as any).trimEnd / selectedTrack.duration) * 100}%`,
+                                }}
+                                title={`End: ${(selectedTrack as any).trimEnd?.toFixed(2)}s`}
+                              />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Cue Point Details */}
+                    <div className="grid grid-cols-3 gap-3 text-xs">
+                      <div className="bg-green-50 border border-green-200 rounded p-2">
+                        <div className="text-green-700 font-semibold mb-1">🎯 Cue In</div>
+                        <div className="text-green-900 font-mono">
+                          {(selectedTrack as any).trimStart !== undefined 
+                            ? `${formatDuration((selectedTrack as any).trimStart)}`
+                            : '-'}
+                        </div>
+                        <div className="text-green-600 text-[10px] mt-1">
+                          Intro: {(selectedTrack as any).trimStart 
+                            ? `${(selectedTrack as any).trimStart.toFixed(1)}s silence`
+                            : '-'}
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2">
+                        <div className="text-blue-700 font-semibold mb-1">🎵 Active</div>
+                        <div className="text-blue-900 font-mono">
+                          {(selectedTrack as any).trimStart !== undefined && (selectedTrack as any).trimEnd !== undefined
+                            ? formatDuration((selectedTrack as any).trimEnd - (selectedTrack as any).trimStart)
+                            : '-'}
+                        </div>
+                        <div className="text-blue-600 text-[10px] mt-1">
+                          Actual audio duration
+                        </div>
+                      </div>
+
+                      <div className="bg-red-50 border border-red-200 rounded p-2">
+                        <div className="text-red-700 font-semibold mb-1">🏁 Cue Out</div>
+                        <div className="text-red-900 font-mono">
+                          {(selectedTrack as any).trimEnd !== undefined 
+                            ? `${formatDuration((selectedTrack as any).trimEnd)}`
+                            : '-'}
+                        </div>
+                        <div className="text-red-600 text-[10px] mt-1">
+                          Outro: {(selectedTrack as any).trimEnd && selectedTrack.duration
+                            ? `${(selectedTrack.duration - (selectedTrack as any).trimEnd).toFixed(1)}s silence`
+                            : '-'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-gray-500 italic">
+                      💡 Auto-detected using -40dB gate • Perfect for DJ mixing
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Waveform */}
               {waveformUrl && (
                 <div className="border-b pb-4">

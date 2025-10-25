@@ -46,6 +46,8 @@ export async function listTracks() {
         'valence',
         'coverArtUrl',
         'waveformUrl',
+        'trimStart',
+        'trimEnd',
         // Skip createdAt/updatedAt - they have datetime format issues from Lambda
       ],
     })
