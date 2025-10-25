@@ -46,8 +46,7 @@ export async function listTracks() {
         'valence',
         'coverArtUrl',
         'waveformUrl',
-        'createdAt',
-        'updatedAt',
+        // Skip createdAt/updatedAt - they have datetime format issues from Lambda
       ],
     })
     if (errors) {
@@ -61,10 +60,14 @@ export async function listTracks() {
           fullError: JSON.stringify(err, null, 2),
         })
       })
-      // Still return data if available (partial success)
-      return { data: data || [], errors }
+      // Still return data if available (partial success), but filter nulls
+      const validTracks = (data || []).filter((track: any) => track !== null && track.id)
+      console.log(`✅ Filtered ${data?.length || 0} items → ${validTracks.length} valid tracks`)
+      return { data: validTracks, errors }
     }
-    return { data: data || [], errors: null }
+    // Filter out null tracks (corrupted data)
+    const validTracks = (data || []).filter((track: any) => track !== null && track.id)
+    return { data: validTracks, errors: null }
   } catch (error) {
     console.error('Failed to list tracks:', error)
     return { data: [], errors: [error] }

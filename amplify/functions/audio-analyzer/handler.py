@@ -243,18 +243,16 @@ def update_track_metadata(track_id: str, bpm: int, key: Optional[str]):
     
     table = dynamodb.Table(table_name)
     
-    from datetime import datetime
-    
+    # Don't set updatedAt manually - let Amplify/AppSync handle it automatically
     table.update_item(
         Key={'id': track_id},
-        UpdateExpression='SET bpm = :bpm, #key = :key, updatedAt = :updatedAt',
+        UpdateExpression='SET bpm = :bpm, #key = :key',
         ExpressionAttributeNames={
             '#key': 'key'
         },
         ExpressionAttributeValues={
             ':bpm': bpm,
-            ':key': key,
-            ':updatedAt': datetime.utcnow().isoformat()
+            ':key': key
         }
     )
     
