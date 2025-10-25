@@ -39,6 +39,9 @@ function Players() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [currentPlaylistId, setCurrentPlaylistId] = useState<string | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [autoPlay, setAutoPlay] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [volume, setVolume] = useState(0.7)
@@ -113,15 +116,49 @@ function Players() {
     }
   }
 
+  function handleLoad() {
+    if (!currentTrack) {
+      alert('No track available to load')
+      return
+    }
+    setIsLoaded(true)
+    alert(`✅ Track loaded: ${currentTrack.title}`)
+  }
+
+  function handleUnload() {
+    if (isPlaying) {
+      handleStop()
+    }
+    setIsLoaded(false)
+    setCurrentTime(0)
+    setDuration(0)
+    alert('⏏️ Track unloaded')
+  }
+
+  function handlePause() {
+    if (!audioRef.current || !isPlaying) return
+    
+    audioRef.current.pause()
+    setIsPlaying(false)
+    setIsPaused(true)
+  }
+
+  function handlePlay() {
+    if (!audioRef.current || !isLoaded) return
+    
+    audioRef.current.play()
+    setIsPlaying(true)
+    setIsPaused(false)
+  }
+
   function togglePlay() {
     if (!audioRef.current) return
     
     if (isPlaying) {
-      audioRef.current.pause()
+      handlePause()
     } else {
-      audioRef.current.play()
+      handlePlay()
     }
-    setIsPlaying(!isPlaying)
   }
 
   function handleStop() {
@@ -129,7 +166,12 @@ function Players() {
     audioRef.current.pause()
     audioRef.current.currentTime = 0
     setIsPlaying(false)
+    setIsPaused(false)
     setCurrentTime(0)
+  }
+
+  function toggleAuto() {
+    setAutoPlay(!autoPlay)
   }
 
   function handleTimeUpdate() {
@@ -309,11 +351,70 @@ function Players() {
                   </div>
                 </div>
 
-                {/* Controls */}
+                {/* Top Controls: Auto, Load/Unload, Pause */}
+                <div className="flex items-center gap-3 mb-6">
+                  {/* Auto Button */}
+                  <button
+                    onClick={toggleAuto}
+                    className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                      autoPlay 
+                        ? 'bg-green-500 text-white shadow-lg shadow-green-500/50' 
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                    title={autoPlay ? 'Auto-play enabled' : 'Auto-play disabled'}
+                  >
+                    {autoPlay ? '🔄 AUTO' : '⏸️ MANUAL'}
+                  </button>
+
+                  {/* Load/Unload Buttons */}
+                  <button
+                    onClick={handleLoad}
+                    disabled={isLoaded}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    title="Load track"
+                  >
+                    📥 LOAD
+                  </button>
+                  <button
+                    onClick={handleUnload}
+                    disabled={!isLoaded}
+                    className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    title="Unload track"
+                  >
+                    ⏏️ UNLOAD
+                  </button>
+
+                  {/* Pause Button */}
+                  <button
+                    onClick={handlePause}
+                    disabled={!isPlaying}
+                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    title="Pause playback"
+                  >
+                    ⏸️ PAUSE
+                  </button>
+
+                  {/* Status Indicators */}
+                  <div className="flex-1 flex items-center gap-3 justify-end">
+                    {isLoaded && (
+                      <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-semibold border border-green-500/50">
+                        ✓ Loaded
+                      </span>
+                    )}
+                    {isPaused && (
+                      <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm font-semibold border border-yellow-500/50">
+                        ⏸️ Paused
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Main Controls */}
                 <div className="flex items-center gap-6">
                   <button
                     onClick={togglePlay}
-                    className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl hover:scale-110 transition-transform shadow-lg"
+                    disabled={!isLoaded}
+                    className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl hover:scale-110 transition-transform shadow-lg disabled:bg-gray-600 disabled:scale-100 disabled:cursor-not-allowed"
                   >
                     {isPlaying ? '⏸️' : '▶️'}
                   </button>
