@@ -80,30 +80,47 @@ function Players() {
       const { data: tracks } = await listTracks()
       if (tracks && tracks.length > 0) {
         const track = tracks[0]
-        setCurrentTrack(track as Track)
-        
-        // Load cover art
-        if (track.coverArtUrl) {
-          try {
-            const url = await getUrl({ path: track.coverArtUrl })
-            setCoverArtUrl(url.url.toString())
-          } catch (e) {
-            console.log('Cover art not found')
-          }
-        }
-
-        // Load waveform
-        if (track.waveformUrl) {
-          try {
-            const url = await getUrl({ path: track.waveformUrl })
-            setWaveformUrl(url.url.toString())
-          } catch (e) {
-            console.log('Waveform not found')
-          }
-        }
+        await loadTrackIntoPlayer(track as Track)
       }
     } catch (error) {
       console.error('Failed to load tracks:', error)
+    }
+  }
+
+  async function loadTrackIntoPlayer(track: any) {
+    try {
+      setCurrentTrack(track as Track)
+      
+      // Load cover art
+      if (track.coverArtUrl) {
+        try {
+          const url = await getUrl({ path: track.coverArtUrl })
+          setCoverArtUrl(url.url.toString())
+        } catch (e) {
+          console.log('Cover art not found')
+          setCoverArtUrl(null)
+        }
+      } else {
+        setCoverArtUrl(null)
+      }
+
+      // Load waveform
+      if (track.waveformUrl) {
+        try {
+          const url = await getUrl({ path: track.waveformUrl })
+          setWaveformUrl(url.url.toString())
+        } catch (e) {
+          console.log('Waveform not found')
+          setWaveformUrl(null)
+        }
+      } else {
+        setWaveformUrl(null)
+      }
+
+      // Mark as loaded
+      setIsLoaded(true)
+    } catch (error) {
+      console.error('Failed to load track:', error)
     }
   }
 
@@ -540,8 +557,29 @@ function Players() {
               compact={false}
               maxHeight="600px"
               allowPlay={true}
-              allowReorder={false}
+              allowReorder={true}
               allowRemove={false}
+              showDragHandle={true}
+              onTrackSelect={async (playlistTrack) => {
+                // Stop current playback if playing
+                if (isPlaying) {
+                  handleStop()
+                }
+                
+                // Load track by ID
+                if (playlistTrack.trackId) {
+                  try {
+                    const { data: tracks } = await listTracks()
+                    const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
+                    if (track) {
+                      await loadTrackIntoPlayer(track)
+                      alert(`✅ Track loaded from playlist: ${track.title}`)
+                    }
+                  } catch (error) {
+                    console.error('Failed to load track from playlist:', error)
+                  }
+                }
+              }}
             />
           </div>
         )}
