@@ -102,6 +102,20 @@ function Planner() {
     }
   }
 
+  function clearAllSlots() {
+    const confirmMessage = `⚠️ WARNING: This will delete ALL ${timeSlots.length} time slots and planning!\n\nThis action cannot be undone.\n\nAre you sure?`
+    
+    if (confirm(confirmMessage)) {
+      const doubleCheck = confirm('🚨 FINAL CONFIRMATION\n\nDelete ALL slots and start fresh?\n\nClick OK to proceed.')
+      
+      if (doubleCheck) {
+        setTimeSlots([])
+        setSelectedSlot(null)
+        alert('✅ All slots cleared! Starting fresh.')
+      }
+    }
+  }
+
   // Bulk Edit Functions
   function applyBulkEdit() {
     if (!bulkPlaylistId || bulkDays.length === 0) {
@@ -256,6 +270,14 @@ function Planner() {
             </p>
           </div>
           <div className="flex gap-3">
+            <button
+              onClick={clearAllSlots}
+              disabled={timeSlots.length === 0}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              title={timeSlots.length === 0 ? 'No slots to clear' : 'Clear all slots'}
+            >
+              <span>🗑️</span> Clear All
+            </button>
             <button
               onClick={() => setShowBulkEdit(true)}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
