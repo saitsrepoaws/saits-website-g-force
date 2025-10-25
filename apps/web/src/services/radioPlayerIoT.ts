@@ -18,6 +18,18 @@ import type {
   CommandType
 } from '../types/player'
 
+// ==========================================================================
+// IoT Log Entry
+// ==========================================================================
+
+export interface IoTLogEntry {
+  timestamp: number
+  direction: 'OUT' | 'IN'
+  topic: string
+  message: any
+  type: string  // 'state', 'command', 'track', 'heartbeat', etc.
+}
+
 /**
  * Radio Player IoT Service Class
  * One instance per player
@@ -32,10 +44,61 @@ export class RadioPlayerIoT {
   private errorCount: number = 0
   private tracksPlayed: number = 0
   private lastTrackId: string | null = null
+  private logs: IoTLogEntry[] = []
+  private maxLogs: number = 100
+  private logCallbacks: Set<(log: IoTLogEntry) => void> = new Set()
 
   constructor(playerId: string) {
     this.playerId = playerId
     console.log(`🎵 RadioPlayerIoT initialized for: ${playerId}`)
+  }
+
+  /**
+   * Add log entry
+   */
+  private addLog(direction: 'OUT' | 'IN', topic: string, message: any, type: string): void {
+    const entry: IoTLogEntry = {
+      timestamp: Date.now(),
+      direction,
+      topic,
+      message,
+      type
+    }
+
+    // Add to logs array (newest first)
+    this.logs.unshift(entry)
+
+    // Keep only last maxLogs entries
+    if (this.logs.length > this.maxLogs) {
+      this.logs = this.logs.slice(0, this.maxLogs)
+    }
+
+    // Notify callbacks
+    this.logCallbacks.forEach(callback => callback(entry))
+  }
+
+  /**
+   * Subscribe to log updates
+   */
+  onLog(callback: (log: IoTLogEntry) => void): () => void {
+    this.logCallbacks.add(callback)
+    return () => {
+      this.logCallbacks.delete(callback)
+    }
+  }
+
+  /**
+   * Get all logs
+   */
+  getLogs(): IoTLogEntry[] {
+    return [...this.logs]
+  }
+
+  /**
+   * Clear logs
+   */
+  clearLogs(): void {
+    this.logs = []
   }
 
   // ==========================================================================
@@ -64,6 +127,9 @@ export class RadioPlayerIoT {
         topic: `radio/player/${this.playerId}/state`,
         message
       })
+
+      // Log outgoing message
+      this.addLog('OUT', `radio/player/${this.playerId}/state`, message, 'state')
 
       console.log(`✅ State published: ${this.currentState} → ${newState}`)
       
@@ -100,6 +166,9 @@ export class RadioPlayerIoT {
       { topic },
       (message: any) => {
         console.log(`📩 Command received:`, message)
+        
+        // Log incoming message
+        this.addLog('IN', topic, message, 'command')
         
         try {
           // Validate command structure
@@ -150,6 +219,9 @@ export class RadioPlayerIoT {
       { topic },
       (message: any) => {
         console.log(`📅 Schedule update received:`, message)
+        
+        // Log incoming message
+        this.addLog('IN', topic, message, 'schedule')
         
         try {
           if (message && typeof message === 'object') {
@@ -209,6 +281,9 @@ export class RadioPlayerIoT {
         message
       })
 
+      // Log outgoing message
+      this.addLog('OUT', `radio/player/${this.playerId}/track`, message, 'track')
+
       console.log(`✅ Track info published: ${track.title}`)
       
       // Update internal tracking
@@ -248,6 +323,9 @@ export class RadioPlayerIoT {
         topic: `radio/player/${this.playerId}/heartbeat`,
         message
       })
+
+      // Log outgoing message (suppress in logs - too frequent)
+      // this.addLog('OUT', `radio/player/${this.playerId}/heartbeat`, message, 'heartbeat')
 
       console.log(`💓 Heartbeat sent (uptime: ${uptime}s)`)
     } catch (error) {
@@ -318,6 +396,9 @@ export class RadioPlayerIoT {
         topic: 'radio/players/status',
         message
       })
+
+      // Log outgoing message
+      this.addLog('OUT', 'radio/players/status', message, 'status')
 
       console.log(`📊 Status broadcast sent`)
     } catch (error) {

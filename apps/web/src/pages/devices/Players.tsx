@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
+import IoTLogModal from '../../components/IoTLogModal'
 import { listPlaylists } from '../../services/playlists'
 import { listTracks } from '../../services/tracks'
 import { getUrl } from 'aws-amplify/storage'
+import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import type { Playlist } from '../../types/playlist'
+import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 
 interface Track {
   id: string
@@ -49,10 +52,34 @@ function Players() {
   const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  
+  // IoT Log Modal
+  const [showIoTLog, setShowIoTLog] = useState(false)
+  const [iotLogs, setIoTLogs] = useState<IoTLogEntry[]>([])
+  const iotServiceRef = useRef<ReturnType<typeof createRadioPlayerIoT> | null>(null)
+  const playerId = 'player-main-001'
 
   useEffect(() => {
     loadPlaylists()
     determineCurrentPlaylist()
+    
+    // Initialize IoT service
+    if (!iotServiceRef.current) {
+      iotServiceRef.current = createRadioPlayerIoT(playerId)
+      
+      // Subscribe to log updates
+      const unsubscribe = iotServiceRef.current.onLog((log) => {
+        setIoTLogs(prev => [log, ...prev.slice(0, 99)]) // Keep last 100, newest first
+      })
+      
+      // Get existing logs
+      setIoTLogs(iotServiceRef.current.getLogs())
+      
+      return () => {
+        unsubscribe()
+        iotServiceRef.current?.cleanup()
+      }
+    }
   }, [])
 
   // Update clock every second
@@ -677,6 +704,20 @@ function Players() {
                     ⏸️ PAUSE
                   </button>
 
+                  {/* IoT Log Button */}
+                  <button
+                    onClick={() => setShowIoTLog(true)}
+                    className="px-4 py-3 bg-purple-500/20 text-purple-300 rounded-lg font-semibold hover:bg-purple-500/30 transition-colors border border-purple-500/50 relative"
+                    title="View IoT Message Log"
+                  >
+                    📡 IoT Log
+                    {iotLogs.length > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                        {iotLogs.length > 99 ? '99+' : iotLogs.length}
+                      </span>
+                    )}
+                  </button>
+
                   {/* Status Indicators */}
                   <div className="flex-1 flex items-center gap-3 justify-end">
                     {isLoaded && (
@@ -804,6 +845,18 @@ function Players() {
           </div>
         )}
       </div>
+
+      {/* IoT Log Modal */}
+      <IoTLogModal
+        isOpen={showIoTLog}
+        onClose={() => setShowIoTLog(false)}
+        logs={iotLogs}
+        playerId={playerId}
+        onClearLogs={() => {
+          iotServiceRef.current?.clearLogs()
+          setIoTLogs([])
+        }}
+      />
     </Layout>
   )
 }
