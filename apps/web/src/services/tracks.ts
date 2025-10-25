@@ -133,15 +133,40 @@ export async function updateTrack(input: UpdateTrackInput) {
  */
 export async function deleteTrack(id: string) {
   try {
+    console.log(`🗑️ Attempting to delete track: ${id}`)
+    
+    // Simple delete with just ID - let Amplify handle the rest
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await getClient().models.Track.delete({ id })
-    if (errors) {
-      console.error('Error deleting track:', errors)
-      return { data: null, errors }
+    const result = await getClient().models.Track.delete({ id })
+    
+    // Check for errors
+    if (result.errors && result.errors.length > 0) {
+      console.error('❌ Delete failed with errors:', result.errors)
+      
+      // Log detailed error info
+      result.errors.forEach((err: any, index: number) => {
+        console.error(`  Error ${index + 1}:`, {
+          message: err.message,
+          path: err.path,
+          errorType: err.errorType,
+          locations: err.locations,
+        })
+      })
+      
+      // Even with errors, check if data came through (partial success)
+      if (result.data) {
+        console.log('⚠️ Delete completed with errors, but data returned:', result.data)
+        return { data: result.data, errors: result.errors }
+      }
+      
+      return { data: null, errors: result.errors }
     }
-    return { data, errors: null }
+    
+    console.log('✅ Track deleted successfully from DynamoDB')
+    return { data: result.data || { id }, errors: null }
+    
   } catch (error) {
-    console.error('Failed to delete track:', error)
+    console.error('❌ Delete operation failed:', error)
     return { data: null, errors: [error] }
   }
 }

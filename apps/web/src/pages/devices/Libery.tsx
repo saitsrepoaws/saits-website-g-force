@@ -270,10 +270,16 @@ This action cannot be undone!`
       // Delete from DynamoDB via GraphQL
       const result = await deleteTrack(id)
       
-      if (result.errors) {
-        console.error('❌ GraphQL delete errors:', result.errors)
+      // If we have errors AND no data, stop
+      if (result.errors && !result.data) {
+        console.error('❌ GraphQL delete failed completely:', result.errors)
         alert(`Failed to delete track: ${result.errors[0]?.message || 'Unknown error'}`)
         return
+      }
+      
+      // If we have errors but also data, continue (partial success)
+      if (result.errors && result.data) {
+        console.warn('⚠️ Delete completed with some errors, continuing with S3 cleanup...')
       }
       
       // Delete S3 files (audio, cover art, waveform)
