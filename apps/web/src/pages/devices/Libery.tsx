@@ -328,6 +328,105 @@ This action cannot be undone!`
     }
   }
 
+  const handleDeleteAllTracks = async () => {
+    const trackCount = tracks.length
+    
+    // Double confirmation for safety
+    const firstConfirm = confirm(
+      `⚠️ DELETE ALL TRACKS?\n\nYou are about to delete ${trackCount} track${trackCount !== 1 ? 's' : ''}.\n\nThis will permanently remove:\n- All track metadata from database\n- All audio files from S3\n- All cover art\n- All waveforms\n\nThis action CANNOT be undone!\n\nClick OK to continue, or Cancel to abort.`
+    )
+    
+    if (!firstConfirm) return
+    
+    // Second confirmation with type requirement
+    const confirmText = `DELETE ${trackCount} TRACKS`
+    const secondConfirm = prompt(
+      `⚠️ FINAL CONFIRMATION\n\nTo confirm deletion of ALL ${trackCount} tracks, please type:\n\n${confirmText}\n\n(Case sensitive)`
+    )
+    
+    if (secondConfirm !== confirmText) {
+      alert('Deletion cancelled - confirmation text did not match.')
+      return
+    }
+    
+    console.log(`🗑️ Starting bulk deletion of ${trackCount} tracks...`)
+    
+    try {
+      const { remove } = await import('aws-amplify/storage')
+      let successCount = 0
+      let failureCount = 0
+      
+      // Delete each track
+      for (const track of tracks) {
+        try {
+          console.log(`🗑️ Deleting ${successCount + 1}/${trackCount}: ${track.title}`)
+          
+          // Delete from DynamoDB
+          const result = await deleteTrack(track.id)
+          
+          if (result.errors && !result.data) {
+            console.error(`❌ Failed to delete ${track.title} from database`)
+            failureCount++
+            continue
+          }
+          
+          // Delete S3 files (best effort)
+          const deletePromises = []
+          
+          if (track.fileUrl) {
+            const audioPath = track.fileUrl.replace('public/', '')
+            deletePromises.push(
+              remove({ path: audioPath }).catch(err => 
+                console.warn(`⚠️ Failed to delete audio for ${track.title}:`, err)
+              )
+            )
+          }
+          
+          if ((track as any).coverArtUrl) {
+            deletePromises.push(
+              remove({ path: (track as any).coverArtUrl }).catch(err => 
+                console.warn(`⚠️ Failed to delete cover art for ${track.title}:`, err)
+              )
+            )
+          }
+          
+          if ((track as any).waveformUrl) {
+            deletePromises.push(
+              remove({ path: (track as any).waveformUrl }).catch(err => 
+                console.warn(`⚠️ Failed to delete waveform for ${track.title}:`, err)
+              )
+            )
+          }
+          
+          await Promise.allSettled(deletePromises)
+          successCount++
+          
+        } catch (error) {
+          console.error(`❌ Error deleting ${track.title}:`, error)
+          failureCount++
+        }
+      }
+      
+      // Clear local state
+      setTracks([])
+      
+      // Show summary
+      console.log(`✅ Bulk deletion complete!`)
+      console.log(`   Successful: ${successCount}/${trackCount}`)
+      if (failureCount > 0) {
+        console.log(`   Failed: ${failureCount}/${trackCount}`)
+      }
+      
+      alert(
+        `Deletion complete!\n\n✅ Deleted: ${successCount} tracks\n${failureCount > 0 ? `⚠️ Failed: ${failureCount} tracks\n` : ''}\nCheck console for details.`
+      )
+      
+    } catch (error) {
+      console.error('❌ Bulk deletion error:', error)
+      alert(`Bulk deletion failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -541,18 +640,29 @@ This action cannot be undone!`
                     className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                {(searchQuery || genreFilter !== 'all' || labelFilter !== 'all') && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('')
-                      setGenreFilter('all')
-                      setLabelFilter('all')
-                    }}
-                    className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-white"
-                  >
-                    Clear Filters
-                  </button>
-                )}
+                <div className="flex gap-2">
+                  {(searchQuery || genreFilter !== 'all' || labelFilter !== 'all') && (
+                    <button
+                      onClick={() => {
+                        setSearchQuery('')
+                        setGenreFilter('all')
+                        setLabelFilter('all')
+                      }}
+                      className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-white"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                  
+                  {tracks.length > 0 && (
+                    <button
+                      onClick={handleDeleteAllTracks}
+                      className="px-3 py-2 text-sm text-white bg-red-600 hover:bg-red-700 border border-red-700 rounded-md font-medium"
+                    >
+                      🗑️ Delete All Tracks
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Filter Dropdowns */}
