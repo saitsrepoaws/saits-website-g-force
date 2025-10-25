@@ -205,22 +205,34 @@ function Players() {
   }
 
   async function handleLoad() {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📥 LOAD BUTTON CLICKED')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    
     // Load first track from current playlist
     if (!currentPlaylistId) {
+      console.error('❌ No playlist selected')
       alert('⚠️ No playlist selected')
       return
     }
 
+    console.log('📋 Current playlist ID:', currentPlaylistId)
+
     try {
       // Publish LOADING state
+      console.log('📤 Publishing LOADING state...')
       await iotServiceRef.current?.publishState(PlayerState.LOADING, {
         playlistId: currentPlaylistId
       })
 
+      console.log('🔍 Fetching playlist data...')
       // @ts-ignore - Playlist model exists at runtime
       const { data: playlistData } = await getClient().models.Playlist.get({ id: currentPlaylistId })
+      console.log('✅ Playlist data received:', playlistData?.name)
+      console.log('📊 Tracks in playlist:', playlistData?.tracks?.length || 0)
       
-      if (!playlistData?.tracks) {
+      if (!playlistData?.tracks || playlistData.tracks.length === 0) {
+        console.error('❌ Playlist has no tracks')
         alert('⚠️ Playlist has no tracks')
         await iotServiceRef.current?.publishState(PlayerState.ERROR, {
           error: 'Playlist has no tracks'
@@ -229,39 +241,57 @@ function Players() {
       }
 
       // Sort tracks by order (ascending)
+      console.log('🔀 Sorting tracks by order...')
       const sortedTracks = [...playlistData.tracks].sort((a, b) => {
         return (a.order ?? 0) - (b.order ?? 0)
       })
 
       const firstPlaylistTrack = sortedTracks[0]
-
-      console.log('Loading track #1 from playlist:', firstPlaylistTrack)
+      console.log('🎵 First track in playlist:', {
+        order: firstPlaylistTrack.order,
+        trackId: firstPlaylistTrack.trackId
+      })
 
       // Load the actual track data
       if (firstPlaylistTrack.trackId) {
+        console.log('🔍 Fetching track data for ID:', firstPlaylistTrack.trackId)
         const { data: tracks } = await listTracks()
+        console.log('📚 Total tracks in library:', tracks?.length || 0)
+        
         const track = tracks?.find((t: any) => t.id === firstPlaylistTrack.trackId)
+        console.log('🔎 Found track:', track ? `${track.title} by ${track.artist}` : 'NOT FOUND')
         
         if (track) {
+          console.log('📥 Loading track into player...')
           await loadTrackIntoPlayer(track)
           
           // Publish LOADED state
+          console.log('📤 Publishing LOADED state...')
           await iotServiceRef.current?.publishState(PlayerState.LOADED, {
             trackId: track.id,
             playlistId: currentPlaylistId,
             duration: track.duration || 0
           })
           
-          alert(`✅ Track #1 loaded from playlist: ${track.title}`)
+          console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+          alert(`✅ Track loaded: ${track.title}`)
         } else {
+          console.error('❌ Track not found in library')
           alert('⚠️ Track not found in library')
           await iotServiceRef.current?.publishState(PlayerState.ERROR, {
             error: 'Track not found in library'
           })
         }
+      } else {
+        console.error('❌ No trackId in playlist track')
+        alert('⚠️ Invalid playlist track')
       }
     } catch (error) {
-      console.error('Failed to load track from playlist:', error)
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌❌❌ LOAD FAILED ❌❌❌')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('Error:', error)
       await iotServiceRef.current?.publishState(PlayerState.ERROR, {
         error: String(error)
       })
