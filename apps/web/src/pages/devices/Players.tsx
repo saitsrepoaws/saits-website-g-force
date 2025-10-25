@@ -5,9 +5,14 @@ import IoTLogModal from '../../components/IoTLogModal'
 import { listPlaylists } from '../../services/playlists'
 import { listTracks } from '../../services/tracks'
 import { getUrl } from 'aws-amplify/storage'
+import { generateClient } from 'aws-amplify/data'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
+import { PlayerState } from '../../types/player'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
+
+// Lazy client for Amplify
+const getClient = () => generateClient()
 
 interface Track {
   id: string
@@ -175,28 +180,27 @@ function Players() {
     }
 
     try {
-      // Get playlist with tracks
-      const { getPlaylist } = await import('../../services/playlists')
-      const { data: playlist } = await getPlaylist(currentPlaylistId)
+      // Publish LOADING state
+      await iotServiceRef.current?.publishState(PlayerState.LOADING, {
+        playlistId: currentPlaylistId
+      })
+
+      // @ts-ignore - Playlist model exists at runtime
+      const { data: playlistData } = await getClient().models.Playlist.get({ id: currentPlaylistId })
       
-      console.log('Playlist data:', playlist)
-      
-      if (!playlist) {
-        alert('⚠️ Playlist not found')
+      if (!playlistData?.tracks) {
+        alert('⚠️ Playlist has no tracks')
+        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+          error: 'Playlist has no tracks'
+        })
         return
       }
 
-      // Parse tracks JSON string to array
-      const tracksData = JSON.parse((playlist as any).tracks || '[]')
-      console.log('Parsed tracks:', tracksData)
-      
-      if (!tracksData || tracksData.length === 0) {
-        alert('⚠️ Playlist is empty')
-        return
-      }
+      // Sort tracks by order (ascending)
+      const sortedTracks = [...playlistData.tracks].sort((a, b) => {
+        return (a.order ?? 0) - (b.order ?? 0)
+      })
 
-      // Sort by position and get first track
-      const sortedTracks = [...tracksData].sort((a: any, b: any) => a.position - b.position)
       const firstPlaylistTrack = sortedTracks[0]
 
       console.log('Loading track #1 from playlist:', firstPlaylistTrack)
@@ -208,18 +212,32 @@ function Players() {
         
         if (track) {
           await loadTrackIntoPlayer(track)
+          
+          // Publish LOADED state
+          await iotServiceRef.current?.publishState(PlayerState.LOADED, {
+            trackId: track.id,
+            playlistId: currentPlaylistId,
+            duration: track.duration || 0
+          })
+          
           alert(`✅ Track #1 loaded from playlist: ${track.title}`)
         } else {
           alert('⚠️ Track not found in library')
+          await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+            error: 'Track not found in library'
+          })
         }
       }
     } catch (error) {
       console.error('Failed to load track from playlist:', error)
+      await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+        error: String(error)
+      })
       alert(`❌ Failed to load track: ${error}`)
     }
   }
 
-  function handleUnload() {
+  async function handleUnload() {
     if (isPlaying) {
       handleStop()
     }
@@ -232,15 +250,25 @@ function Players() {
     setCurrentTime(0)
     setDuration(0)
     
+    // Publish IDLE state
+    await iotServiceRef.current?.publishState(PlayerState.IDLE)
+    
     alert('⏏️ Track unloaded')
   }
 
-  function handlePause() {
+  async function handlePause() {
     if (!audioRef.current || !isPlaying) return
     
     audioRef.current.pause()
     setIsPlaying(false)
     setIsPaused(true)
+    
+    // Publish PAUSED state
+    await iotServiceRef.current?.publishState(PlayerState.PAUSED, {
+      trackId: currentTrack?.id,
+      position: audioRef.current.currentTime,
+      duration: audioRef.current.duration
+    })
   }
 
   async function handlePlay() {
@@ -385,6 +413,30 @@ function Players() {
       await audio.play()
       setIsPlaying(true)
       setIsPaused(false)
+      
+      // Publish PLAYING state
+      await iotServiceRef.current?.publishState(PlayerState.PLAYING, {
+        trackId: currentTrack.id,
+        playlistId: currentPlaylistId || undefined,
+        position: audio.currentTime,
+        duration: audio.duration,
+        volume: volume
+      })
+      
+      // Publish track info
+      await iotServiceRef.current?.publishTrackInfo({
+        trackId: currentTrack.id,
+        title: currentTrack.title || 'Unknown',
+        artist: currentTrack.artist || 'Unknown',
+        album: currentTrack.album || undefined,
+        duration: audio.duration,
+        bpm: currentTrack.bpm || undefined,
+        key: currentTrack.key || undefined,
+        genre: currentTrack.genre || undefined,
+        playlistId: currentPlaylistId || undefined,
+        position: 0
+      })
+      
       console.log('✅✅✅ PLAYBACK STARTED SUCCESSFULLY! ✅✅✅')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       
@@ -439,13 +491,19 @@ function Players() {
     }
   }
 
-  function handleStop() {
+  async function handleStop() {
     if (!audioRef.current) return
     audioRef.current.pause()
     audioRef.current.currentTime = 0
     setIsPlaying(false)
     setIsPaused(false)
     setCurrentTime(0)
+    
+    // Publish STOPPED state
+    await iotServiceRef.current?.publishState(PlayerState.STOPPED, {
+      trackId: currentTrack?.id,
+      position: 0
+    })
   }
 
   function toggleAuto() {
