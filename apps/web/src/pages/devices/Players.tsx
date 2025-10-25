@@ -226,19 +226,10 @@ function Players() {
 
   async function handlePlay() {
     console.log('🎵 handlePlay called', {
-      hasAudioRef: !!audioRef.current,
       isLoaded,
       hasCurrentTrack: !!currentTrack,
-      audioUrl: currentTrack?.audioUrl?.substring(0, 80),
-      readyState: audioRef.current?.readyState,
-      networkState: audioRef.current?.networkState
+      currentTrackAudioUrl: currentTrack?.audioUrl?.substring(0, 80)
     })
-    
-    if (!audioRef.current) {
-      console.error('❌ No audio element reference!')
-      alert('⚠️ Audio player not initialized')
-      return
-    }
     
     if (!isLoaded) {
       console.warn('⚠️ Track not loaded')
@@ -246,40 +237,91 @@ function Players() {
       return
     }
     
-    if (!currentTrack?.audioUrl) {
-      console.error('❌ No audio URL available')
-      alert('⚠️ No audio file available for this track')
+    if (!currentTrack) {
+      console.error('❌ No track available')
+      alert('⚠️ No track available')
       return
     }
     
     try {
-      const audio = audioRef.current
-      
-      console.log('🎵 Audio element state:', {
-        src: audio.src,
-        readyState: audio.readyState,
-        paused: audio.paused,
-        currentTime: audio.currentTime,
-        duration: audio.duration,
-        error: audio.error
-      })
-      
-      // Check for errors
-      if (audio.error) {
-        throw new Error(`Audio error code ${audio.error.code}: ${audio.error.message}`)
+      // If already playing, just resume
+      if (audioRef.current && !audioRef.current.paused) {
+        console.log('✅ Already playing')
+        return
       }
       
-      console.log('▶️ Attempting to play audio from:', currentTrack.audioUrl.substring(0, 100))
-      
-      // Try to play
-      const playPromise = audio.play()
-      
-      if (playPromise !== undefined) {
-        await playPromise
+      // If paused, resume
+      if (audioRef.current && audioRef.current.paused && audioRef.current.src) {
+        console.log('▶️ Resuming playback')
+        await audioRef.current.play()
         setIsPlaying(true)
         setIsPaused(false)
-        console.log('✅ Playback started successfully!')
+        console.log('✅ Resumed successfully')
+        return
       }
+      
+      // Create new audio element (like PlaylistViewer does)
+      console.log('🎵 Creating new audio element for:', currentTrack.title)
+      
+      // Get fresh S3 URL
+      if (!currentTrack.audioUrl) {
+        console.error('❌ No audioUrl in currentTrack')
+        alert('⚠️ No audio file available')
+        return
+      }
+      
+      let audioUrl = currentTrack.audioUrl
+      
+      // If it's an S3 path, resolve it
+      if (!audioUrl.startsWith('http')) {
+        console.log('🔗 Resolving S3 path:', audioUrl)
+        const result = await getUrl({ path: audioUrl })
+        audioUrl = result.url.toString()
+        console.log('✅ Resolved to:', audioUrl.substring(0, 100))
+      }
+      
+      console.log('🎵 Creating Audio object with URL:', audioUrl.substring(0, 100))
+      const audio = new Audio(audioUrl)
+      
+      // Set up event listeners
+      audio.addEventListener('loadedmetadata', () => {
+        console.log('✅ Metadata loaded, duration:', audio.duration)
+        setDuration(audio.duration)
+        audio.volume = volume
+      })
+      
+      audio.addEventListener('timeupdate', () => {
+        setCurrentTime(audio.currentTime)
+      })
+      
+      audio.addEventListener('ended', () => {
+        console.log('✅ Track ended')
+        setIsPlaying(false)
+        setIsPaused(false)
+        setCurrentTime(0)
+      })
+      
+      audio.addEventListener('error', (e) => {
+        console.error('❌ Audio error:', e)
+        console.error('Audio error code:', audio.error)
+        alert('⚠️ Failed to load audio file')
+        setIsPlaying(false)
+      })
+      
+      audio.addEventListener('canplay', () => {
+        console.log('✅ Audio can play')
+      })
+      
+      // Store reference
+      audioRef.current = audio
+      
+      // Play
+      console.log('▶️ Starting playback...')
+      await audio.play()
+      setIsPlaying(true)
+      setIsPaused(false)
+      console.log('✅ Playback started successfully!')
+      
     } catch (error: any) {
       console.error('❌ Playback failed:', error)
       console.error('Error name:', error.name)
@@ -319,13 +361,6 @@ function Players() {
 
   function toggleAuto() {
     setAutoPlay(!autoPlay)
-  }
-
-  function handleTimeUpdate() {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime)
-      setDuration(audioRef.current.duration || 0)
-    }
   }
 
   function handleSeek(e: React.MouseEvent<HTMLDivElement>) {
@@ -635,47 +670,7 @@ function Players() {
             </div>
           </div>
 
-          {/* Audio Element */}
-          {currentTrack?.audioUrl && (
-            <audio
-              ref={audioRef}
-              src={currentTrack.audioUrl}
-              preload="auto"
-              crossOrigin="anonymous"
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={() => {
-                setIsPlaying(false)
-                setIsPaused(false)
-                console.log('✅ Track ended')
-              }}
-              onLoadedMetadata={() => {
-                console.log('✅ Audio metadata loaded, duration:', audioRef.current?.duration)
-                if (audioRef.current) {
-                  audioRef.current.volume = volume
-                }
-              }}
-              onLoadedData={() => {
-                console.log('✅ Audio data loaded, can play')
-              }}
-              onError={(e: any) => {
-                console.error('❌ Audio error:', e)
-                console.error('Audio element error code:', audioRef.current?.error)
-                alert('⚠️ Failed to load audio file. Check console for details.')
-              }}
-              onCanPlay={() => {
-                console.log('✅ Audio ready to play (canPlay event)')
-              }}
-              onCanPlayThrough={() => {
-                console.log('✅ Audio can play through (buffered)')
-              }}
-              onLoadStart={() => {
-                console.log('⏳ Audio loading started...')
-              }}
-              onProgress={() => {
-                console.log('📥 Audio buffering...')
-              }}
-            />
-          )}
+          {/* Audio is created dynamically via new Audio() in handlePlay */}
         </div>
 
         {/* Current Playlist */}
