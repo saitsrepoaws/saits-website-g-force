@@ -47,7 +47,7 @@ const audioAnalyzerLambda = new DockerImageFunction(
   {
     code: DockerImageCode.fromEcr(ecrRepository, {
       // Use digest instead of tag to force Lambda to pull new image
-      tagOrDigest: 'sha256:0e5ecd5fb8a339536868d09b7fd6037637ae53ca16a15e5d25a1e85a7cf477d6',
+      tagOrDigest: 'sha256:7f5a6d358c16c938b518080f92df811450c07677aecae97009844afee460f3f4',
     }),
     timeout: Duration.seconds(300),
     memorySize: 3008,
