@@ -550,25 +550,27 @@ function Libery() {
             ) : (
               <div className="space-y-2">
                 {/* Header Row */}
-                <div className="grid grid-cols-12 gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
-                  <div className="col-span-1"></div>
-                  <div className="col-span-2">Artist</div>
-                  <div className="col-span-2">Title</div>
-                  <div className="col-span-2">Genre</div>
-                  <div className="col-span-1">Year</div>
-                  <div className="col-span-1">Version</div>
-                  <div className="col-span-2">Label</div>
-                  <div className="col-span-1"></div>
+                <div className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
+                  <div></div>
+                  <div>Artist</div>
+                  <div>Title</div>
+                  <div className="text-center">🥁 BPM</div>
+                  <div className="text-center">🎹 Key</div>
+                  <div>Genre</div>
+                  <div>Year</div>
+                  <div>Version</div>
+                  <div>Label</div>
+                  <div></div>
                 </div>
 
                 {/* Track Rows */}
                 {filteredTracks.map((track) => (
                   <div
                     key={track.id}
-                    className="grid grid-cols-12 gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
+                    className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
                   >
                     {/* Cover Art */}
-                    <div className="col-span-1">
+                    <div>
                       {coverArtUrls[track.id] ? (
                         <img
                           src={coverArtUrls[track.id]}
@@ -581,25 +583,45 @@ function Libery() {
                         </div>
                       )}
                     </div>
-                    <div className="col-span-2 text-sm font-medium text-gray-900 truncate">
+                    <div className="text-sm font-medium text-gray-900 truncate">
                       {track.artist || '-'}
                     </div>
-                    <div className="col-span-2 text-sm text-gray-900 truncate">
+                    <div className="text-sm text-gray-900 truncate">
                       {track.title}
                     </div>
-                    <div className="col-span-2 text-xs text-gray-600 truncate">
+                    {/* BPM */}
+                    <div className="text-center">
+                      {track.bpm && track.bpm > 0 ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          {track.bpm}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
+                    </div>
+                    {/* Key */}
+                    <div className="text-center">
+                      {(track as any).key ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
+                          {(track as any).key}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-600 truncate">
                       {(track as any).genre || '-'}
                     </div>
-                    <div className="col-span-1 text-xs text-gray-600">
+                    <div className="text-xs text-gray-600">
                       {(track as any).year || '-'}
                     </div>
-                    <div className="col-span-1 text-xs text-gray-600 truncate">
+                    <div className="text-xs text-gray-600 truncate">
                       {track.version || '-'}
                     </div>
-                    <div className="col-span-2 text-xs text-gray-600 truncate">
+                    <div className="text-xs text-gray-600 truncate">
                       {track.label || '-'}
                     </div>
-                    <div className="col-span-1 text-right flex gap-1 justify-end">
+                    <div className="text-right flex gap-1 justify-end">
                       <button
                         onClick={() => {
                           console.log('🎵 Opening track info for:', track.title)
