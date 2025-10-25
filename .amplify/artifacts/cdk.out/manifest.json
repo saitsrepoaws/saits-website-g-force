@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/27df21d1b87e4bcebc6cff3556cfdb23f018875b335d9bc2ebc89ba6ca8c78f0.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fc90ec7c1f83e2367d1127a1e265c879269a29f2a26587e1315af036a29fb6ee.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1991,12 +1991,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "AudioCachePolicy1975B062"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Origin1/S3Origin/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StorageDistributionOrigin1S3Origin4569DD08"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Resource": [

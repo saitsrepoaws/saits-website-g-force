@@ -140,12 +140,7 @@
        "Action": "s3:GetObject",
        "Effect": "Allow",
        "Principal": {
-        "CanonicalUser": {
-         "Fn::GetAtt": [
-          "StorageDistributionOrigin1S3Origin4569DD08",
-          "S3CanonicalUserId"
-         ]
-        }
+        "AWS": "*"
        },
        "Resource": {
         "Fn::Join": [
@@ -157,7 +152,7 @@
             "Arn"
            ]
           },
-          "/*"
+          "/public/*"
          ]
         ]
        }
@@ -1517,7 +1512,7 @@
        "HeaderBehavior": "none"
       },
       "QueryStringsConfig": {
-       "QueryStringBehavior": "all"
+       "QueryStringBehavior": "none"
       }
      }
     }
@@ -1526,19 +1521,6 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioCachePolicy/Resource"
-   }
-  },
-  "StorageDistributionOrigin1S3Origin4569DD08": {
-   "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
-   "Properties": {
-    "CloudFrontOriginAccessIdentityConfig": {
-     "Comment": "Identity for amplifygforgeiotgerardsandbox28f2e0c620storageStorageDistributionOrigin17DEEAD45"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Origin1/S3Origin/Resource"
    }
   },
   "StorageDistributionE9D21ABB": {
@@ -1561,7 +1543,6 @@
        "OPTIONS"
       ],
       "Compress": true,
-      "OriginRequestPolicyId": "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf",
       "ResponseHeadersPolicyId": "60669652-455b-4ae9-85a4-c4c02393f86c",
       "TargetOriginId": "amplifygforgeiotgerardsandbox28f2e0c620storageStorageDistributionOrigin17DEEAD45",
       "ViewerProtocolPolicy": "redirect-to-https"
@@ -1571,26 +1552,28 @@
      "IPV6Enabled": true,
      "Origins": [
       {
-       "DomainName": {
-        "Fn::GetAtt": [
-         "gforgeIotStorageBucketEED00516",
-         "RegionalDomainName"
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "https-only",
+        "OriginSSLProtocols": [
+         "TLSv1.2"
         ]
        },
-       "Id": "amplifygforgeiotgerardsandbox28f2e0c620storageStorageDistributionOrigin17DEEAD45",
-       "S3OriginConfig": {
-        "OriginAccessIdentity": {
-         "Fn::Join": [
-          "",
-          [
-           "origin-access-identity/cloudfront/",
-           {
-            "Ref": "StorageDistributionOrigin1S3Origin4569DD08"
-           }
-          ]
+       "DomainName": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Ref": "gforgeIotStorageBucketEED00516"
+          },
+          ".s3.",
+          {
+           "Ref": "AWS::Region"
+          },
+          ".amazonaws.com"
          ]
-        }
-       }
+        ]
+       },
+       "Id": "amplifygforgeiotgerardsandbox28f2e0c620storageStorageDistributionOrigin17DEEAD45"
       }
      ],
      "PriceClass": "PriceClass_100"
@@ -1615,7 +1598,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/3VQW27CMBA8C//GpeEEEITUj0IUDoCMvaRLYjvyrkEoyt0rJzyiSv2amdXO7COTWbaQi5m60Vybet7gSXY7IAZzYKVroW507Ggpu3XUNbDIz+7BRih8g/r+Lj/0KNaKoBeNsiejZJefXQHBIhF6lxzb6DQnvvG6hvBlVQXPWi+IrOwOHNBVhQrKAkNIrpfoBSoru/cGD1b6BpJM+Jx+dN7AheRugNdgWh4VETDJVQIBOsgSWk/IPtzT+kI3Pppz8I5llyv9A+95U7lB4oCnOMTuA1boVloD0ZcBx8ijIWVtU9Z/HdOYvhd5JPa2BPIx6PGoCf9WbYuu+tNVBH9FA2HYfjjrwKpKfVPvPnIbuRfpL/JCH9csk9mnXMwuhDgP0TFakOWIv+LphhkmAgAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12P0W7CMAxFv4X34LHyBaNo0h7GqvIBKKSmM22SKnZAqOq/T6EFqj3deyxf+TqDLFvBaqGvvDRVs2zpCP0OWbDaizaN0lc+9LyGfhNNg6Lyk5vcKIVvydxe44lH2GjGQbXaHisNfX5yBQZLzORdSnxGZyT5rTcNhi+ra3zMBsVsod9LIFcXOmiLgiGlnjAo0hb6V4PJlb7FhEkf1w/OV3hm2N3leZjXB82MwvCRRKEJUGLnmcSHW6qvTOtjdQreCfS5Nr/4ujfHLbEEOkaZfpvzMKg8snhbIvsYzNhu5r9115Gr/20VwV+ownCvce+3F12nvXn2J0oXZVDpQTjz2yXLIHuH1eLMRMsQnZBFKEf9Aw4Y07LvAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default"

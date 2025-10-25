@@ -7,7 +7,7 @@ import { waveformGenerator } from './functions/waveform-generator/resource'
 import { playlistGenerator } from './functions/playlist-generator/resource'
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
-import { Policy, PolicyStatement, Effect } from 'aws-cdk-lib/aws-iam'
+import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
 import { DockerImageFunction, DockerImageCode, Architecture } from 'aws-cdk-lib/aws-lambda'
@@ -16,6 +16,7 @@ import * as ecr from 'aws-cdk-lib/aws-ecr'
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3 from 'aws-cdk-lib/aws-s3'
+import * as iam from 'aws-cdk-lib/aws-iam'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -148,13 +149,13 @@ authenticatedRole.attachInlinePolicy(
 )
 
 // CloudFront Distribution for S3 Storage
-// This provides faster access and shorter URLs for audio/images
+// Use public S3 origin (no OAI/OAC) for simplicity with Amplify Storage
 const cloudFrontDistribution = new cloudfront.Distribution(
   backend.storage.stack,
   'StorageDistribution',
   {
     defaultBehavior: {
-      origin: new origins.S3Origin(storageBucket),
+      origin: new origins.HttpOrigin(`${storageBucket.bucketName}.s3.${backend.storage.stack.region}.amazonaws.com`),
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
       allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
       cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
@@ -169,16 +170,27 @@ const cloudFrontDistribution = new cloudfront.Distribution(
           minTtl: Duration.seconds(0),
           enableAcceptEncodingGzip: true,
           enableAcceptEncodingBrotli: true,
-          queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(), // Include query params in cache key
+          queryStringBehavior: cloudfront.CacheQueryStringBehavior.none(), // Don't cache AWS auth params
         }
       ),
-      originRequestPolicy: cloudfront.OriginRequestPolicy.CORS_S3_ORIGIN,
       responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS,
     },
     comment: 'CDN for audio files, cover art, and waveforms',
     enableLogging: false, // Disable access logs to reduce costs
     priceClass: cloudfront.PriceClass.PRICE_CLASS_100, // Use only North America & Europe edge locations
   }
+)
+
+// Add bucket policy to allow public read on public/* prefix
+storageBucket.addToResourcePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    principals: [new iam.AnyPrincipal()],
+    actions: ['s3:GetObject'],
+    resources: [
+      `${storageBucket.bucketArn}/public/*`,
+    ],
+  })
 )
 
 // Export CloudFront domain for use in frontend
