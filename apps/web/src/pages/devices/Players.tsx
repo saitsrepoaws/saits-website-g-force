@@ -96,6 +96,27 @@ function Players() {
     return () => clearInterval(interval)
   }, [])
 
+  // TEST FUNCTION - Direct IoT test
+  async function testIoTConnection() {
+    console.log('🧪 Testing IoT connection...')
+    try {
+      if (!iotServiceRef.current) {
+        console.error('❌ IoT service not initialized!')
+        alert('❌ IoT service not initialized!')
+        return
+      }
+      
+      console.log('📤 Publishing test state...')
+      await iotServiceRef.current.publishState(PlayerState.IDLE)
+      
+      console.log('✅ Test message published!')
+      alert('✅ Test message published! Check IoT Log.')
+    } catch (error) {
+      console.error('❌ Test failed:', error)
+      alert(`❌ Test failed: ${error}`)
+    }
+  }
+
   async function loadPlaylists() {
     try {
       const { data } = await listPlaylists()
@@ -760,6 +781,15 @@ function Players() {
                     title="Pause playback"
                   >
                     ⏸️ PAUSE
+                  </button>
+
+                  {/* TEST IoT Button */}
+                  <button
+                    onClick={testIoTConnection}
+                    className="px-4 py-3 bg-green-500/20 text-green-300 rounded-lg font-semibold hover:bg-green-500/30 transition-colors border border-green-500/50"
+                    title="Test IoT Connection"
+                  >
+                    🧪 TEST IoT
                   </button>
 
                   {/* IoT Log Button */}
