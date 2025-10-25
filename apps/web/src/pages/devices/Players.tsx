@@ -932,9 +932,93 @@ function Players() {
             </select>
           </div>
         )}
+
+        {/* IoT Log Window - Always visible under player */}
+        <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+          <div className="px-6 py-4 bg-gray-800 border-b border-gray-700 flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-white">
+                📡 IoT Message Log
+              </h2>
+              <p className="text-sm text-gray-400 mt-1">
+                Player: <span className="font-mono font-medium">{playerId}</span> • {iotLogs.length} messages
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                iotServiceRef.current?.clearLogs()
+                setIoTLogs([])
+              }}
+              className="px-3 py-1 text-sm bg-gray-700 text-white rounded hover:bg-gray-600"
+            >
+              🧹 Clear
+            </button>
+          </div>
+
+          <div className="p-4 h-96 overflow-y-auto">
+            {iotLogs.length === 0 ? (
+              <div className="text-center text-gray-500 py-8">
+                No messages yet. Click 🧪 TEST IoT to start!
+              </div>
+            ) : (
+              <div className="space-y-2 font-mono text-sm">
+                {iotLogs.map((log, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded border-l-4 ${
+                      log.direction === 'OUT' 
+                        ? 'bg-blue-900/20 border-blue-500' 
+                        : 'bg-green-900/20 border-green-500'
+                    }`}
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                          log.direction === 'OUT' 
+                            ? 'text-blue-400 bg-blue-900/30' 
+                            : 'text-green-400 bg-green-900/30'
+                        }`}>
+                          {log.direction === 'OUT' ? '📤' : '📥'} {log.direction}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${
+                          log.type === 'state' ? 'bg-purple-600' :
+                          log.type === 'command' ? 'bg-orange-600' :
+                          log.type === 'track' ? 'bg-blue-600' :
+                          log.type === 'status' ? 'bg-green-600' :
+                          'bg-gray-600'
+                        }`}>
+                          {log.type.toUpperCase()}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(log.timestamp).toLocaleTimeString('nl-NL', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            fractionalSecondDigits: 3
+                          })}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Topic */}
+                    <div className="text-xs text-gray-400 mb-2">
+                      📍 {log.topic}
+                    </div>
+
+                    {/* Message */}
+                    <pre className="text-xs text-gray-300 overflow-x-auto whitespace-pre-wrap">
+                      {JSON.stringify(log.message, null, 2)}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* IoT Log Modal */}
+      {/* IoT Log Modal - Keep for optional full screen view */}
       <IoTLogModal
         isOpen={showIoTLog}
         onClose={() => setShowIoTLog(false)}

@@ -57,6 +57,8 @@ export class RadioPlayerIoT {
    * Add log entry
    */
   private addLog(direction: 'OUT' | 'IN', topic: string, message: any, type: string): void {
+    console.log('📝 addLog called:', { direction, type, topic })
+    
     const entry: IoTLogEntry = {
       timestamp: Date.now(),
       direction,
@@ -68,13 +70,19 @@ export class RadioPlayerIoT {
     // Add to logs array (newest first)
     this.logs.unshift(entry)
 
+    console.log('📊 Logs array size:', this.logs.length)
+    console.log('📞 Callbacks count:', this.logCallbacks.size)
+
     // Keep only last maxLogs entries
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(0, this.maxLogs)
     }
 
     // Notify callbacks
-    this.logCallbacks.forEach(callback => callback(entry))
+    this.logCallbacks.forEach(callback => {
+      console.log('🔔 Calling callback with entry:', entry.type)
+      callback(entry)
+    })
   }
 
   /**
