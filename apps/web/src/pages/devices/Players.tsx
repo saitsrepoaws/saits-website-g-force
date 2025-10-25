@@ -75,18 +75,6 @@ function Players() {
     }
   }
 
-  async function loadSampleTrack() {
-    try {
-      const { data: tracks } = await listTracks()
-      if (tracks && tracks.length > 0) {
-        const track = tracks[0]
-        await loadTrackIntoPlayer(track as Track)
-      }
-    } catch (error) {
-      console.error('Failed to load tracks:', error)
-    }
-  }
-
   async function loadTrackIntoPlayer(track: any) {
     try {
       // Create a new track object with resolved URLs
@@ -162,11 +150,18 @@ function Players() {
 
   async function handleLoad() {
     // Load track from library
-    await loadSampleTrack()
-    
-    if (currentTrack) {
-      setIsLoaded(true)
-      alert(`✅ Track loaded: ${currentTrack.title}`)
+    try {
+      const { data: tracks } = await listTracks()
+      if (tracks && tracks.length > 0) {
+        const track = tracks[0]
+        await loadTrackIntoPlayer(track)
+        alert(`✅ Track loaded: ${track.title}`)
+      } else {
+        alert('⚠️ No tracks available to load')
+      }
+    } catch (error) {
+      console.error('Failed to load track:', error)
+      alert('❌ Failed to load track')
     }
   }
 
@@ -195,19 +190,40 @@ function Players() {
   }
 
   async function handlePlay() {
-    if (!audioRef.current || !isLoaded) {
-      console.warn('Cannot play: audio not ready or track not loaded')
+    console.log('handlePlay called', {
+      hasAudioRef: !!audioRef.current,
+      isLoaded,
+      hasCurrentTrack: !!currentTrack,
+      audioUrl: currentTrack?.audioUrl?.substring(0, 50)
+    })
+    
+    if (!audioRef.current) {
+      console.error('No audio element reference!')
+      alert('⚠️ Audio player not initialized')
+      return
+    }
+    
+    if (!isLoaded) {
+      console.warn('Track not loaded')
+      alert('⚠️ Please load a track first (click LOAD button)')
+      return
+    }
+    
+    if (!currentTrack?.audioUrl) {
+      console.error('No audio URL available')
+      alert('⚠️ No audio file available for this track')
       return
     }
     
     try {
+      console.log('Attempting to play audio from:', currentTrack.audioUrl.substring(0, 100))
       await audioRef.current.play()
       setIsPlaying(true)
       setIsPaused(false)
-      console.log('Playback started')
+      console.log('✅ Playback started successfully')
     } catch (error) {
-      console.error('Playback failed:', error)
-      alert('⚠️ Playback failed. Audio file may not be available.')
+      console.error('❌ Playback failed:', error)
+      alert(`⚠️ Playback failed: ${error}`)
     }
   }
 
