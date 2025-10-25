@@ -135,27 +135,6 @@
          ]
         }
        ]
-      },
-      {
-       "Action": "s3:GetObject",
-       "Effect": "Allow",
-       "Principal": {
-        "AWS": "*"
-       },
-       "Resource": {
-        "Fn::Join": [
-         "",
-         [
-          {
-           "Fn::GetAtt": [
-            "gforgeIotStorageBucketEED00516",
-            "Arn"
-           ]
-          },
-          "/public/*"
-         ]
-        ]
-       }
       }
      ],
      "Version": "2012-10-17"
@@ -1497,9 +1476,9 @@
    "Type": "AWS::CloudFront::CachePolicy",
    "Properties": {
     "CachePolicyConfig": {
-     "Comment": "Cache policy for audio files and images",
-     "DefaultTTL": 86400,
-     "MaxTTL": 31536000,
+     "Comment": "Cache policy for audio files with auth params",
+     "DefaultTTL": 900,
+     "MaxTTL": 3600,
      "MinTTL": 0,
      "Name": "AudioFilesCache",
      "ParametersInCacheKeyAndForwardedToOrigin": {
@@ -1512,7 +1491,7 @@
        "HeaderBehavior": "none"
       },
       "QueryStringsConfig": {
-       "QueryStringBehavior": "none"
+       "QueryStringBehavior": "all"
       }
      }
     }
@@ -1527,7 +1506,7 @@
    "Type": "AWS::CloudFront::Distribution",
    "Properties": {
     "DistributionConfig": {
-     "Comment": "CDN for audio files, cover art, and waveforms",
+     "Comment": "CDN for audio files, cover art, and waveforms (with presigned URLs)",
      "DefaultCacheBehavior": {
       "AllowedMethods": [
        "GET",

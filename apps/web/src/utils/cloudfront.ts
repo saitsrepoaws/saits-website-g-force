@@ -13,7 +13,7 @@ const CLOUDFRONT_DOMAIN = 'd80d0cwbzav1v.cloudfront.net'
 /**
  * Convert S3 path to CloudFront URL
  * 
- * @param s3Path - S3 object key (e.g., "public/audio/track.mp3")
+ * @param s3PathOrUrl - S3 object key (e.g., "public/audio/track.mp3") or full S3 URL
  * @returns CloudFront URL (e.g., "https://d80d0cwbzav1v.cloudfront.net/public/audio/track.mp3")
  * 
  * @example
@@ -22,9 +22,29 @@ const CLOUDFRONT_DOMAIN = 'd80d0cwbzav1v.cloudfront.net'
  * // Returns: https://d80d0cwbzav1v.cloudfront.net/public/audio/1234-track.mp3
  * ```
  */
-export function getCloudFrontUrl(s3Path: string): string {
+export function getCloudFrontUrl(s3PathOrUrl: string): string {
+  let cleanPath = s3PathOrUrl
+  
+  // If it's a full S3 URL, extract just the path
+  if (s3PathOrUrl.includes('amazonaws.com')) {
+    try {
+      const url = new URL(s3PathOrUrl)
+      // Extract path after bucket name
+      // e.g., /public/audio/track.mp3 or https://bucket.s3.region.amazonaws.com/public/audio/track.mp3
+      cleanPath = url.pathname.replace(/^\/+/, '')
+    } catch (e) {
+      console.warn('Failed to parse S3 URL, using as-is:', e)
+    }
+  }
+  
   // Remove any leading slashes
-  const cleanPath = s3Path.replace(/^\/+/, '')
+  cleanPath = cleanPath.replace(/^\/+/, '')
+  
+  // If path starts with "public/", it's already clean
+  // Otherwise, it might be just the filename
+  if (!cleanPath.startsWith('public/')) {
+    console.warn('Path does not start with public/, might be incorrect:', cleanPath)
+  }
   
   return `https://${CLOUDFRONT_DOMAIN}/${cleanPath}`
 }

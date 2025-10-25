@@ -149,7 +149,7 @@ authenticatedRole.attachInlinePolicy(
 )
 
 // CloudFront Distribution for S3 Storage
-// Use public S3 origin (no OAI/OAC) for simplicity with Amplify Storage
+// Cache presigned URLs from Amplify Storage (respects auth + Block Public Access)
 const cloudFrontDistribution = new cloudfront.Distribution(
   backend.storage.stack,
   'StorageDistribution',
@@ -164,33 +164,22 @@ const cloudFrontDistribution = new cloudfront.Distribution(
         'AudioCachePolicy',
         {
           cachePolicyName: 'AudioFilesCache',
-          comment: 'Cache policy for audio files and images',
-          defaultTtl: Duration.hours(24), // Cache for 24 hours
-          maxTtl: Duration.days(365), // Max 1 year
+          comment: 'Cache policy for audio files with auth params',
+          defaultTtl: Duration.minutes(15), // Match presigned URL expiry
+          maxTtl: Duration.hours(1), // Max 1 hour
           minTtl: Duration.seconds(0),
           enableAcceptEncodingGzip: true,
           enableAcceptEncodingBrotli: true,
-          queryStringBehavior: cloudfront.CacheQueryStringBehavior.none(), // Don't cache AWS auth params
+          // Include query strings for presigned URLs
+          queryStringBehavior: cloudfront.CacheQueryStringBehavior.all(),
         }
       ),
       responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS,
     },
-    comment: 'CDN for audio files, cover art, and waveforms',
-    enableLogging: false, // Disable access logs to reduce costs
-    priceClass: cloudfront.PriceClass.PRICE_CLASS_100, // Use only North America & Europe edge locations
+    comment: 'CDN for audio files, cover art, and waveforms (with presigned URLs)',
+    enableLogging: false,
+    priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
   }
-)
-
-// Add bucket policy to allow public read on public/* prefix
-storageBucket.addToResourcePolicy(
-  new iam.PolicyStatement({
-    effect: iam.Effect.ALLOW,
-    principals: [new iam.AnyPrincipal()],
-    actions: ['s3:GetObject'],
-    resources: [
-      `${storageBucket.bucketArn}/public/*`,
-    ],
-  })
 )
 
 // Export CloudFront domain for use in frontend
