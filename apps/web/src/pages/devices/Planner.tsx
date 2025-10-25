@@ -29,6 +29,10 @@ function Planner() {
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [showAddSlot, setShowAddSlot] = useState(false)
   const [currentDay, setCurrentDay] = useState<string>('MON')
+  const [showBulkEdit, setShowBulkEdit] = useState(false)
+  const [bulkPlaylistId, setBulkPlaylistId] = useState<string>('')
+  const [bulkDays, setBulkDays] = useState<string[]>([])
+  const [bulkSlots, setBulkSlots] = useState<string[]>([])
 
   useEffect(() => {
     loadPlaylists()
@@ -96,6 +100,96 @@ function Planner() {
     }
   }
 
+  // Bulk Edit Functions
+  function applyBulkEdit() {
+    if (!bulkPlaylistId || bulkSlots.length === 0 || bulkDays.length === 0) {
+      alert('Please select playlist, time slots, and days')
+      return
+    }
+
+    setTimeSlots(slots => slots.map(slot => {
+      if (bulkSlots.includes(slot.id)) {
+        return {
+          ...slot,
+          playlistId: bulkPlaylistId,
+          days: bulkDays,
+          active: true
+        }
+      }
+      return slot
+    }))
+
+    setShowBulkEdit(false)
+    setBulkPlaylistId('')
+    setBulkDays([])
+    setBulkSlots([])
+    alert(`✅ Bulk edit applied to ${bulkSlots.length} slots!`)
+  }
+
+  function quickFillWeekdays(playlistId: string) {
+    if (!playlistId) return
+    
+    setTimeSlots(slots => slots.map(slot => ({
+      ...slot,
+      playlistId,
+      days: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+      active: true
+    })))
+    alert('✅ All slots filled with playlist for weekdays!')
+  }
+
+  function quickFillWeekend(playlistId: string) {
+    if (!playlistId) return
+    
+    setTimeSlots(slots => slots.map(slot => ({
+      ...slot,
+      playlistId,
+      days: ['SAT', 'SUN'],
+      active: true
+    })))
+    alert('✅ All slots filled with playlist for weekend!')
+  }
+
+  function quickFillAllDays(playlistId: string) {
+    if (!playlistId) return
+    
+    setTimeSlots(slots => slots.map(slot => ({
+      ...slot,
+      playlistId,
+      days: DAYS,
+      active: true
+    })))
+    alert('✅ All slots filled with playlist for all days!')
+  }
+
+  function duplicateSlot(slotId: string) {
+    const slot = timeSlots.find(s => s.id === slotId)
+    if (!slot) return
+
+    const newSlot: TimeSlot = {
+      ...slot,
+      id: Date.now().toString(),
+      name: `${slot.name} (Copy)`,
+    }
+    setTimeSlots([...timeSlots, newSlot])
+  }
+
+  function toggleBulkSlot(slotId: string) {
+    setBulkSlots(prev => 
+      prev.includes(slotId)
+        ? prev.filter(id => id !== slotId)
+        : [...prev, slotId]
+    )
+  }
+
+  function toggleBulkDay(day: string) {
+    setBulkDays(prev =>
+      prev.includes(day)
+        ? prev.filter(d => d !== day)
+        : [...prev, day]
+    )
+  }
+
   const filteredSlots = timeSlots
     .filter(slot => slot.days.includes(currentDay))
     .sort((a, b) => a.time.localeCompare(b.time))
@@ -110,12 +204,20 @@ function Planner() {
               Plan your broadcast schedule with playlists
             </p>
           </div>
-          <button
-            onClick={() => setShowAddSlot(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            + Add Time Slot
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowBulkEdit(true)}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+            >
+              <span>⚡</span> Bulk Fill
+            </button>
+            <button
+              onClick={() => setShowAddSlot(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              + Add Time Slot
+            </button>
+          </div>
         </div>
 
         {/* Day Selector */}
@@ -244,6 +346,16 @@ function Planner() {
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
+                              duplicateSlot(slot.id)
+                            }}
+                            className="text-blue-600 hover:bg-blue-50 p-2 rounded"
+                            title="Duplicate"
+                          >
+                            📋
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
                               deleteSlot(slot.id)
                             }}
                             className="text-red-600 hover:bg-red-50 p-2 rounded"
@@ -359,6 +471,224 @@ function Planner() {
             </div>
           </div>
         </div>
+
+        {/* Bulk Edit Modal */}
+        {showBulkEdit && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">⚡ Bulk Fill Schedule</h3>
+                <button
+                  onClick={() => setShowBulkEdit(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Quick Fill Templates */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                <h4 className="font-bold text-gray-900 mb-3">🚀 Quick Fill (All Slots)</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Instantly fill ALL time slots with a playlist
+                </p>
+                <div className="flex items-center gap-3">
+                  <select
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        const action = e.target.value
+                        e.target.value = ''
+                        
+                        const playlistId = prompt('Enter Playlist ID or select from dropdown below:')
+                        if (!playlistId) return
+
+                        if (action === 'weekdays') quickFillWeekdays(playlistId)
+                        else if (action === 'weekend') quickFillWeekend(playlistId)
+                        else if (action === 'alldays') quickFillAllDays(playlistId)
+                      }
+                    }}
+                  >
+                    <option value="">Choose template...</option>
+                    <option value="weekdays">📅 Weekdays (Mon-Fri)</option>
+                    <option value="weekend">🎉 Weekend (Sat-Sun)</option>
+                    <option value="alldays">🌍 All Days (Mon-Sun)</option>
+                  </select>
+                  <div className="text-sm text-gray-600">
+                    or use Custom Fill below →
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 my-6"></div>
+
+              {/* Custom Bulk Fill */}
+              <div>
+                <h4 className="font-bold text-gray-900 mb-4">🎯 Custom Bulk Fill</h4>
+                
+                {/* Step 1: Select Playlist */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    1️⃣ Select Playlist
+                  </label>
+                  <select
+                    value={bulkPlaylistId}
+                    onChange={(e) => setBulkPlaylistId(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Choose playlist...</option>
+                    {playlists.map(playlist => (
+                      <option key={playlist.id} value={playlist.id}>
+                        {playlist.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Step 2: Select Time Slots */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    2️⃣ Select Time Slots
+                  </label>
+                  <div className="grid grid-cols-2 gap-2 p-4 bg-gray-50 rounded-lg max-h-60 overflow-y-auto">
+                    {timeSlots.map(slot => (
+                      <button
+                        key={slot.id}
+                        onClick={() => toggleBulkSlot(slot.id)}
+                        className={`text-left p-3 rounded-lg border-2 transition-all ${
+                          bulkSlots.includes(slot.id)
+                            ? 'border-purple-600 bg-purple-50'
+                            : 'border-gray-200 bg-white hover:border-purple-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                            bulkSlots.includes(slot.id)
+                              ? 'border-purple-600 bg-purple-600'
+                              : 'border-gray-300'
+                          }`}>
+                            {bulkSlots.includes(slot.id) && (
+                              <span className="text-white text-xs">✓</span>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm">{slot.time} - {slot.name}</div>
+                            <div className="text-xs text-gray-600">{slot.duration}m</div>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => setBulkSlots(timeSlots.map(s => s.id))}
+                      className="text-sm text-purple-600 hover:text-purple-700"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      onClick={() => setBulkSlots([])}
+                      className="text-sm text-gray-600 hover:text-gray-700"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+
+                {/* Step 3: Select Days */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    3️⃣ Select Days
+                  </label>
+                  <div className="flex gap-2">
+                    {DAYS.map(day => (
+                      <button
+                        key={day}
+                        onClick={() => toggleBulkDay(day)}
+                        className={`flex-1 py-3 rounded-lg font-medium transition-all ${
+                          bulkDays.includes(day)
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {day}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      onClick={() => setBulkDays(['MON', 'TUE', 'WED', 'THU', 'FRI'])}
+                      className="text-sm text-purple-600 hover:text-purple-700"
+                    >
+                      Weekdays
+                    </button>
+                    <button
+                      onClick={() => setBulkDays(['SAT', 'SUN'])}
+                      className="text-sm text-purple-600 hover:text-purple-700"
+                    >
+                      Weekend
+                    </button>
+                    <button
+                      onClick={() => setBulkDays(DAYS)}
+                      className="text-sm text-purple-600 hover:text-purple-700"
+                    >
+                      All Days
+                    </button>
+                    <button
+                      onClick={() => setBulkDays([])}
+                      className="text-sm text-gray-600 hover:text-gray-700"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                {/* Summary */}
+                {(bulkPlaylistId || bulkSlots.length > 0 || bulkDays.length > 0) && (
+                  <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h5 className="font-semibold text-blue-900 mb-2">Summary:</h5>
+                    <ul className="text-sm text-blue-800 space-y-1">
+                      <li>
+                        <strong>Playlist:</strong>{' '}
+                        {bulkPlaylistId
+                          ? playlists.find(p => p.id === bulkPlaylistId)?.name || 'Unknown'
+                          : 'Not selected'}
+                      </li>
+                      <li>
+                        <strong>Time Slots:</strong> {bulkSlots.length} selected
+                      </li>
+                      <li>
+                        <strong>Days:</strong> {bulkDays.length > 0 ? bulkDays.join(', ') : 'None'}
+                      </li>
+                    </ul>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={applyBulkEdit}
+                    disabled={!bulkPlaylistId || bulkSlots.length === 0 || bulkDays.length === 0}
+                    className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+                  >
+                    Apply Bulk Fill
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowBulkEdit(false)
+                      setBulkPlaylistId('')
+                      setBulkDays([])
+                      setBulkSlots([])
+                    }}
+                    className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Add Slot Modal */}
         {showAddSlot && (
