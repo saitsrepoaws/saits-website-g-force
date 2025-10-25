@@ -110,36 +110,34 @@ storageBucket.addEventNotification(
 )
 
 // Add IoT policy to authenticated role for PubSub access
+// Open policy for development - see /docs/IOT_TOPICS_SPECIFICATION.md for production policy
 const authenticatedRole = backend.auth.resources.authenticatedUserIamRole
 
 authenticatedRole.attachInlinePolicy(
   new Policy(authenticatedRole.stack, 'IotPubSubPolicy', {
     statements: [
+      // Connect - allow any client ID for development
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: [
-          'iot:Connect',
-        ],
+        actions: ['iot:Connect'],
         resources: [
-          // Allow connection with client ID matching the identity ID pattern
           'arn:aws:iot:eu-west-1:*:client/*',
         ],
       }),
+      
+      // Subscribe - allow all topics for development
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: [
-          'iot:Subscribe',
-        ],
+        actions: ['iot:Subscribe'],
         resources: [
           'arn:aws:iot:eu-west-1:*:topicfilter/*',
         ],
       }),
+      
+      // Publish & Receive - allow all topics for development
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: [
-          'iot:Publish',
-          'iot:Receive',
-        ],
+        actions: ['iot:Publish', 'iot:Receive'],
         resources: [
           'arn:aws:iot:eu-west-1:*:topic/*',
         ],
