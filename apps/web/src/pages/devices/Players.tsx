@@ -77,28 +77,21 @@ function Players() {
 
   async function loadTrackIntoPlayer(track: any) {
     try {
-      // Create a new track object with resolved URLs
-      const resolvedTrack: Track = { ...track }
+      console.log('📥 loadTrackIntoPlayer called with track:', track.title)
+      console.log('📋 Track has fileUrl:', !!(track as any).fileUrl)
+      console.log('📋 Track has audioUrl:', !!track.audioUrl)
       
-      // Load audio URL from S3
-      if (track.audioUrl) {
-        try {
-          const url = await getUrl({ path: track.audioUrl })
-          resolvedTrack.audioUrl = url.url.toString()
-          console.log('Audio URL resolved:', resolvedTrack.audioUrl)
-        } catch (e) {
-          console.error('Audio not found:', e)
-          resolvedTrack.audioUrl = null
-        }
-      }
+      // Store track AS-IS (don't resolve audio URL yet - we do that in handlePlay)
+      setCurrentTrack(track as Track)
       
       // Load cover art
       if (track.coverArtUrl) {
         try {
           const url = await getUrl({ path: track.coverArtUrl })
           setCoverArtUrl(url.url.toString())
+          console.log('✅ Cover art loaded')
         } catch (e) {
-          console.log('Cover art not found')
+          console.log('⚠️ Cover art not found')
           setCoverArtUrl(null)
         }
       } else {
@@ -110,23 +103,22 @@ function Players() {
         try {
           const url = await getUrl({ path: track.waveformUrl })
           setWaveformUrl(url.url.toString())
+          console.log('✅ Waveform loaded')
         } catch (e) {
-          console.log('Waveform not found')
+          console.log('⚠️ Waveform not found')
           setWaveformUrl(null)
         }
       } else {
         setWaveformUrl(null)
       }
 
-      // Set the resolved track
-      setCurrentTrack(resolvedTrack)
-      
       // Mark as loaded
       setIsLoaded(true)
       
-      console.log('Track loaded:', resolvedTrack.title, 'Audio ready:', !!resolvedTrack.audioUrl)
+      console.log('✅ Track loaded into player:', track.title)
+      console.log('   - Audio URL will be resolved when PLAY is clicked')
     } catch (error) {
-      console.error('Failed to load track:', error)
+      console.error('❌ Failed to load track:', error)
     }
   }
 
@@ -225,69 +217,100 @@ function Players() {
   }
 
   async function handlePlay() {
-    console.log('🎵 handlePlay called', {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🎵 PLAY BUTTON CLICKED')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Current state:', {
       isLoaded,
       hasCurrentTrack: !!currentTrack,
-      currentTrackAudioUrl: currentTrack?.audioUrl?.substring(0, 80)
+      currentTrackId: currentTrack?.id,
+      currentTrackTitle: currentTrack?.title,
+      hasAudioRef: !!audioRef.current,
+      isCurrentlyPlaying: isPlaying,
+      isPaused
     })
     
     if (!isLoaded) {
-      console.warn('⚠️ Track not loaded')
+      console.warn('⚠️ Track not loaded - user needs to click LOAD first')
       alert('⚠️ Please load a track first (click LOAD button)')
       return
     }
     
     if (!currentTrack) {
-      console.error('❌ No track available')
+      console.error('❌ No currentTrack object available')
       alert('⚠️ No track available')
       return
     }
     
+    console.log('📋 Current track object:', currentTrack)
+    
     try {
       // If already playing, just resume
       if (audioRef.current && !audioRef.current.paused) {
-        console.log('✅ Already playing')
+        console.log('✅ Already playing, nothing to do')
         return
       }
       
       // If paused, resume
       if (audioRef.current && audioRef.current.paused && audioRef.current.src) {
-        console.log('▶️ Resuming playback')
+        console.log('▶️ Resuming paused playback')
         await audioRef.current.play()
         setIsPlaying(true)
         setIsPaused(false)
-        console.log('✅ Resumed successfully')
+        console.log('✅ Resumed successfully!')
         return
       }
       
-      // Create new audio element (like PlaylistViewer does)
+      // EXACT SAME AS PLAYLISTVIEWER - Use fileUrl!
       console.log('🎵 Creating new audio element for:', currentTrack.title)
+      console.log('🔍 Checking track properties:', {
+        hasFileUrl: !!(currentTrack as any).fileUrl,
+        hasAudioUrl: !!currentTrack.audioUrl,
+        fileUrl: (currentTrack as any).fileUrl,
+        audioUrl: currentTrack.audioUrl
+      })
       
-      // Get fresh S3 URL
-      if (!currentTrack.audioUrl) {
-        console.error('❌ No audioUrl in currentTrack')
-        alert('⚠️ No audio file available')
+      // Use fileUrl (like PlaylistViewer) as primary, fallback to audioUrl
+      const trackUrl = (currentTrack as any).fileUrl || currentTrack.audioUrl
+      
+      if (!trackUrl) {
+        console.error('❌ No fileUrl or audioUrl in currentTrack')
+        console.error('Track object:', currentTrack)
+        alert('⚠️ No audio file available for this track')
         return
       }
       
-      let audioUrl = currentTrack.audioUrl
+      console.log('📂 Using track URL:', trackUrl)
       
-      // If it's an S3 path, resolve it
-      if (!audioUrl.startsWith('http')) {
-        console.log('🔗 Resolving S3 path:', audioUrl)
-        const result = await getUrl({ path: audioUrl })
-        audioUrl = result.url.toString()
-        console.log('✅ Resolved to:', audioUrl.substring(0, 100))
+      // EXACT SAME AS PLAYLISTVIEWER - Handle legacy amazonaws.com URLs
+      let s3Path = trackUrl
+      if (s3Path.includes('amazonaws.com')) {
+        console.log('🔧 Detected legacy amazonaws.com URL, extracting path...')
+        try {
+          const url = new URL(s3Path)
+          s3Path = url.pathname.replace(/^\//, '')
+          console.log('✅ Extracted S3 path:', s3Path)
+        } catch (e) {
+          console.error('❌ Failed to parse legacy URL:', e)
+        }
       }
       
-      console.log('🎵 Creating Audio object with URL:', audioUrl.substring(0, 100))
+      console.log('🔗 Resolving S3 path to signed URL:', s3Path)
+      const result = await getUrl({ path: s3Path })
+      const audioUrl = result.url.toString()
+      console.log('✅ S3 signed URL obtained:', audioUrl.substring(0, 120) + '...')
+      
+      console.log('🎵 Creating new Audio() object...')
       const audio = new Audio(audioUrl)
       
-      // Set up event listeners
+      console.log('📡 Setting up event listeners...')
+      
+      // Set up event listeners (EXACT SAME AS PLAYLISTVIEWER)
       audio.addEventListener('loadedmetadata', () => {
-        console.log('✅ Metadata loaded, duration:', audio.duration)
+        console.log('✅ LOADEDMETADATA - Duration:', audio.duration, 'seconds')
         setDuration(audio.duration)
         audio.volume = volume
+        console.log('🔊 Volume set to:', volume)
       })
       
       audio.addEventListener('timeupdate', () => {
@@ -295,48 +318,71 @@ function Players() {
       })
       
       audio.addEventListener('ended', () => {
-        console.log('✅ Track ended')
+        console.log('🏁 ENDED - Track finished playing')
         setIsPlaying(false)
         setIsPaused(false)
         setCurrentTime(0)
       })
       
       audio.addEventListener('error', (e) => {
-        console.error('❌ Audio error:', e)
-        console.error('Audio error code:', audio.error)
+        console.error('❌ AUDIO ERROR EVENT:', e)
+        console.error('Error details:', {
+          error: audio.error,
+          code: audio.error?.code,
+          message: audio.error?.message,
+          networkState: audio.networkState,
+          readyState: audio.readyState
+        })
         alert('⚠️ Failed to load audio file')
         setIsPlaying(false)
       })
       
       audio.addEventListener('canplay', () => {
-        console.log('✅ Audio can play')
+        console.log('✅ CANPLAY - Audio ready to start')
+      })
+      
+      audio.addEventListener('playing', () => {
+        console.log('✅ PLAYING - Playback actually started')
+      })
+      
+      audio.addEventListener('pause', () => {
+        console.log('⏸️ PAUSE event')
       })
       
       // Store reference
       audioRef.current = audio
+      console.log('✅ Audio reference stored in audioRef.current')
       
-      // Play
-      console.log('▶️ Starting playback...')
+      // Play (EXACT SAME AS PLAYLISTVIEWER)
+      console.log('▶️ Calling audio.play()...')
       await audio.play()
       setIsPlaying(true)
       setIsPaused(false)
-      console.log('✅ Playback started successfully!')
+      console.log('✅✅✅ PLAYBACK STARTED SUCCESSFULLY! ✅✅✅')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       
     } catch (error: any) {
-      console.error('❌ Playback failed:', error)
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌❌❌ PLAYBACK FAILED ❌❌❌')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('Error object:', error)
       console.error('Error name:', error.name)
       console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
       
       let errorMsg = 'Playback failed'
       if (error.name === 'NotAllowedError') {
         errorMsg = 'Browser blocked autoplay. Try clicking play again.'
+        console.error('💡 This is usually a browser autoplay policy issue')
       } else if (error.name === 'NotSupportedError') {
         errorMsg = 'Audio format not supported'
+        console.error('💡 The audio file format may not be supported by this browser')
       } else if (error.message) {
         errorMsg = error.message
       }
       
       alert(`⚠️ ${errorMsg}`)
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     }
   }
 
