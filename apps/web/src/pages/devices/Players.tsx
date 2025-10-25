@@ -387,12 +387,28 @@ function Players() {
   }
 
   function togglePlay() {
-    if (!audioRef.current) return
+    console.log('🎛️ togglePlay called', {
+      hasAudioRef: !!audioRef.current,
+      isPlaying,
+      isPaused
+    })
     
-    if (isPlaying) {
-      handlePause()
-    } else {
+    // If no audio yet but track is loaded, create new audio
+    if (!audioRef.current && isLoaded) {
+      console.log('▶️ No audio yet, calling handlePlay to create new Audio()')
       handlePlay()
+      return
+    }
+    
+    // If audio exists, toggle play/pause
+    if (audioRef.current) {
+      if (isPlaying) {
+        console.log('⏸️ Currently playing, pausing...')
+        handlePause()
+      } else {
+        console.log('▶️ Currently paused, playing...')
+        handlePlay()
+      }
     }
   }
 
