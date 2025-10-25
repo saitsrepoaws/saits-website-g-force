@@ -37,11 +37,14 @@ def lambda_handler(event, context):
         
         # Analyze audio
         print("🔍 Analyzing audio with aubio...")
-        bpm, key = analyze_audio_aubio(temp_file)
+        bpm, key, trim_start, trim_end = analyze_audio_aubio(temp_file)
         
         # Update DynamoDB
-        print(f"💾 Updating track {track_id} with BPM={bpm}, Key={key}")
-        update_track_metadata(track_id, bpm, key)
+        if trim_start is not None and trim_end is not None:
+            print(f"💾 Updating track {track_id} with BPM={bpm}, Key={key}, Trim={trim_start:.2f}s-{trim_end:.2f}s")
+        else:
+            print(f"💾 Updating track {track_id} with BPM={bpm}, Key={key}")
+        update_track_metadata(track_id, bpm, key, trim_start, trim_end)
         
         # Cleanup
         os.unlink(temp_file)
@@ -55,7 +58,9 @@ def lambda_handler(event, context):
                 'trackId': track_id,
                 'analysis': {
                     'bpm': bpm,
-                    'key': key
+                    'key': key,
+                    'trimStart': trim_start,
+                    'trimEnd': trim_end
                 }
             })
         }
@@ -85,10 +90,10 @@ def download_from_s3(bucket: str, key: str) -> str:
     return temp_file.name
 
 
-def analyze_audio_aubio(filepath: str) -> Tuple[int, Optional[str]]:
+def analyze_audio_aubio(filepath: str) -> Tuple[int, Optional[str], Optional[float], Optional[float]]:
     """
     Analyze audio file using aubio (C-based, fast, no numba!)
-    Returns: (bpm, key)
+    Returns: (bpm, key, trim_start, trim_end)
     """
     try:
         # Convert to WAV if needed (aubio works best with WAV)
@@ -105,17 +110,25 @@ def analyze_audio_aubio(filepath: str) -> Tuple[int, Optional[str]]:
         key = detect_key_aubio(wav_path)
         print(f"✅ Key detected: {key}")
         
+        # Trim Detection (silence at start/end)
+        print("✂️ Detecting trim points (silence removal)...")
+        trim_start, trim_end = detect_trim_points(filepath)
+        if trim_start is not None and trim_end is not None:
+            print(f"✅ Trim points: Start={trim_start:.2f}s, End={trim_end:.2f}s")
+        else:
+            print("⚠️ Trim detection failed, using full duration")
+        
         # Cleanup temp WAV if created
         if wav_path != filepath:
             os.unlink(wav_path)
         
-        return bpm, key
+        return bpm, key, trim_start, trim_end
         
     except Exception as e:
         print(f"❌ Aubio analysis failed: {e}")
         import traceback
         traceback.print_exc()
-        return 0, None
+        return 0, None, None, None
 
 
 def convert_to_wav(filepath: str) -> str:
@@ -235,7 +248,71 @@ def detect_key_aubio(filepath: str) -> Optional[str]:
         return None
 
 
-def update_track_metadata(track_id: str, bpm: int, key: Optional[str]):
+def detect_trim_points(filepath: str, threshold_db: float = -40.0, min_silence_ms: int = 500) -> Tuple[Optional[float], Optional[float]]:
+    """
+    Detect trim points (start/end) based on dB level gate detection
+    
+    Args:
+        filepath: Path to audio file
+        threshold_db: dB threshold below which is considered silence (default: -40 dB)
+        min_silence_ms: Minimum silence duration in milliseconds (default: 500ms)
+    
+    Returns:
+        (trim_start, trim_end) in seconds, or (None, None) if detection fails
+    """
+    try:
+        # Load audio with pydub
+        audio = AudioSegment.from_file(filepath)
+        
+        # Get duration in seconds
+        duration_s = len(audio) / 1000.0
+        
+        # Split into chunks for analysis (100ms chunks)
+        chunk_length_ms = 100
+        chunks = [audio[i:i+chunk_length_ms] for i in range(0, len(audio), chunk_length_ms)]
+        
+        # Find first non-silent chunk (trim start)
+        trim_start = None
+        for i, chunk in enumerate(chunks):
+            if chunk.dBFS > threshold_db:
+                # Found audio above threshold
+                # Go back a bit to include attack
+                trim_start = max(0, (i * chunk_length_ms - min_silence_ms)) / 1000.0
+                break
+        
+        # Find last non-silent chunk (trim end)
+        trim_end = None
+        for i, chunk in enumerate(reversed(chunks)):
+            if chunk.dBFS > threshold_db:
+                # Found audio above threshold
+                # Go forward a bit to include release
+                reverse_idx = len(chunks) - i - 1
+                trim_end = min(duration_s, ((reverse_idx + 1) * chunk_length_ms + min_silence_ms)) / 1000.0
+                break
+        
+        # Validation
+        if trim_start is None:
+            trim_start = 0.0
+        if trim_end is None:
+            trim_end = duration_s
+            
+        # Ensure trim_end > trim_start
+        if trim_end <= trim_start:
+            print(f"   ⚠️ Invalid trim points detected, using full duration")
+            return 0.0, duration_s
+        
+        trim_duration = trim_end - trim_start
+        print(f"   ✂️ Silence detected: {trim_start:.2f}s intro, {(duration_s - trim_end):.2f}s outro")
+        print(f"   🎵 Actual audio duration: {trim_duration:.2f}s (from {duration_s:.2f}s total)")
+        
+        return trim_start, trim_end
+        
+    except Exception as e:
+        print(f"   ❌ Trim detection error: {e}")
+        return None, None
+
+
+def update_track_metadata(track_id: str, bpm: int, key: Optional[str], trim_start: Optional[float] = None, trim_end: Optional[float] = None):
     """Update track in DynamoDB with analysis results"""
     table_name = os.environ.get('TRACK_TABLE_NAME')
     if not table_name:
@@ -243,17 +320,28 @@ def update_track_metadata(track_id: str, bpm: int, key: Optional[str]):
     
     table = dynamodb.Table(table_name)
     
+    # Build update expression dynamically
+    update_parts = ['bpm = :bpm', '#key = :key']
+    attr_names = {'#key': 'key'}
+    attr_values = {':bpm': bpm, ':key': key}
+    
+    # Add trim points if available
+    if trim_start is not None:
+        update_parts.append('trimStart = :trimStart')
+        attr_values[':trimStart'] = trim_start
+    
+    if trim_end is not None:
+        update_parts.append('trimEnd = :trimEnd')
+        attr_values[':trimEnd'] = trim_end
+    
+    update_expression = 'SET ' + ', '.join(update_parts)
+    
     # Don't set updatedAt manually - let Amplify/AppSync handle it automatically
     table.update_item(
         Key={'id': track_id},
-        UpdateExpression='SET bpm = :bpm, #key = :key',
-        ExpressionAttributeNames={
-            '#key': 'key'
-        },
-        ExpressionAttributeValues={
-            ':bpm': bpm,
-            ':key': key
-        }
+        UpdateExpression=update_expression,
+        ExpressionAttributeNames=attr_names,
+        ExpressionAttributeValues=attr_values
     )
     
     print(f"✅ Track {track_id} updated in DynamoDB")
