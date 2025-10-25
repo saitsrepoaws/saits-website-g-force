@@ -52,7 +52,6 @@ function Players() {
 
   useEffect(() => {
     loadPlaylists()
-    loadSampleTrack()
     determineCurrentPlaylist()
   }, [])
 
@@ -126,22 +125,29 @@ function Players() {
     }
   }
 
-  function handleLoad() {
-    if (!currentTrack) {
-      alert('No track available to load')
-      return
+  async function handleLoad() {
+    // Load track from library
+    await loadSampleTrack()
+    
+    if (currentTrack) {
+      setIsLoaded(true)
+      alert(`✅ Track loaded: ${currentTrack.title}`)
     }
-    setIsLoaded(true)
-    alert(`✅ Track loaded: ${currentTrack.title}`)
   }
 
   function handleUnload() {
     if (isPlaying) {
       handleStop()
     }
+    
+    // Clear all track data
     setIsLoaded(false)
+    setCurrentTrack(null)
+    setCoverArtUrl(null)
+    setWaveformUrl(null)
     setCurrentTime(0)
     setDuration(0)
+    
     alert('⏏️ Track unloaded')
   }
 
@@ -294,8 +300,13 @@ function Players() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-8xl">🎵</span>
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
+                      <span className="text-8xl mb-4">🎵</span>
+                      {!currentTrack && (
+                        <p className="text-white/80 text-sm font-semibold">
+                          No track loaded
+                        </p>
+                      )}
                     </div>
                   )}
                   {isPlaying && (
@@ -314,7 +325,7 @@ function Players() {
                     {currentTrack?.title || 'No Track Loaded'}
                   </h3>
                   <p className="text-2xl text-blue-200 mb-4">
-                    {currentTrack?.artist || 'Unknown Artist'}
+                    {currentTrack?.artist || (currentTrack ? 'Unknown Artist' : 'Click LOAD to start')}
                   </p>
                   <div className="flex items-center gap-4 text-sm text-blue-300 mb-6">
                     {currentTrack?.album && <span>💿 {currentTrack.album}</span>}
