@@ -24,8 +24,10 @@ function getClient() {
  */
 export async function listTracks() {
   try {
+    console.log('🔍 Attempting to list tracks...')
+    
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await getClient().models.Track.list({
+    const result = await getClient().models.Track.list({
       selectionSet: [
         'id',
         'artist',
@@ -51,6 +53,11 @@ export async function listTracks() {
         // Skip createdAt/updatedAt - they have datetime format issues from Lambda
       ],
     })
+    
+    console.log('📦 Raw result from GraphQL:', result)
+    
+    const { data, errors } = result
+    
     if (errors) {
       console.error('❌ GraphQL Errors listing tracks:', errors)
       errors.forEach((err: any, i: number) => {
@@ -59,19 +66,27 @@ export async function listTracks() {
           path: err.path,
           errorType: err.errorType,
           errorInfo: err.errorInfo,
-          fullError: JSON.stringify(err, null, 2),
+          locations: err.locations,
+          fullError: err,
         })
       })
       // Still return data if available (partial success), but filter nulls
       const validTracks = (data || []).filter((track: any) => track !== null && track.id)
-      console.log(`✅ Filtered ${data?.length || 0} items → ${validTracks.length} valid tracks`)
+      console.log(`⚠️ Filtered ${data?.length || 0} items → ${validTracks.length} valid tracks`)
       return { data: validTracks, errors }
     }
+    
     // Filter out null tracks (corrupted data)
     const validTracks = (data || []).filter((track: any) => track !== null && track.id)
+    console.log(`✅ Successfully loaded ${validTracks.length} tracks`)
     return { data: validTracks, errors: null }
   } catch (error) {
-    console.error('Failed to list tracks:', error)
+    console.error('❌ Failed to list tracks:', error)
+    console.error('Error details:', {
+      name: (error as any).name,
+      message: (error as any).message,
+      stack: (error as any).stack
+    })
     return { data: [], errors: [error] }
   }
 }
