@@ -62,14 +62,21 @@ function Libery() {
     const loadWaveformUrl = async () => {
       if (selectedTrack && (selectedTrack as any).waveformUrl) {
         try {
+          // Handle legacy URLs
+          let s3Path = (selectedTrack as any).waveformUrl
+          if (s3Path.includes('amazonaws.com')) {
+            const url = new URL(s3Path)
+            s3Path = url.pathname.replace(/^\//, '')
+          }
+          
           const result = await getUrl({
-            path: (selectedTrack as any).waveformUrl,
+            path: s3Path,
             options: {
               expiresIn: 3600, // 1 hour
             },
           })
           setWaveformUrl(result.url.toString())
-          console.log('🌊 Waveform URL loaded:', result.url.toString())
+          console.log('🌊 Waveform URL loaded')
         } catch (error) {
           console.error('Failed to load waveform URL:', error)
           setWaveformUrl(null)
@@ -109,8 +116,15 @@ function Libery() {
       data.map(async (track: any) => {
         if (track.coverArtUrl) {
           try {
+            // Handle legacy URLs
+            let s3Path = track.coverArtUrl
+            if (s3Path.includes('amazonaws.com')) {
+              const url = new URL(s3Path)
+              s3Path = url.pathname.replace(/^\//, '')
+            }
+            
             const result = await getUrl({
-              path: (track as any).coverArtUrl,
+              path: s3Path,
               options: { expiresIn: 3600 },
             })
             urls[track.id] = result.url.toString()
@@ -172,13 +186,14 @@ function Libery() {
         })
 
         // Create track in database
+        // Store S3 key (not presigned URL) so we can generate fresh URLs later
         const { data } = await createTrack({
           artist: item.artist || undefined,
           title: item.title,
           version: item.version || undefined,
           label: item.label || undefined,
           duration: item.duration || undefined,
-          fileUrl: audioResult.url,
+          fileUrl: `public/${audioResult.key}`, // Store S3 path, not presigned URL
           fileSize: audioResult.size,
           format: audioResult.format,
           addedAt: new Date().toISOString(),
@@ -211,8 +226,15 @@ function Libery() {
                   updated.data.map(async (track: any) => {
                     if (track.coverArtUrl) {
                       try {
+                        // Handle legacy URLs
+                        let s3Path = track.coverArtUrl
+                        if (s3Path.includes('amazonaws.com')) {
+                          const url = new URL(s3Path)
+                          s3Path = url.pathname.replace(/^\//, '')
+                        }
+                        
                         const result = await getUrl({
-                          path: track.coverArtUrl,
+                          path: s3Path,
                           options: { expiresIn: 3600 },
                         })
                         urls[track.id] = result.url.toString()
@@ -459,9 +481,23 @@ This action cannot be undone!`
       
       // Get S3 presigned URL for the track
       console.log('🎵 Loading track:', track.title)
-      const result = await getUrl({ path: track.fileUrl })
+      
+      // Handle legacy tracks that might have full URLs stored
+      let s3Path = track.fileUrl
+      if (s3Path.includes('amazonaws.com')) {
+        console.warn('⚠️ Track has old URL format, extracting path...')
+        try {
+          const url = new URL(s3Path)
+          s3Path = url.pathname.replace(/^\//, '') // Remove leading slash
+        } catch (e) {
+          console.error('Failed to parse legacy URL:', e)
+        }
+      }
+      
+      const result = await getUrl({ path: s3Path })
       const url = result.url.toString()
       setAudioUrl(url)
+      console.log('✅ Audio URL generated:', url.substring(0, 100) + '...')
       
       // Create new audio element
       const audio = new Audio(url)
