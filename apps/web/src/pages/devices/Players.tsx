@@ -67,25 +67,36 @@ function Players() {
   useEffect(() => {
     loadPlaylists()
     determineCurrentPlaylist()
-    
-    // Initialize IoT service
-    if (!iotServiceRef.current) {
-      iotServiceRef.current = createRadioPlayerIoT(playerId)
-      
-      // Subscribe to log updates
-      const unsubscribe = iotServiceRef.current.onLog((log) => {
-        setIoTLogs(prev => [log, ...prev.slice(0, 99)]) // Keep last 100, newest first
-      })
-      
-      // Get existing logs
-      setIoTLogs(iotServiceRef.current.getLogs())
-      
-      return () => {
-        unsubscribe()
-        iotServiceRef.current?.cleanup()
-      }
-    }
   }, [])
+
+  // Separate effect for IoT service - always re-subscribe
+  useEffect(() => {
+    console.log('🔌 Setting up IoT service...')
+    
+    // Initialize IoT service if needed
+    if (!iotServiceRef.current) {
+      console.log('🆕 Creating new IoT service')
+      iotServiceRef.current = createRadioPlayerIoT(playerId)
+    }
+    
+    // Always subscribe to log updates (even if service already exists)
+    console.log('📝 Registering log callback')
+    const unsubscribe = iotServiceRef.current.onLog((log) => {
+      console.log('🔔 Log callback triggered!', log.type)
+      setIoTLogs(prev => [log, ...prev.slice(0, 99)])
+    })
+    
+    // Get existing logs
+    const existingLogs = iotServiceRef.current.getLogs()
+    console.log('📚 Loading existing logs:', existingLogs.length)
+    setIoTLogs(existingLogs)
+    
+    // Cleanup: only unsubscribe callback, don't cleanup service
+    return () => {
+      console.log('🧹 Unsubscribing log callback')
+      unsubscribe()
+    }
+  }, [playerId])
 
   // Update clock every second
   useEffect(() => {
