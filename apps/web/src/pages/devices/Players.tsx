@@ -89,7 +89,20 @@ function Players() {
 
   async function loadTrackIntoPlayer(track: any) {
     try {
-      setCurrentTrack(track as Track)
+      // Create a new track object with resolved URLs
+      const resolvedTrack: Track = { ...track }
+      
+      // Load audio URL from S3
+      if (track.audioUrl) {
+        try {
+          const url = await getUrl({ path: track.audioUrl })
+          resolvedTrack.audioUrl = url.url.toString()
+          console.log('Audio URL resolved:', resolvedTrack.audioUrl)
+        } catch (e) {
+          console.error('Audio not found:', e)
+          resolvedTrack.audioUrl = null
+        }
+      }
       
       // Load cover art
       if (track.coverArtUrl) {
@@ -117,8 +130,13 @@ function Players() {
         setWaveformUrl(null)
       }
 
+      // Set the resolved track
+      setCurrentTrack(resolvedTrack)
+      
       // Mark as loaded
       setIsLoaded(true)
+      
+      console.log('Track loaded:', resolvedTrack.title, 'Audio ready:', !!resolvedTrack.audioUrl)
     } catch (error) {
       console.error('Failed to load track:', error)
     }
@@ -176,12 +194,21 @@ function Players() {
     setIsPaused(true)
   }
 
-  function handlePlay() {
-    if (!audioRef.current || !isLoaded) return
+  async function handlePlay() {
+    if (!audioRef.current || !isLoaded) {
+      console.warn('Cannot play: audio not ready or track not loaded')
+      return
+    }
     
-    audioRef.current.play()
-    setIsPlaying(true)
-    setIsPaused(false)
+    try {
+      await audioRef.current.play()
+      setIsPlaying(true)
+      setIsPaused(false)
+      console.log('Playback started')
+    } catch (error) {
+      console.error('Playback failed:', error)
+      alert('⚠️ Playback failed. Audio file may not be available.')
+    }
   }
 
   function togglePlay() {
@@ -527,7 +554,24 @@ function Players() {
               ref={audioRef}
               src={currentTrack.audioUrl}
               onTimeUpdate={handleTimeUpdate}
-              onEnded={() => setIsPlaying(false)}
+              onEnded={() => {
+                setIsPlaying(false)
+                setIsPaused(false)
+                console.log('Track ended')
+              }}
+              onLoadedMetadata={() => {
+                console.log('Audio metadata loaded, duration:', audioRef.current?.duration)
+                if (audioRef.current) {
+                  audioRef.current.volume = volume
+                }
+              }}
+              onError={(e) => {
+                console.error('Audio error:', e)
+                alert('⚠️ Failed to load audio file')
+              }}
+              onCanPlay={() => {
+                console.log('Audio ready to play')
+              }}
             />
           )}
         </div>
