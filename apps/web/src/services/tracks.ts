@@ -25,7 +25,31 @@ function getClient() {
 export async function listTracks() {
   try {
     // @ts-ignore - Track model exists at runtime
-    const { data, errors } = await getClient().models.Track.list()
+    const { data, errors } = await getClient().models.Track.list({
+      selectionSet: [
+        'id',
+        'artist',
+        'title',
+        'version',
+        'label',
+        'genre',
+        'year',
+        'duration',
+        'fileUrl',
+        'fileSize',
+        'format',
+        'addedAt',
+        'bpm',
+        'key',
+        'energy',
+        'danceability',
+        'valence',
+        'coverArtUrl',
+        'waveformUrl',
+        'createdAt',
+        'updatedAt',
+      ],
+    })
     if (errors) {
       console.error('❌ GraphQL Errors listing tracks:', errors)
       errors.forEach((err: any, i: number) => {
@@ -34,9 +58,11 @@ export async function listTracks() {
           path: err.path,
           errorType: err.errorType,
           errorInfo: err.errorInfo,
+          fullError: JSON.stringify(err, null, 2),
         })
       })
-      return { data: [], errors }
+      // Still return data if available (partial success)
+      return { data: data || [], errors }
     }
     return { data: data || [], errors: null }
   } catch (error) {

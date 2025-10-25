@@ -77,7 +77,13 @@ function Libery() {
 
   const loadTracksFromDB = async () => {
     setIsLoadingTracks(true)
-    const { data } = await listTracks()
+    const { data, errors } = await listTracks()
+    
+    if (errors && errors.length > 0) {
+      console.warn('⚠️ GraphQL errors occurred, but got', data.length, 'tracks')
+      console.warn('💡 TIP: Try hard refresh (Cmd+Shift+R) to clear cache')
+    }
+    
     console.log('📊 Loaded tracks from DB:', data)
     console.log('📊 First track audio features:', data[0] ? {
       bpm: data[0].bpm,
