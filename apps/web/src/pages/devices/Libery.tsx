@@ -251,20 +251,74 @@ function Libery() {
   }
 
   const handleDeleteTrack = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this track?')) return
+    const track = tracks.find(t => t.id === id)
+    if (!track) return
+    
+    const confirmMsg = `Are you sure you want to delete "${track.title}"?\n\nThis will permanently remove:
+- Track metadata
+- Audio file from S3
+- Cover art
+- Waveform
+    
+This action cannot be undone!`
+    
+    if (!confirm(confirmMsg)) return
+    
+    console.log(`🗑️ Deleting track: ${track.title} (${id})`)
     
     try {
+      // Delete from DynamoDB via GraphQL
       const result = await deleteTrack(id)
-      if (result.data || !result.errors) {
-        setTracks(tracks.filter((t) => t.id !== id))
-        console.log('Track deleted successfully')
-      } else {
-        console.error('Failed to delete track:', result.errors)
-        alert('Failed to delete track. Please try again.')
+      
+      if (result.errors) {
+        console.error('❌ GraphQL delete errors:', result.errors)
+        alert(`Failed to delete track: ${result.errors[0]?.message || 'Unknown error'}`)
+        return
       }
+      
+      // Delete S3 files (audio, cover art, waveform)
+      console.log('🗑️ Deleting S3 files...')
+      const { remove } = await import('aws-amplify/storage')
+      
+      const deletePromises = []
+      
+      // Delete audio file
+      if (track.fileUrl) {
+        const audioPath = track.fileUrl.replace('public/', '')
+        deletePromises.push(
+          remove({ path: audioPath })
+            .then(() => console.log('✅ Deleted audio file'))
+            .catch((err) => console.warn('⚠️ Failed to delete audio:', err))
+        )
+      }
+      
+      // Delete cover art
+      if ((track as any).coverArtUrl) {
+        deletePromises.push(
+          remove({ path: (track as any).coverArtUrl })
+            .then(() => console.log('✅ Deleted cover art'))
+            .catch((err) => console.warn('⚠️ Failed to delete cover art:', err))
+        )
+      }
+      
+      // Delete waveform
+      if ((track as any).waveformUrl) {
+        deletePromises.push(
+          remove({ path: (track as any).waveformUrl })
+            .then(() => console.log('✅ Deleted waveform'))
+            .catch((err) => console.warn('⚠️ Failed to delete waveform:', err))
+        )
+      }
+      
+      await Promise.allSettled(deletePromises)
+      
+      // Update local state
+      setTracks(tracks.filter((t) => t.id !== id))
+      console.log('✅ Track deleted successfully!')
+      
     } catch (error) {
-      console.error('Error deleting track:', error)
-      alert('Failed to delete track. Please try again.')
+      console.error('❌ Error deleting track:', error)
+      alert(`Failed to delete track: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
