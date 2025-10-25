@@ -28,6 +28,14 @@ function Libery() {
   const [isLoadingTracks, setIsLoadingTracks] = useState(false)
   const [showAddTrack, setShowAddTrack] = useState(false)
   
+  // Audio Player State
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  
   // Multi-file upload state
   const [uploadQueue, setUploadQueue] = useState<FileUploadItem[]>([])
   const [isUploading, setIsUploading] = useState(false)
@@ -427,6 +435,88 @@ This action cannot be undone!`
     }
   }
 
+  // Audio Player Functions
+  const handlePlayTrack = async (track: Track) => {
+    try {
+      // If clicking same track, toggle play/pause
+      if (playingTrackId === track.id && audioElement) {
+        if (isPlaying) {
+          audioElement.pause()
+          setIsPlaying(false)
+        } else {
+          await audioElement.play()
+          setIsPlaying(true)
+        }
+        return
+      }
+      
+      // Stop current audio if playing
+      if (audioElement) {
+        audioElement.pause()
+        audioElement.currentTime = 0
+      }
+      
+      // Get S3 URL for the track
+      console.log('🎵 Loading track:', track.title)
+      const url = await getUrl({ path: track.fileUrl })
+      setAudioUrl(url.url.toString())
+      
+      // Create new audio element
+      const audio = new Audio(url.url.toString())
+      
+      // Event listeners
+      audio.addEventListener('loadedmetadata', () => {
+        setDuration(audio.duration)
+        console.log(`✅ Loaded: ${track.title} (${audio.duration}s)`)
+      })
+      
+      audio.addEventListener('timeupdate', () => {
+        setCurrentTime(audio.currentTime)
+      })
+      
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false)
+        setCurrentTime(0)
+      })
+      
+      audio.addEventListener('error', (e) => {
+        console.error('❌ Audio error:', e)
+        alert('Failed to load audio file')
+        setPlayingTrackId(null)
+        setIsPlaying(false)
+      })
+      
+      setAudioElement(audio)
+      setPlayingTrackId(track.id)
+      
+      // Start playing
+      await audio.play()
+      setIsPlaying(true)
+      
+    } catch (error) {
+      console.error('❌ Error playing track:', error)
+      alert('Failed to play track')
+    }
+  }
+  
+  const handleStopTrack = () => {
+    if (audioElement) {
+      audioElement.pause()
+      audioElement.currentTime = 0
+    }
+    setPlayingTrackId(null)
+    setIsPlaying(false)
+    setCurrentTime(0)
+    setDuration(0)
+  }
+  
+  const handleSeek = (time: number) => {
+    if (audioElement) {
+      audioElement.currentTime = time
+      setCurrentTime(time)
+    }
+  }
+
   const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -741,10 +831,10 @@ This action cannot be undone!`
 
                 {/* Track Rows */}
                 {filteredTracks.map((track) => (
-                  <div
-                    key={track.id}
-                    className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
-                  >
+                  <div key={track.id}>
+                    <div
+                      className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
+                    >
                     {/* Cover Art */}
                     <div>
                       {coverArtUrls[track.id] ? (
@@ -798,6 +888,18 @@ This action cannot be undone!`
                       {track.label || '-'}
                     </div>
                     <div className="text-right flex gap-1 justify-end">
+                      {/* Play Button */}
+                      <button
+                        onClick={() => handlePlayTrack(track)}
+                        className={`px-2 py-1 text-xs rounded ${
+                          playingTrackId === track.id
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                            : 'text-green-600 hover:bg-green-50'
+                        }`}
+                        title={playingTrackId === track.id ? (isPlaying ? 'Pause' : 'Resume') : 'Play'}
+                      >
+                        {playingTrackId === track.id ? (isPlaying ? '⏸️' : '▶️') : '▶️'}
+                      </button>
                       <button
                         onClick={() => {
                           console.log('🎵 Opening track info for:', track.title)
@@ -825,6 +927,128 @@ This action cannot be undone!`
                       </button>
                     </div>
                   </div>
+
+                  {/* Inline Audio Player */}
+                  {playingTrackId === track.id && (
+                    <div className="border border-gray-200 border-t-0 rounded-b-lg p-4 bg-gradient-to-r from-green-50 to-blue-50 animate-slideDown">
+                      <div className="flex items-center gap-4">
+                        {/* Playback Controls */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handlePlayTrack(track)}
+                            className="w-10 h-10 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full shadow-md transition-all"
+                            title={isPlaying ? 'Pause' : 'Play'}
+                          >
+                            {isPlaying ? (
+                              <span className="text-lg">⏸️</span>
+                            ) : (
+                              <span className="text-lg">▶️</span>
+                            )}
+                          </button>
+                          <button
+                            onClick={handleStopTrack}
+                            className="w-8 h-8 flex items-center justify-center bg-white hover:bg-gray-100 rounded-full shadow-sm"
+                            title="Stop"
+                          >
+                            <span className="text-sm">⏹️</span>
+                          </button>
+                        </div>
+
+                        {/* Track Info */}
+                        <div className="flex-shrink-0">
+                          <div className="text-sm font-semibold text-gray-900">
+                            {track.artist} - {track.title}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {formatDuration(currentTime)} / {formatDuration(duration || track.duration || 0)}
+                          </div>
+                        </div>
+
+                        {/* Timeline Scrubber */}
+                        <div className="flex-1">
+                          <div className="relative group">
+                            {/* Progress Bar Background */}
+                            <div className="h-2 bg-gray-300 rounded-full overflow-hidden cursor-pointer"
+                              onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect()
+                                const x = e.clientX - rect.left
+                                const percentage = x / rect.width
+                                const newTime = percentage * duration
+                                handleSeek(newTime)
+                              }}
+                            >
+                              {/* Progress Fill */}
+                              <div
+                                className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all"
+                                style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+                              />
+                            </div>
+
+                            {/* Trim Point Markers */}
+                            {(track as any).trimStart !== undefined && (track as any).trimEnd !== undefined && track.duration && (
+                              <>
+                                {/* Trim Start Marker */}
+                                <div
+                                  className="absolute top-0 w-0.5 h-4 bg-green-600 shadow-lg"
+                                  style={{
+                                    left: `${((track as any).trimStart / track.duration) * 100}%`,
+                                    transform: 'translateX(-50%)',
+                                  }}
+                                  title={`Cue In: ${formatDuration((track as any).trimStart)}`}
+                                />
+                                {/* Trim End Marker */}
+                                <div
+                                  className="absolute top-0 w-0.5 h-4 bg-red-600 shadow-lg"
+                                  style={{
+                                    left: `${((track as any).trimEnd / track.duration) * 100}%`,
+                                    transform: 'translateX(-50%)',
+                                  }}
+                                  title={`Cue Out: ${formatDuration((track as any).trimEnd)}`}
+                                />
+                              </>
+                            )}
+
+                            {/* Playhead */}
+                            <div
+                              className="absolute top-1/2 w-3 h-3 bg-white border-2 border-blue-600 rounded-full shadow-lg transform -translate-y-1/2 -translate-x-1/2 group-hover:scale-125 transition-transform"
+                              style={{ left: `${duration ? (currentTime / duration) * 100 : 0}%` }}
+                            />
+                          </div>
+
+                          {/* Time Markers */}
+                          <div className="flex justify-between mt-1 text-xs text-gray-500">
+                            <span>0:00</span>
+                            {(track as any).trimStart !== undefined && (
+                              <span className="text-green-600" title="Cue In">
+                                ▼ {formatDuration((track as any).trimStart)}
+                              </span>
+                            )}
+                            {(track as any).trimEnd !== undefined && (
+                              <span className="text-red-600" title="Cue Out">
+                                {formatDuration((track as any).trimEnd)} ▼
+                              </span>
+                            )}
+                            <span>{formatDuration(track.duration || 0)}</span>
+                          </div>
+                        </div>
+
+                        {/* BPM & Key Display */}
+                        <div className="flex-shrink-0 text-right">
+                          {track.bpm && track.bpm > 0 && (
+                            <div className="text-sm font-semibold text-blue-700">
+                              {track.bpm} BPM
+                            </div>
+                          )}
+                          {(track as any).key && (
+                            <div className="text-xs text-indigo-600">
+                              {(track as any).key}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 ))}
               </div>
             )}
