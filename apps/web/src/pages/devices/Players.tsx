@@ -149,19 +149,43 @@ function Players() {
   }
 
   async function handleLoad() {
-    // Load track from library
+    // Load first track from current playlist
+    if (!currentPlaylistId) {
+      alert('⚠️ No playlist selected')
+      return
+    }
+
     try {
-      const { data: tracks } = await listTracks()
-      if (tracks && tracks.length > 0) {
-        const track = tracks[0]
-        await loadTrackIntoPlayer(track)
-        alert(`✅ Track loaded: ${track.title}`)
-      } else {
-        alert('⚠️ No tracks available to load')
+      // Get playlist with tracks
+      const { getPlaylist } = await import('../../services/playlists')
+      const { data: playlist } = await getPlaylist(currentPlaylistId)
+      
+      if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
+        alert('⚠️ Playlist is empty')
+        return
+      }
+
+      // Sort by position and get first track
+      const sortedTracks = [...playlist.tracks].sort((a: any, b: any) => a.position - b.position)
+      const firstPlaylistTrack = sortedTracks[0]
+
+      console.log('Loading track #1 from playlist:', firstPlaylistTrack)
+
+      // Load the actual track data
+      if (firstPlaylistTrack.trackId) {
+        const { data: tracks } = await listTracks()
+        const track = tracks?.find((t: any) => t.id === firstPlaylistTrack.trackId)
+        
+        if (track) {
+          await loadTrackIntoPlayer(track)
+          alert(`✅ Track #1 loaded from playlist: ${track.title}`)
+        } else {
+          alert('⚠️ Track not found')
+        }
       }
     } catch (error) {
-      console.error('Failed to load track:', error)
-      alert('❌ Failed to load track')
+      console.error('Failed to load track from playlist:', error)
+      alert('❌ Failed to load track from playlist')
     }
   }
 
