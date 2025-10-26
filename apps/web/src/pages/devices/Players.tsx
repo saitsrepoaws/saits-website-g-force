@@ -8,10 +8,11 @@ import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
 import { loadTrackAssets, resolveAudioUrl, formatTime } from '../../services/playerService'
+import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
 import { PlayerState } from '../../types/player'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
-import type { ScheduleSlot } from '../../utils/scheduleCalculator'
+import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
 import type { Track } from '../../services/playerService'
 
 // Mock schedule - later vervangen met echte data
@@ -49,6 +50,7 @@ function Players() {
   // Schedule & Current Track
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([])
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
+  const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
 
   useEffect(() => {
     loadPlaylists()

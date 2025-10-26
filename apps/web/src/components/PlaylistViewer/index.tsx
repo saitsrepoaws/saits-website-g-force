@@ -25,6 +25,7 @@ interface SortableTrackRowProps {
   showDragHandle?: boolean
   showDelete?: boolean
   compact?: boolean
+  isHighlighted?: boolean
 }
 
 function SortableTrackRow({ 
@@ -42,7 +43,8 @@ function SortableTrackRow({
   onRemove,
   showDragHandle = true,
   showDelete = true,
-  compact = false
+  compact = false,
+  isHighlighted = false
 }: SortableTrackRowProps) {
   const {
     attributes,
@@ -68,8 +70,12 @@ function SortableTrackRow({
           compact 
             ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
             : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'
-        } gap-3 items-center p-3 border border-gray-200 rounded-lg ${
-          isDragging ? 'bg-blue-50 shadow-lg z-10' : 'hover:bg-gray-50'
+        } gap-3 items-center p-3 border rounded-lg ${
+          isHighlighted 
+            ? 'bg-green-100 border-green-400 shadow-md' 
+            : isDragging 
+              ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
+              : 'border-gray-200 hover:bg-gray-50'
         } transition-colors`}
       >
       {showDragHandle && (
@@ -277,6 +283,9 @@ export interface PlaylistViewerProps {
   allowRemove?: boolean
   allowPlay?: boolean
   
+  // Highlight
+  highlightTrackId?: string | null
+  
   // Callbacks
   onTrackSelect?: (track: PlaylistTrackItem) => void
   onTrackRemove?: (trackId: string) => void
@@ -297,6 +306,7 @@ export function PlaylistViewer({
   allowReorder = true,
   allowRemove = true,
   allowPlay = true,
+  highlightTrackId = null,
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
@@ -588,6 +598,7 @@ export function PlaylistViewer({
                       showDragHandle={showDragHandle && allowReorder}
                       showDelete={showDelete && allowRemove}
                       compact={compact}
+                      isHighlighted={highlightTrackId === track.trackId}
                     />
                   ))}
                 </SortableContext>
