@@ -2,15 +2,18 @@ import { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
+import IoTLogPanel from '../../components/IoTLogPanel'
+import SchedulePlaylist from '../../components/SchedulePlaylist'
+import PlayerDisplay from '../../components/PlayerDisplay'
 import { listPlaylists } from '../../services/playlists'
 import { getUrl } from 'aws-amplify/storage'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
 import { PlayerState } from '../../types/player'
-import { findActiveSlot, calculateCurrentTrack, formatDuration } from '../../utils/scheduleCalculator'
+import { findActiveSlot } from '../../utils/scheduleCalculator'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
-import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
+import type { ScheduleSlot } from '../../utils/scheduleCalculator'
 
 interface Track {
   id: string
@@ -65,8 +68,6 @@ function Players() {
   // Schedule & Current Track
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([])
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
-  const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
-  const [showScheduleHistory, setShowScheduleHistory] = useState(false)
 
   useEffect(() => {
     loadPlaylists()
@@ -1051,69 +1052,13 @@ function Players() {
 
       {/* IoT Log - Right Column */}
       <div className="lg:col-span-1">
-        <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden sticky top-6 max-h-[calc(100vh-8rem)]">
-          <div className="px-4 py-3 bg-gray-800 border-b border-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm font-semibold text-white">📡 IoT Log</h3>
-                <p className="text-xs text-gray-400 mt-0.5">{iotLogs.length} messages</p>
-              </div>
-              <button
-                onClick={() => {
-                  iotServiceRef.current?.clearLogs()
-                  setIoTLogs([])
-                }}
-                className="px-2 py-1 text-xs bg-gray-700 text-white rounded hover:bg-gray-600"
-              >
-                🧹
-              </button>
-            </div>
-          </div>
-
-          <div className="p-3 h-[calc(100vh-12rem)] overflow-y-auto">
-            {iotLogs.length === 0 ? (
-              <div className="text-center text-gray-500 py-8 text-sm">
-                No messages yet
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {iotLogs.map((log, index) => (
-                  <div
-                    key={index}
-                    className={`p-2 rounded text-xs border-l-2 ${
-                      log.direction === 'OUT' 
-                        ? 'bg-blue-900/20 border-blue-500' 
-                        : 'bg-green-900/20 border-green-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                        log.direction === 'OUT' 
-                          ? 'text-blue-400 bg-blue-900/30' 
-                          : 'text-green-400 bg-green-900/30'
-                      }`}>
-                        {log.direction === 'OUT' ? '📤' : '📥'}
-                      </span>
-                      <span className="text-[10px] text-gray-500">
-                        {new Date(log.timestamp).toLocaleTimeString('nl-NL', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-gray-400 mb-1 truncate">
-                      {log.topic}
-                    </div>
-                    <pre className="text-[10px] text-gray-300 overflow-x-auto whitespace-pre-wrap break-all">
-                      {JSON.stringify(log.message, null, 1)}
-                    </pre>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        <IoTLogPanel
+          logs={iotLogs}
+          onClearLogs={() => {
+            iotServiceRef.current?.clearLogs()
+            setIoTLogs([])
+          }}
+        />
       </div>
     </div>
 
@@ -1136,59 +1081,7 @@ function Players() {
 
         {/* Current Playlist from Schedule */}
         {activeSlot && activeSlot.playlistId && (
-          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-lg overflow-hidden border border-purple-200">
-            <div className="p-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                    <span className="text-3xl">📻</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white text-lg">Now Playing Schedule</h3>
-                    <p className="text-white/80 text-sm">{activeSlot.name}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-sm font-bold text-gray-800 shadow-lg">
-                    ⏰ {activeSlot.time}
-                  </div>
-                  <div className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-sm font-bold text-white shadow-lg border border-white/30">
-                    ⏱️ {activeSlot.duration}m
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20 mt-3">
-                <div className="text-lg font-bold text-white mb-1">
-                  {playlists.find(p => p.id === activeSlot.playlistId)?.name || 'Loading...'}
-                </div>
-                <div className="flex items-center gap-3 text-sm text-white/90">
-                  <span className="flex items-center gap-1">
-                    <span className="text-green-300">▶️</span>
-                    Auto-loaded from schedule
-                  </span>
-                  <span className="text-white/50">•</span>
-                  <span className="flex items-center gap-1">
-                    🎧 Click track to preview
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white">
-              <PlaylistViewer
-                playlistId={activeSlot.playlistId}
-                compact={true}
-                maxHeight="400px"
-                showHeader={false}
-                showDragHandle={false}
-                allowReorder={false}
-                allowRemove={false}
-                allowPlay={true}
-                containerClassName=""
-              />
-            </div>
-          </div>
+          <SchedulePlaylist activeSlot={activeSlot} playlists={playlists} />
         )}
       </div>
 
