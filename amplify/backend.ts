@@ -5,6 +5,9 @@ import { storage } from './storage/resource'
 import { audioMetadata } from './functions/audio-metadata/resource'
 import { waveformGenerator } from './functions/waveform-generator/resource'
 import { playlistGenerator } from './functions/playlist-generator/resource'
+import { playerLoadHandler } from './functions/player-load-handler/resource'
+import { playerIotPublisher } from './functions/player-iot-publisher/resource'
+import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
@@ -17,6 +20,11 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import * as iam from 'aws-cdk-lib/aws-iam'
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions'
+import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks'
+import * as iot from 'aws-cdk-lib/aws-iot'
+import * as fs from 'fs'
+import * as path from 'path'
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -26,6 +34,9 @@ export const backend = defineBackend({
   audioMetadata,
   waveformGenerator,
   playlistGenerator,
+  playerLoadHandler,
+  playerIotPublisher,
+  playerSimpleHandler,
   // audioAnalyzer - replaced with container Lambda below
 })
 
@@ -191,4 +202,89 @@ new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
   value: cloudFrontDistribution.distributionId,
   description: 'CloudFront distribution ID',
   exportName: 'StorageCloudFrontDistributionId',
+})
+
+// =============================================================================
+// Player State Machine Setup
+// =============================================================================
+
+// Get Lambda functions for State Machine
+const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
+const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
+const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
+
+// Grant DynamoDB access to load handler
+backend.playerLoadHandler.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
+backend.playerLoadHandler.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+playlistTable.grantReadData(loadHandlerLambda)
+trackTable.grantReadData(loadHandlerLambda)
+
+// Grant IoT publish permission to IoT publisher
+iotPublisherLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/player/*/command'],
+  })
+)
+
+// Read State Machine definition
+const stateMachineDefinitionPath = path.join(__dirname, 'functions/state-machine/definition.asl.json')
+const stateMachineDefinitionRaw = fs.readFileSync(stateMachineDefinitionPath, 'utf-8')
+
+// Replace placeholders with actual Lambda ARNs
+const stateMachineDefinition = stateMachineDefinitionRaw
+  .replace(/\$\{LoadCommandHandlerArn\}/g, loadHandlerLambda.functionArn)
+  .replace(/\$\{PublishIoTCommandArn\}/g, iotPublisherLambda.functionArn)
+  .replace(/\$\{SimpleCommandHandlerArn\}/g, simpleHandlerLambda.functionArn)
+  .replace(/\$\{PlayCommandHandlerArn\}/g, simpleHandlerLambda.functionArn)
+
+// Create State Machine
+const playerStateMachine = new sfn.StateMachine(backend.storage.stack, 'PlayerStateMachine', {
+  stateMachineName: 'RadioPlayerStateMachine',
+  definitionBody: sfn.DefinitionBody.fromString(stateMachineDefinition),
+  timeout: Duration.minutes(5),
+})
+
+// Grant State Machine permission to invoke Lambdas
+loadHandlerLambda.grantInvoke(playerStateMachine)
+iotPublisherLambda.grantInvoke(playerStateMachine)
+simpleHandlerLambda.grantInvoke(playerStateMachine)
+
+// Create IoT Rule to trigger State Machine
+const iotRuleRole = new iam.Role(backend.storage.stack, 'IoTRuleRole', {
+  assumedBy: new ServicePrincipal('iot.amazonaws.com'),
+})
+
+playerStateMachine.grantStartExecution(iotRuleRole)
+
+const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule', {
+  ruleName: 'RadioPlayerCommandRule',
+  topicRulePayload: {
+    sql: "SELECT * FROM 'radio/player/+/command'",
+    description: 'Trigger State Machine for player commands',
+    actions: [
+      {
+        stepFunctions: {
+          stateMachineName: playerStateMachine.stateMachineName,
+          executionNamePrefix: 'player-cmd-',
+          roleArn: iotRuleRole.roleArn,
+        } as any, // Type assertion for CDK compatibility
+      },
+    ],
+    awsIotSqlVersion: '2016-03-23',
+  },
+})
+
+// Output State Machine ARN
+new CfnOutput(backend.storage.stack, 'PlayerStateMachineArn', {
+  value: playerStateMachine.stateMachineArn,
+  description: 'ARN of the Player State Machine',
+  exportName: 'PlayerStateMachineArn',
+})
+
+new CfnOutput(backend.storage.stack, 'IoTRuleArn', {
+  value: `arn:aws:iot:${backend.storage.stack.region}:${backend.storage.stack.account}:rule/${iotRule.ruleName}`,
+  description: 'ARN of the IoT Rule for player commands',
+  exportName: 'PlayerCommandIoTRuleArn',
 })
