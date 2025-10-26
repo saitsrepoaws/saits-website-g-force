@@ -231,7 +231,7 @@ function Players() {
       console.log('✅ Playlist data received:', playlistData)
       
       if (!playlistData?.tracks) {
-        console.error('❌ Playlist has no tracks')
+        console.error('❌ Playlist has no tracks field')
         alert('⚠️ Playlist has no tracks')
         await iotServiceRef.current?.publishState(PlayerState.ERROR, {
           error: 'Playlist has no tracks'
@@ -239,10 +239,40 @@ function Players() {
         return
       }
 
-      console.log('📊 Playlist has', playlistData.tracks.length, 'tracks')
+      // Parse tracks from JSON string
+      console.log('📋 Raw tracks data:', playlistData.tracks)
+      let parsedTracks: any[] = []
+      
+      try {
+        if (typeof playlistData.tracks === 'string') {
+          parsedTracks = JSON.parse(playlistData.tracks)
+          console.log('✅ Parsed tracks from JSON string')
+        } else if (Array.isArray(playlistData.tracks)) {
+          parsedTracks = playlistData.tracks
+          console.log('✅ Tracks already an array')
+        }
+      } catch (e) {
+        console.error('❌ Failed to parse tracks:', e)
+        alert('⚠️ Failed to parse playlist tracks')
+        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+          error: 'Failed to parse playlist tracks'
+        })
+        return
+      }
+
+      if (parsedTracks.length === 0) {
+        console.error('❌ Playlist has no tracks')
+        alert('⚠️ Playlist is empty')
+        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+          error: 'Playlist is empty'
+        })
+        return
+      }
+
+      console.log('📊 Playlist has', parsedTracks.length, 'tracks')
 
       // Sort tracks by order (ascending)
-      const sortedTracks = [...playlistData.tracks].sort((a, b) => {
+      const sortedTracks = [...parsedTracks].sort((a, b) => {
         return (a.order ?? 0) - (b.order ?? 0)
       })
 
