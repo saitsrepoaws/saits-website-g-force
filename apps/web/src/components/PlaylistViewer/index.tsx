@@ -27,6 +27,7 @@ interface SortableTrackRowProps {
   compact?: boolean
   trackStatus?: 'past' | 'current' | 'future'
   scheduledTime?: { start: string; end: string } | null
+  isLoadedInPlayer?: boolean
 }
 
 function SortableTrackRow({ 
@@ -46,7 +47,8 @@ function SortableTrackRow({
   showDelete = true,
   compact = false,
   trackStatus,
-  scheduledTime
+  scheduledTime,
+  isLoadedInPlayer = false
 }: SortableTrackRowProps) {
   const {
     attributes,
@@ -73,15 +75,17 @@ function SortableTrackRow({
             ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
             : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,150px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
-          trackStatus === 'current'
-            ? 'bg-purple-100 border-purple-400 shadow-md' 
-            : trackStatus === 'future'
-              ? 'bg-green-50 border-green-300'
-              : trackStatus === 'past'
-                ? 'bg-gray-100 border-gray-300 opacity-60'
-                : isDragging 
-                  ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
-                  : 'border-gray-200 hover:bg-gray-50'
+          isLoadedInPlayer
+            ? 'bg-orange-100 border-orange-400 shadow-md' 
+            : trackStatus === 'current'
+              ? 'bg-purple-100 border-purple-400 shadow-md' 
+              : trackStatus === 'future'
+                ? 'bg-green-50 border-green-300'
+                : trackStatus === 'past'
+                  ? 'bg-gray-100 border-gray-300 opacity-60'
+                  : isDragging 
+                    ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
+                    : 'border-gray-200 hover:bg-gray-50'
         } transition-colors`}
       >
       {showDragHandle && (
@@ -300,6 +304,7 @@ export interface PlaylistViewerProps {
   highlightTrackId?: string | null
   currentTrackIndex?: number | null
   scheduleSlot?: { time: string; duration: number } | null
+  loadedTrackId?: string | null
   
   // Callbacks
   onTrackSelect?: (track: PlaylistTrackItem) => void
@@ -325,6 +330,7 @@ export function PlaylistViewer({
   highlightTrackId = null,
   currentTrackIndex = null,
   scheduleSlot = null,
+  loadedTrackId = null,
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
@@ -669,6 +675,7 @@ export function PlaylistViewer({
                           compact={compact}
                           trackStatus={trackStatus}
                           scheduledTime={scheduledTime}
+                          isLoadedInPlayer={loadedTrackId === track.trackId}
                         />
                       )
 

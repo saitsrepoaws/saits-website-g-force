@@ -1020,6 +1020,7 @@ function Players() {
               highlightTrackId={scheduledTrackId}
               currentTrackIndex={currentTrackInfo?.trackIndex ?? null}
               scheduleSlot={activeSlot ? { time: activeSlot.time, duration: activeSlot.duration } : null}
+              loadedTrackId={currentTrack?.id ?? null}
               onTracksLoaded={(tracks) => {
                 console.log('📋 Playlist tracks loaded:', tracks.length)
                 setPlaylistTracksCache(tracks)
