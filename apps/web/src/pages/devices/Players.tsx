@@ -3,8 +3,6 @@ import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
 import IoTLogPanel from '../../components/IoTLogPanel'
-import SchedulePlaylist from '../../components/SchedulePlaylist'
-import PlayerDisplay from '../../components/PlayerDisplay'
 import { listPlaylists } from '../../services/playlists'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
@@ -986,27 +984,6 @@ function Players() {
       </div>
     </div>
 
-    {!currentPlaylistId && playlists.length > 0 && (
-      <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-        <p className="text-gray-500 mb-4">No scheduled playlist for current time</p>
-        <select
-          onChange={(e) => setCurrentPlaylistId(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg"
-        >
-          <option value="">Select a playlist...</option>
-          {playlists.map(playlist => (
-            <option key={playlist.id} value={playlist.id}>
-              {playlist.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    )}
-
-    {/* Current Playlist from Schedule */}
-    {activeSlot && activeSlot.playlistId && (
-      <SchedulePlaylist activeSlot={activeSlot} playlists={playlists} />
-    )}
   </div>
 
   {/* IoT Log Modal - Keep for optional full screen view */}
