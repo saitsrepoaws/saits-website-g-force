@@ -1,60 +1,28 @@
 /**
  * Player IoT Publisher
  * 
- * Publishes messages to AWS IoT Core
- * Used by State Machine to send command responses back to players
+ * TEMPORARY MOCK - Logs instead of publishing
+ * TODO: Implement real IoT publishing once bundling issues are resolved
  */
 
-import { IoTDataPlane } from '@aws-sdk/client-iot-data-plane'
-
-const iotClient = new IoTDataPlane({})
-
-interface PublishEvent {
-  topic: string
-  message: any
-}
-
-interface PublishResponse {
-  success: boolean
-  topic?: string
-  error?: string
-}
-
-export const handler = async (event: PublishEvent): Promise<PublishResponse> => {
-  console.log('📤 IoT Publisher invoked:', JSON.stringify(event, null, 2))
+export const handler = async (event: any) => {
+  console.log('📤 IoT Publisher (MOCK) invoked:', JSON.stringify(event, null, 2))
 
   const { topic, message } = event
 
   if (!topic || !message) {
-    console.error('❌ Missing topic or message')
     return {
       success: false,
       error: 'Missing topic or message parameter'
     }
   }
 
-  try {
-    // Publish to IoT Core
-    console.log(`📡 Publishing to topic: ${topic}`)
-    
-    await iotClient.publish({
-      topic: topic,
-      payload: new TextEncoder().encode(JSON.stringify(message)),
-      qos: 1 // At least once delivery
-    })
-
-    console.log('✅ Message published successfully')
-    
-    return {
-      success: true,
-      topic: topic
-    }
-
-  } catch (error) {
-    console.error('❌ Error publishing to IoT:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : String(error)
-    }
+  // MOCK: Just log instead of publishing
+  console.log(`📡 MOCK Publishing to topic: ${topic}`)
+  console.log(`📝 Message:`, JSON.stringify(message, null, 2))
+  
+  return {
+    success: true,
+    topic: topic
   }
 }
