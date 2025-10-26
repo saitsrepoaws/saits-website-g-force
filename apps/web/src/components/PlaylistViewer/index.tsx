@@ -26,6 +26,7 @@ interface SortableTrackRowProps {
   showDelete?: boolean
   compact?: boolean
   trackStatus?: 'past' | 'current' | 'future'
+  scheduledTime?: { start: string; end: string } | null
 }
 
 function SortableTrackRow({ 
@@ -44,7 +45,8 @@ function SortableTrackRow({
   showDragHandle = true,
   showDelete = true,
   compact = false,
-  trackStatus
+  trackStatus,
+  scheduledTime
 }: SortableTrackRowProps) {
   const {
     attributes,
@@ -69,7 +71,7 @@ function SortableTrackRow({
         className={`grid ${
           compact 
             ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
-            : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'
+            : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,120px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
           trackStatus === 'current'
             ? 'bg-purple-100 border-purple-400 shadow-md' 
@@ -167,6 +169,13 @@ function SortableTrackRow({
             {track.trackDuration ? formatDuration(track.trackDuration) : '-'}
           </div>
         </>
+      )}
+
+      {/* Scheduled Time */}
+      {!compact && scheduledTime && (
+        <div className="text-xs font-mono text-gray-700 bg-blue-50 px-2 py-1 rounded border border-blue-200">
+          {scheduledTime.start} - {scheduledTime.end}
+        </div>
       )}
       
       {/* Play Button */}
@@ -290,6 +299,7 @@ export interface PlaylistViewerProps {
   // Highlight
   highlightTrackId?: string | null
   currentTrackIndex?: number | null
+  scheduleSlot?: { time: string; duration: number } | null
   
   // Callbacks
   onTrackSelect?: (track: PlaylistTrackItem) => void
@@ -314,6 +324,7 @@ export function PlaylistViewer({
   allowPlay = true,
   highlightTrackId = null,
   currentTrackIndex = null,
+  scheduleSlot = null,
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
@@ -326,6 +337,7 @@ export function PlaylistViewer({
   const [isLoading, setIsLoading] = useState(true)
   const [allTracks, setAllTracks] = useState<Track[]>([])
   const [coverArtUrls, setCoverArtUrls] = useState<Record<string, string>>({})
+  const [showPastTracks, setShowPastTracks] = useState(false)
 
   // Audio Player State
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
@@ -593,41 +605,109 @@ export function PlaylistViewer({
                   items={playlistTracks.map(t => t.trackId)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {playlistTracks.map((track, index) => {
-                    // Determine track status based on currentTrackIndex
-                    let trackStatus: 'past' | 'current' | 'future' | undefined
-                    if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
-                      if (index < currentTrackIndex) {
-                        trackStatus = 'past'
-                      } else if (index === currentTrackIndex) {
-                        trackStatus = 'current'
-                      } else {
-                        trackStatus = 'future'
+                  {/* Split tracks into past, current, and future */}
+                  {(() => {
+                    const pastTracks: JSX.Element[] = []
+                    const currentAndFutureTracks: JSX.Element[] = []
+
+                    // Calculate accumulated time for schedule
+                    let accumulatedSeconds = 0
+                    
+                    playlistTracks.forEach((track, index) => {
+                      // Determine track status based on currentTrackIndex
+                      let trackStatus: 'past' | 'current' | 'future' | undefined
+                      if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
+                        if (index < currentTrackIndex) {
+                          trackStatus = 'past'
+                        } else if (index === currentTrackIndex) {
+                          trackStatus = 'current'
+                        } else {
+                          trackStatus = 'future'
+                        }
                       }
-                    }
+
+                      // Calculate scheduled time if we have a schedule slot
+                      let scheduledTime: { start: string; end: string } | null = null
+                      if (scheduleSlot) {
+                        const [slotHour, slotMin] = scheduleSlot.time.split(':').map(Number)
+                        const trackDuration = track.trackDuration || 180 // Default 3 min
+                        
+                        // Calculate start time
+                        const startDate = new Date()
+                        startDate.setHours(slotHour, slotMin, 0, 0)
+                        startDate.setSeconds(startDate.getSeconds() + accumulatedSeconds)
+                        
+                        // Calculate end time
+                        const endDate = new Date(startDate)
+                        endDate.setSeconds(endDate.getSeconds() + trackDuration)
+                        
+                        scheduledTime = {
+                          start: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`,
+                          end: `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`
+                        }
+                        
+                        accumulatedSeconds += trackDuration
+                      }
+
+                      const trackElement = (
+                        <SortableTrackRow
+                          key={track.trackId}
+                          track={track}
+                          index={index}
+                          coverArtUrl={coverArtUrls[track.trackId]}
+                          formatDuration={formatDuration}
+                          playingTrackId={playingTrackId}
+                          isPlaying={isPlaying}
+                          currentTime={currentTime}
+                          duration={duration}
+                          onPlay={handlePlayTrack}
+                          onStop={handleStopTrack}
+                          onSeek={handleSeek}
+                          onRemove={allowRemove ? handleRemoveTrack : undefined}
+                          showDragHandle={showDragHandle && allowReorder}
+                          showDelete={showDelete && allowRemove}
+                          compact={compact}
+                          trackStatus={trackStatus}
+                          scheduledTime={scheduledTime}
+                        />
+                      )
+
+                      if (trackStatus === 'past') {
+                        pastTracks.push(trackElement)
+                      } else {
+                        currentAndFutureTracks.push(trackElement)
+                      }
+                    })
 
                     return (
-                      <SortableTrackRow
-                        key={track.trackId}
-                        track={track}
-                        index={index}
-                        coverArtUrl={coverArtUrls[track.trackId]}
-                        formatDuration={formatDuration}
-                        playingTrackId={playingTrackId}
-                        isPlaying={isPlaying}
-                        currentTime={currentTime}
-                        duration={duration}
-                        onPlay={handlePlayTrack}
-                        onStop={handleStopTrack}
-                        onSeek={handleSeek}
-                        onRemove={allowRemove ? handleRemoveTrack : undefined}
-                        showDragHandle={showDragHandle && allowReorder}
-                        showDelete={showDelete && allowRemove}
-                        compact={compact}
-                        trackStatus={trackStatus}
-                      />
+                      <>
+                        {/* Past tracks - collapsible */}
+                        {pastTracks.length > 0 && (
+                          <div className="mb-2">
+                            <button
+                              onClick={() => setShowPastTracks(!showPastTracks)}
+                              className="w-full px-3 py-2 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg flex items-center justify-between transition-colors"
+                            >
+                              <span>
+                                {showPastTracks ? '▼' : '▶'} Already Played ({pastTracks.length})
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {showPastTracks ? 'Hide' : 'Show'}
+                              </span>
+                            </button>
+                            {showPastTracks && (
+                              <div className="mt-2 space-y-2">
+                                {pastTracks}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Current and future tracks */}
+                        {currentAndFutureTracks}
+                      </>
                     )
-                  })}
+                  })()}
                 </SortableContext>
               </DndContext>
             </div>
