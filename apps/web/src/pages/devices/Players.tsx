@@ -698,9 +698,9 @@ function Players() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Main Player - 2 columns */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transform hover:scale-[1.01] transition-transform duration-300">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-white/10">
+          <div className="px-6 py-4 border-b border-white/20 bg-gradient-to-r from-purple-800/30 to-blue-800/30 backdrop-blur-sm">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-white mb-1">🎵 Now Playing</h2>
@@ -750,7 +750,7 @@ function Players() {
             <div className="grid grid-cols-3 gap-4">
               {/* Left: Cover Art */}
               <div className="col-span-1">
-                <div className="aspect-square rounded-xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-500 to-pink-500 relative">
+                <div className="aspect-square rounded-2xl overflow-hidden shadow-[0_15px_40px_-10px_rgba(0,0,0,0.6)] bg-gradient-to-br from-purple-500 to-pink-500 relative transform hover:scale-105 transition-transform duration-300 border-4 border-white/20">
                   {coverArtUrl ? (
                     <img 
                       src={coverArtUrl} 
@@ -758,18 +758,18 @@ function Players() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
-                      <span className="text-8xl mb-4">🎵</span>
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500">
+                      <span className="text-8xl mb-4 drop-shadow-2xl">🎵</span>
                       {!currentTrack && (
-                        <p className="text-white/80 text-sm font-semibold">
+                        <p className="text-white/90 text-sm font-bold drop-shadow-lg">
                           No track loaded
                         </p>
                       )}
                     </div>
                   )}
                   {isPlaying && (
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                      <div className="text-white text-6xl animate-pulse">▶️</div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-center justify-center backdrop-blur-[2px]">
+                      <div className="text-white text-6xl animate-pulse drop-shadow-2xl">▶️</div>
                     </div>
                   )}
                 </div>
@@ -883,7 +883,7 @@ function Players() {
                   <button
                     onClick={handleLoad}
                     disabled={isLoaded}
-                    className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold hover:from-blue-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 active:scale-95"
                     title="Load track"
                   >
                     📥 LOAD
@@ -891,7 +891,7 @@ function Players() {
                   <button
                     onClick={handleUnload}
                     disabled={!isLoaded}
-                    className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-orange-500/50 transform hover:scale-105 active:scale-95"
                     title="Unload track"
                   >
                     ⏏️ UNLOAD
@@ -901,33 +901,10 @@ function Players() {
                   <button
                     onClick={handlePause}
                     disabled={!isPlaying}
-                    className="px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-bold hover:from-yellow-600 hover:to-yellow-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-yellow-500/50 transform hover:scale-105 active:scale-95"
                     title="Pause playback"
                   >
                     ⏸️ PAUSE
-                  </button>
-
-                  {/* TEST IoT Button */}
-                  <button
-                    onClick={testIoTConnection}
-                    className="px-4 py-3 bg-green-500/20 text-green-300 rounded-lg font-semibold hover:bg-green-500/30 transition-colors border border-green-500/50"
-                    title="Test IoT Connection"
-                  >
-                    🧪 TEST IoT
-                  </button>
-
-                  {/* IoT Log Button */}
-                  <button
-                    onClick={() => setShowIoTLog(true)}
-                    className="px-4 py-3 bg-purple-500/20 text-purple-300 rounded-lg font-semibold hover:bg-purple-500/30 transition-colors border border-purple-500/50 relative"
-                    title="View IoT Message Log"
-                  >
-                    📡 IoT Log
-                    {iotLogs.length > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                        {iotLogs.length > 99 ? '99+' : iotLogs.length}
-                      </span>
-                    )}
                   </button>
 
                   {/* Status Indicators */}
@@ -950,13 +927,13 @@ function Players() {
                   <button
                     onClick={togglePlay}
                     disabled={!isLoaded}
-                    className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-3xl hover:scale-110 transition-transform shadow-lg disabled:bg-gray-600 disabled:scale-100 disabled:cursor-not-allowed"
+                    className="w-20 h-20 bg-gradient-to-br from-white to-gray-200 rounded-full flex items-center justify-center text-4xl hover:scale-110 transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_40px_-5px_rgba(255,255,255,0.3)] disabled:from-gray-600 disabled:to-gray-700 disabled:scale-100 disabled:cursor-not-allowed transform active:scale-95 border-4 border-white/30"
                   >
                     {isPlaying ? '⏸️' : '▶️'}
                   </button>
                   <button
                     onClick={handleStop}
-                    className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl hover:bg-white/30 transition-colors"
+                    className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center text-2xl hover:from-red-600 hover:to-red-700 transition-all shadow-lg hover:shadow-red-500/50 transform hover:scale-110 active:scale-95 border-2 border-white/20"
                   >
                     ⏹️
                   </button>
