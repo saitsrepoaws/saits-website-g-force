@@ -10,6 +10,7 @@ import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService
 import { loadTrackAssets, resolveAudioUrl, formatTime } from '../../services/playerService'
 import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
 import { PlayerState } from '../../types/player'
+import { getUrl } from 'aws-amplify/storage'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
@@ -302,6 +303,13 @@ function Players() {
       console.log('📋 Track ID:', scheduledTrackId)
       
       try {
+        // Publish LOADING state
+        console.log('📤 Publishing LOADING state...')
+        await iotServiceRef.current?.publishState(PlayerState.LOADING, {
+          playlistId: currentPlaylistId || undefined,
+          trackId: scheduledTrackId
+        })
+        
         // Find the full track data
         const { data: allTracks } = await listTracks()
         const track = allTracks?.find((t: any) => t.id === scheduledTrackId)
@@ -310,13 +318,31 @@ function Players() {
           console.log('✅ Found scheduled track, loading...')
           await loadTrackIntoPlayer(track)
           console.log(`✅ Loaded scheduled track: ${track.title}`)
+          
+          // Publish LOADED state
+          console.log('📤 Publishing LOADED state...')
+          await iotServiceRef.current?.publishState(PlayerState.LOADED, {
+            trackId: track.id,
+            playlistId: currentPlaylistId || undefined,
+            duration: track.duration || 0
+          })
         } else {
           console.error('❌ Scheduled track not found in database')
           alert('❌ Scheduled track not found')
+          
+          // Publish ERROR state
+          await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+            error: 'Track not found in database'
+          })
         }
       } catch (error) {
         console.error('❌ Failed to load scheduled track:', error)
         alert(`❌ Failed to load track: ${error}`)
+        
+        // Publish ERROR state
+        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
+          error: String(error)
+        })
       }
       return
     }
