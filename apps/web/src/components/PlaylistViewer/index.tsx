@@ -71,7 +71,7 @@ function SortableTrackRow({
         className={`grid ${
           compact 
             ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
-            : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,120px,auto,50px]'
+            : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,150px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
           trackStatus === 'current'
             ? 'bg-purple-100 border-purple-400 shadow-md' 
@@ -642,8 +642,8 @@ export function PlaylistViewer({
                         endDate.setSeconds(endDate.getSeconds() + trackDuration)
                         
                         scheduledTime = {
-                          start: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}`,
-                          end: `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}`
+                          start: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}:${String(startDate.getSeconds()).padStart(2, '0')}`,
+                          end: `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}:${String(endDate.getSeconds()).padStart(2, '0')}`
                         }
                         
                         accumulatedSeconds += trackDuration
