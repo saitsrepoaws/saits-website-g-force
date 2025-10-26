@@ -256,6 +256,42 @@ export class RadioPlayerIoT {
   }
 
   // ==========================================================================
+  // Command Publishing
+  // ==========================================================================
+
+  /**
+   * Publish command (button click → IoT)
+   * Topic: radio/player/{playerId}/command
+   * QoS: 1
+   */
+  async publishCommand(command: PlayerCommand): Promise<void> {
+    const topic = `radio/player/${this.playerId}/command`
+
+    const message = {
+      ...command,
+      playerId: this.playerId,
+      timestamp: new Date().toISOString()
+    }
+
+    console.log(`🎛️ Publishing command: ${command.command}`, message)
+
+    try {
+      await pubsub.publish({
+        topic,
+        message
+      })
+
+      // Log outgoing command
+      this.addLog('OUT', topic, message, 'command')
+
+      console.log(`✅ Command published: ${command.command}`)
+    } catch (error) {
+      console.error(`❌ Failed to publish command:`, error)
+      throw error
+    }
+  }
+
+  // ==========================================================================
   // Track Info Publishing
   // ==========================================================================
 
