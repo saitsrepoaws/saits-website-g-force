@@ -14,6 +14,7 @@ import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
 import type { Track } from '../../services/playerService'
+import { listTracks } from '../../services/tracks'
 
 // Mock schedule - later vervangen met echte data
 const MOCK_SCHEDULE = [
@@ -296,8 +297,33 @@ function Players() {
     console.log('📥 LOAD BUTTON CLICKED')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
+    // Check if we have a scheduled track
+    if (currentTrackInfo && scheduledTrackId) {
+      console.log('🎯 Loading scheduled track:', currentTrackInfo.track.trackTitle)
+      console.log('📋 Track ID:', scheduledTrackId)
+      
+      try {
+        // Find the full track data
+        const { data: allTracks } = await listTracks()
+        const track = allTracks?.find((t: any) => t.id === scheduledTrackId)
+        
+        if (track) {
+          console.log('✅ Found scheduled track, loading...')
+          await loadTrackIntoPlayer(track)
+          alert(`✅ Loaded scheduled track: ${track.title}`)
+        } else {
+          console.error('❌ Scheduled track not found in database')
+          alert('❌ Scheduled track not found')
+        }
+      } catch (error) {
+        console.error('❌ Failed to load scheduled track:', error)
+        alert(`❌ Failed to load track: ${error}`)
+      }
+      return
+    }
+    
     if (!currentPlaylistId) {
-      console.error('❌ No playlist selected')
+      console.error('❌ No playlist selected and no scheduled track')
       alert('⚠️ No playlist selected')
       return
     }
