@@ -224,7 +224,6 @@ function Players() {
       await iotServiceRef.current.publishState(PlayerState.IDLE)
       
       console.log('✅ Test message published!')
-      alert('✅ Test message published! Check IoT Log.')
     } catch (error) {
       console.error('❌ Test failed:', error)
       alert(`❌ Test failed: ${error}`)
@@ -310,7 +309,7 @@ function Players() {
         if (track) {
           console.log('✅ Found scheduled track, loading...')
           await loadTrackIntoPlayer(track)
-          alert(`✅ Loaded scheduled track: ${track.title}`)
+          console.log(`✅ Loaded scheduled track: ${track.title}`)
         } else {
           console.error('❌ Scheduled track not found in database')
           alert('❌ Scheduled track not found')
@@ -377,7 +376,7 @@ function Players() {
       
       console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      alert(`✅ Track loaded: ${track.title}`)
+      console.log(`✅ Track loaded: ${track.title}`)
     } catch (error) {
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.error('❌❌❌ LOAD EXECUTION FAILED ❌❌❌')
@@ -406,7 +405,7 @@ function Players() {
     // Publish IDLE state
     await iotServiceRef.current?.publishState(PlayerState.IDLE)
     
-    alert('⏏️ Track unloaded')
+    console.log('⏏️ Track unloaded')
   }
 
   async function handlePause() {
@@ -1038,7 +1037,7 @@ function Players() {
                     const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
                     if (track) {
                       await loadTrackIntoPlayer(track)
-                      alert(`✅ Track loaded from playlist: ${track.title}`)
+                      console.log(`✅ Track loaded from playlist: ${track.title}`)
                     }
                   } catch (error) {
                     console.error('Failed to load track from playlist:', error)
