@@ -935,7 +935,7 @@ function Players() {
                 <div className="text-right">
                   <div className="text-sm text-gray-600">Current Time</div>
                   <div className="text-lg font-bold text-indigo-600">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </div>
                 </div>
               </div>
