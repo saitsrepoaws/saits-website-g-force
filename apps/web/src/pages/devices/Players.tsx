@@ -5,6 +5,7 @@ import IoTLogModal from '../../components/IoTLogModal'
 import { listPlaylists } from '../../services/playlists'
 import { getUrl } from 'aws-amplify/storage'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
+import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
 import { PlayerState } from '../../types/player'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
@@ -62,6 +63,15 @@ function Players() {
   useEffect(() => {
     loadPlaylists()
     determineCurrentPlaylist()
+    
+    // Start Mock State Machine
+    console.log('🤖 Starting Mock State Machine...')
+    startMockStateMachine()
+    
+    return () => {
+      console.log('🛑 Stopping Mock State Machine...')
+      stopMockStateMachine()
+    }
   }, [])
 
   // Separate effect for IoT service - always re-subscribe
