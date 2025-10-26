@@ -8,11 +8,40 @@
  * 4. Returns track data for IoT response
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
+import { env } from '$amplify/env/player-load-handler'
+import type { Schema } from '../../data/resource'
+import { Amplify } from 'aws-amplify'
+import { generateClient } from 'aws-amplify/data'
 
-const client = new DynamoDBClient({})
-const docClient = DynamoDBDocumentClient.from(client)
+Amplify.configure(
+  {
+    API: {
+      GraphQL: {
+        endpoint: env.AMPLIFY_DATA_GRAPHQL_ENDPOINT,
+        region: env.AWS_REGION,
+        defaultAuthMode: 'iam'
+      }
+    }
+  },
+  {
+    Auth: {
+      credentialsProvider: {
+        getCredentialsAndIdentityId: async () => ({
+          credentials: {
+            accessKeyId: env.AWS_ACCESS_KEY_ID,
+            secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
+            sessionToken: env.AWS_SESSION_TOKEN,
+          },
+        }),
+        clearCredentialsAndIdentityId: () => {
+          /* noop */
+        },
+      },
+    },
+  }
+)
+
+const client = generateClient<Schema>({ authMode: 'iam' })
 
 interface LoadCommandEvent {
   command: string
@@ -41,30 +70,19 @@ export const handler = async (event: LoadCommandEvent): Promise<LoadCommandRespo
   }
 
   try {
-    // 1. Fetch playlist from DynamoDB
+    // 1. Fetch playlist via GraphQL
     console.log('🔍 Fetching playlist:', playlistId)
     
-    const playlistTableName = process.env.PLAYLIST_TABLE_NAME
-    if (!playlistTableName) {
-      throw new Error('PLAYLIST_TABLE_NAME environment variable not set')
-    }
+    const { data: playlist, errors } = await client.models.Playlist.get({ id: playlistId })
 
-    const playlistResult = await docClient.send(
-      new GetCommand({
-        TableName: playlistTableName,
-        Key: { id: playlistId }
-      })
-    )
-
-    if (!playlistResult.Item) {
-      console.error('❌ Playlist not found:', playlistId)
+    if (errors || !playlist) {
+      console.error('❌ Playlist not found:', playlistId, errors)
       return {
         success: false,
         error: `Playlist not found: ${playlistId}`
       }
     }
 
-    const playlist = playlistResult.Item
     console.log('✅ Playlist fetched:', playlist.name)
 
     // 2. Parse tracks from JSON string
@@ -100,30 +118,21 @@ export const handler = async (event: LoadCommandEvent): Promise<LoadCommandRespo
       }
     }
 
-    // 4. Fetch complete track data from DynamoDB
+    // 4. Fetch complete track data via GraphQL
     console.log('🔍 Fetching track:', firstPlaylistTrack.trackId)
     
-    const trackTableName = process.env.TRACK_TABLE_NAME
-    if (!trackTableName) {
-      throw new Error('TRACK_TABLE_NAME environment variable not set')
-    }
+    const { data: track, errors: trackErrors } = await client.models.Track.get({ 
+      id: firstPlaylistTrack.trackId 
+    })
 
-    const trackResult = await docClient.send(
-      new GetCommand({
-        TableName: trackTableName,
-        Key: { id: firstPlaylistTrack.trackId }
-      })
-    )
-
-    if (!trackResult.Item) {
-      console.error('❌ Track not found:', firstPlaylistTrack.trackId)
+    if (trackErrors || !track) {
+      console.error('❌ Track not found:', firstPlaylistTrack.trackId, trackErrors)
       return {
         success: false,
         error: `Track not found: ${firstPlaylistTrack.trackId}`
       }
     }
 
-    const track = trackResult.Item
     console.log('✅ Track fetched:', track.title)
 
     // 5. Return complete track data

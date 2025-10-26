@@ -5,9 +5,9 @@
  * Used by State Machine to send command responses back to players
  */
 
-import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
+import { IoTDataPlane } from '@aws-sdk/client-iot-data-plane'
 
-const iotClient = new IoTDataPlaneClient({})
+const iotClient = new IoTDataPlane({})
 
 interface PublishEvent {
   topic: string
@@ -37,13 +37,11 @@ export const handler = async (event: PublishEvent): Promise<PublishResponse> => 
     // Publish to IoT Core
     console.log(`📡 Publishing to topic: ${topic}`)
     
-    const command = new PublishCommand({
+    await iotClient.publish({
       topic: topic,
-      payload: Buffer.from(JSON.stringify(message)),
+      payload: new TextEncoder().encode(JSON.stringify(message)),
       qos: 1 // At least once delivery
     })
-
-    await iotClient.send(command)
 
     console.log('✅ Message published successfully')
     
