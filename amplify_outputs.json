@@ -26,7 +26,7 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://wundgqo455gr7n656pfh2rkyrq.appsync-api.eu-west-1.amazonaws.com/graphql",
+    "url": "https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql",
     "aws_region": "eu-west-1",
     "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
@@ -456,11 +456,11 @@
   },
   "storage": {
     "aws_region": "eu-west-1",
-    "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-rzbnwdrzhtzq",
+    "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-ezjbtc4ovwwr",
     "buckets": [
       {
         "name": "gforgeIotStorage",
-        "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-rzbnwdrzhtzq",
+        "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-ezjbtc4ovwwr",
         "aws_region": "eu-west-1",
         "paths": {
           "public/audio/*": {

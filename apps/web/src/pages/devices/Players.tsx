@@ -664,7 +664,7 @@ function Players() {
                 <div className="px-2 py-1 bg-white/10 backdrop-blur-sm rounded text-xs border border-white/20">
                   <div className="text-[10px] text-gray-400 font-semibold">TIME</div>
                   <div className="text-white font-mono text-sm font-bold">
-                    {currentTimeDisplay.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {currentTimeDisplay.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </div>
                 </div>
 
