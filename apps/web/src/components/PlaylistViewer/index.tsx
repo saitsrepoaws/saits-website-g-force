@@ -619,10 +619,27 @@ export function PlaylistViewer({
                     // Calculate accumulated time for schedule
                     let accumulatedSeconds = 0
                     
+                    // Find the index of the loaded track
+                    const loadedTrackIndex = loadedTrackId 
+                      ? playlistTracks.findIndex(t => t.trackId === loadedTrackId)
+                      : -1
+                    
                     playlistTracks.forEach((track, index) => {
                       // Determine track status based on currentTrackIndex
                       let trackStatus: 'past' | 'current' | 'future' | undefined
-                      if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
+                      
+                      // If a track is loaded, the NEXT track becomes "current" (purple)
+                      if (loadedTrackIndex >= 0) {
+                        if (index < loadedTrackIndex) {
+                          trackStatus = 'past'
+                        } else if (index === loadedTrackIndex + 1) {
+                          trackStatus = 'current' // Next track after loaded = purple!
+                        } else if (index > loadedTrackIndex + 1) {
+                          trackStatus = 'future'
+                        }
+                        // The loaded track itself will be orange (handled by isLoadedInPlayer)
+                      } else if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
+                        // No loaded track, use schedule-based logic
                         if (index < currentTrackIndex) {
                           trackStatus = 'past'
                         } else if (index === currentTrackIndex) {
