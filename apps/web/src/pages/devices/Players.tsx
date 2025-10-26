@@ -242,14 +242,23 @@ function Players() {
 
       // Sort tracks by order (ascending)
       console.log('🔀 Sorting tracks by order...')
+      console.log('📋 ALL tracks in playlist:', playlistData.tracks.map((t: any) => ({
+        order: t.order,
+        trackId: t.trackId,
+        hasTrackId: !!t.trackId
+      })))
+      
       const sortedTracks = [...playlistData.tracks].sort((a, b) => {
         return (a.order ?? 0) - (b.order ?? 0)
       })
 
       const firstPlaylistTrack = sortedTracks[0]
-      console.log('🎵 First track in playlist:', {
+      console.log('🎵 First track in playlist (FULL OBJECT):', firstPlaylistTrack)
+      console.log('🎵 First track details:', {
         order: firstPlaylistTrack.order,
-        trackId: firstPlaylistTrack.trackId
+        trackId: firstPlaylistTrack.trackId,
+        hasTrackId: !!firstPlaylistTrack.trackId,
+        allKeys: Object.keys(firstPlaylistTrack)
       })
 
       // Load the actual track data
