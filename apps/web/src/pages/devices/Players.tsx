@@ -116,15 +116,57 @@ function Players() {
         alert('❌ IoT service not initialized!')
         return
       }
-      
+
       console.log('📤 Publishing test state...')
       await iotServiceRef.current.publishState(PlayerState.IDLE)
-      
+
       console.log('✅ Test message published!')
       alert('✅ Test message published! Check IoT Log.')
     } catch (error) {
       console.error('❌ Test failed:', error)
       alert(`❌ Test failed: ${error}`)
+    }
+  }
+
+  // TEST FUNCTION - Create playlist with real tracks
+  async function createTestPlaylist() {
+    console.log('🧪 Creating test playlist with real tracks...')
+
+    try {
+      // Get all tracks from library
+      const { data: tracks } = await listTracks()
+      console.log('📚 Found tracks in library:', tracks?.length || 0)
+
+      if (!tracks || tracks.length === 0) {
+        alert('❌ No tracks in library! Upload tracks first.')
+        return
+      }
+
+      // Take first 3 tracks
+      const tracksToAdd = tracks.slice(0, 3)
+      console.log('🎵 Using tracks:', tracksToAdd.map((t: any) => `${t.title} by ${t.artist}`))
+
+      // Create playlist
+      const client = getClient()
+      // @ts-ignore
+      const { data: playlist } = await client.models.Playlist.create({
+        name: 'Test Radio Playlist',
+        description: 'Auto-generated test playlist',
+        tracks: tracksToAdd.map((track: any, index: number) => ({
+          trackId: track.id,
+          order: index
+        }))
+      })
+
+      console.log('✅ Created playlist:', playlist)
+      alert(`✅ Created playlist: ${playlist.name} with ${tracksToAdd.length} tracks`)
+
+      // Reload playlists
+      loadPlaylists()
+
+    } catch (error) {
+      console.error('❌ Failed to create test playlist:', error)
+      alert(`❌ Failed to create playlist: ${error}`)
     }
   }
 
@@ -831,6 +873,15 @@ function Players() {
                     title="Pause playback"
                   >
                     ⏸️ PAUSE
+                  </button>
+
+                  {/* CREATE PLAYLIST Button */}
+                  <button
+                    onClick={createTestPlaylist}
+                    className="px-4 py-3 bg-green-500/20 text-green-300 rounded-lg font-semibold hover:bg-green-500/30 transition-colors border border-green-500/50"
+                    title="Create test playlist with real tracks"
+                  >
+                    🎵 CREATE PLAYLIST
                   </button>
 
                   {/* TEST IoT Button */}
