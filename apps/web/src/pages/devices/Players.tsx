@@ -52,6 +52,7 @@ function Players() {
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
   const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
   const [scheduledTrackId, setScheduledTrackId] = useState<string | null>(null)
+  const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
 
   useEffect(() => {
     loadPlaylists()
@@ -75,6 +76,46 @@ function Players() {
     
     return () => clearInterval(interval)
   }, [])
+
+  // Calculate scheduled track every second
+  useEffect(() => {
+    function updateScheduledTrack() {
+      if (!activeSlot || !currentPlaylistId || playlistTracksCache.length === 0) {
+        setScheduledTrackId(null)
+        return
+      }
+
+      // Find current playlist
+      const currentPlaylist = playlists.find(p => p.id === currentPlaylistId)
+      if (!currentPlaylist) {
+        setScheduledTrackId(null)
+        return
+      }
+
+      // Calculate current track
+      const trackInfo = calculateCurrentTrack(
+        activeSlot,
+        playlistTracksCache,
+        currentPlaylist.name || 'Playlist'
+      )
+
+      if (trackInfo) {
+        setCurrentTrackInfo(trackInfo)
+        setScheduledTrackId(trackInfo.track.trackId)
+        console.log('🎯 Scheduled track:', trackInfo.track.trackTitle, `(${trackInfo.percentComplete}%)`)
+      } else {
+        setScheduledTrackId(null)
+      }
+    }
+
+    // Update immediately
+    updateScheduledTrack()
+
+    // Then update every second
+    const interval = setInterval(updateScheduledTrack, 1000)
+    
+    return () => clearInterval(interval)
+  }, [activeSlot, currentPlaylistId, playlistTracksCache, playlists])
 
   // Separate effect for IoT service - always re-subscribe
   useEffect(() => {
@@ -951,6 +992,10 @@ function Players() {
               allowRemove={false}
               showDragHandle={true}
               highlightTrackId={scheduledTrackId}
+              onTracksLoaded={(tracks) => {
+                console.log('📋 Playlist tracks loaded:', tracks.length)
+                setPlaylistTracksCache(tracks)
+              }}
               onTrackSelect={async (playlistTrack) => {
                 // Stop current playback if playing
                 if (isPlaying) {

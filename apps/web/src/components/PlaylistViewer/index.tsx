@@ -290,6 +290,7 @@ export interface PlaylistViewerProps {
   onTrackSelect?: (track: PlaylistTrackItem) => void
   onTrackRemove?: (trackId: string) => void
   onPlaylistUpdate?: (playlist: Playlist) => void
+  onTracksLoaded?: (tracks: PlaylistTrackItem[]) => void
   
   // Styling
   className?: string
@@ -310,6 +311,7 @@ export function PlaylistViewer({
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
+  onTracksLoaded,
   className = '',
   containerClassName = '',
 }: PlaylistViewerProps) {
@@ -350,6 +352,11 @@ export function PlaylistViewer({
         setPlaylist(data as Playlist)
         const tracks: PlaylistTrackItem[] = JSON.parse((data as any).tracks || '[]')
         setPlaylistTracks(tracks)
+        
+        // Notify parent of loaded tracks
+        if (onTracksLoaded) {
+          onTracksLoaded(tracks)
+        }
         
         if (onPlaylistUpdate) {
           onPlaylistUpdate(data as Playlist)
