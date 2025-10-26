@@ -64,9 +64,13 @@ function SortableTrackRow({
       <div
         ref={setNodeRef}
         style={style}
-        className={`grid ${compact ? 'grid-cols-[auto,2fr,auto,50px]' : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'} gap-2 items-center p-3 border border-gray-200 rounded ${
+        className={`grid ${
+          compact 
+            ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
+            : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'
+        } gap-3 items-center p-3 border border-gray-200 rounded-lg ${
           isDragging ? 'bg-blue-50 shadow-lg z-10' : 'hover:bg-gray-50'
-        }`}
+        } transition-colors`}
       >
       {showDragHandle && (
         <div className="text-sm text-gray-500 cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
@@ -90,15 +94,52 @@ function SortableTrackRow({
         </div>
       )}
       
+      {/* Artist - Always show */}
+      <div className="text-sm font-semibold text-gray-700 truncate">
+        {track.trackArtist || 'Unknown Artist'}
+      </div>
+      
+      {/* Title - Always show */}
       <div className="text-sm font-medium text-gray-900 truncate">
         {track.trackTitle || 'Unknown'}
       </div>
 
+      {/* Compact mode: BPM, Key, Year */}
+      {compact && (
+        <>
+          <div className="text-center">
+            {track.trackBpm ? (
+              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">
+                {track.trackBpm} BPM
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400">-</span>
+            )}
+          </div>
+          <div className="text-center">
+            {(track as any).trackKey ? (
+              <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">
+                {(track as any).trackKey}
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400">-</span>
+            )}
+          </div>
+          <div className="text-center">
+            {(track as any).trackYear ? (
+              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-semibold">
+                {(track as any).trackYear}
+              </span>
+            ) : (
+              <span className="text-xs text-gray-400">-</span>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Full mode: Genre, Key, BPM, Duration */}
       {!compact && (
         <>
-          <div className="text-sm text-gray-600 truncate">
-            {track.trackArtist || '-'}
-          </div>
           <div className="text-xs text-gray-600 truncate">
             {track.trackGenre || '-'}
           </div>
