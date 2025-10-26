@@ -982,7 +982,6 @@ function Players() {
             />
           </div>
         )}
-        </div>
       </div>
 
       {/* IoT Log - Right Column */}
