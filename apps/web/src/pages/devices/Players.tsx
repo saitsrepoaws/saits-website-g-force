@@ -51,6 +51,7 @@ function Players() {
   const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([])
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
   const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
+  const [scheduledTrackId, setScheduledTrackId] = useState<string | null>(null)
 
   useEffect(() => {
     loadPlaylists()
@@ -949,6 +950,7 @@ function Players() {
               allowReorder={true}
               allowRemove={false}
               showDragHandle={true}
+              highlightTrackId={scheduledTrackId}
               onTrackSelect={async (playlistTrack) => {
                 // Stop current playback if playing
                 if (isPlaying) {

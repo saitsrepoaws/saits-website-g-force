@@ -72,7 +72,7 @@ function SortableTrackRow({
             : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
           isHighlighted 
-            ? 'bg-green-100 border-green-400 shadow-md' 
+            ? 'bg-purple-100 border-purple-400 shadow-md' 
             : isDragging 
               ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
               : 'border-gray-200 hover:bg-gray-50'
