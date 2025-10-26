@@ -25,7 +25,7 @@ interface SortableTrackRowProps {
   showDragHandle?: boolean
   showDelete?: boolean
   compact?: boolean
-  isHighlighted?: boolean
+  trackStatus?: 'past' | 'current' | 'future'
 }
 
 function SortableTrackRow({ 
@@ -44,7 +44,7 @@ function SortableTrackRow({
   showDragHandle = true,
   showDelete = true,
   compact = false,
-  isHighlighted = false
+  trackStatus
 }: SortableTrackRowProps) {
   const {
     attributes,
@@ -71,11 +71,15 @@ function SortableTrackRow({
             ? 'grid-cols-[auto,2fr,1.5fr,80px,60px,60px,auto]' 
             : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
-          isHighlighted 
+          trackStatus === 'current'
             ? 'bg-purple-100 border-purple-400 shadow-md' 
-            : isDragging 
-              ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
-              : 'border-gray-200 hover:bg-gray-50'
+            : trackStatus === 'future'
+              ? 'bg-green-50 border-green-300'
+              : trackStatus === 'past'
+                ? 'bg-gray-100 border-gray-300 opacity-60'
+                : isDragging 
+                  ? 'bg-blue-50 border-gray-200 shadow-lg z-10' 
+                  : 'border-gray-200 hover:bg-gray-50'
         } transition-colors`}
       >
       {showDragHandle && (
@@ -285,6 +289,7 @@ export interface PlaylistViewerProps {
   
   // Highlight
   highlightTrackId?: string | null
+  currentTrackIndex?: number | null
   
   // Callbacks
   onTrackSelect?: (track: PlaylistTrackItem) => void
@@ -308,6 +313,7 @@ export function PlaylistViewer({
   allowRemove = true,
   allowPlay = true,
   highlightTrackId = null,
+  currentTrackIndex = null,
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
@@ -587,27 +593,41 @@ export function PlaylistViewer({
                   items={playlistTracks.map(t => t.trackId)}
                   strategy={verticalListSortingStrategy}
                 >
-                  {playlistTracks.map((track, index) => (
-                    <SortableTrackRow
-                      key={track.trackId}
-                      track={track}
-                      index={index}
-                      coverArtUrl={coverArtUrls[track.trackId]}
-                      formatDuration={formatDuration}
-                      playingTrackId={playingTrackId}
-                      isPlaying={isPlaying}
-                      currentTime={currentTime}
-                      duration={duration}
-                      onPlay={handlePlayTrack}
-                      onStop={handleStopTrack}
-                      onSeek={handleSeek}
-                      onRemove={allowRemove ? handleRemoveTrack : undefined}
-                      showDragHandle={showDragHandle && allowReorder}
-                      showDelete={showDelete && allowRemove}
-                      compact={compact}
-                      isHighlighted={highlightTrackId === track.trackId}
-                    />
-                  ))}
+                  {playlistTracks.map((track, index) => {
+                    // Determine track status based on currentTrackIndex
+                    let trackStatus: 'past' | 'current' | 'future' | undefined
+                    if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
+                      if (index < currentTrackIndex) {
+                        trackStatus = 'past'
+                      } else if (index === currentTrackIndex) {
+                        trackStatus = 'current'
+                      } else {
+                        trackStatus = 'future'
+                      }
+                    }
+
+                    return (
+                      <SortableTrackRow
+                        key={track.trackId}
+                        track={track}
+                        index={index}
+                        coverArtUrl={coverArtUrls[track.trackId]}
+                        formatDuration={formatDuration}
+                        playingTrackId={playingTrackId}
+                        isPlaying={isPlaying}
+                        currentTime={currentTime}
+                        duration={duration}
+                        onPlay={handlePlayTrack}
+                        onStop={handleStopTrack}
+                        onSeek={handleSeek}
+                        onRemove={allowRemove ? handleRemoveTrack : undefined}
+                        showDragHandle={showDragHandle && allowReorder}
+                        showDelete={showDelete && allowRemove}
+                        compact={compact}
+                        trackStatus={trackStatus}
+                      />
+                    )
+                  })}
                 </SortableContext>
               </DndContext>
             </div>
