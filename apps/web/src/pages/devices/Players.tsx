@@ -1190,7 +1190,6 @@ function Players() {
             </div>
           </div>
         )}
-
       </div>
 
       {/* IoT Log Modal - Keep for optional full screen view */}
