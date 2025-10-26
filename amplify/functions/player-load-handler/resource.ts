@@ -5,6 +5,7 @@ export const playerLoadHandler = defineFunction({
   entry: './handler.ts',
   timeoutSeconds: 30,
   memoryMB: 512,
+  runtime: 20,
   environment: {
     // Will be set by backend.ts
   }

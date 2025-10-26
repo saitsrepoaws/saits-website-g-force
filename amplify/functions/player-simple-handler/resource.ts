@@ -4,5 +4,6 @@ export const playerSimpleHandler = defineFunction({
   name: 'player-simple-handler',
   entry: './handler.ts',
   timeoutSeconds: 5,
-  memoryMB: 128
+  memoryMB: 128,
+  runtime: 20
 })
