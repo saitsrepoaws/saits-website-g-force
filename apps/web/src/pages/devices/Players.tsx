@@ -116,57 +116,15 @@ function Players() {
         alert('❌ IoT service not initialized!')
         return
       }
-
+      
       console.log('📤 Publishing test state...')
       await iotServiceRef.current.publishState(PlayerState.IDLE)
-
+      
       console.log('✅ Test message published!')
       alert('✅ Test message published! Check IoT Log.')
     } catch (error) {
       console.error('❌ Test failed:', error)
       alert(`❌ Test failed: ${error}`)
-    }
-  }
-
-  // TEST FUNCTION - Create playlist with real tracks
-  async function createTestPlaylist() {
-    console.log('🧪 Creating test playlist with real tracks...')
-
-    try {
-      // Get all tracks from library
-      const { data: tracks } = await listTracks()
-      console.log('📚 Found tracks in library:', tracks?.length || 0)
-
-      if (!tracks || tracks.length === 0) {
-        alert('❌ No tracks in library! Upload tracks first.')
-        return
-      }
-
-      // Take first 3 tracks
-      const tracksToAdd = tracks.slice(0, 3)
-      console.log('🎵 Using tracks:', tracksToAdd.map((t: any) => `${t.title} by ${t.artist}`))
-
-      // Create playlist
-      const client = getClient()
-      // @ts-ignore
-      const { data: playlist } = await client.models.Playlist.create({
-        name: 'Test Radio Playlist',
-        description: 'Auto-generated test playlist',
-        tracks: tracksToAdd.map((track: any, index: number) => ({
-          trackId: track.id,
-          order: index
-        }))
-      })
-
-      console.log('✅ Created playlist:', playlist)
-      alert(`✅ Created playlist: ${playlist.name} with ${tracksToAdd.length} tracks`)
-
-      // Reload playlists
-      loadPlaylists()
-
-    } catch (error) {
-      console.error('❌ Failed to create test playlist:', error)
-      alert(`❌ Failed to create playlist: ${error}`)
     }
   }
 
@@ -270,10 +228,9 @@ function Players() {
       console.log('🔍 Fetching playlist data...')
       // @ts-ignore - Playlist model exists at runtime
       const { data: playlistData } = await getClient().models.Playlist.get({ id: currentPlaylistId })
-      console.log('✅ Playlist data received:', playlistData?.name)
-      console.log('📊 Tracks in playlist:', playlistData?.tracks?.length || 0)
+      console.log('✅ Playlist data received:', playlistData)
       
-      if (!playlistData?.tracks || playlistData.tracks.length === 0) {
+      if (!playlistData?.tracks) {
         console.error('❌ Playlist has no tracks')
         alert('⚠️ Playlist has no tracks')
         await iotServiceRef.current?.publishState(PlayerState.ERROR, {
@@ -282,42 +239,34 @@ function Players() {
         return
       }
 
+      console.log('📊 Playlist has', playlistData.tracks.length, 'tracks')
+
       // Sort tracks by order (ascending)
-      console.log('🔀 Sorting tracks by order...')
-      console.log('📋 ALL tracks in playlist:', playlistData.tracks.map((t: any) => ({
-        order: t.order,
-        trackId: t.trackId,
-        hasTrackId: !!t.trackId
-      })))
-      
       const sortedTracks = [...playlistData.tracks].sort((a, b) => {
         return (a.order ?? 0) - (b.order ?? 0)
       })
 
       const firstPlaylistTrack = sortedTracks[0]
-      console.log('🎵 First track in playlist (FULL OBJECT):', firstPlaylistTrack)
-      console.log('🎵 First track details:', {
-        order: firstPlaylistTrack.order,
-        trackId: firstPlaylistTrack.trackId,
-        hasTrackId: !!firstPlaylistTrack.trackId,
-        allKeys: Object.keys(firstPlaylistTrack)
-      })
+
+      console.log('🎵 First track in playlist:', firstPlaylistTrack)
+      console.log('   - trackId:', firstPlaylistTrack.trackId)
+      console.log('   - order:', firstPlaylistTrack.order)
 
       // Load the actual track data
       if (firstPlaylistTrack.trackId) {
-        console.log('🔍 Fetching track data for ID:', firstPlaylistTrack.trackId)
+        console.log('🔍 Fetching track from library...')
         const { data: tracks } = await listTracks()
         console.log('📚 Total tracks in library:', tracks?.length || 0)
         
         const track = tracks?.find((t: any) => t.id === firstPlaylistTrack.trackId)
-        console.log('🔎 Found track:', track ? `${track.title} by ${track.artist}` : 'NOT FOUND')
+        console.log('🎵 Found track:', track ? track.title : 'NOT FOUND')
         
         if (track) {
           console.log('📥 Loading track into player...')
           await loadTrackIntoPlayer(track)
           
-          // Publish LOADED state
           console.log('📤 Publishing LOADED state...')
+          // Publish LOADED state
           await iotServiceRef.current?.publishState(PlayerState.LOADED, {
             trackId: track.id,
             playlistId: currentPlaylistId,
@@ -326,7 +275,7 @@ function Players() {
           
           console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
           console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-          alert(`✅ Track loaded: ${track.title}`)
+          alert(`✅ Track #1 loaded from playlist: ${track.title}`)
         } else {
           console.error('❌ Track not found in library')
           alert('⚠️ Track not found in library')
@@ -336,7 +285,6 @@ function Players() {
         }
       } else {
         console.error('❌ No trackId in playlist track')
-        alert('⚠️ Invalid playlist track')
       }
     } catch (error) {
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -873,15 +821,6 @@ function Players() {
                     title="Pause playback"
                   >
                     ⏸️ PAUSE
-                  </button>
-
-                  {/* CREATE PLAYLIST Button */}
-                  <button
-                    onClick={createTestPlaylist}
-                    className="px-4 py-3 bg-green-500/20 text-green-300 rounded-lg font-semibold hover:bg-green-500/30 transition-colors border border-green-500/50"
-                    title="Create test playlist with real tracks"
-                  >
-                    🎵 CREATE PLAYLIST
                   </button>
 
                   {/* TEST IoT Button */}
