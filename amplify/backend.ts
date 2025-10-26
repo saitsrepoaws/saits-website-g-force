@@ -213,11 +213,17 @@ const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
 const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
 const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
 
-// Grant DynamoDB access to load handler
-backend.playerLoadHandler.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
-backend.playerLoadHandler.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
-playlistTable.grantReadData(loadHandlerLambda)
-trackTable.grantReadData(loadHandlerLambda)
+// Grant GraphQL API access to load handler (via IAM policy)
+loadHandlerLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['appsync:GraphQL'],
+    resources: [
+      `${backend.data.resources.graphqlApi.arn}/types/Query/*`,
+      `${backend.data.resources.graphqlApi.arn}/types/Mutation/*`
+    ],
+  })
+)
 
 // Grant IoT publish permission to IoT publisher
 iotPublisherLambda.addToRolePolicy(
