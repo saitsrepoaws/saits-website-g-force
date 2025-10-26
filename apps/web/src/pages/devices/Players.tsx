@@ -6,32 +6,15 @@ import IoTLogPanel from '../../components/IoTLogPanel'
 import SchedulePlaylist from '../../components/SchedulePlaylist'
 import PlayerDisplay from '../../components/PlayerDisplay'
 import { listPlaylists } from '../../services/playlists'
-import { getUrl } from 'aws-amplify/storage'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
+import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
+import { loadTrackAssets, resolveAudioUrl, formatTime } from '../../services/playerService'
 import { PlayerState } from '../../types/player'
-import { findActiveSlot } from '../../utils/scheduleCalculator'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 import type { ScheduleSlot } from '../../utils/scheduleCalculator'
-
-interface Track {
-  id: string
-  title?: string | null
-  artist?: string | null
-  album?: string | null
-  genre?: string | null
-  year?: number | null
-  bpm?: number | null
-  key?: string | null
-  energy?: number | null
-  danceability?: number | null
-  valence?: number | null
-  duration?: number | null
-  audioUrl?: string | null
-  coverArtUrl?: string | null
-  waveformUrl?: string | null
-}
+import type { Track } from '../../services/playerService'
 
 // Mock schedule - later vervangen met echte data
 const MOCK_SCHEDULE = [
@@ -71,7 +54,7 @@ function Players() {
 
   useEffect(() => {
     loadPlaylists()
-    loadScheduleAndDeterminePlaylist()
+    loadSchedule()
     
     // Start Mock State Machine
     console.log('🤖 Starting Mock State Machine...')
@@ -86,7 +69,7 @@ function Players() {
   // Update active slot every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      loadScheduleAndDeterminePlaylist()
+      loadSchedule()
     }, 60000) // Check every minute
     
     return () => clearInterval(interval)
@@ -216,75 +199,27 @@ function Players() {
     }
   }
   
-  function loadScheduleAndDeterminePlaylist() {
-    console.log('📅 Loading schedule from localStorage...')
+  function loadSchedule() {
+    const result = loadScheduleAndDeterminePlaylist()
+    setScheduleSlots(result.slots)
+    setActiveSlot(result.activeSlot)
     
-    // Load schedule from localStorage (same as Planner)
-    try {
-      const stored = localStorage.getItem('planner-time-slots')
-      if (stored) {
-        const slots: ScheduleSlot[] = JSON.parse(stored)
-        setScheduleSlots(slots)
-        
-        // Find active slot for current time
-        const active = findActiveSlot(slots)
-        setActiveSlot(active)
-        
-        if (active) {
-          console.log('✅ Active slot found:', active.name, `(${active.time})`)
-          console.log('📋 Playlist ID:', active.playlistId)
-          
-          // Set as current playlist
-          if (active.playlistId) {
-            setCurrentPlaylistId(active.playlistId)
-          }
-        } else {
-          console.log('⚠️ No active slot for current time')
-        }
-      } else {
-        console.log('⚠️ No schedule found in localStorage')
-      }
-    } catch (error) {
-      console.error('❌ Failed to load schedule:', error)
+    if (result.playlistId) {
+      setCurrentPlaylistId(result.playlistId)
     }
   }
 
   async function loadTrackIntoPlayer(track: any) {
     try {
       console.log('📥 loadTrackIntoPlayer called with track:', track.title)
-      console.log('📋 Track has fileUrl:', !!(track as any).fileUrl)
-      console.log('📋 Track has audioUrl:', !!track.audioUrl)
       
       // Store track AS-IS (don't resolve audio URL yet - we do that in handlePlay)
       setCurrentTrack(track as Track)
       
-      // Load cover art
-      if (track.coverArtUrl) {
-        try {
-          const url = await getUrl({ path: track.coverArtUrl })
-          setCoverArtUrl(url.url.toString())
-          console.log('✅ Cover art loaded')
-        } catch (e) {
-          console.log('⚠️ Cover art not found')
-          setCoverArtUrl(null)
-        }
-      } else {
-        setCoverArtUrl(null)
-      }
-
-      // Load waveform
-      if (track.waveformUrl) {
-        try {
-          const url = await getUrl({ path: track.waveformUrl })
-          setWaveformUrl(url.url.toString())
-          console.log('✅ Waveform loaded')
-        } catch (e) {
-          console.log('⚠️ Waveform not found')
-          setWaveformUrl(null)
-        }
-      } else {
-        setWaveformUrl(null)
-      }
+      // Load assets (cover art and waveform)
+      const assets = await loadTrackAssets(track as Track)
+      setCoverArtUrl(assets.coverArtUrl)
+      setWaveformUrl(assets.waveformUrl)
 
       // Mark as loaded
       setIsLoaded(true)
