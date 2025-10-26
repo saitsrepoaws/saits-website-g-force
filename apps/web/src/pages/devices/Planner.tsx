@@ -516,74 +516,96 @@ function Planner() {
 
                 {/* Playlist Preview with Audio Player */}
                 {selectedSlot.playlistId && (
-                  <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">🎵</span>
-                          <h3 className="font-bold text-gray-900">Playlist Preview</h3>
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+                    {/* Header Section */}
+                    <div className="p-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                            <span className="text-3xl">🎵</span>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-white text-lg">Playlist Preview</h3>
+                            <p className="text-white/80 text-sm">{selectedSlot.name}</p>
+                          </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="px-2 py-1 bg-white rounded-full text-xs font-semibold text-gray-700 shadow-sm">
-                            {selectedSlot.time}
+                          <div className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-sm font-bold text-gray-800 shadow-lg">
+                            ⏰ {selectedSlot.time}
                           </div>
-                          <div className="px-2 py-1 bg-blue-600 rounded-full text-xs font-semibold text-white shadow-sm">
-                            {selectedSlot.duration}m
+                          <div className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-sm font-bold text-white shadow-lg border border-white/30">
+                            ⏱️ {selectedSlot.duration}m
                           </div>
                         </div>
                       </div>
-                      <div className="text-sm font-semibold text-gray-800">
-                        {playlists.find(p => p.id === selectedSlot.playlistId)?.name || 'Loading...'}
-                      </div>
-                      <div className="flex items-center gap-4 mt-2 text-xs">
-                        <span className="text-green-600">
-                          ▶️ Click to preview
-                        </span>
-                        <span className="text-gray-500">
-                          🎧 Inline player enabled
-                        </span>
+                      
+                      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                        <div className="text-lg font-bold text-white mb-1">
+                          {playlists.find(p => p.id === selectedSlot.playlistId)?.name || 'Loading...'}
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-white/90">
+                          <span className="flex items-center gap-1">
+                            <span className="text-green-300">▶️</span>
+                            Click track to preview
+                          </span>
+                          <span className="text-white/50">•</span>
+                          <span className="flex items-center gap-1">
+                            🎧 Inline player
+                          </span>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* Quick Info Bar */}
-                    <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <span className="font-semibold text-gray-700">Days:</span>
-                          <span className="text-gray-600">{selectedSlot.days.join(', ')}</span>
+                    {/* Info Bar */}
+                    <div className="px-6 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Days:</span>
+                            <div className="flex gap-1">
+                              {selectedSlot.days.map(day => (
+                                <span key={day} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
+                                  {day}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            selectedSlot.active 
+                              ? 'bg-green-500 text-white shadow-sm' 
+                              : 'bg-gray-300 text-gray-600'
+                          }`}>
+                            {selectedSlot.active ? '✓ Active' : '○ Inactive'}
+                          </div>
                         </div>
-                        <div className={`px-2 py-1 rounded ${
-                          selectedSlot.active 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-200 text-gray-600'
-                        }`}>
-                          {selectedSlot.active ? '✓ Active' : '○ Inactive'}
-                        </div>
+                        <button
+                          onClick={() => {
+                            const playlist = playlists.find(p => p.id === selectedSlot.playlistId)
+                            if (playlist) {
+                              alert(`📋 Playlist: ${playlist.name}\n⏰ Time: ${selectedSlot.time}\n📅 Days: ${selectedSlot.days.join(', ')}\n⏱️ Duration: ${selectedSlot.duration} minutes`)
+                            }
+                          }}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-semibold shadow-sm"
+                        >
+                          ℹ️ Details
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          const playlist = playlists.find(p => p.id === selectedSlot.playlistId)
-                          if (playlist) {
-                            alert(`📋 Playlist: ${playlist.name}\n⏰ Time: ${selectedSlot.time}\n📅 Days: ${selectedSlot.days.join(', ')}\n⏱️ Duration: ${selectedSlot.duration} minutes`)
-                          }
-                        }}
-                        className="text-blue-600 hover:text-blue-700 font-medium"
-                      >
-                        ℹ️ Info
-                      </button>
                     </div>
 
-                    <PlaylistViewer
-                      playlistId={selectedSlot.playlistId}
-                      compact={true}
-                      maxHeight="450px"
-                      showHeader={false}
-                      showDragHandle={false}
-                      allowReorder={false}
-                      allowRemove={false}
-                      allowPlay={true}
-                      containerClassName=""
-                    />
+                    {/* Playlist Tracks */}
+                    <div className="bg-white">
+                      <PlaylistViewer
+                        playlistId={selectedSlot.playlistId}
+                        compact={true}
+                        maxHeight="450px"
+                        showHeader={false}
+                        showDragHandle={false}
+                        allowReorder={false}
+                        allowRemove={false}
+                        allowPlay={true}
+                        containerClassName=""
+                      />
+                    </div>
                   </div>
                 )}
               </>
