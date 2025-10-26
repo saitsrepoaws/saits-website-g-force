@@ -3,16 +3,11 @@ import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
 import { listPlaylists } from '../../services/playlists'
-import { listTracks } from '../../services/tracks'
 import { getUrl } from 'aws-amplify/storage'
-import { generateClient } from 'aws-amplify/data'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { PlayerState } from '../../types/player'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
-
-// Lazy client for Amplify
-const getClient = () => generateClient()
 
 interface Track {
   id: string
@@ -81,9 +76,20 @@ function Players() {
     
     // Always subscribe to log updates (even if service already exists)
     console.log('📝 Registering log callback')
-    const unsubscribe = iotServiceRef.current.onLog((log) => {
+    const unsubscribeLog = iotServiceRef.current.onLog((log) => {
       console.log('🔔 Log callback triggered!', log.type)
       setIoTLogs(prev => [log, ...prev.slice(0, 99)])
+    })
+    
+    // Subscribe to commands (IoT → Player)
+    console.log('🎧 Subscribing to IoT commands...')
+    let unsubscribeCommands: (() => void) | null = null
+    
+    iotServiceRef.current.subscribeToCommands((command) => {
+      console.log('🎛️ Command received from IoT:', command)
+      handleCommand(command)
+    }).then(unsub => {
+      unsubscribeCommands = unsub
     })
     
     // Get existing logs
@@ -91,10 +97,11 @@ function Players() {
     console.log('📚 Loading existing logs:', existingLogs.length)
     setIoTLogs(existingLogs)
     
-    // Cleanup: only unsubscribe callback, don't cleanup service
+    // Cleanup: unsubscribe callbacks
     return () => {
-      console.log('🧹 Unsubscribing log callback')
-      unsubscribe()
+      console.log('🧹 Unsubscribing callbacks')
+      unsubscribeLog()
+      if (unsubscribeCommands) unsubscribeCommands()
     }
   }, [playerId])
 
@@ -107,7 +114,49 @@ function Players() {
     return () => clearInterval(interval)
   }, [])
 
-  // TEST FUNCTION - Direct IoT test
+  // ==========================================================================
+  // Command Handler (IoT → Player)
+  // ==========================================================================
+
+  function handleCommand(command: any) {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🎛️ COMMAND RECEIVED:', command.command)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+    switch (command.command) {
+      case 'LOAD':
+        if (command.params?.track) {
+          executeLoad(command.params.track)
+        } else {
+          console.error('❌ LOAD command missing track data')
+        }
+        break
+
+      case 'PLAY':
+        executePlay()
+        break
+
+      case 'PAUSE':
+        executePause()
+        break
+
+      case 'STOP':
+        executeStop()
+        break
+
+      case 'UNLOAD':
+        executeUnload()
+        break
+
+      default:
+        console.warn('⚠️ Unknown command:', command.command)
+    }
+  }
+
+  // ==========================================================================
+  // TEST FUNCTION
+  // ==========================================================================
+
   async function testIoTConnection() {
     console.log('🧪 Testing IoT connection...')
     try {
@@ -209,7 +258,6 @@ function Players() {
     console.log('📥 LOAD BUTTON CLICKED')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
-    // Load first track from current playlist
     if (!currentPlaylistId) {
       console.error('❌ No playlist selected')
       alert('⚠️ No playlist selected')
@@ -219,106 +267,56 @@ function Players() {
     console.log('📋 Current playlist ID:', currentPlaylistId)
 
     try {
+      // Publish LOAD command to IoT (don't execute yet!)
+      console.log('🎛️ Publishing LOAD command to IoT...')
+      await iotServiceRef.current?.publishCommand({
+        command: 'LOAD',
+        timestamp: new Date().toISOString(),
+        params: {
+          playlistId: currentPlaylistId
+        }
+      })
+      
+      console.log('✅ LOAD command published - waiting for response from State Machine...')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    } catch (error) {
+      console.error('❌ Failed to publish LOAD command:', error)
+      alert(`❌ Failed to send LOAD command: ${error}`)
+    }
+  }
+
+  // Execute LOAD when command comes back from State Machine
+  async function executeLoad(track: any) {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('⚙️ EXECUTING LOAD COMMAND')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📦 Track data from IoT payload:', track)
+
+    try {
       // Publish LOADING state
       console.log('📤 Publishing LOADING state...')
       await iotServiceRef.current?.publishState(PlayerState.LOADING, {
-        playlistId: currentPlaylistId
+        playlistId: currentPlaylistId || undefined,
+        trackId: track.id
       })
 
-      console.log('🔍 Fetching playlist data...')
-      // @ts-ignore - Playlist model exists at runtime
-      const { data: playlistData } = await getClient().models.Playlist.get({ id: currentPlaylistId })
-      console.log('✅ Playlist data received:', playlistData)
+      // Load track (data already complete from IoT payload!)
+      console.log('📥 Loading track into player...')
+      await loadTrackIntoPlayer(track)
       
-      if (!playlistData?.tracks) {
-        console.error('❌ Playlist has no tracks field')
-        alert('⚠️ Playlist has no tracks')
-        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-          error: 'Playlist has no tracks'
-        })
-        return
-      }
-
-      // Parse tracks from JSON string
-      console.log('📋 Raw tracks data:', playlistData.tracks)
-      let parsedTracks: any[] = []
-      
-      try {
-        if (typeof playlistData.tracks === 'string') {
-          parsedTracks = JSON.parse(playlistData.tracks)
-          console.log('✅ Parsed tracks from JSON string')
-        } else if (Array.isArray(playlistData.tracks)) {
-          parsedTracks = playlistData.tracks
-          console.log('✅ Tracks already an array')
-        }
-      } catch (e) {
-        console.error('❌ Failed to parse tracks:', e)
-        alert('⚠️ Failed to parse playlist tracks')
-        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-          error: 'Failed to parse playlist tracks'
-        })
-        return
-      }
-
-      if (parsedTracks.length === 0) {
-        console.error('❌ Playlist has no tracks')
-        alert('⚠️ Playlist is empty')
-        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-          error: 'Playlist is empty'
-        })
-        return
-      }
-
-      console.log('📊 Playlist has', parsedTracks.length, 'tracks')
-
-      // Sort tracks by order (ascending)
-      const sortedTracks = [...parsedTracks].sort((a, b) => {
-        return (a.order ?? 0) - (b.order ?? 0)
+      console.log('📤 Publishing LOADED state...')
+      await iotServiceRef.current?.publishState(PlayerState.LOADED, {
+        trackId: track.id,
+        playlistId: currentPlaylistId || undefined,
+        duration: track.duration || 0
       })
-
-      const firstPlaylistTrack = sortedTracks[0]
-
-      console.log('🎵 First track in playlist:', firstPlaylistTrack)
-      console.log('   - trackId:', firstPlaylistTrack.trackId)
-      console.log('   - order:', firstPlaylistTrack.order)
-
-      // Load the actual track data
-      if (firstPlaylistTrack.trackId) {
-        console.log('🔍 Fetching track from library...')
-        const { data: tracks } = await listTracks()
-        console.log('📚 Total tracks in library:', tracks?.length || 0)
-        
-        const track = tracks?.find((t: any) => t.id === firstPlaylistTrack.trackId)
-        console.log('🎵 Found track:', track ? track.title : 'NOT FOUND')
-        
-        if (track) {
-          console.log('📥 Loading track into player...')
-          await loadTrackIntoPlayer(track)
-          
-          console.log('📤 Publishing LOADED state...')
-          // Publish LOADED state
-          await iotServiceRef.current?.publishState(PlayerState.LOADED, {
-            trackId: track.id,
-            playlistId: currentPlaylistId,
-            duration: track.duration || 0
-          })
-          
-          console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
-          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-          alert(`✅ Track #1 loaded from playlist: ${track.title}`)
-        } else {
-          console.error('❌ Track not found in library')
-          alert('⚠️ Track not found in library')
-          await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-            error: 'Track not found in library'
-          })
-        }
-      } else {
-        console.error('❌ No trackId in playlist track')
-      }
+      
+      console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      alert(`✅ Track loaded: ${track.title}`)
     } catch (error) {
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('❌❌❌ LOAD FAILED ❌❌❌')
+      console.error('❌❌❌ LOAD EXECUTION FAILED ❌❌❌')
       console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.error('Error:', error)
       await iotServiceRef.current?.publishState(PlayerState.ERROR, {
