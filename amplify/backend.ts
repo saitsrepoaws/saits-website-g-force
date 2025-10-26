@@ -23,8 +23,12 @@ import * as iam from 'aws-cdk-lib/aws-iam'
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions'
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks'
 import * as iot from 'aws-cdk-lib/aws-iot'
-import * as fs from 'fs'
-import * as path from 'path'
+import { readFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 // Compose resources explicitly to keep files small and modular
 export const backend = defineBackend({
@@ -235,8 +239,8 @@ iotPublisherLambda.addToRolePolicy(
 )
 
 // Read State Machine definition
-const stateMachineDefinitionPath = path.join(__dirname, 'functions/state-machine/definition.asl.json')
-const stateMachineDefinitionRaw = fs.readFileSync(stateMachineDefinitionPath, 'utf-8')
+const stateMachineDefinitionPath = join(__dirname, 'functions/state-machine/definition.asl.json')
+const stateMachineDefinitionRaw = readFileSync(stateMachineDefinitionPath, 'utf-8')
 
 // Replace placeholders with actual Lambda ARNs
 const stateMachineDefinition = stateMachineDefinitionRaw

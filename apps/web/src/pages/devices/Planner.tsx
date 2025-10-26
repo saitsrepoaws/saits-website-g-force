@@ -16,16 +16,32 @@ interface TimeSlot {
 
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
+// Default mock schedule (only used if localStorage is empty)
+const DEFAULT_TIME_SLOTS: TimeSlot[] = [
+  { id: '1', time: '06:00', name: 'Morning Show', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
+  { id: '2', time: '09:00', name: 'Midday Mix', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
+  { id: '3', time: '12:00', name: 'Lunch Hour', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 60, active: true },
+  { id: '4', time: '15:00', name: 'Afternoon Drive', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
+  { id: '5', time: '18:00', name: 'Evening Session', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], duration: 180, active: true },
+  { id: '6', time: '21:00', name: 'Night Vibes', playlistId: null, days: ['FRI', 'SAT'], duration: 240, active: true },
+]
+
+// Load from localStorage or use default
+function loadTimeSlotsFromStorage(): TimeSlot[] {
+  try {
+    const stored = localStorage.getItem('planner-time-slots')
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (error) {
+    console.error('Failed to load time slots from localStorage:', error)
+  }
+  return DEFAULT_TIME_SLOTS
+}
+
 function Planner() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([
-    { id: '1', time: '06:00', name: 'Morning Show', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-    { id: '2', time: '09:00', name: 'Midday Mix', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-    { id: '3', time: '12:00', name: 'Lunch Hour', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 60, active: true },
-    { id: '4', time: '15:00', name: 'Afternoon Drive', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-    { id: '5', time: '18:00', name: 'Evening Session', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], duration: 180, active: true },
-    { id: '6', time: '21:00', name: 'Night Vibes', playlistId: null, days: ['FRI', 'SAT'], duration: 240, active: true },
-  ])
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(loadTimeSlotsFromStorage())
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [showAddSlot, setShowAddSlot] = useState(false)
   const [currentDay, setCurrentDay] = useState<string>('MON')
@@ -39,6 +55,15 @@ function Planner() {
   useEffect(() => {
     loadPlaylists()
   }, [])
+
+  // Save timeSlots to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('planner-time-slots', JSON.stringify(timeSlots))
+    } catch (error) {
+      console.error('Failed to save time slots to localStorage:', error)
+    }
+  }, [timeSlots])
 
   async function loadPlaylists() {
     try {
