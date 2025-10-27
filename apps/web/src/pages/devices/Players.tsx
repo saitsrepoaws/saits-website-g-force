@@ -335,60 +335,21 @@ function Players() {
     console.log('📥 LOAD BUTTON CLICKED')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
-    // Check if we have a scheduled track
-    if (currentTrackInfo && scheduledTrackId) {
-      console.log('🎯 Publishing LOAD command for scheduled track:', currentTrackInfo.track.trackTitle)
-      console.log('📋 Track ID:', scheduledTrackId)
-      
-      try {
-        // Find the full track data
-        const { data: allTracks } = await listTracks()
-        const track = allTracks?.find((t: any) => t.id === scheduledTrackId)
-        
-        if (track) {
-          // Publish LOAD command to IoT with track data
-          console.log('📤 Publishing LOAD command to IoT...')
-          await iotServiceRef.current?.publishCommand({
-            command: 'LOAD',
-            timestamp: new Date().toISOString(),
-            params: {
-              track: track,
-              playlistId: currentPlaylistId || undefined
-            }
-          })
-          
-          console.log('✅ LOAD command published - waiting for State Machine response...')
-        } else {
-          console.error('❌ Scheduled track not found in database')
-          alert('❌ Scheduled track not found')
-        }
-      } catch (error) {
-        console.error('❌ Failed to publish LOAD command:', error)
-        alert(`❌ Failed to send LOAD command: ${error}`)
-      }
-      return
-    }
-    
-    if (!currentPlaylistId) {
-      console.error('❌ No playlist selected and no scheduled track')
-      alert('⚠️ No playlist selected')
-      return
-    }
-
-    console.log('📋 Current playlist ID:', currentPlaylistId)
-
     try {
-      // Publish LOAD command to IoT (don't execute yet!)
-      console.log('🎛️ Publishing LOAD command to IoT...')
+      // Simple LOAD command - backend will determine which track to load
+      console.log('📤 Publishing LOAD command to IoT...')
+      console.log('🎯 Backend will determine track based on schedule')
+      
       await iotServiceRef.current?.publishCommand({
         command: 'LOAD',
         timestamp: new Date().toISOString(),
         params: {
-          playlistId: currentPlaylistId
+          playlistId: currentPlaylistId || undefined
         }
       })
       
-      console.log('✅ LOAD command published - waiting for response from State Machine...')
+      console.log('✅ LOAD command published')
+      console.log('⏳ Waiting for backend to send track data...')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
       console.error('❌ Failed to publish LOAD command:', error)
