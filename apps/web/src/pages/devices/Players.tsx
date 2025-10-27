@@ -147,10 +147,14 @@ function Players() {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.log('Command:', command)
       console.log('Command type:', command.command)
+      console.log('Params:', command.params)
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      
+      // Execute command (accept own commands for now - State Machine will process later)
       handleCommand(command)
     }).then(unsub => {
       console.log('✅ Successfully subscribed to commands')
+      console.log('📡 Listening on: radio/player/' + playerId + '/command')
       unsubscribeCommands = unsub
     }).catch(err => {
       console.error('❌ Failed to subscribe to commands:', err)
