@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/25e2a4adac92c8c7ef85fac0b0e3c22d05ae0f6c06391a01d3005c10097dddbd.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/583dca0dc7bab4c0044e1c53347b0c92ebcf248ae1c9bb5d7076269ab6abcded.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -2185,6 +2185,18 @@
             "data": "playersimplehandlerlambdaC2FF27C5"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/state-machine-trigger-lambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "statemachinetriggerlambdaServiceRoleE801CFAB"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/state-machine-trigger-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "statemachinetriggerlambda9003FBAB"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -2213,6 +2225,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": [

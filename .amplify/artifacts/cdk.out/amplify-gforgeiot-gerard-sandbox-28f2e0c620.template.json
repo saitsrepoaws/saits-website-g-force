@@ -197,6 +197,13 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -529,7 +536,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/138431573536640009137d46a374f02f005cf0691d3660123073ada078aa5f93.json"
+       "/73f0d3dcaa4007f322777463c61a470310f29a4e08933073659f25516436149d.json"
       ]
      ]
     }

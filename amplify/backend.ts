@@ -8,6 +8,7 @@ import { playlistGenerator } from './functions/playlist-generator/resource'
 import { playerLoadHandler } from './functions/player-load-handler/resource'
 import { playerIotPublisher } from './functions/player-iot-publisher/resource'
 import { playerSimpleHandler } from './functions/player-simple-handler/resource'
+import { stateMachineTrigger } from './functions/state-machine-trigger/resource'
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
@@ -41,6 +42,7 @@ export const backend = defineBackend({
   playerLoadHandler,
   playerIotPublisher,
   playerSimpleHandler,
+  stateMachineTrigger,
   // audioAnalyzer - replaced with container Lambda below
 })
 
@@ -229,13 +231,7 @@ new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
 const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
 const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
 const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
-
-// Add environment variables to load handler
-loadHandlerLambda.addEnvironment('APPSYNC_ENDPOINT', backend.data.resources.graphqlApi.graphqlUrl)
-loadHandlerLambda.addEnvironment('APPSYNC_API_KEY', backend.data.resources.graphqlApi.apiKey || '')
-
-// Add environment variable to IoT publisher
-iotPublisherLambda.addEnvironment('IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
+const triggerLambda = backend.stateMachineTrigger.resources.lambda
 
 // Grant GraphQL API access to load handler (via IAM policy)
 loadHandlerLambda.addToRolePolicy(
@@ -281,34 +277,29 @@ loadHandlerLambda.grantInvoke(playerStateMachine)
 iotPublisherLambda.grantInvoke(playerStateMachine)
 simpleHandlerLambda.grantInvoke(playerStateMachine)
 
-// Create IoT Rule to trigger State Machine
-const iotRuleRole = new iam.Role(backend.storage.stack, 'IoTRuleRole', {
-  assumedBy: new ServicePrincipal('iot.amazonaws.com'),
-})
+// Add environment variable to trigger Lambda
+triggerLambda.addEnvironment('STATE_MACHINE_ARN', playerStateMachine.stateMachineArn)
+triggerLambda.addEnvironment('AWS_REGION', backend.storage.stack.region)
 
-playerStateMachine.grantStartExecution(iotRuleRole)
+// Grant trigger Lambda permission to start State Machine
+playerStateMachine.grantStartExecution(triggerLambda)
+
+// Create IoT Rule to trigger Lambda (which then starts State Machine)
+triggerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
 
 const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule', {
   ruleName: 'RadioPlayerCommandRule',
   topicRulePayload: {
     sql: "SELECT * FROM 'radio/player/+/command-request'",
-    description: 'Trigger State Machine for player command requests',
+    description: 'Trigger Lambda for player command requests',
     actions: [
       {
-        stepFunctions: {
-          stateMachineName: playerStateMachine.stateMachineName,
-          executionNamePrefix: 'player-cmd-',
-          roleArn: iotRuleRole.roleArn,
+        lambda: {
+          functionArn: triggerLambda.functionArn,
         },
       },
     ],
     awsIotSqlVersion: '2016-03-23',
-    errorAction: {
-      cloudwatchLogs: {
-        logGroupName: '/aws/iot/rules/RadioPlayerCommandRule',
-        roleArn: iotRuleRole.roleArn,
-      },
-    },
   },
 })
 
