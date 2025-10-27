@@ -138,13 +138,22 @@ function Players() {
     
     // Subscribe to commands (IoT → Player)
     console.log('🎧 Subscribing to IoT commands...')
+    console.log('📡 Topic:', `radio/player/${playerId}/command`)
     let unsubscribeCommands: (() => void) | null = null
     
     iotServiceRef.current.subscribeToCommands((command) => {
-      console.log('🎛️ Command received from IoT:', command)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('📥 COMMAND RECEIVED FROM IoT!')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('Command:', command)
+      console.log('Command type:', command.command)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       handleCommand(command)
     }).then(unsub => {
+      console.log('✅ Successfully subscribed to commands')
       unsubscribeCommands = unsub
+    }).catch(err => {
+      console.error('❌ Failed to subscribe to commands:', err)
     })
     
     // Get existing logs
