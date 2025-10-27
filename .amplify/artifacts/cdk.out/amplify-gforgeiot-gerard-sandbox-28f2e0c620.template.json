@@ -200,8 +200,8 @@
       "\",\"",
       {
        "Fn::GetAtt": [
-        "function1351588B",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref"
+        "customplayerstatemachine74B5C2ED",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Ref"
        ]
       },
       "\"]"
@@ -459,10 +459,10 @@
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
       ]
      },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn": {
       "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
+       "customplayerstatemachine74B5C2ED",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn"
       ]
      }
     },
@@ -492,7 +492,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/adabb7f0b60db8f5bcc4805f6de66392f233e5d0eca234cd8bcaf6e38f68cc59.json"
+       "/b6d5cb72065d5688c1dce4462af266b52b27d348b14209036b882658c90744da.json"
       ]
      ]
     }
@@ -514,7 +514,51 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
       ]
+     }
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
      },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TemplateURL": {
+     "Fn::Join": [
+      "",
+      [
+       "https://s3.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".",
+       {
+        "Ref": "AWS::URLSuffix"
+       },
+       "/",
+       {
+        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+       },
+       "/9b11449034e1cd7344d429ac57d81a5a2b5ecb8dc63bfe27477e3528098a191b.json"
+      ]
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function.NestedStack/function.NestedStackResource",
+    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620functionDC40D732.nested.template.json",
+    "aws:asset:property": "TemplateURL"
+   }
+  },
+  "customplayerstatemachine74B5C2ED": {
+   "Type": "AWS::CloudFormation::Stack",
+   "Properties": {
+    "Parameters": {
      "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
       "Fn::GetAtt": [
        "storage0EC3F24A",
@@ -548,7 +592,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/cfcd1a4cf92bd94e97ff3ad4ee6465ed5a0aa6f68c9afab66aa8246548d6a51a.json"
+       "/0dd84c23056427c5d6fd2965b73c68d63ee9a576e076e4f8244cea3428d8931b.json"
       ]
      ]
     }
@@ -556,8 +600,8 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function.NestedStack/function.NestedStackResource",
-    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620functionDC40D732.nested.template.json",
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine.NestedStack/custom-player-state-machine.NestedStackResource",
+    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachine1288B6DD.nested.template.json",
     "aws:asset:property": "TemplateURL"
    }
   },

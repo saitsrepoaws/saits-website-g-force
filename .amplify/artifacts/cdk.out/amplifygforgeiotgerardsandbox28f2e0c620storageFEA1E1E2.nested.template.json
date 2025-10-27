@@ -1781,7 +1781,7 @@
       {
        "Lambda": {
         "FunctionArn": {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn"
         }
        }
       }
@@ -2309,7 +2309,7 @@
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
    "Type": "String"
   },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn": {
    "Type": "String"
   }
  }

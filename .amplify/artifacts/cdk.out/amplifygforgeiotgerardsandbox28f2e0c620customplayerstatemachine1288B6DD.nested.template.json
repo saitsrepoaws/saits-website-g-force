@@ -1,0 +1,458 @@
+{
+ "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"AmplifySandbox\",\"createdWith\":\"1.14.1\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+ "Resources": {
+  "statemachinetriggerlambdaServiceRoleE801CFAB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "state-machine-trigger"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/state-machine-trigger-lambda/ServiceRole/Resource"
+   }
+  },
+  "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C",
+    "Roles": [
+     {
+      "Ref": "statemachinetriggerlambdaServiceRoleE801CFAB"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/state-machine-trigger-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "statemachinetriggerlambda9003FBAB": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "bc679195da64b67c115d7a28def12c97cc8e72ac79603669330c73d4b55b3f80.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "STATE_MACHINE_ARN": {
+       "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+      }
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "statemachinetriggerlambdaServiceRoleE801CFAB",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "state-machine-trigger"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C",
+    "statemachinetriggerlambdaServiceRoleE801CFAB"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/state-machine-trigger-lambda/Resource",
+    "aws:asset:path": "asset.bc679195da64b67c115d7a28def12c97cc8e72ac79603669330c73d4b55b3f80",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "statemachinetriggerlambdaInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE4289D75A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "statemachinetriggerlambda9003FBAB",
+      "Arn"
+     ]
+    },
+    "Principal": "iot.amazonaws.com"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/state-machine-trigger-lambda/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2OSwqDQBBEz5J92zHjCaKQpQQ9gLRjK+1nBuwxEsS7BxWyelWLepRBY2KMb7RqZJshGqXGLWcN3JSB7AC0arWNNNUNVc433CvmJ16Ls0G8A6EJt8KPDFnrTr79KPZ71CvtoElFqhwUnwdAE0wXO3BISRkuPW5Z6/7WY8zzJKri3b5DweqX2TKcgjJQJ67b4biEvd4/xqB5YHzrVSSaFxdkYiwu/gBfvjrD5QAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Outputs": {
+  "amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Ref": {
+   "Value": {
+    "Ref": "statemachinetriggerlambda9003FBAB"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "statemachinetriggerlambda9003FBAB",
+     "Arn"
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
+   "Type": "String"
+  }
+ }
+}

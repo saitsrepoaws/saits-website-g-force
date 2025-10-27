@@ -265,8 +265,11 @@ const stateMachineDefinition = stateMachineDefinitionRaw
   .replace(/\$\{SimpleCommandHandlerArn\}/g, simpleHandlerLambda.functionArn)
   .replace(/\$\{PlayCommandHandlerArn\}/g, simpleHandlerLambda.functionArn)
 
-// Create State Machine
-const playerStateMachine = new sfn.StateMachine(backend.storage.stack, 'PlayerStateMachine', {
+// Create custom stack for State Machine to avoid circular dependencies
+const stateMachineStack = backend.createStack('custom-player-state-machine')
+
+// Create State Machine in custom stack
+const playerStateMachine = new sfn.StateMachine(stateMachineStack, 'PlayerStateMachine', {
   stateMachineName: 'RadioPlayerStateMachine',
   definitionBody: sfn.DefinitionBody.fromString(stateMachineDefinition),
   timeout: Duration.minutes(5),
@@ -286,7 +289,7 @@ playerStateMachine.grantStartExecution(triggerLambda)
 // Create IoT Rule to trigger Lambda (which then starts State Machine)
 triggerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
 
-const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule', {
+const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
   ruleName: 'RadioPlayerCommandRule',
   topicRulePayload: {
     sql: "SELECT * FROM 'radio/player/+/command-request'",
@@ -303,14 +306,14 @@ const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule',
 })
 
 // Output State Machine ARN
-new CfnOutput(backend.storage.stack, 'PlayerStateMachineArn', {
+new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
   value: playerStateMachine.stateMachineArn,
   description: 'ARN of the Player State Machine',
   exportName: 'PlayerStateMachineArn',
 })
 
-new CfnOutput(backend.storage.stack, 'IoTRuleArn', {
-  value: `arn:aws:iot:${backend.storage.stack.region}:${backend.storage.stack.account}:rule/${iotRule.ruleName}`,
+new CfnOutput(stateMachineStack, 'IoTRuleArn', {
+  value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${iotRule.ruleName}`,
   description: 'ARN of the IoT Rule for player commands',
   exportName: 'PlayerCommandIoTRuleArn',
 })
