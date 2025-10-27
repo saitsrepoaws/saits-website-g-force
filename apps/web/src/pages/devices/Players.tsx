@@ -188,19 +188,19 @@ function Players() {
         break
 
       case 'PLAY':
-        executePlay()
+        handlePlay()
         break
 
       case 'PAUSE':
-        executePause()
+        handlePause()
         break
 
       case 'STOP':
-        executeStop()
+        handleStop()
         break
 
       case 'UNLOAD':
-        executeUnload()
+        handleUnload()
         break
 
       default:
