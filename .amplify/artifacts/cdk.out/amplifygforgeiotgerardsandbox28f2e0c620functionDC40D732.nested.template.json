@@ -110,7 +110,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "fc6bb275b90a2c9bef9fd54fb48fe199d988aedcf30e2caa4a31774c3e2728c5.zip"
+     "S3Key": "94e6ea41a7a334a4568f3c6436189e7ac30315c3fbc9cca798302a4bda1e69cc.zip"
     },
     "Environment": {
      "Variables": {
@@ -153,7 +153,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/Resource",
-    "aws:asset:path": "asset.fc6bb275b90a2c9bef9fd54fb48fe199d988aedcf30e2caa4a31774c3e2728c5",
+    "aws:asset:path": "asset.94e6ea41a7a334a4568f3c6436189e7ac30315c3fbc9cca798302a4bda1e69cc",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -244,7 +244,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "baf1e72215ff01371e5081b1425e943a1764244d6fe930e5f3b296c432697c93.zip"
+     "S3Key": "1c11aacaa3651abcb6bea0a65a5dbf9e81d89f4ff15677ef08c5671834c2af7f.zip"
     },
     "Environment": {
      "Variables": {
@@ -287,7 +287,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-iot-publisher-lambda/Resource",
-    "aws:asset:path": "asset.baf1e72215ff01371e5081b1425e943a1764244d6fe930e5f3b296c432697c93",
+    "aws:asset:path": "asset.1c11aacaa3651abcb6bea0a65a5dbf9e81d89f4ff15677ef08c5671834c2af7f",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -352,7 +352,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "6d5b02336d68d5a3059f02ad20a267f812b62b61119efcdd0448cd2ec74f5f5e.zip"
+     "S3Key": "5df89b58bd8b5f57edb3127688e2fbe00c985084bab5d032de6cfbc9e5ddfd7e.zip"
     },
     "Environment": {
      "Variables": {
@@ -394,7 +394,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-simple-handler-lambda/Resource",
-    "aws:asset:path": "asset.6d5b02336d68d5a3059f02ad20a267f812b62b61119efcdd0448cd2ec74f5f5e",
+    "aws:asset:path": "asset.5df89b58bd8b5f57edb3127688e2fbe00c985084bab5d032de6cfbc9e5ddfd7e",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
