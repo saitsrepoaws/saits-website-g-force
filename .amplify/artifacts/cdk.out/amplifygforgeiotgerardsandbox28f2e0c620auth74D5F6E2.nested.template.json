@@ -321,6 +321,11 @@
        ],
        "Effect": "Allow",
        "Resource": "arn:aws:iot:eu-west-1:*:topic/*"
+      },
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": "arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine"
       }
      ],
      "Version": "2012-10-17"

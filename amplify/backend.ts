@@ -157,6 +157,15 @@ authenticatedRole.attachInlinePolicy(
           'arn:aws:iot:eu-west-1:*:topic/*',
         ],
       }),
+      
+      // Step Functions - allow starting State Machine executions
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ['states:StartExecution'],
+        resources: [
+          'arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine',
+        ],
+      }),
     ],
   })
 )
