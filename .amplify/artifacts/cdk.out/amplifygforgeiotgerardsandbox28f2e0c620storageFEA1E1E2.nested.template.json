@@ -1858,6 +1858,17 @@
      ],
      "AwsIotSqlVersion": "2016-03-23",
      "Description": "Trigger State Machine for player command requests",
+     "ErrorAction": {
+      "CloudwatchLogs": {
+       "LogGroupName": "/aws/iot/rules/RadioPlayerCommandRule",
+       "RoleArn": {
+        "Fn::GetAtt": [
+         "IoTRuleRole7CB25599",
+         "Arn"
+        ]
+       }
+      }
+     },
      "Sql": "SELECT * FROM 'radio/player/+/command-request'"
     }
    },

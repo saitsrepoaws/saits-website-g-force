@@ -299,10 +299,16 @@ const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule',
           stateMachineName: playerStateMachine.stateMachineName,
           executionNamePrefix: 'player-cmd-',
           roleArn: iotRuleRole.roleArn,
-        } as any, // Type assertion for CDK compatibility
+        },
       },
     ],
     awsIotSqlVersion: '2016-03-23',
+    errorAction: {
+      cloudwatchLogs: {
+        logGroupName: '/aws/iot/rules/RadioPlayerCommandRule',
+        roleArn: iotRuleRole.roleArn,
+      },
+    },
   },
 })
 
