@@ -335,26 +335,32 @@ function Players() {
     console.log('📥 LOAD BUTTON CLICKED')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
-    try {
-      // Simple LOAD command - backend will determine which track to load
-      console.log('📤 Publishing LOAD command to IoT...')
-      console.log('🎯 Backend will determine track based on schedule')
+    // For now: Load scheduled track directly (State Machine integration later)
+    if (currentTrackInfo && scheduledTrackId) {
+      console.log('🎯 Loading scheduled track:', currentTrackInfo.track.trackTitle)
+      console.log('📋 Track ID:', scheduledTrackId)
       
-      await iotServiceRef.current?.publishCommand({
-        command: 'LOAD',
-        timestamp: new Date().toISOString(),
-        params: {
-          playlistId: currentPlaylistId || undefined
+      try {
+        // Find the full track data
+        const { data: allTracks } = await listTracks()
+        const track = allTracks?.find((t: any) => t.id === scheduledTrackId)
+        
+        if (track) {
+          console.log('✅ Found scheduled track, loading directly...')
+          await executeLoad(track)
+        } else {
+          console.error('❌ Scheduled track not found in database')
+          alert('❌ Scheduled track not found')
         }
-      })
-      
-      console.log('✅ LOAD command published')
-      console.log('⏳ Waiting for backend to send track data...')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    } catch (error) {
-      console.error('❌ Failed to publish LOAD command:', error)
-      alert(`❌ Failed to send LOAD command: ${error}`)
+      } catch (error) {
+        console.error('❌ Failed to load scheduled track:', error)
+        alert(`❌ Failed to load track: ${error}`)
+      }
+      return
     }
+    
+    console.error('❌ No scheduled track available')
+    alert('⚠️ No track scheduled for current time')
   }
 
   // Execute LOAD when command comes back from State Machine
