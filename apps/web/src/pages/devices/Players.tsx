@@ -336,97 +336,25 @@ function Players() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
     try {
-      // Trigger State Machine directly (IoT Rule doesn't work with loopback)
-      console.log('🚀 Triggering State Machine directly...')
+      // IoT-driven: Send LOAD command, backend determines track
+      console.log('📤 Publishing LOAD command to IoT...')
+      console.log('🎯 Backend will determine track based on schedule')
       console.log('📋 Playlist ID:', currentPlaylistId)
       
-      // Dynamic imports
-      const sfnModule = await import('@aws-sdk/client-sfn')
-      const { fetchAuthSession } = await import('aws-amplify/auth')
-      
-      // Get credentials
-      const session = await fetchAuthSession()
-      const credentials = session.credentials
-      
-      if (!credentials) {
-        throw new Error('No credentials available')
-      }
-      
-      // Create Step Functions client
-      const sfnClient = new sfnModule.SFNClient({
-        region: 'eu-west-1',
-        credentials: credentials
+      await iotServiceRef.current?.publishCommand({
+        command: 'LOAD',
+        timestamp: new Date().toISOString(),
+        params: {
+          playlistId: currentPlaylistId || undefined
+        }
       })
       
-      // Start State Machine execution
-      const stateMachineArn = 'arn:aws:states:eu-west-1:035636364722:stateMachine:RadioPlayerStateMachine'
-      
-      const command = new sfnModule.StartExecutionCommand({
-        stateMachineArn: stateMachineArn,
-        input: JSON.stringify({
-          command: 'LOAD',
-          playerId: playerId,
-          params: {
-            playlistId: currentPlaylistId
-          },
-          timestamp: new Date().toISOString()
-        })
-      })
-      
-      const result = await sfnClient.send(command)
-      
-      console.log('✅ State Machine execution started:', result.executionArn || 'unknown')
-      console.log('⏳ Waiting for execution to complete...')
-      
-      // Poll for execution completion
-      const executionArn = result.executionArn
-      if (executionArn) {
-        let attempts = 0
-        const maxAttempts = 10
-        
-        while (attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 500)) // Wait 500ms
-          
-          const describeCommand = new sfnModule.DescribeExecutionCommand({
-            executionArn: executionArn
-          })
-          
-          const execution = await sfnClient.send(describeCommand)
-          
-          if (execution.status === 'SUCCEEDED') {
-            console.log('✅ Execution completed successfully!')
-            
-            // Parse output
-            const output = JSON.parse(execution.output || '{}')
-            const track = output.loadResult?.Payload?.track
-            
-            if (track) {
-              console.log('🎵 Track received:', track.title, 'by', track.artist)
-              await executeLoad(track)
-            } else {
-              console.error('❌ No track in execution output')
-              alert('❌ No track data received')
-            }
-            break
-          } else if (execution.status === 'FAILED' || execution.status === 'TIMED_OUT' || execution.status === 'ABORTED') {
-            console.error('❌ Execution failed:', execution.status)
-            alert(`❌ Failed to load track: ${execution.status}`)
-            break
-          }
-          
-          attempts++
-        }
-        
-        if (attempts >= maxAttempts) {
-          console.error('❌ Execution timeout')
-          alert('❌ Timeout waiting for track data')
-        }
-      }
-      
+      console.log('✅ LOAD command published')
+      console.log('⏳ Waiting for backend to send track data via IoT...')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
-      console.error('❌ Failed to trigger State Machine:', error)
-      alert(`❌ Failed to load track: ${error}`)
+      console.error('❌ Failed to publish LOAD command:', error)
+      alert(`❌ Failed to send LOAD command: ${error}`)
     }
   }
 

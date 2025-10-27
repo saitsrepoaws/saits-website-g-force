@@ -230,6 +230,13 @@ const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
 const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
 const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
 
+// Add environment variables to load handler
+loadHandlerLambda.addEnvironment('APPSYNC_ENDPOINT', backend.data.resources.graphqlApi.graphqlUrl)
+loadHandlerLambda.addEnvironment('APPSYNC_API_KEY', backend.data.resources.graphqlApi.apiKey || '')
+
+// Add environment variable to IoT publisher
+iotPublisherLambda.addEnvironment('IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
+
 // Grant GraphQL API access to load handler (via IAM policy)
 loadHandlerLambda.addToRolePolicy(
   new PolicyStatement({
