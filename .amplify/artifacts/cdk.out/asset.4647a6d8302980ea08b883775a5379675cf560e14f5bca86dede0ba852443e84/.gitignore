@@ -1,5 +1,0 @@
-# Don't commit the large FFmpeg binary to git
-# It will be downloaded during build
-bin/ffmpeg
-*.tar.xz
-ffmpeg-*-amd64-static/

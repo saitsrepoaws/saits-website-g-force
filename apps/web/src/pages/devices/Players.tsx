@@ -376,7 +376,53 @@ function Players() {
       const result = await sfnClient.send(command)
       
       console.log('✅ State Machine execution started:', result.executionArn || 'unknown')
-      console.log('⏳ Waiting for track data via IoT...')
+      console.log('⏳ Waiting for execution to complete...')
+      
+      // Poll for execution completion
+      const executionArn = result.executionArn
+      if (executionArn) {
+        let attempts = 0
+        const maxAttempts = 10
+        
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 500)) // Wait 500ms
+          
+          const describeCommand = new sfnModule.DescribeExecutionCommand({
+            executionArn: executionArn
+          })
+          
+          const execution = await sfnClient.send(describeCommand)
+          
+          if (execution.status === 'SUCCEEDED') {
+            console.log('✅ Execution completed successfully!')
+            
+            // Parse output
+            const output = JSON.parse(execution.output || '{}')
+            const track = output.loadResult?.Payload?.track
+            
+            if (track) {
+              console.log('🎵 Track received:', track.title, 'by', track.artist)
+              await executeLoad(track)
+            } else {
+              console.error('❌ No track in execution output')
+              alert('❌ No track data received')
+            }
+            break
+          } else if (execution.status === 'FAILED' || execution.status === 'TIMED_OUT' || execution.status === 'ABORTED') {
+            console.error('❌ Execution failed:', execution.status)
+            alert(`❌ Failed to load track: ${execution.status}`)
+            break
+          }
+          
+          attempts++
+        }
+        
+        if (attempts >= maxAttempts) {
+          console.error('❌ Execution timeout')
+          alert('❌ Timeout waiting for track data')
+        }
+      }
+      
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
       console.error('❌ Failed to trigger State Machine:', error)
