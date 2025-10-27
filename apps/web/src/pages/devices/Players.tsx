@@ -336,25 +336,50 @@ function Players() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
     try {
-      // Pure IoT-driven: Send LOAD command, backend determines track
-      console.log('📤 Publishing LOAD command to IoT...')
-      console.log('🎯 Backend will determine track based on schedule')
+      // Trigger State Machine directly (IoT Rule doesn't work with loopback)
+      console.log('🚀 Triggering State Machine directly...')
       console.log('📋 Playlist ID:', currentPlaylistId)
       
-      await iotServiceRef.current?.publishCommand({
-        command: 'LOAD',
-        timestamp: new Date().toISOString(),
-        params: {
-          playlistId: currentPlaylistId || undefined
-        }
+      const { StepFunctionsClient, StartExecutionCommand } = await import('@aws-sdk/client-sfn')
+      const { fetchAuthSession } = await import('aws-amplify/auth')
+      
+      // Get credentials
+      const session = await fetchAuthSession()
+      const credentials = session.credentials
+      
+      if (!credentials) {
+        throw new Error('No credentials available')
+      }
+      
+      // Create Step Functions client
+      const sfnClient = new StepFunctionsClient({
+        region: 'eu-west-1',
+        credentials: credentials
       })
       
-      console.log('✅ LOAD command published')
-      console.log('⏳ Waiting for backend to send track data via IoT...')
+      // Start State Machine execution
+      const stateMachineArn = 'arn:aws:states:eu-west-1:035636364722:stateMachine:RadioPlayerStateMachine'
+      
+      const command = new StartExecutionCommand({
+        stateMachineArn: stateMachineArn,
+        input: JSON.stringify({
+          command: 'LOAD',
+          playerId: playerId,
+          params: {
+            playlistId: currentPlaylistId
+          },
+          timestamp: new Date().toISOString()
+        })
+      })
+      
+      const result = await sfnClient.send(command)
+      
+      console.log('✅ State Machine execution started:', result.executionArn)
+      console.log('⏳ Waiting for track data via IoT...')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
-      console.error('❌ Failed to publish LOAD command:', error)
-      alert(`❌ Failed to send LOAD command: ${error}`)
+      console.error('❌ Failed to trigger State Machine:', error)
+      alert(`❌ Failed to load track: ${error}`)
     }
   }
 

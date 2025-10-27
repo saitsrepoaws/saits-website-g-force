@@ -62,7 +62,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
   
-  // Custom query to generate playlist via Lambda
+  // Custom query to generate playlist based on criteria
   generatePlaylist: a
     .query()
     .arguments({
@@ -80,6 +80,7 @@ const schema = a.schema({
     .returns(a.json())
     .authorization((allow) => [allow.authenticated()])
     .handler(a.handler.function(playlistGenerator)),
+  
 })
 
 export type Schema = ClientSchema<typeof schema>
