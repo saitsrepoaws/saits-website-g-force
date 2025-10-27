@@ -197,13 +197,6 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref"
        ]
       },
-      "\",\"",
-      {
-       "Fn::GetAtt": [
-        "function1351588B",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref"
-       ]
-      },
       "\"]"
      ]
     ]
@@ -490,12 +483,6 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
       ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinePlayerStateMachineA0252536Ref": {
-      "Fn::GetAtt": [
-       "customplayerstatemachine74B5C2ED",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinePlayerStateMachineA0252536Ref"
-      ]
      }
     },
     "Tags": [
@@ -524,7 +511,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/51b3b8aed89e8c9a4c2d9783434e7c63aa76af14592ae499120a9eef990c1375.json"
+       "/eea73e4e4685d98f3c7c54c0f28faec176374a5382b573139fed017029899644.json"
       ]
      ]
     }
@@ -558,12 +545,6 @@
        "function1351588B",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
       ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
-      ]
      }
     },
     "Tags": [
@@ -592,7 +573,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/497af6e276beefe9abd1b910e0b386db9a29b5780edcbbfde29e7eb17855d79e.json"
+       "/bdff776f810174a8ab487a2c3df4968697ce9dc1b9cceb0dc73c1dab5e61ece1.json"
       ]
      ]
     }

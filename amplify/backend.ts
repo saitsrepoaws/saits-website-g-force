@@ -8,13 +8,14 @@ import { playlistGenerator } from './functions/playlist-generator/resource'
 import { playerLoadHandler } from './functions/player-load-handler/resource'
 import { playerIotPublisher } from './functions/player-iot-publisher/resource'
 import { playerSimpleHandler } from './functions/player-simple-handler/resource'
-import { stateMachineTrigger } from './functions/state-machine-trigger/resource'
+// stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
-import { DockerImageFunction, DockerImageCode, Architecture } from 'aws-cdk-lib/aws-lambda'
+import { DockerImageFunction, DockerImageCode, Architecture, Runtime } from 'aws-cdk-lib/aws-lambda'
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { Duration, CfnOutput } from 'aws-cdk-lib'
 import * as ecr from 'aws-cdk-lib/aws-ecr'
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
@@ -42,7 +43,6 @@ export const backend = defineBackend({
   playerLoadHandler,
   playerIotPublisher,
   playerSimpleHandler,
-  stateMachineTrigger,
   // audioAnalyzer - replaced with container Lambda below
 })
 
@@ -231,7 +231,6 @@ new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
 const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
 const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
 const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
-const triggerLambda = backend.stateMachineTrigger.resources.lambda
 
 // Grant GraphQL API access to load handler (via IAM policy)
 loadHandlerLambda.addToRolePolicy(
@@ -267,6 +266,15 @@ const stateMachineDefinition = stateMachineDefinitionRaw
 
 // Create custom stack for State Machine to avoid circular dependencies
 const stateMachineStack = backend.createStack('custom-player-state-machine')
+
+// Create trigger Lambda directly in custom stack
+const triggerLambda = new NodejsFunction(stateMachineStack, 'StateMachineTrigger', {
+  functionName: 'state-machine-trigger',
+  entry: join(__dirname, 'functions/state-machine-trigger/handler.ts'),
+  runtime: Runtime.NODEJS_20_X,
+  timeout: Duration.seconds(10),
+  memorySize: 256,
+})
 
 // Create State Machine in custom stack
 const playerStateMachine = new sfn.StateMachine(stateMachineStack, 'PlayerStateMachine', {

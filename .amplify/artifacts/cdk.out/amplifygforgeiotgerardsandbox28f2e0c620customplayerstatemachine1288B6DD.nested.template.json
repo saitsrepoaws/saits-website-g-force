@@ -1,6 +1,149 @@
 {
  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"AmplifySandbox\",\"createdWith\":\"1.16.1\",\"stackType\":\"custom\",\"metadata\":{}}",
  "Resources": {
+  "StateMachineTriggerServiceRole7DACBDBA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/ServiceRole/Resource"
+   }
+  },
+  "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "PlayerStateMachineDF3FE3FD"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7",
+    "Roles": [
+     {
+      "Ref": "StateMachineTriggerServiceRole7DACBDBA"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "StateMachineTrigger27A3F693": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "7095284e12136ab2c28ecca344fade809d3a9d659656cade4fb80fc8ae18a17e.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STATE_MACHINE_ARN": {
+       "Ref": "PlayerStateMachineDF3FE3FD"
+      }
+     }
+    },
+    "FunctionName": "state-machine-trigger",
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "StateMachineTriggerServiceRole7DACBDBA",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7",
+    "StateMachineTriggerServiceRole7DACBDBA"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/Resource",
+    "aws:asset:path": "asset.7095284e12136ab2c28ecca344fade809d3a9d659656cade4fb80fc8ae18a17e",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "StateMachineTrigger27A3F693",
+      "Arn"
+     ]
+    },
+    "Principal": "iot.amazonaws.com"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
+   }
+  },
   "PlayerStateMachineRoleD8681A5A": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -208,7 +351,10 @@
       {
        "Lambda": {
         "FunctionArn": {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
+         "Fn::GetAtt": [
+          "StateMachineTrigger27A3F693",
+          "Arn"
+         ]
         }
        }
       }
@@ -227,7 +373,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02Lyw6CMBBFv4V9GbG/wNpHqntTyxAHSkuYqcQ0/XcjbFyde3JyNWjdQFPZlWvXjbWnJ+QzsmB3E+tGZVd+ZBac+xScUAwM+SZW8GTdiwKqtg//XhTZCbKJfksbr9GT+/x0X0VRFGj7cI8zOZM8FmWQY1rcdrokmZMUFWKHMPDhrTXoIzTVwET1koLQhGB2fgFtV6dvwgAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02PwW6DQAxEvyV349LNFzRIvTWpoHfkLCZ1gF2EvY0qxL9XQFX19DyyZkbj0Lkc8wM9NPNNl/VyxfnMatxURr4Demg99zRcG6pDbPiueN7wmoI3iQGEBpzL2DMUbdj4Hnvx36vcrwX0WJMqm+LLCtAjnpLv2E6kDHs8zkUb/lJXM0+DqEoMC6jx2P7+FOfKyPiN/KeErfa/XkCiYdGGjziKL1PPC5SsMU2eYauvjG4SbqvxkmxMtsA6De/69OUcumfMD3cVyaYUTAbGcucPEiQKVS0BAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default"
@@ -265,11 +411,6 @@
    },
    "Export": {
     "Name": "PlayerCommandIoTRuleArn"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinePlayerStateMachineA0252536Ref": {
-   "Value": {
-    "Ref": "PlayerStateMachineDF3FE3FD"
    }
   }
  },
@@ -547,9 +688,6 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
    "Type": "String"
   }
  }
