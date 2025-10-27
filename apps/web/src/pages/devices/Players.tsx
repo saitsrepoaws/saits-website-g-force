@@ -340,7 +340,8 @@ function Players() {
       console.log('🚀 Triggering State Machine directly...')
       console.log('📋 Playlist ID:', currentPlaylistId)
       
-      const { StepFunctionsClient, StartExecutionCommand } = await import('@aws-sdk/client-sfn')
+      // Dynamic imports
+      const sfnModule = await import('@aws-sdk/client-sfn')
       const { fetchAuthSession } = await import('aws-amplify/auth')
       
       // Get credentials
@@ -352,7 +353,7 @@ function Players() {
       }
       
       // Create Step Functions client
-      const sfnClient = new StepFunctionsClient({
+      const sfnClient = new sfnModule.SFNClient({
         region: 'eu-west-1',
         credentials: credentials
       })
@@ -360,7 +361,7 @@ function Players() {
       // Start State Machine execution
       const stateMachineArn = 'arn:aws:states:eu-west-1:035636364722:stateMachine:RadioPlayerStateMachine'
       
-      const command = new StartExecutionCommand({
+      const command = new sfnModule.StartExecutionCommand({
         stateMachineArn: stateMachineArn,
         input: JSON.stringify({
           command: 'LOAD',
@@ -374,7 +375,7 @@ function Players() {
       
       const result = await sfnClient.send(command)
       
-      console.log('✅ State Machine execution started:', result.executionArn)
+      console.log('✅ State Machine execution started:', result.executionArn || 'unknown')
       console.log('⏳ Waiting for track data via IoT...')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
