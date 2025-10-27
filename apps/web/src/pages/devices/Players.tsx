@@ -213,7 +213,7 @@ function Players() {
   // ==========================================================================
 
   async function testIoTConnection() {
-    console.log('🧪 Testing IoT connection...')
+    console.log('🧪 Testing IoT Commands...')
     try {
       if (!iotServiceRef.current) {
         console.error('❌ IoT service not initialized!')
@@ -221,10 +221,35 @@ function Players() {
         return
       }
       
-      console.log('📤 Publishing test state...')
-      await iotServiceRef.current.publishState(PlayerState.IDLE)
+      console.log('📤 Publishing test commands...')
       
-      console.log('✅ Test message published!')
+      // Test 1: PLAY command
+      console.log('1️⃣ Publishing PLAY command...')
+      await iotServiceRef.current.publishCommand({
+        command: 'PLAY',
+        timestamp: new Date().toISOString()
+      })
+      
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Test 2: PAUSE command
+      console.log('2️⃣ Publishing PAUSE command...')
+      await iotServiceRef.current.publishCommand({
+        command: 'PAUSE',
+        timestamp: new Date().toISOString()
+      })
+      
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
+      // Test 3: STOP command
+      console.log('3️⃣ Publishing STOP command...')
+      await iotServiceRef.current.publishCommand({
+        command: 'STOP',
+        timestamp: new Date().toISOString()
+      })
+      
+      console.log('✅ All test commands published!')
+      console.log('👀 Check the IoT Log panel to see the commands!')
     } catch (error) {
       console.error('❌ Test failed:', error)
       alert(`❌ Test failed: ${error}`)
