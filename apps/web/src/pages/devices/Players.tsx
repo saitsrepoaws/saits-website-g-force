@@ -188,19 +188,19 @@ function Players() {
         break
 
       case 'PLAY':
-        handlePlay()
+        executePlay()
         break
 
       case 'PAUSE':
-        handlePause()
+        executePause()
         break
 
       case 'STOP':
-        handleStop()
+        executeStop()
         break
 
       case 'UNLOAD':
-        handleUnload()
+        executeUnload()
         break
 
       default:
@@ -324,50 +324,34 @@ function Players() {
     
     // Check if we have a scheduled track
     if (currentTrackInfo && scheduledTrackId) {
-      console.log('🎯 Loading scheduled track:', currentTrackInfo.track.trackTitle)
+      console.log('🎯 Publishing LOAD command for scheduled track:', currentTrackInfo.track.trackTitle)
       console.log('📋 Track ID:', scheduledTrackId)
       
       try {
-        // Publish LOADING state
-        console.log('📤 Publishing LOADING state...')
-        await iotServiceRef.current?.publishState(PlayerState.LOADING, {
-          playlistId: currentPlaylistId || undefined,
-          trackId: scheduledTrackId
-        })
-        
         // Find the full track data
         const { data: allTracks } = await listTracks()
         const track = allTracks?.find((t: any) => t.id === scheduledTrackId)
         
         if (track) {
-          console.log('✅ Found scheduled track, loading...')
-          await loadTrackIntoPlayer(track)
-          console.log(`✅ Loaded scheduled track: ${track.title}`)
-          
-          // Publish LOADED state
-          console.log('📤 Publishing LOADED state...')
-          await iotServiceRef.current?.publishState(PlayerState.LOADED, {
-            trackId: track.id,
-            playlistId: currentPlaylistId || undefined,
-            duration: track.duration || 0
+          // Publish LOAD command to IoT with track data
+          console.log('📤 Publishing LOAD command to IoT...')
+          await iotServiceRef.current?.publishCommand({
+            command: 'LOAD',
+            timestamp: new Date().toISOString(),
+            params: {
+              track: track,
+              playlistId: currentPlaylistId || undefined
+            }
           })
+          
+          console.log('✅ LOAD command published - waiting for State Machine response...')
         } else {
           console.error('❌ Scheduled track not found in database')
           alert('❌ Scheduled track not found')
-          
-          // Publish ERROR state
-          await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-            error: 'Track not found in database'
-          })
         }
       } catch (error) {
-        console.error('❌ Failed to load scheduled track:', error)
-        alert(`❌ Failed to load track: ${error}`)
-        
-        // Publish ERROR state
-        await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-          error: String(error)
-        })
+        console.error('❌ Failed to publish LOAD command:', error)
+        alert(`❌ Failed to send LOAD command: ${error}`)
       }
       return
     }
@@ -441,11 +425,40 @@ function Players() {
   }
 
   async function handleUnload() {
-    if (isPlaying) {
-      handleStop()
-    }
+    console.log('⏏️ UNLOAD button clicked - publishing command to IoT...')
     
-    // Clear all track data
+    try {
+      await iotServiceRef.current?.publishCommand({
+        command: 'UNLOAD',
+        timestamp: new Date().toISOString()
+      })
+      console.log('✅ UNLOAD command published')
+    } catch (error) {
+      console.error('❌ Failed to publish UNLOAD command:', error)
+    }
+  }
+
+  async function handlePause() {
+    console.log('⏸️ PAUSE button clicked - publishing command to IoT...')
+    
+    try {
+      await iotServiceRef.current?.publishCommand({
+        command: 'PAUSE',
+        timestamp: new Date().toISOString()
+      })
+      console.log('✅ PAUSE command published')
+    } catch (error) {
+      console.error('❌ Failed to publish PAUSE command:', error)
+    }
+  }
+  
+  // Execute UNLOAD when command comes from IoT
+  async function executeUnload() {
+    console.log('⚙️ Executing UNLOAD...')
+    
+    // Clear player state
+    setIsPlaying(false)
+    setIsPaused(false)
     setIsLoaded(false)
     setCurrentTrack(null)
     setCoverArtUrl(null)
@@ -456,10 +469,13 @@ function Players() {
     // Publish IDLE state
     await iotServiceRef.current?.publishState(PlayerState.IDLE)
     
-    console.log('⏏️ Track unloaded')
+    console.log('✅ Track unloaded')
   }
-
-  async function handlePause() {
+  
+  // Execute PAUSE when command comes from IoT
+  async function executePause() {
+    console.log('⚙️ Executing PAUSE...')
+    
     if (!audioRef.current || !isPlaying) return
     
     audioRef.current.pause()
@@ -472,11 +488,28 @@ function Players() {
       position: audioRef.current.currentTime,
       duration: audioRef.current.duration
     })
+    
+    console.log('✅ Paused')
   }
 
   async function handlePlay() {
+    console.log('▶️ PLAY button clicked - publishing command to IoT...')
+    
+    try {
+      await iotServiceRef.current?.publishCommand({
+        command: 'PLAY',
+        timestamp: new Date().toISOString()
+      })
+      console.log('✅ PLAY command published')
+    } catch (error) {
+      console.error('❌ Failed to publish PLAY command:', error)
+    }
+  }
+  
+  // Execute PLAY when command comes from IoT
+  async function executePlay() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('🎵 PLAY BUTTON CLICKED')
+    console.log('⚙️ EXECUTING PLAY COMMAND')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     console.log('Current state:', {
       isLoaded,
@@ -695,6 +728,23 @@ function Players() {
   }
 
   async function handleStop() {
+    console.log('⏹️ STOP button clicked - publishing command to IoT...')
+    
+    try {
+      await iotServiceRef.current?.publishCommand({
+        command: 'STOP',
+        timestamp: new Date().toISOString()
+      })
+      console.log('✅ STOP command published')
+    } catch (error) {
+      console.error('❌ Failed to publish STOP command:', error)
+    }
+  }
+  
+  // Execute STOP when command comes from IoT
+  async function executeStop() {
+    console.log('⚙️ Executing STOP...')
+    
     if (!audioRef.current) return
     audioRef.current.pause()
     audioRef.current.currentTime = 0
@@ -707,6 +757,8 @@ function Players() {
       trackId: currentTrack?.id,
       position: 0
     })
+    
+    console.log('✅ Stopped')
   }
 
   function toggleAuto() {
