@@ -323,9 +323,15 @@
        "Resource": "arn:aws:iot:eu-west-1:*:topic/*"
       },
       {
-       "Action": "states:StartExecution",
+       "Action": [
+        "states:StartExecution",
+        "states:DescribeExecution"
+       ],
        "Effect": "Allow",
-       "Resource": "arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine"
+       "Resource": [
+        "arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine",
+        "arn:aws:states:eu-west-1:*:execution:RadioPlayerStateMachine:*"
+       ]
       }
      ],
      "Version": "2012-10-17"

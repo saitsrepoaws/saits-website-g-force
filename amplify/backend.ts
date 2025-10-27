@@ -158,12 +158,16 @@ authenticatedRole.attachInlinePolicy(
         ],
       }),
       
-      // Step Functions - allow starting State Machine executions
+      // Step Functions - allow starting and describing State Machine executions
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: ['states:StartExecution'],
+        actions: [
+          'states:StartExecution',
+          'states:DescribeExecution'
+        ],
         resources: [
           'arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine',
+          'arn:aws:states:eu-west-1:*:execution:RadioPlayerStateMachine:*'
         ],
       }),
     ],
