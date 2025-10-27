@@ -46,13 +46,33 @@ export default function IoTLogPanel({ logs, onClearLogs }: IoTLogPanelProps) {
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                    log.direction === 'OUT' 
-                      ? 'text-blue-400 bg-blue-900/30' 
-                      : 'text-green-400 bg-green-900/30'
-                  }`}>
-                    {log.direction === 'OUT' ? '📤' : '📥'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {/* Direction Badge */}
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      log.direction === 'OUT' 
+                        ? 'text-blue-400 bg-blue-900/30' 
+                        : 'text-green-400 bg-green-900/30'
+                    }`}>
+                      {log.direction === 'OUT' ? '📤 OUT' : '📥 IN'}
+                    </span>
+                    
+                    {/* Message Type Badge */}
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${
+                      log.type === 'command' 
+                        ? 'text-purple-400 bg-purple-900/30 border border-purple-500/30' 
+                        : log.type === 'state'
+                        ? 'text-yellow-400 bg-yellow-900/30 border border-yellow-500/30'
+                        : log.type === 'track'
+                        ? 'text-pink-400 bg-pink-900/30 border border-pink-500/30'
+                        : 'text-gray-400 bg-gray-900/30 border border-gray-500/30'
+                    }`}>
+                      {log.type === 'command' && '🎛️ CMD'}
+                      {log.type === 'state' && '📊 STATE'}
+                      {log.type === 'track' && '🎵 TRACK'}
+                      {!log.type && '📦 DATA'}
+                    </span>
+                  </div>
+                  
                   <span className="text-[10px] text-gray-500">
                     {new Date(log.timestamp).toLocaleTimeString('nl-NL', {
                       hour: '2-digit',
