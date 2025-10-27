@@ -291,8 +291,8 @@ playerStateMachine.grantStartExecution(iotRuleRole)
 const iotRule = new iot.CfnTopicRule(backend.storage.stack, 'PlayerCommandRule', {
   ruleName: 'RadioPlayerCommandRule',
   topicRulePayload: {
-    sql: "SELECT * FROM 'radio/player/+/command'",
-    description: 'Trigger State Machine for player commands',
+    sql: "SELECT * FROM 'radio/player/+/command-request'",
+    description: 'Trigger State Machine for player command requests',
     actions: [
       {
         stepFunctions: {

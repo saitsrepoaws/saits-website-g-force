@@ -260,12 +260,12 @@ export class RadioPlayerIoT {
   // ==========================================================================
 
   /**
-   * Publish command (button click → IoT)
-   * Topic: radio/player/{playerId}/command
+   * Publish a command to IoT
+   * Topic: radio/player/{playerId}/command-request (to trigger backend)
    * QoS: 1
    */
   async publishCommand(command: PlayerCommand): Promise<void> {
-    const topic = `radio/player/${this.playerId}/command`
+    const topic = `radio/player/${this.playerId}/command-request`
 
     const message = {
       ...command,
@@ -273,7 +273,7 @@ export class RadioPlayerIoT {
       timestamp: new Date().toISOString()
     }
 
-    console.log(`🎛️ Publishing command: ${command.command}`, message)
+    console.log(`🎛️ Publishing command to backend: ${command.command}`, message)
 
     try {
       await pubsub.publish({
@@ -284,7 +284,7 @@ export class RadioPlayerIoT {
       // Log outgoing command
       this.addLog('OUT', topic, message, 'command')
 
-      console.log(`✅ Command published: ${command.command}`)
+      console.log(`✅ Command published to backend: ${command.command}`)
     } catch (error) {
       console.error(`❌ Failed to publish command:`, error)
       throw error

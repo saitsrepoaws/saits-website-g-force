@@ -250,7 +250,7 @@
     "Environment": {
      "Variables": {
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "IOT_ENDPOINT": "undefined.iot.eu-west-1.amazonaws.com"
+      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
      }
     },
     "EphemeralStorage": {

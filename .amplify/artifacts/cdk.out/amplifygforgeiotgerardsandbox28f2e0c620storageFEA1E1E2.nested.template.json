@@ -1857,8 +1857,8 @@
       }
      ],
      "AwsIotSqlVersion": "2016-03-23",
-     "Description": "Trigger State Machine for player commands",
-     "Sql": "SELECT * FROM 'radio/player/+/command'"
+     "Description": "Trigger State Machine for player command requests",
+     "Sql": "SELECT * FROM 'radio/player/+/command-request'"
     }
    },
    "UpdateReplacePolicy": "Delete",
