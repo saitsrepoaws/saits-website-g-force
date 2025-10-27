@@ -7,7 +7,7 @@
 import https from 'https'
 
 const STATE_MACHINE_ARN = process.env.STATE_MACHINE_ARN || ''
-const AWS_REGION = process.env.AWS_REGION || 'eu-west-1'
+const AWS_REGION = process.env.AWS_REGION || 'eu-west-1' // Automatically set by Lambda
 
 async function startStateMachine(input: any) {
   const url = new URL(`https://states.${AWS_REGION}.amazonaws.com/`)

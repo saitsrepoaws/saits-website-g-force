@@ -114,8 +114,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "APPSYNC_API_KEY": ""
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -249,8 +248,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -451,6 +449,34 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/state-machine-trigger-lambda/ServiceRole/Resource"
    }
   },
+  "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C",
+    "Roles": [
+     {
+      "Ref": "statemachinetriggerlambdaServiceRoleE801CFAB"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/state-machine-trigger-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
   "statemachinetriggerlambda9003FBAB": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -465,7 +491,10 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}"
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "STATE_MACHINE_ARN": {
+       "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+      }
      }
     },
     "EphemeralStorage": {
@@ -497,6 +526,7 @@
     "Timeout": 10
    },
    "DependsOn": [
+    "statemachinetriggerlambdaServiceRoleDefaultPolicyC4076E6C",
     "statemachinetriggerlambdaServiceRoleE801CFAB"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -508,10 +538,28 @@
     "aws:asset:property": "Code"
    }
   },
+  "statemachinetriggerlambdaInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE4289D75A": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "statemachinetriggerlambda9003FBAB",
+      "Arn"
+     ]
+    },
+    "Principal": "iot.amazonaws.com"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/state-machine-trigger-lambda/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWOTQqDMBCFz9L9OLXxBFXoUooeQMZklPiTgJNUinj3otLV997ifTyFSqWY3miVRJsxmWyLW8kS2NSB9Ai0SrNNNLeGGucND4LliVd0OljvwNKMW+UnhqJzJ99+svp71CvtIFlDIhwEnwdAMsyjHjnkJAyXHovO/aU7VCw+LprhHNSBeuv6HY4LOMj9oxSqB6a3QaxNluiCnRmriz8pbZ6m1QAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2OSwqDQBBEz5J92zHjCaKQpQQ9gLRjK+1nBuwxEsS7BxWyelWLepRBY2KMb7RqZJshGqXGLWcN3JSB7AC0arWNNNUNVc433CvmJ16Ls0G8A6EJt8KPDFnrTr79KPZ71CvtoElFqhwUnwdAE0wXO3BISRkuPW5Z6/7WY8zzJKri3b5DweqX2TKcgjJQJ67b4biEvd4/xqB5YHzrVSSaFxdkYiwu/gBfvjrD5QAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default"
@@ -829,10 +877,21 @@
      "Arn"
     ]
    }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "statemachinetriggerlambda9003FBAB",
+     "Arn"
+    ]
+   }
   }
  },
  "Parameters": {
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
    "Type": "String"
   }
  }

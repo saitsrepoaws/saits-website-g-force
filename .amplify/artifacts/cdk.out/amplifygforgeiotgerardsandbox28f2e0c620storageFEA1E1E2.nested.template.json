@@ -1762,66 +1762,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/PlayerStateMachine/Resource"
    }
   },
-  "IoTRuleRole7CB25599": {
-   "Type": "AWS::IAM::Role",
-   "Properties": {
-    "AssumeRolePolicyDocument": {
-     "Statement": [
-      {
-       "Action": "sts:AssumeRole",
-       "Effect": "Allow",
-       "Principal": {
-        "Service": "iot.amazonaws.com"
-       }
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/IoTRuleRole/Resource"
-   }
-  },
-  "IoTRuleRoleDefaultPolicy35031C66": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "states:StartExecution",
-       "Effect": "Allow",
-       "Resource": {
-        "Ref": "PlayerStateMachineDF3FE3FD"
-       }
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "IoTRuleRoleDefaultPolicy35031C66",
-    "Roles": [
-     {
-      "Ref": "IoTRuleRole7CB25599"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/IoTRuleRole/DefaultPolicy/Resource"
-   }
-  },
   "PlayerCommandRule": {
    "Type": "AWS::IoT::TopicRule",
    "Properties": {
@@ -1839,36 +1779,15 @@
     "TopicRulePayload": {
      "Actions": [
       {
-       "StepFunctions": {
-        "ExecutionNamePrefix": "player-cmd-",
-        "RoleArn": {
-         "Fn::GetAtt": [
-          "IoTRuleRole7CB25599",
-          "Arn"
-         ]
-        },
-        "StateMachineName": {
-         "Fn::GetAtt": [
-          "PlayerStateMachineDF3FE3FD",
-          "Name"
-         ]
+       "Lambda": {
+        "FunctionArn": {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
         }
        }
       }
      ],
      "AwsIotSqlVersion": "2016-03-23",
-     "Description": "Trigger State Machine for player command requests",
-     "ErrorAction": {
-      "CloudwatchLogs": {
-       "LogGroupName": "/aws/iot/rules/RadioPlayerCommandRule",
-       "RoleArn": {
-        "Fn::GetAtt": [
-         "IoTRuleRole7CB25599",
-         "Arn"
-        ]
-       }
-      }
-     },
+     "Description": "Trigger Lambda for player command requests",
      "Sql": "SELECT * FROM 'radio/player/+/command-request'"
     }
    },
@@ -2092,6 +2011,11 @@
   "amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref": {
    "Value": {
     "Ref": "waveformgeneratorlambdaD07307E8"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
+   "Value": {
+    "Ref": "PlayerStateMachineDF3FE3FD"
    }
   },
   "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
@@ -2383,6 +2307,9 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
    "Type": "String"
   }
  }

@@ -458,6 +458,12 @@
        "function1351588B",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
+      "Fn::GetAtt": [
+       "function1351588B",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
+      ]
      }
     },
     "Tags": [
@@ -486,7 +492,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/624313774d700038a4f319117eaf81c155bf25e001129b087ee3b0fe711a8c96.json"
+       "/adabb7f0b60db8f5bcc4805f6de66392f233e5d0eca234cd8bcaf6e38f68cc59.json"
       ]
      ]
     }
@@ -508,6 +514,12 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
+      "Fn::GetAtt": [
+       "storage0EC3F24A",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+      ]
      }
     },
     "Tags": [
@@ -536,7 +548,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/73f0d3dcaa4007f322777463c61a470310f29a4e08933073659f25516436149d.json"
+       "/cfcd1a4cf92bd94e97ff3ad4ee6465ed5a0aa6f68c9afab66aa8246548d6a51a.json"
       ]
      ]
     }

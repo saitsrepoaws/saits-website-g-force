@@ -279,7 +279,6 @@ simpleHandlerLambda.grantInvoke(playerStateMachine)
 
 // Add environment variable to trigger Lambda
 triggerLambda.addEnvironment('STATE_MACHINE_ARN', playerStateMachine.stateMachineArn)
-triggerLambda.addEnvironment('AWS_REGION', backend.storage.stack.region)
 
 // Grant trigger Lambda permission to start State Machine
 playerStateMachine.grantStartExecution(triggerLambda)
