@@ -1574,233 +1574,10 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Resource"
    }
   },
-  "PlayerStateMachineRoleD8681A5A": {
-   "Type": "AWS::IAM::Role",
-   "Properties": {
-    "AssumeRolePolicyDocument": {
-     "Statement": [
-      {
-       "Action": "sts:AssumeRole",
-       "Effect": "Allow",
-       "Principal": {
-        "Service": "states.amazonaws.com"
-       }
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/PlayerStateMachine/Role/Resource"
-   }
-  },
-  "PlayerStateMachineRoleDefaultPolicy5946B8E0": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "lambda:InvokeFunction",
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-           },
-           ":*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Action": "lambda:InvokeFunction",
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-           },
-           ":*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Action": "lambda:InvokeFunction",
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-           },
-           ":*"
-          ]
-         ]
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "PlayerStateMachineRoleDefaultPolicy5946B8E0",
-    "Roles": [
-     {
-      "Ref": "PlayerStateMachineRoleD8681A5A"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/PlayerStateMachine/Role/DefaultPolicy/Resource"
-   }
-  },
-  "PlayerStateMachineDF3FE3FD": {
-   "Type": "AWS::StepFunctions::StateMachine",
-   "Properties": {
-    "DefinitionString": {
-     "Fn::Join": [
-      "",
-      [
-       "{\n  \"Comment\": \"Radio Player State Machine - Controls player state transitions and command orchestration\",\n  \"StartAt\": \"ParseCommand\",\n  \"States\": {\n    \"ParseCommand\": {\n      \"Type\": \"Pass\",\n      \"Comment\": \"Extract command details from IoT message\",\n      \"Parameters\": {\n        \"command.$\": \"$.command\",\n        \"playerId.$\": \"$.playerId\",\n        \"params.$\": \"$.params\",\n        \"timestamp.$\": \"$.timestamp\"\n      },\n      \"Next\": \"RouteCommand\"\n    },\n    \n    \"RouteCommand\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Route to appropriate handler based on command type\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"LOAD\",\n          \"Next\": \"HandleLoadCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"PLAY\",\n          \"Next\": \"HandlePlayCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"PAUSE\",\n          \"Next\": \"HandlePauseCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"STOP\",\n          \"Next\": \"HandleStopCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"UNLOAD\",\n          \"Next\": \"HandleUnloadCommand\"\n        }\n      ],\n      \"Default\": \"UnknownCommand\"\n    },\n    \n    \"HandleLoadCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process LOAD command - fetch playlist and track data\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-       },
-       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\",\n          \"playlistId.$\": \"$.params.playlistId\"\n        }\n      },\n      \"ResultPath\": \"$.loadResult\",\n      \"Next\": \"ValidateLoadResult\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"ValidateLoadResult\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Check if track data was successfully loaded\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.loadResult.Payload.success\",\n          \"BooleanEquals\": true,\n          \"Next\": \"PublishLoadResponse\"\n        }\n      ],\n      \"Default\": \"HandleError\"\n    },\n    \n    \"PublishLoadResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish LOAD command response with track data to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-       },
-       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"LOAD\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"params\": {\n              \"playlistId.$\": \"$.loadResult.Payload.playlistId\",\n              \"track.$\": \"$.loadResult.Payload.track\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"HandlePlayCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PLAY command - validate state and respond\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-       },
-       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.playResult\",\n      \"Next\": \"PublishPlayResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"PublishPlayResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish PLAY command response to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-       },
-       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"PLAY\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\"\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"HandlePauseCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PAUSE command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-       },
-       "\",\n        \"Payload\": {\n          \"command\": \"PAUSE\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandleStopCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process STOP command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-       },
-       "\",\n        \"Payload\": {\n          \"command\": \"STOP\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandleUnloadCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process UNLOAD command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-       },
-       "\",\n        \"Payload\": {\n          \"command\": \"UNLOAD\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"PublishSimpleResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish simple command response (PAUSE/STOP/UNLOAD) to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-       },
-       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command.$\": \"$.result.Payload.command\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\"\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"UnknownCommand\": {\n      \"Type\": \"Fail\",\n      \"Comment\": \"Unknown command type received\",\n      \"Error\": \"UnknownCommandError\",\n      \"Cause\": \"The command type is not recognized by the state machine\"\n    },\n    \n    \"HandleError\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Handle errors and publish error response to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
-       {
-        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-       },
-       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"ERROR\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"error\": {\n              \"message.$\": \"$.error.Cause\",\n              \"originalCommand.$\": \"$.command\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.errorPublishResult\",\n      \"Next\": \"CommandFailed\"\n    },\n    \n    \"CommandSuccess\": {\n      \"Type\": \"Succeed\",\n      \"Comment\": \"Command processed successfully\"\n    },\n    \n    \"CommandFailed\": {\n      \"Type\": \"Fail\",\n      \"Comment\": \"Command processing failed\",\n      \"Error\": \"CommandProcessingError\",\n      \"Cause\": \"Failed to process player command\"\n    }\n  }\n}\n"
-      ]
-     ]
-    },
-    "RoleArn": {
-     "Fn::GetAtt": [
-      "PlayerStateMachineRoleD8681A5A",
-      "Arn"
-     ]
-    },
-    "StateMachineName": "RadioPlayerStateMachine",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ]
-   },
-   "DependsOn": [
-    "PlayerStateMachineRoleDefaultPolicy5946B8E0",
-    "PlayerStateMachineRoleD8681A5A"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/PlayerStateMachine/Resource"
-   }
-  },
-  "PlayerCommandRule": {
-   "Type": "AWS::IoT::TopicRule",
-   "Properties": {
-    "RuleName": "RadioPlayerCommandRule",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "TopicRulePayload": {
-     "Actions": [
-      {
-       "Lambda": {
-        "FunctionArn": {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn"
-        }
-       }
-      }
-     ],
-     "AwsIotSqlVersion": "2016-03-23",
-     "Description": "Trigger Lambda for player command requests",
-     "Sql": "SELECT * FROM 'radio/player/+/command-request'"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/PlayerCommandRule"
-   }
-  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12QwW7CMBBEv4W72dLwBSWoUg/QKPSOjLOhSxI78q5BKMq/V04CRD3NvJVXs+MEkmQFq4W+8dIU1bKmE3R7ZMHiINpUSt/42PEauk0wFYpKSzu5UTJXk7m/xhOPsNGMvap1cyo0dGlpM/QNMZOzceMzWCPRb52p0H81+oyPWa+YG+gO4smeM+11g4I+bj2hV6Qb6F4XTC53NUaM+kg/WlfghWE/yDOY10fNjMLwEUWh8ZBj65jE+Xs8X5nahaL0zgp0qTa/+Mqb45ZYPJ2CTN3m3CsWbMsplGMrLbjT5pfscOmce0VOIC3tj2vJ5CF2SAOLa3JkF7wZu838Trct2fO/V5l3VyrQDyWGdgfR5/huvvsdpA3Sq/g9cOG3a5JA8g6rxYWJlj5YoQYhH/UPQx3XQi0CAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12P0W7CMAxFv4X34LHyBaNo0h7GqvIBKKSmM22SKnZAqOq/T6EFqj3deyxf+TqDLFvBaqGvvDRVs2zpCP0OWbDaizaN0lc+9LyGfhNNg6Lyk5vcKIVvydxe44lH2GjGQbXaHisNfX5yBQZLzORdSnxGZyT5rTcNhi+ra3zMBsVsod9LIFcXOmiLgiGlnjAo0hb6V4PJlb7FhEkf1w/OV3hm2N3leZjXB82MwvCRRKEJUGLnmcSHW6qvTOtjdQreCfS5Nr/4ujfHLbEEOkaZfpvzMKg8snhbIvsYzNhu5r9115Gr/20VwV+ownCvce+3F12nvXn2J0oXZVDpQTjz2yXLIHuH1eLMRMsQnZBFKEf9Aw4Y07LvAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default"
@@ -1972,37 +1749,6 @@
     "Name": "StorageCloudFrontDistributionId"
    }
   },
-  "PlayerStateMachineArn": {
-   "Description": "ARN of the Player State Machine",
-   "Value": {
-    "Ref": "PlayerStateMachineDF3FE3FD"
-   },
-   "Export": {
-    "Name": "PlayerStateMachineArn"
-   }
-  },
-  "IoTRuleArn": {
-   "Description": "ARN of the IoT Rule for player commands",
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "arn:aws:iot:",
-      {
-       "Ref": "AWS::Region"
-      },
-      ":",
-      {
-       "Ref": "AWS::AccountId"
-      },
-      ":rule/RadioPlayerCommandRule"
-     ]
-    ]
-   },
-   "Export": {
-    "Name": "PlayerCommandIoTRuleArn"
-   }
-  },
   "amplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambdaA03668D7Ref": {
    "Value": {
     "Ref": "audiometadatalambdaA2764F23"
@@ -2011,11 +1757,6 @@
   "amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref": {
    "Value": {
     "Ref": "waveformgeneratorlambdaD07307E8"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
-   "Value": {
-    "Ref": "PlayerStateMachineDF3FE3FD"
    }
   },
   "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
@@ -2298,18 +2039,6 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn": {
    "Type": "String"
   }
  }

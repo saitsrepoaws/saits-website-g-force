@@ -6,5 +6,5 @@ export const stateMachineTrigger = defineFunction({
   timeoutSeconds: 10,
   memoryMB: 256,
   runtime: 20,
-  resourceGroupName: 'custom-player-state-machine', // Custom stack for State Machine resources
+  // No resourceGroupName - will be added to custom stack in backend.ts
 })

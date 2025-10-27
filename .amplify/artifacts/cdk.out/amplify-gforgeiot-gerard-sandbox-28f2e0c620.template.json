@@ -200,8 +200,8 @@
       "\",\"",
       {
        "Fn::GetAtt": [
-        "customplayerstatemachine74B5C2ED",
-        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Ref"
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Ref"
        ]
       },
       "\"]"
@@ -440,30 +440,6 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
       ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn": {
-      "Fn::GetAtt": [
-       "customplayerstatemachine74B5C2ED",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinestatemachinetriggerlambdaE3EC8FB9Arn"
-      ]
      }
     },
     "Tags": [
@@ -492,7 +468,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/b6d5cb72065d5688c1dce4462af266b52b27d348b14209036b882658c90744da.json"
+       "/9dc3448a7ed12875a5cc6391fbf3840aab130bb3544baf933811b749298bbec0.json"
       ]
      ]
     }
@@ -514,6 +490,12 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachineNestedStackcustomplayerstatemachineNestedStackResource6BFF4251Outputsamplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinePlayerStateMachineA0252536Ref": {
+      "Fn::GetAtt": [
+       "customplayerstatemachine74B5C2ED",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachinePlayerStateMachineA0252536Ref"
+      ]
      }
     },
     "Tags": [
@@ -542,7 +524,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/9b11449034e1cd7344d429ac57d81a5a2b5ecb8dc63bfe27477e3528098a191b.json"
+       "/51b3b8aed89e8c9a4c2d9783434e7c63aa76af14592ae499120a9eef990c1375.json"
       ]
      ]
     }
@@ -559,10 +541,28 @@
    "Type": "AWS::CloudFormation::Stack",
    "Properties": {
     "Parameters": {
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref": {
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
       "Fn::GetAtt": [
-       "storage0EC3F24A",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagePlayerStateMachine3CECBBA8Ref"
+       "function1351588B",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
+      "Fn::GetAtt": [
+       "function1351588B",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
+      "Fn::GetAtt": [
+       "function1351588B",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn": {
+      "Fn::GetAtt": [
+       "function1351588B",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstatemachinetriggerlambda9BEC0899Arn"
       ]
      }
     },
@@ -592,7 +592,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/0dd84c23056427c5d6fd2965b73c68d63ee9a576e076e4f8244cea3428d8931b.json"
+       "/497af6e276beefe9abd1b910e0b386db9a29b5780edcbbfde29e7eb17855d79e.json"
       ]
      ]
     }
