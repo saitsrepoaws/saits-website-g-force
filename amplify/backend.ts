@@ -274,6 +274,11 @@ const triggerLambda = new NodejsFunction(stateMachineStack, 'StateMachineTrigger
   runtime: Runtime.NODEJS_20_X,
   timeout: Duration.seconds(10),
   memorySize: 256,
+  bundling: {
+    externalModules: [], // Bundle ALL modules including AWS SDK
+    minify: false,
+    sourceMap: false,
+  },
 })
 
 // Create State Machine in custom stack
