@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth'
 import { useAuthenticator } from '@aws-amplify/ui-react'
-import { isEnabled as pubsubEnabled, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from './services/pubsub'
+import { isEnabled as pubsubEnabled, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from '../services/pubsub'
 
 const INPUT_TOPIC = 'gforce/libery/input'
 const OUTPUT_TOPIC = 'gforce/libery/output'
