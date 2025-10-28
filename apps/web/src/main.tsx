@@ -6,6 +6,7 @@ import './index.css'
 import './styles/theme.css'
 import App from './App.tsx'
 import IotTest from './pages/IotTest'
+import MqttTest from './pages/MqttTest'
 import DeviceManagement from './pages/DeviceManagement'
 import Libery from './pages/devices/Libery'
 import Playlist from './pages/devices/Playlist'
@@ -32,6 +33,14 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <IotTest />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/mqtt-test', 
+    element: (
+      <AuthGate>
+        <MqttTest />
       </AuthGate>
     )
   },
