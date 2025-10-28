@@ -1,40 +1,49 @@
 /**
  * Player LOAD Command Handler
  * 
- * Uses Amplify Data client with IAM auth
+ * Uses AWS AppSync GraphQL API with IAM auth via AWS SDK
  */
 
-import { Amplify } from 'aws-amplify'
-import { generateClient } from 'aws-amplify/data'
-import type { Schema } from '../../data/resource'
+import { SignatureV4 } from '@aws-sdk/signature-v4'
+import { Sha256 } from '@aws-crypto/sha256-js'
+import { HttpRequest } from '@aws-sdk/protocol-http'
+import { defaultProvider } from '@aws-sdk/credential-provider-node'
 
 const APPSYNC_ENDPOINT = process.env.APPSYNC_ENDPOINT || ''
+const AWS_REGION = process.env.AWS_REGION || 'eu-west-1'
 
-// Configure Amplify for Lambda
-Amplify.configure({
-  API: {
-    GraphQL: {
-      endpoint: APPSYNC_ENDPOINT,
-      region: process.env.AWS_REGION || 'eu-west-1',
-      defaultAuthMode: 'iam'
-    }
-  }
-}, {
-  Auth: {
-    credentialsProvider: {
-      getCredentialsAndIdentityId: async () => ({
-        credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-          sessionToken: process.env.AWS_SESSION_TOKEN
-        }
-      }),
-      clearCredentialsAndIdentityId: () => {}
-    }
-  }
-})
+async function graphqlRequest(query: string, variables: any = {}) {
+  const url = new URL(APPSYNC_ENDPOINT)
+  
+  const request = new HttpRequest({
+    method: 'POST',
+    protocol: url.protocol.slice(0, -1),
+    hostname: url.hostname,
+    path: url.pathname,
+    headers: {
+      'Content-Type': 'application/json',
+      host: url.hostname,
+    },
+    body: JSON.stringify({ query, variables }),
+  })
 
-const client = generateClient<Schema>()
+  const signer = new SignatureV4({
+    credentials: defaultProvider(),
+    region: AWS_REGION,
+    service: 'appsync',
+    sha256: Sha256,
+  })
+
+  const signedRequest = await signer.sign(request)
+  
+  const response = await fetch(APPSYNC_ENDPOINT, {
+    method: signedRequest.method,
+    headers: signedRequest.headers,
+    body: signedRequest.body,
+  })
+
+  return response.json()
+}
 
 export const handler = async (event: any) => {
   console.log('📥 LOAD Command Handler invoked:', JSON.stringify(event, null, 2))
@@ -49,11 +58,22 @@ export const handler = async (event: any) => {
   }
 
   try {
-    // 1. Fetch playlist using Amplify client
-    const { data: playlist, errors } = await client.models.Playlist.get({ id: playlistId })
+    // 1. Fetch playlist
+    const playlistQuery = `
+      query GetPlaylist($id: ID!) {
+        getPlaylist(id: $id) {
+          id
+          name
+          tracks
+        }
+      }
+    `
 
-    if (errors || !playlist) {
-      console.error('❌ Playlist fetch error:', errors)
+    const playlistResult: any = await graphqlRequest(playlistQuery, { id: playlistId })
+    const playlist = playlistResult.data?.getPlaylist
+
+    if (!playlist) {
+      console.error('❌ Playlist not found')
       return {
         success: false,
         error: 'Playlist not found'
@@ -98,11 +118,33 @@ export const handler = async (event: any) => {
     console.log('🎯 Selected track index:', currentTrackIndex)
     console.log('🎵 Track ID:', selectedTrack.trackId)
 
-    // 3. Fetch full track data using Amplify client
-    const { data: track, errors: trackErrors } = await client.models.Track.get({ id: selectedTrack.trackId })
+    // 3. Fetch full track data
+    const trackQuery = `
+      query GetTrack($id: ID!) {
+        getTrack(id: $id) {
+          id
+          title
+          artist
+          album
+          fileUrl
+          coverArtUrl
+          waveformUrl
+          duration
+          bpm
+          key
+          energy
+          genre
+          year
+          label
+        }
+      }
+    `
 
-    if (trackErrors || !track) {
-      console.error('❌ Track fetch error:', trackErrors)
+    const trackResult: any = await graphqlRequest(trackQuery, { id: selectedTrack.trackId })
+    const track = trackResult.data?.getTrack
+
+    if (!track) {
+      console.error('❌ Track not found')
       return {
         success: false,
         error: 'Track not found'
