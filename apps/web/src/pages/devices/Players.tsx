@@ -336,17 +336,15 @@ function Players() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
     try {
-      // IoT-driven: Send LOAD command, backend determines track
+      // IoT-driven: Send LOAD command, backend determines track based on time
       console.log('📤 Publishing LOAD command to IoT...')
-      console.log('🎯 Backend will determine track based on schedule')
-      console.log('📋 Playlist ID:', currentPlaylistId)
+      console.log('🎯 Backend will determine playlist AND track based on current time')
+      console.log('⏰ Timestamp:', new Date().toISOString())
       
       await iotServiceRef.current?.publishCommand({
         command: 'LOAD',
-        timestamp: new Date().toISOString(),
-        params: {
-          playlistId: currentPlaylistId || undefined
-        }
+        timestamp: new Date().toISOString()
+        // No params needed! Backend determines everything based on time
       })
       
       console.log('✅ LOAD command published')

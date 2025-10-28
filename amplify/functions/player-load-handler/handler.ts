@@ -48,17 +48,19 @@ async function graphqlRequest(query: string, variables: any = {}) {
 export const handler = async (event: any) => {
   console.log('📥 LOAD Command Handler invoked:', JSON.stringify(event, null, 2))
 
-  const { playerId, playlistId, timestamp } = event
-
-  if (!playlistId) {
-    return {
-      success: false,
-      error: 'Missing playlistId'
-    }
-  }
+  const { playerId, timestamp } = event
+  const now = new Date(timestamp || Date.now())
 
   try {
-    // 1. Fetch playlist
+    // 1. Determine which playlist should be active NOW based on schedule
+    // For now, we'll use a hardcoded playlist ID
+    // TODO: Implement schedule-based playlist selection
+    const playlistId = 'playlist-1761422965322-2ko9rx2fh' // Hardcoded for now
+    
+    console.log('🎯 Using playlist:', playlistId)
+    console.log('⏰ Current time:', now.toISOString())
+
+    // 2. Fetch playlist
     const playlistQuery = `
       query GetPlaylist($id: ID!) {
         getPlaylist(id: $id) {
@@ -91,8 +93,7 @@ export const handler = async (event: any) => {
       }
     }
 
-    // 2. Calculate current track based on time
-    const now = new Date(timestamp || Date.now())
+    // 3. Calculate current track based on time of day
     const currentTimeInSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()
 
     let cumulativeTime = 0
