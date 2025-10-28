@@ -278,7 +278,7 @@ const triggerLambda = new NodejsFunction(stateMachineStack, 'StateMachineTrigger
 
 // Create State Machine in custom stack
 const playerStateMachine = new sfn.StateMachine(stateMachineStack, 'PlayerStateMachine', {
-  stateMachineName: 'RadioPlayerStateMachine',
+  stateMachineName: 'RadioPlayerStateMachineV2', // Changed name to avoid conflict with old stack
   definitionBody: sfn.DefinitionBody.fromString(stateMachineDefinition),
   timeout: Duration.minutes(5),
 })

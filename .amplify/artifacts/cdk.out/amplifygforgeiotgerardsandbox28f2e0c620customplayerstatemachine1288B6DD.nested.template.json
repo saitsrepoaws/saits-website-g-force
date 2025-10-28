@@ -310,7 +310,7 @@
       "Arn"
      ]
     },
-    "StateMachineName": "RadioPlayerStateMachine",
+    "StateMachineName": "RadioPlayerStateMachineV2",
     "Tags": [
      {
       "Key": "amplify:deployment-type",
