@@ -8,7 +8,6 @@
       "Parameters": {
         "command.$": "$.command",
         "playerId.$": "$.playerId",
-        "params.$": "$.params",
         "timestamp.$": "$.timestamp"
       },
       "Next": "RouteCommand"
@@ -56,7 +55,7 @@
         "Payload": {
           "command.$": "$.command",
           "playerId.$": "$.playerId",
-          "playlistId.$": "$.params.playlistId"
+          "timestamp.$": "$.timestamp"
         }
       },
       "ResultPath": "$.loadResult",
