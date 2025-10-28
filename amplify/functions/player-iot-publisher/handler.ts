@@ -1,18 +1,20 @@
 /**
  * Player IoT Publisher
  * 
- * Publishes to AWS IoT Core using AWS SDK (available in Lambda runtime)
+ * Publishes to AWS IoT Core using dynamic import (no bundling issues!)
  */
 
-import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
-
 const IOT_ENDPOINT = process.env.IOT_ENDPOINT || ''
-const iotClient = new IoTDataPlaneClient({ 
-  region: process.env.AWS_REGION || 'eu-west-1',
-  endpoint: `https://${IOT_ENDPOINT}`
-})
 
 async function publishToIoT(topic: string, payload: any) {
+  // Dynamic import - SDK available in Lambda runtime
+  const { IoTDataPlaneClient, PublishCommand } = await import('@aws-sdk/client-iot-data-plane')
+  
+  const iotClient = new IoTDataPlaneClient({ 
+    region: process.env.AWS_REGION || 'eu-west-1',
+    endpoint: `https://${IOT_ENDPOINT}`
+  })
+  
   const command = new PublishCommand({
     topic,
     payload: Buffer.from(JSON.stringify(payload)),
