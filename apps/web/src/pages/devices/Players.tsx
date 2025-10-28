@@ -61,6 +61,18 @@ function Players() {
     loadPlaylists()
     loadSchedule()
     
+    // Test IoT connection on startup
+    import('../../services/pubsub').then(({ testConnect }) => {
+      console.log('🔌 Testing IoT connection...')
+      testConnect('radio/player/connection-test').then((ok: boolean) => {
+        if (ok) {
+          console.log('✅ IoT connection test PASSED')
+        } else {
+          console.error('❌ IoT connection test FAILED')
+        }
+      })
+    })
+    
     // Start Mock State Machine
     console.log('🤖 Starting Mock State Machine...')
     startMockStateMachine()
