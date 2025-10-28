@@ -298,7 +298,7 @@ playerStateMachine.grantStartExecution(triggerLambda)
 triggerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
 
 const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
-  ruleName: 'RadioPlayerCommandRule',
+  ruleName: 'RadioPlayerCommandRuleV2', // Changed name to avoid conflict with old stack
   topicRulePayload: {
     sql: "SELECT * FROM 'radio/player/+/command-request'",
     description: 'Trigger Lambda for player command requests',

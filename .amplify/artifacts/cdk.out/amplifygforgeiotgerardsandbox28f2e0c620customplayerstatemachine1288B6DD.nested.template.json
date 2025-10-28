@@ -335,7 +335,7 @@
   "PlayerCommandRule": {
    "Type": "AWS::IoT::TopicRule",
    "Properties": {
-    "RuleName": "RadioPlayerCommandRule",
+    "RuleName": "RadioPlayerCommandRuleV2",
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -405,7 +405,7 @@
       {
        "Ref": "AWS::AccountId"
       },
-      ":rule/RadioPlayerCommandRule"
+      ":rule/RadioPlayerCommandRuleV2"
      ]
     ]
    },
