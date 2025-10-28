@@ -45,13 +45,22 @@ export async function generateSignedIoTUrl(
   }
 
   // Presign the request (generates query string with signature)
-  const presignedUrl = await signer.presign(request, {
+  const presigned = await signer.presign(request, {
     expiresIn: 300, // 5 minutes
   })
 
-  // Build WebSocket URL
-  const url = `wss://${presignedUrl.hostname}${presignedUrl.path}?${presignedUrl.query || ''}`
+  // Extract query params from presigned request
+  const url = new URL(`wss://${endpoint}/mqtt`)
   
-  return { url }
+  // Add all query params from presigned request (QueryParameterBag is Record<string, string>)
+  if (presigned.query) {
+    for (const [key, value] of Object.entries(presigned.query)) {
+      url.searchParams.set(key, String(value))
+    }
+  }
+  
+  console.log('🔐 Signed URL generated with', Object.keys(presigned.query || {}).length, 'params')
+  
+  return { url: url.toString() }
 }
 
