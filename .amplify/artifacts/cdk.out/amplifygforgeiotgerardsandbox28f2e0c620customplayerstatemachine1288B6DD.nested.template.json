@@ -240,6 +240,11 @@
          ]
         }
        ]
+      },
+      {
+       "Action": "iot:Publish",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:*:*:topic/radio/player/*"
       }
      ],
      "Version": "2012-10-17"
@@ -268,11 +273,11 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
        },
-       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\",\n          \"timestamp.$\": \"$.timestamp\"\n        }\n      },\n      \"ResultPath\": \"$.loadResult\",\n      \"Next\": \"ValidateLoadResult\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"ValidateLoadResult\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Check if track data was successfully loaded\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.loadResult.Payload.success\",\n          \"BooleanEquals\": true,\n          \"Next\": \"PublishLoadResponse\"\n        }\n      ],\n      \"Default\": \"HandleError\"\n    },\n    \n    \"PublishLoadResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish LOAD command response with track data to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\",\n          \"timestamp.$\": \"$.timestamp\"\n        }\n      },\n      \"ResultPath\": \"$.loadResult\",\n      \"Next\": \"ValidateLoadResult\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"ValidateLoadResult\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Check if track data was successfully loaded\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.loadResult.Payload.success\",\n          \"BooleanEquals\": true,\n          \"Next\": \"PublishLoadResponse\"\n        }\n      ],\n      \"Default\": \"HandleError\"\n    },\n    \n    \"PublishLoadResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish LOAD command response with track data to IoT via Lambda\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
        },
-       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"LOAD\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"params\": {\n              \"playlistId.$\": \"$.loadResult.Payload.playlistId\",\n              \"track.$\": \"$.loadResult.Payload.track\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"HandlePlayCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PLAY command - validate state and respond\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"LOAD\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"params\": {\n              \"playlistId.$\": \"$.loadResult.Payload.playlistId\",\n              \"track.$\": \"$.loadResult.Payload.track\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandlePlayCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PLAY command - validate state and respond\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
        },

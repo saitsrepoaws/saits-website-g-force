@@ -84,12 +84,22 @@
     
     "PublishLoadResponse": {
       "Type": "Task",
-      "Comment": "Publish LOAD command response with track data directly to IoT",
-      "Resource": "arn:aws:states:::aws-sdk:iotdataplane:publish",
+      "Comment": "Publish LOAD command response with track data to IoT via Lambda",
+      "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "Topic.$": "States.Format('radio/player/{}/command', $.playerId)",
-        "Payload.$": "States.JsonToString({'command': 'LOAD', 'playerId': $.playerId, 'timestamp': $$.State.EnteredTime, 'params': {'playlistId': $.loadResult.Payload.playlistId, 'track': $.loadResult.Payload.track}})",
-        "Qos": 1
+        "FunctionName": "${PublishIoTCommandArn}",
+        "Payload": {
+          "topic.$": "States.Format('radio/player/{}/command', $.playerId)",
+          "message": {
+            "command": "LOAD",
+            "playerId.$": "$.playerId",
+            "timestamp.$": "$$.State.EnteredTime",
+            "params": {
+              "playlistId.$": "$.loadResult.Payload.playlistId",
+              "track.$": "$.loadResult.Payload.track"
+            }
+          }
+        }
       },
       "ResultPath": "$.publishResult",
       "Next": "CommandSuccess",
