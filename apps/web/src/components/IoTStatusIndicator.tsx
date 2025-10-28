@@ -1,17 +1,19 @@
 /**
  * IoT Status Indicator Component
- * Shows connection status with colored indicator
+ * Shows connection status with colored indicator + retry button
  */
 
 import { useState, useEffect } from 'react'
 import { Hub } from 'aws-amplify/utils'
 import { CONNECTION_STATE_CHANGE } from '@aws-amplify/pubsub'
+import { testConnect, resetPubSub } from '../services/pubsub'
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'disrupted'
 
 export default function IoTStatusIndicator() {
   const [status, setStatus] = useState<ConnectionStatus>('disconnected')
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [isRetrying, setIsRetrying] = useState(false)
 
   useEffect(() => {
     // Listen to PubSub connection state changes via Hub
@@ -69,6 +71,22 @@ export default function IoTStatusIndicator() {
     }
   }
 
+  const handleRetry = async () => {
+    setIsRetrying(true)
+    console.log('🔄 Manual IoT reconnect requested...')
+    
+    // Reset PubSub instance
+    resetPubSub()
+    setStatus('connecting')
+    
+    // Test connection
+    const ok = await testConnect('radio/player/connection-test')
+    setStatus(ok ? 'connected' : 'disconnected')
+    setIsRetrying(false)
+    
+    console.log(ok ? '✅ Reconnect successful' : '❌ Reconnect failed')
+  }
+
   return (
     <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200">
       {/* Status dot */}
@@ -83,6 +101,18 @@ export default function IoTStatusIndicator() {
           {lastUpdate.toLocaleTimeString()}
         </span>
       </div>
+      
+      {/* Retry button (only show if not connected) */}
+      {status !== 'connected' && (
+        <button
+          onClick={handleRetry}
+          disabled={isRetrying}
+          className="px-2 py-0.5 text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 rounded border border-blue-300 disabled:opacity-50"
+          title="Retry connection"
+        >
+          {isRetrying ? '...' : '↻'}
+        </button>
+      )}
     </div>
   )
 }
