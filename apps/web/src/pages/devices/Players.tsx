@@ -3,6 +3,7 @@ import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
 import IoTLogPanel from '../../components/IoTLogPanel'
+import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 import { listPlaylists } from '../../services/playlists'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
 import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
@@ -778,9 +779,13 @@ function Players() {
           {/* Header */}
           <div className="px-6 py-4 border-b border-white/20 bg-gradient-to-r from-purple-800/30 to-blue-800/30 backdrop-blur-sm">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">🎵 Now Playing</h2>
-                <p className="text-sm text-blue-200">Live Audio Player</p>
+              <div className="flex items-center gap-3">
+                <div>
+                  <h2 className="text-xl font-bold text-white mb-1">🎵 Now Playing</h2>
+                  <p className="text-sm text-blue-200">Live Audio Player</p>
+                </div>
+                {/* IoT Status Indicator */}
+                <IoTStatusIndicator />
               </div>
               <div className="flex items-center gap-2">
                 {/* Track Elapsed Time */}
