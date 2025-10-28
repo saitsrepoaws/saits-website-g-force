@@ -232,12 +232,17 @@ const loadHandlerLambda = backend.playerLoadHandler.resources.lambda
 const iotPublisherLambda = backend.playerIotPublisher.resources.lambda
 const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
 
-// Add environment variables to load handler
-loadHandlerLambda.addEnvironment('APPSYNC_ENDPOINT', backend.data.resources.graphqlApi.graphqlUrl)
-loadHandlerLambda.addEnvironment('APPSYNC_API_KEY', backend.data.resources.graphqlApi.apiKey || '')
+// Add environment variables using CDK CfnFunction
+const loadHandlerCfn = loadHandlerLambda.node.defaultChild as any
+if (loadHandlerCfn && loadHandlerCfn.environment) {
+  loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_ENDPOINT', backend.data.resources.graphqlApi.graphqlUrl)
+  loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_API_KEY', backend.data.resources.graphqlApi.apiKey || '')
+}
 
-// Add environment variable to IoT publisher
-iotPublisherLambda.addEnvironment('IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
+const iotPublisherCfn = iotPublisherLambda.node.defaultChild as any
+if (iotPublisherCfn && iotPublisherCfn.environment) {
+  iotPublisherCfn.addPropertyOverride('Environment.Variables.IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
+}
 
 // Grant GraphQL API access to load handler (via IAM policy)
 loadHandlerLambda.addToRolePolicy(
