@@ -301,6 +301,15 @@ loadHandlerLambda.grantInvoke(playerStateMachine)
 iotPublisherLambda.grantInvoke(playerStateMachine)
 simpleHandlerLambda.grantInvoke(playerStateMachine)
 
+// Grant State Machine permission to publish to IoT
+playerStateMachine.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/player/*'],
+  })
+)
+
 // Add environment variable to trigger Lambda
 triggerLambda.addEnvironment('STATE_MACHINE_ARN', playerStateMachine.stateMachineArn)
 
