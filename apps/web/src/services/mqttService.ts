@@ -56,14 +56,20 @@ export class MQTTService {
       console.log('🔐 Generated signed URL for MQTT connection')
 
       // Connect with MQTT.js
+      const clientId = identityId?.replace(':', '-') || `mqtt-${Date.now()}`
+      console.log('🆔 Client ID:', clientId)
+      console.log('🔌 Connecting to MQTT...')
+      
       this.client = mqtt.connect(url, {
-        clientId: identityId?.replace(':', '-') || `mqtt-${Date.now()}`,
+        clientId,
         protocol: 'wss',
         reconnectPeriod: 5000,
         connectTimeout: 30000,
         clean: true,
         keepalive: 60,
       })
+      
+      console.log('📡 MQTT client created, waiting for connection...')
 
       // Setup event handlers
       this.setupEventHandlers()

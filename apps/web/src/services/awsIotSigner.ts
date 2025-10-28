@@ -22,6 +22,12 @@ export async function generateSignedIoTUrl(
   region: string = 'eu-west-1'
 ): Promise<{ url: string }> {
   
+  console.log('🔐 Starting URL signing...')
+  console.log('  Endpoint:', endpoint)
+  console.log('  Region:', region)
+  console.log('  AccessKeyId:', credentials.accessKeyId.substring(0, 10) + '...')
+  console.log('  Has SessionToken:', !!credentials.sessionToken)
+  
   const signer = new SignatureV4({
     service: 'iotdevicegateway',
     region,
@@ -32,6 +38,8 @@ export async function generateSignedIoTUrl(
     },
     sha256: Sha256,
   })
+  
+  console.log('✅ SignatureV4 instance created')
 
   // Create request to presign
   const request = {
@@ -45,22 +53,31 @@ export async function generateSignedIoTUrl(
   }
 
   // Presign the request (generates query string with signature)
-  const presigned = await signer.presign(request, {
-    expiresIn: 300, // 5 minutes
-  })
+  console.log('⏳ Calling presign()...')
+  try {
+    const presigned = await signer.presign(request, {
+      expiresIn: 300, // 5 minutes
+    })
+    
+    console.log('✅ Presign completed')
+    console.log('  Query params:', Object.keys(presigned.query || {}).length)
 
-  // Extract query params from presigned request
-  const url = new URL(`wss://${endpoint}/mqtt`)
-  
-  // Add all query params from presigned request (QueryParameterBag is Record<string, string>)
-  if (presigned.query) {
-    for (const [key, value] of Object.entries(presigned.query)) {
-      url.searchParams.set(key, String(value))
+    // Extract query params from presigned request
+    const url = new URL(`wss://${endpoint}/mqtt`)
+    
+    // Add all query params from presigned request (QueryParameterBag is Record<string, string>)
+    if (presigned.query) {
+      for (const [key, value] of Object.entries(presigned.query)) {
+        url.searchParams.set(key, String(value))
+      }
     }
+    
+    console.log('🔐 Final signed URL:', url.toString().substring(0, 120) + '...')
+    
+    return { url: url.toString() }
+  } catch (error) {
+    console.error('❌ Presign failed:', error)
+    throw error
   }
-  
-  console.log('🔐 Signed URL generated with', Object.keys(presigned.query || {}).length, 'params')
-  
-  return { url: url.toString() }
 }
 
