@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react'
+import { fetchAuthSession } from 'aws-amplify/auth'
 import { getMQTTService, resetMQTTService } from '../services/mqttService'
 
 const TEST_TOPIC = 'radio/player/player-main-001/command'
@@ -13,8 +14,16 @@ export default function MqttTest() {
   const [messages, setMessages] = useState<Array<{ topic: string; message: any; time: Date }>>([])
   const [testMessage, setTestMessage] = useState('{"command":"LOAD","test":true}')
   const [subscribed, setSubscribed] = useState(false)
+  const [identityId, setIdentityId] = useState<string>('')
 
   useEffect(() => {
+    // Get Identity ID on mount
+    fetchAuthSession().then(session => {
+      setIdentityId(session.identityId || '')
+    }).catch(err => {
+      console.error('Failed to get identity ID:', err)
+    })
+
     const mqtt = getMQTTService()
     
     // Listen to connection state
@@ -102,7 +111,34 @@ export default function MqttTest() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">🔌 MQTT.js Test</h1>
+        <h1 className="text-3xl font-bold mb-4">🔌 MQTT.js Test</h1>
+        
+        {/* Identity ID Display */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900 mb-1">🆔 Your Cognito Identity ID:</h3>
+              {identityId ? (
+                <code className="text-sm bg-white px-3 py-2 rounded border border-blue-300 block font-mono break-all">
+                  {identityId}
+                </code>
+              ) : (
+                <p className="text-sm text-gray-500 italic">Loading...</p>
+              )}
+            </div>
+            {identityId && (
+              <button
+                onClick={() => navigator.clipboard.writeText(identityId)}
+                className="ml-4 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm whitespace-nowrap"
+              >
+                📋 Copy
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-blue-700 mt-2">
+            💡 Use this ID in the script: <code className="bg-blue-100 px-1">./scripts/attach-iot-policy-to-current-user.sh</code>
+          </p>
+        </div>
 
         {/* Status */}
         <div className="bg-white rounded-lg p-6 shadow mb-6">
