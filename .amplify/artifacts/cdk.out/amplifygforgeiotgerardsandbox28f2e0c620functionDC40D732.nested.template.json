@@ -115,6 +115,7 @@
     "Environment": {
      "Variables": {
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "APPSYNC_ENDPOINT": "https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql",
       "APPSYNC_API_KEY": ""
      }
     },

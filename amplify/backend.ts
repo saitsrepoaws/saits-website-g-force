@@ -234,8 +234,8 @@ const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
 
 // Add environment variables using CDK escape hatch
 const loadHandlerCfn = loadHandlerLambda.node.defaultChild as any
-loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_ENDPOINT', backend.data.resources.graphqlApi.graphqlUrl)
-loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_API_KEY', backend.data.resources.graphqlApi.apiKey || '')
+loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_ENDPOINT', 'https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql')
+loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_API_KEY', '')
 
 const iotPublisherCfn = iotPublisherLambda.node.defaultChild as any
 iotPublisherCfn.addPropertyOverride('Environment.Variables.IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
