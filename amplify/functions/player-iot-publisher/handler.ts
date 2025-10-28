@@ -1,45 +1,26 @@
 /**
  * Player IoT Publisher
  * 
- * Publishes to AWS IoT Core using HTTPS API (no AWS SDK needed!)
+ * Publishes to AWS IoT Core using AWS SDK (available in Lambda runtime)
  */
 
-import https from 'https'
+import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
 
 const IOT_ENDPOINT = process.env.IOT_ENDPOINT || ''
+const iotClient = new IoTDataPlaneClient({ 
+  region: process.env.AWS_REGION || 'eu-west-1',
+  endpoint: `https://${IOT_ENDPOINT}`
+})
 
 async function publishToIoT(topic: string, payload: any) {
-  const url = new URL(`https://${IOT_ENDPOINT}/topics/${encodeURIComponent(topic)}?qos=1`)
-  
-  const postData = JSON.stringify(payload)
-
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname + url.search,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    }
-
-    const req = https.request(options, (res) => {
-      let data = ''
-      res.on('data', (chunk) => { data += chunk })
-      res.on('end', () => {
-        if (res.statusCode === 200) {
-          resolve({ success: true })
-        } else {
-          reject(new Error(`IoT publish failed: ${res.statusCode} ${data}`))
-        }
-      })
-    })
-
-    req.on('error', reject)
-    req.write(postData)
-    req.end()
+  const command = new PublishCommand({
+    topic,
+    payload: Buffer.from(JSON.stringify(payload)),
+    qos: 1
   })
+  
+  await iotClient.send(command)
+  return { success: true }
 }
 
 export const handler = async (event: any) => {

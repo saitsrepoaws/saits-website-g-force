@@ -252,12 +252,12 @@ loadHandlerLambda.addToRolePolicy(
   })
 )
 
-// Grant IoT publish permission to IoT publisher
+// Grant IoT publish permission to IoT publisher (all player topics)
 iotPublisherLambda.addToRolePolicy(
   new PolicyStatement({
     effect: Effect.ALLOW,
     actions: ['iot:Publish'],
-    resources: ['arn:aws:iot:*:*:topic/radio/player/*/command'],
+    resources: ['arn:aws:iot:*:*:topic/radio/player/*'],
   })
 )
 
