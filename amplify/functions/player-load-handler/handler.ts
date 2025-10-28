@@ -1,51 +1,40 @@
 /**
  * Player LOAD Command Handler
  * 
- * Uses AppSync GraphQL API directly (no AWS SDK needed!)
+ * Uses Amplify Data client with IAM auth
  */
 
-import https from 'https'
+import { Amplify } from 'aws-amplify'
+import { generateClient } from 'aws-amplify/data'
+import type { Schema } from '../../data/resource'
 
 const APPSYNC_ENDPOINT = process.env.APPSYNC_ENDPOINT || ''
-const APPSYNC_API_KEY = process.env.APPSYNC_API_KEY || ''
 
-async function graphqlRequest(query: string, variables: any = {}) {
-  const url = new URL(APPSYNC_ENDPOINT)
-  
-  const postData = JSON.stringify({
-    query,
-    variables
-  })
-
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': APPSYNC_API_KEY,
-        'Content-Length': Buffer.byteLength(postData)
-      }
+// Configure Amplify for Lambda
+Amplify.configure({
+  API: {
+    GraphQL: {
+      endpoint: APPSYNC_ENDPOINT,
+      region: process.env.AWS_REGION || 'eu-west-1',
+      defaultAuthMode: 'iam'
     }
-
-    const req = https.request(options, (res) => {
-      let data = ''
-      res.on('data', (chunk) => { data += chunk })
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(data))
-        } catch (e) {
-          reject(e)
+  }
+}, {
+  Auth: {
+    credentialsProvider: {
+      getCredentialsAndIdentityId: async () => ({
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          sessionToken: process.env.AWS_SESSION_TOKEN
         }
-      })
-    })
+      }),
+      clearCredentialsAndIdentityId: () => {}
+    }
+  }
+})
 
-    req.on('error', reject)
-    req.write(postData)
-    req.end()
-  })
-}
+const client = generateClient<Schema>()
 
 export const handler = async (event: any) => {
   console.log('📥 LOAD Command Handler invoked:', JSON.stringify(event, null, 2))
@@ -60,26 +49,18 @@ export const handler = async (event: any) => {
   }
 
   try {
-    // 1. Fetch playlist
-    const playlistQuery = `
-      query GetPlaylist($id: ID!) {
-        getPlaylist(id: $id) {
-          id
-          name
-          tracks
-        }
-      }
-    `
+    // 1. Fetch playlist using Amplify client
+    const { data: playlist, errors } = await client.models.Playlist.get({ id: playlistId })
 
-    const playlistResult: any = await graphqlRequest(playlistQuery, { id: playlistId })
-    const playlist = playlistResult.data?.getPlaylist
-
-    if (!playlist) {
+    if (errors || !playlist) {
+      console.error('❌ Playlist fetch error:', errors)
       return {
         success: false,
         error: 'Playlist not found'
       }
     }
+
+    console.log('✅ Playlist found:', playlist.name)
 
     const playlistTracks = JSON.parse(playlist.tracks || '[]')
     
@@ -117,32 +98,11 @@ export const handler = async (event: any) => {
     console.log('🎯 Selected track index:', currentTrackIndex)
     console.log('🎵 Track ID:', selectedTrack.trackId)
 
-    // 3. Fetch full track data
-    const trackQuery = `
-      query GetTrack($id: ID!) {
-        getTrack(id: $id) {
-          id
-          title
-          artist
-          album
-          fileUrl
-          coverArtUrl
-          waveformUrl
-          duration
-          bpm
-          key
-          energy
-          genre
-          year
-          label
-        }
-      }
-    `
+    // 3. Fetch full track data using Amplify client
+    const { data: track, errors: trackErrors } = await client.models.Track.get({ id: selectedTrack.trackId })
 
-    const trackResult: any = await graphqlRequest(trackQuery, { id: selectedTrack.trackId })
-    const track = trackResult.data?.getTrack
-
-    if (!track) {
+    if (trackErrors || !track) {
+      console.error('❌ Track fetch error:', trackErrors)
       return {
         success: false,
         error: 'Track not found'
