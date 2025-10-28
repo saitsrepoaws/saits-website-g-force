@@ -47,13 +47,17 @@ export class MQTTService {
       console.log(`🔑 Using identityId: ${identityId}`)
 
       // Generate signed WebSocket URL
-      const { url } = await generateSignedIoTUrl(
+      console.log('⏳ Calling generateSignedIoTUrl...')
+      const result = await generateSignedIoTUrl(
         this.endpoint,
         session.credentials,
         this.region
       )
+      console.log('✅ generateSignedIoTUrl returned:', typeof result, Object.keys(result))
+      const { url } = result
 
       console.log('🔐 Generated signed URL for MQTT connection')
+      console.log('🔗 URL length:', url?.length, 'chars')
 
       // Connect with MQTT.js
       const clientId = identityId?.replace(':', '-') || `mqtt-${Date.now()}`
