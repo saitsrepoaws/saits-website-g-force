@@ -18,6 +18,7 @@
     "@aws-sdk/credential-providers": "^3.919.0",
     "@aws-sdk/signature-v4": "^3.374.0",
     "@aws-sdk/types": "^3.914.0",
+    "@aws-sdk/util-utf8-browser": "^3.259.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
