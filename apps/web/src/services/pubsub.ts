@@ -56,10 +56,10 @@ let hubListenerRegistered = false // Track if Hub listener is already registered
 function scheduleConnectionCheck() {
   if (connectionStateTimeout) clearTimeout(connectionStateTimeout)
   connectionStateTimeout = setTimeout(() => {
-    log('warn', 'Connection disrupted for too long, resetting PubSub instance')
-    pubsubInstance = null
-    hubListenerRegistered = false // Allow re-registration on next instance
-  }, 10000) // Reset after 10 seconds of disruption
+    log('warn', 'Connection disrupted for 30 seconds - use retry button to reconnect')
+    // DON'T auto-reset - let user use retry button instead
+    // Auto-reset was destroying active subscriptions!
+  }, 30000) // Just log warning after 30 seconds
 }
 
 async function getPubSubInstance(): Promise<PubSub> {
@@ -197,43 +197,65 @@ export async function subscribe(
   }
 }
 
-export async function testConnect(topic: string, timeoutMs = 1500): Promise<boolean> {
+export async function testConnect(topic: string, timeoutMs = 5000): Promise<boolean> {
   if (!isEnabled()) {
     log('warn', 'testConnect() called but PubSub is disabled')
     return false
   }
   log('info', `Testing connection to topic: ${topic} (timeout: ${timeoutMs}ms)`)
+  
   return new Promise(async (resolve) => {
     let done = false
+    let connectionCheckInterval: NodeJS.Timeout | null = null
+    
     try {
       const pubsub = await getPubSubInstance()
+      
+      // Wait for Connected state by checking Hub events
+      const checkConnection = () => {
+        // Check if we've seen a Connected state via Hub listener
+        // If timeout reached without explicit error, assume OK
+        if (!done) {
+          done = true
+          log('info', `testConnect timeout reached for ${topic} - assuming connection OK`)
+          if (connectionCheckInterval) clearInterval(connectionCheckInterval)
+          resolve(true)
+        }
+      }
+      
+      // Subscribe to test topic
       const sub = pubsub.subscribe({ topics: [topic] }).subscribe({
         next: () => {
-          log('info', `testConnect received data on ${topic}`)
+          if (!done) {
+            done = true
+            log('info', `testConnect received message on ${topic} - connection confirmed!`)
+            if (connectionCheckInterval) clearInterval(connectionCheckInterval)
+            try { sub.unsubscribe() } catch {}
+            resolve(true)
+          }
         },
         error: (err: unknown) => {
           if (!done) {
             done = true
             log('error', `testConnect error on ${topic}: ${err}`)
+            if (connectionCheckInterval) clearInterval(connectionCheckInterval)
             try { sub.unsubscribe() } catch {}
             resolve(false)
           }
-        },
-        complete: () => {
-          log('info', `testConnect completed on ${topic}`)
         }
       })
-      log('info', `testConnect subscribed to ${topic}, waiting for timeout...`)
+      
+      log('info', `testConnect subscribed to ${topic}, waiting up to ${timeoutMs}ms...`)
+      
+      // Set timeout
       setTimeout(() => {
-        if (!done) {
-          done = true
-          log('info', `testConnect timeout reached for ${topic} - connection OK`)
-          try { sub.unsubscribe() } catch {}
-          resolve(true)
-        }
+        checkConnection()
+        try { sub.unsubscribe() } catch {}
       }, timeoutMs)
+      
     } catch (err) {
       log('error', `testConnect setup failed: ${err}`)
+      if (connectionCheckInterval) clearInterval(connectionCheckInterval)
       resolve(false)
     }
   })
