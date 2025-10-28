@@ -40,15 +40,17 @@ export function clearLogs() {
 export function resetPubSub() {
   log('warn', 'Manually resetting PubSub instance')
   pubsubInstance = null
+  hubListenerRegistered = false // Allow re-registration
   if (connectionStateTimeout) {
     clearTimeout(connectionStateTimeout)
     connectionStateTimeout = null
   }
 }
 
-// PubSub instance - initialized lazily
+// PubSub instance - initialized lazily (SINGLETON for entire app!)
 let pubsubInstance: PubSub | null = null
 let connectionStateTimeout: NodeJS.Timeout | null = null
+let hubListenerRegistered = false // Track if Hub listener is already registered
 
 // Reset PubSub instance if connection stays disrupted
 function scheduleConnectionCheck() {
@@ -56,6 +58,7 @@ function scheduleConnectionCheck() {
   connectionStateTimeout = setTimeout(() => {
     log('warn', 'Connection disrupted for too long, resetting PubSub instance')
     pubsubInstance = null
+    hubListenerRegistered = false // Allow re-registration on next instance
   }, 10000) // Reset after 10 seconds of disruption
 }
 
@@ -93,31 +96,37 @@ async function getPubSubInstance(): Promise<PubSub> {
         clientId: clientId,
       })
       
-      // Listen to connection state changes
-      Hub.listen('pubsub', (data) => {
-        const { payload } = data
-        if (payload.event === CONNECTION_STATE_CHANGE) {
-          const connectionState = (payload.data as any).connectionState as ConnectionState
-          log('info', `Connection state: ${connectionState}`)
-          
-          if (connectionState === ConnectionState.Connected) {
-            log('info', '✅ PubSub connected - ready to send/receive')
-            // Clear timeout when connected
-            if (connectionStateTimeout) {
-              clearTimeout(connectionStateTimeout)
-              connectionStateTimeout = null
+      // Listen to connection state changes (ONLY ONCE for entire app!)
+      if (!hubListenerRegistered) {
+        log('info', '🎧 Registering Hub listener (once for entire app)')
+        Hub.listen('pubsub', (data) => {
+          const { payload } = data
+          if (payload.event === CONNECTION_STATE_CHANGE) {
+            const connectionState = (payload.data as any).connectionState as ConnectionState
+            log('info', `Connection state: ${connectionState}`)
+            
+            if (connectionState === ConnectionState.Connected) {
+              log('info', '✅ PubSub connected - ready to send/receive')
+              // Clear timeout when connected
+              if (connectionStateTimeout) {
+                clearTimeout(connectionStateTimeout)
+                connectionStateTimeout = null
+              }
+            } else if (connectionState === ConnectionState.Disconnected) {
+              log('warn', 'PubSub disconnected')
+            } else if (connectionState === ConnectionState.Connecting) {
+              log('info', 'PubSub connecting...')
+            } else if (connectionState === ConnectionState.ConnectionDisrupted) {
+              log('info', 'PubSub connection disrupted (normal during handshake)')
+              // Schedule reset if stays disrupted
+              scheduleConnectionCheck()
             }
-          } else if (connectionState === ConnectionState.Disconnected) {
-            log('warn', 'PubSub disconnected')
-          } else if (connectionState === ConnectionState.Connecting) {
-            log('info', 'PubSub connecting...')
-          } else if (connectionState === ConnectionState.ConnectionDisrupted) {
-            log('info', 'PubSub connection disrupted (normal during handshake)')
-            // Schedule reset if stays disrupted
-            scheduleConnectionCheck()
           }
-        }
-      })
+        })
+        hubListenerRegistered = true
+      } else {
+        log('info', '♻️ Hub listener already registered, skipping')
+      }
       
       log('info', 'PubSub instance created and cached')
     } catch (err) {
