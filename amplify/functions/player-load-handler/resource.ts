@@ -1,4 +1,4 @@
-import { defineFunction } from '@aws-amplify/backend'
+import { defineFunction, secret } from '@aws-amplify/backend'
 
 export const playerLoadHandler = defineFunction({
   name: 'player-load-handler',
@@ -6,7 +6,4 @@ export const playerLoadHandler = defineFunction({
   timeoutSeconds: 30,
   memoryMB: 512,
   runtime: 20,
-  environment: {
-    // Will be set by backend.ts
-  }
 })
