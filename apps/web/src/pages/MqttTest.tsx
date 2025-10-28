@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react'
 import { fetchAuthSession } from 'aws-amplify/auth'
 import { getMQTTService, resetMQTTService } from '../services/mqttService'
+import { attachIoTPolicyToCurrentUser } from '../services/iotPolicyAttacher'
 
 const TEST_TOPIC = 'radio/player/player-main-001/command'
 
@@ -15,6 +16,8 @@ export default function MqttTest() {
   const [testMessage, setTestMessage] = useState('{"command":"LOAD","test":true}')
   const [subscribed, setSubscribed] = useState(false)
   const [identityId, setIdentityId] = useState<string>('')
+  const [isAttachingPolicy, setIsAttachingPolicy] = useState(false)
+  const [policyAttached, setPolicyAttached] = useState(false)
 
   useEffect(() => {
     // Get Identity ID on mount
@@ -35,6 +38,23 @@ export default function MqttTest() {
       unsubscribe()
     }
   }, [])
+
+  const handleAttachPolicy = async () => {
+    setIsAttachingPolicy(true)
+    try {
+      const success = await attachIoTPolicyToCurrentUser()
+      setPolicyAttached(success)
+      if (success) {
+        alert('✅ IoT Policy attached! Now try connecting to MQTT.')
+      } else {
+        alert('❌ Failed to attach IoT Policy. Check console for details.')
+      }
+    } catch (error) {
+      alert(`❌ Error: ${error}`)
+    } finally {
+      setIsAttachingPolicy(false)
+    }
+  }
 
   const handleConnect = async () => {
     setStatus('connecting')
@@ -115,7 +135,7 @@ export default function MqttTest() {
         
         {/* Identity ID Display */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-blue-900 mb-1">🆔 Your Cognito Identity ID:</h3>
               {identityId ? (
@@ -135,9 +155,30 @@ export default function MqttTest() {
               </button>
             )}
           </div>
-          <p className="text-xs text-blue-700 mt-2">
-            💡 Use this ID in the script: <code className="bg-blue-100 px-1">./scripts/attach-iot-policy-to-current-user.sh</code>
-          </p>
+          
+          {/* Attach Policy Button */}
+          <div className="border-t border-blue-200 pt-3">
+            <button
+              onClick={handleAttachPolicy}
+              disabled={isAttachingPolicy || !identityId}
+              className={`w-full px-4 py-3 rounded font-semibold transition-colors ${
+                policyAttached
+                  ? 'bg-green-500 text-white hover:bg-green-600'
+                  : 'bg-orange-500 text-white hover:bg-orange-600'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isAttachingPolicy ? (
+                '⏳ Attaching IoT Policy...'
+              ) : policyAttached ? (
+                '✅ IoT Policy Attached!'
+              ) : (
+                '🔧 Attach IoT Policy (Required for MQTT)'
+              )}
+            </button>
+            <p className="text-xs text-blue-700 mt-2">
+              ⚠️ You MUST attach the IoT Policy before MQTT will work! Click the button above.
+            </p>
+          </div>
         </div>
 
         {/* Status */}
