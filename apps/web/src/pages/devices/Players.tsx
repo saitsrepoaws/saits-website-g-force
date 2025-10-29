@@ -59,10 +59,55 @@ function Players() {
   // PlayerState for persistence
   const [playerStateId, setPlayerStateId] = useState<string | null>(null)
   const [isRestoringState, setIsRestoringState] = useState(false)
+  const [backendPlayerState, setBackendPlayerState] = useState<any>(null)
+  
+  // Console logs capture
+  const [consoleLogs, setConsoleLogs] = useState<Array<{type: string, message: string, timestamp: Date}>>([])
+  const maxConsoleLogs = 50
   
   // Station mode (IoT-driven vs Manual)
   const [stationMode, setStationMode] = useState<'manual' | 'station'>('manual')
   const [scheduledPlayback, setScheduledPlayback] = useState<NodeJS.Timeout | null>(null)
+
+  // Intercept console logs
+  useEffect(() => {
+    const originalLog = console.log
+    const originalWarn = console.warn
+    const originalError = console.error
+
+    console.log = (...args) => {
+      originalLog.apply(console, args)
+      setConsoleLogs(prev => [...prev.slice(-maxConsoleLogs), {
+        type: 'log',
+        message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '),
+        timestamp: new Date()
+      }])
+    }
+
+    console.warn = (...args) => {
+      originalWarn.apply(console, args)
+      setConsoleLogs(prev => [...prev.slice(-maxConsoleLogs), {
+        type: 'warn',
+        message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '),
+        timestamp: new Date()
+      }])
+    }
+
+    console.error = (...args) => {
+      originalError.apply(console, args)
+      setConsoleLogs(prev => [...prev.slice(-maxConsoleLogs), {
+        type: 'error',
+        message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' '),
+        timestamp: new Date()
+      }])
+    }
+
+    return () => {
+      console.log = originalLog
+      console.warn = originalWarn
+      console.error = originalError
+    }
+  }, [maxConsoleLogs])
 
   useEffect(() => {
     loadPlaylists()
@@ -119,6 +164,7 @@ function Players() {
         }
         
         setPlayerStateId(data.id)
+        setBackendPlayerState(data) // Show in UI
         console.log('✅ PlayerState loaded:', data.id)
         
         // Restore state if was playing/paused
@@ -730,20 +776,22 @@ function Players() {
       
       // Save to PlayerState
       if (playerStateId) {
-        await savePlayerState(playerStateId, {
+        const stateData = {
           playerId,
           currentTrackId: fullTrack.id,
           currentTrackTitle: fullTrack.title,
           currentTrackArtist: fullTrack.artist,
           currentPlaylistId: currentPlaylistId || undefined,
-          status: 'stopped',
+          status: 'stopped' as const,
           lastPosition: 0,
           duration: fullTrack.duration || 0,
           volume,
           autoPlayEnabled: autoPlay,
           currentScheduleSlotId: activeSlot?.id,
           currentScheduleSlotName: activeSlot?.name
-        })
+        }
+        await savePlayerState(playerStateId, stateData)
+        setBackendPlayerState({...stateData, id: playerStateId, lastUpdated: new Date().toISOString()})
         console.log('💾 PlayerState saved (LOAD)')
       }
       
@@ -856,13 +904,15 @@ function Players() {
     
     // Save to PlayerState
     if (playerStateId && currentTrack) {
-      await savePlayerState(playerStateId, {
+      const stateData = {
         playerId,
-        status: 'paused',
+        status: 'paused' as const,
         lastPosition: audioRef.current.currentTime,
         volume,
         autoPlayEnabled: autoPlay
-      })
+      }
+      await savePlayerState(playerStateId, stateData)
+      setBackendPlayerState((prev: any) => ({...prev, ...stateData, lastUpdated: new Date().toISOString()}))
       console.log('💾 PlayerState saved (PAUSE) at', Math.round(audioRef.current.currentTime), 'seconds')
     }
     
@@ -1121,13 +1171,15 @@ function Players() {
     
     // Save to PlayerState
     if (playerStateId && currentTrack) {
-      await savePlayerState(playerStateId, {
+      const stateData = {
         playerId,
-        status: 'stopped',
+        status: 'stopped' as const,
         lastPosition: 0,
         volume,
         autoPlayEnabled: autoPlay
-      })
+      }
+      await savePlayerState(playerStateId, stateData)
+      setBackendPlayerState((prev: any) => ({...prev, ...stateData, lastUpdated: new Date().toISOString()}))
       console.log('💾 PlayerState saved (STOP)')
     }
     
@@ -1305,6 +1357,50 @@ function Players() {
   return (
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
+        
+        {/* Backend PlayerState Display */}
+        {backendPlayerState && (
+          <div className="mb-6 bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl shadow-lg border border-white/20 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                💾 Backend Player State
+                <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded border border-green-500/50">
+                  SYNCED
+                </span>
+              </h3>
+              <button
+                onClick={() => setBackendPlayerState(null)}
+                className="text-white/60 hover:text-white text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div className="bg-white/10 rounded p-2 border border-white/20">
+                <div className="text-blue-300 text-xs mb-1">Status</div>
+                <div className="text-white font-semibold">{backendPlayerState.status || 'idle'}</div>
+              </div>
+              <div className="bg-white/10 rounded p-2 border border-white/20">
+                <div className="text-blue-300 text-xs mb-1">Track</div>
+                <div className="text-white font-semibold truncate" title={backendPlayerState.currentTrackTitle}>
+                  {backendPlayerState.currentTrackTitle || 'None'}
+                </div>
+              </div>
+              <div className="bg-white/10 rounded p-2 border border-white/20">
+                <div className="text-blue-300 text-xs mb-1">Last Position</div>
+                <div className="text-white font-semibold">
+                  {backendPlayerState.lastPosition ? formatTime(backendPlayerState.lastPosition) : '0:00'}
+                </div>
+              </div>
+              <div className="bg-white/10 rounded p-2 border border-white/20">
+                <div className="text-blue-300 text-xs mb-1">Last Updated</div>
+                <div className="text-white font-semibold text-xs">
+                  {backendPlayerState.lastUpdated ? new Date(backendPlayerState.lastUpdated).toLocaleTimeString() : 'N/A'}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Player + IoT Log Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Main Player - 2 columns */}
@@ -1658,15 +1754,75 @@ function Players() {
         )}
       </div>
 
-      {/* IoT Log - Right Column */}
-      <div className="lg:col-span-1">
-        <IoTLogPanel
-          logs={iotLogs}
-          onClearLogs={() => {
-            iotServiceRef.current?.clearLogs()
-            setIoTLogs([])
-          }}
-        />
+      {/* Logs - Right Column (Split into 2) */}
+      <div className="lg:col-span-1 space-y-4">
+        {/* IoT Logs */}
+        <div className="bg-gray-900 rounded-xl shadow-lg border border-white/10">
+          <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              📡 IoT Messages
+              <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">
+                {iotLogs.length}
+              </span>
+            </h3>
+          </div>
+          <IoTLogPanel
+            logs={iotLogs}
+            onClearLogs={() => {
+              iotServiceRef.current?.clearLogs()
+              setIoTLogs([])
+            }}
+          />
+        </div>
+
+        {/* Console Logs */}
+        <div className="bg-gray-900 rounded-xl shadow-lg border border-white/10">
+          <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-green-900/50 to-teal-900/50">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                💻 Console Logs
+                <span className="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded">
+                  {consoleLogs.length}
+                </span>
+              </h3>
+              <button
+                onClick={() => setConsoleLogs([])}
+                className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          <div className="p-3 max-h-[300px] overflow-y-auto bg-black/30">
+            {consoleLogs.length === 0 ? (
+              <div className="text-center text-gray-500 text-sm py-8">
+                No console logs yet
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {consoleLogs.slice(-20).reverse().map((log, idx) => (
+                  <div
+                    key={idx}
+                    className={`text-xs font-mono p-2 rounded border ${
+                      log.type === 'error' 
+                        ? 'bg-red-900/20 border-red-500/30 text-red-300'
+                        : log.type === 'warn'
+                        ? 'bg-yellow-900/20 border-yellow-500/30 text-yellow-300'
+                        : 'bg-gray-800/50 border-gray-700/50 text-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span className="text-gray-500 flex-shrink-0">
+                        {log.timestamp.toLocaleTimeString()}
+                      </span>
+                      <span className="flex-1 break-all">{log.message}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
 
