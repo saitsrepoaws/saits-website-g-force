@@ -16,6 +16,8 @@ import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
 import type { Track } from '../../services/playerService'
 import { listTracks } from '../../services/tracks'
+import { getPlayerState, savePlayerState, updatePlayerPosition, clearPlayerState } from '../../services/playerState'
+import type { PlayerStateData } from '../../services/playerState'
 
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
@@ -53,6 +55,10 @@ function Players() {
   const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
   const [scheduledTrackId, setScheduledTrackId] = useState<string | null>(null)
   const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
+  
+  // PlayerState for persistence
+  const [playerStateId, setPlayerStateId] = useState<string | null>(null)
+  const [isRestoringState, setIsRestoringState] = useState(false)
 
   useEffect(() => {
     loadPlaylists()
@@ -94,6 +100,68 @@ function Players() {
     }, 60000) // Check every minute
     
     return () => clearInterval(interval)
+  }, [])
+  
+  // Initialize PlayerState - restore from last session
+  useEffect(() => {
+    async function initPlayerState() {
+      try {
+        console.log('💾 Initializing PlayerState...')
+        const { data, errors } = await getPlayerState(playerId)
+        
+        if (errors || !data) {
+          console.error('❌ Failed to get player state:', errors)
+          return
+        }
+        
+        setPlayerStateId(data.id)
+        console.log('✅ PlayerState loaded:', data.id)
+        
+        // Restore state if was playing/paused
+        if (data.status === 'paused' && data.currentTrackId && data.lastPosition > 0) {
+          console.log('🔄 Restoring playback state...')
+          console.log('   Track:', data.currentTrackTitle)
+          console.log('   Position:', Math.round(data.lastPosition), 'seconds')
+          
+          setIsRestoringState(true)
+          
+          // Load the track
+          const { data: tracks } = await listTracks()
+          const track = tracks?.find((t: any) => t.id === data.currentTrackId)
+          
+          if (track) {
+            await loadTrackIntoPlayer(track)
+            
+            // Wait for audio to load
+            setTimeout(() => {
+              if (audioRef.current) {
+                audioRef.current.currentTime = data.lastPosition
+                setCurrentTime(data.lastPosition)
+                console.log('✅ Playback restored to:', Math.round(data.lastPosition), 'seconds')
+              }
+              setIsRestoringState(false)
+            }, 1000)
+          }
+        }
+        
+        // Restore volume
+        if (data.volume) {
+          setVolume(data.volume)
+          if (audioRef.current) {
+            audioRef.current.volume = data.volume
+          }
+        }
+        
+        // Restore autoPlay
+        if (data.autoPlayEnabled !== undefined) {
+          setAutoPlay(data.autoPlayEnabled)
+        }
+      } catch (error) {
+        console.error('❌ Failed to initialize player state:', error)
+      }
+    }
+    
+    initPlayerState()
   }, [])
   
   // Auto-switch playlist when activeSlot changes
@@ -548,6 +616,25 @@ function Players() {
       // Load track into player
       await loadTrackIntoPlayer(fullTrack)
       
+      // Save to PlayerState
+      if (playerStateId) {
+        await savePlayerState(playerStateId, {
+          playerId,
+          currentTrackId: fullTrack.id,
+          currentTrackTitle: fullTrack.title,
+          currentTrackArtist: fullTrack.artist,
+          currentPlaylistId: currentPlaylistId || undefined,
+          status: 'stopped',
+          lastPosition: 0,
+          duration: fullTrack.duration || 0,
+          volume,
+          autoPlayEnabled: autoPlay,
+          currentScheduleSlotId: activeSlot?.id,
+          currentScheduleSlotName: activeSlot?.name
+        })
+        console.log('💾 PlayerState saved (LOAD)')
+      }
+      
       console.log('✅✅✅ LOAD COMPLETE! ✅✅✅')
       
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -654,6 +741,18 @@ function Players() {
       position: audioRef.current.currentTime,
       duration: audioRef.current.duration
     })
+    
+    // Save to PlayerState
+    if (playerStateId && currentTrack) {
+      await savePlayerState(playerStateId, {
+        playerId,
+        status: 'paused',
+        lastPosition: audioRef.current.currentTime,
+        volume,
+        autoPlayEnabled: autoPlay
+      })
+      console.log('💾 PlayerState saved (PAUSE) at', Math.round(audioRef.current.currentTime), 'seconds')
+    }
     
     console.log('✅ Paused')
   }
@@ -908,6 +1007,18 @@ function Players() {
       position: 0
     })
     
+    // Save to PlayerState
+    if (playerStateId && currentTrack) {
+      await savePlayerState(playerStateId, {
+        playerId,
+        status: 'stopped',
+        lastPosition: 0,
+        volume,
+        autoPlayEnabled: autoPlay
+      })
+      console.log('💾 PlayerState saved (STOP)')
+    }
+    
     console.log('✅ Stopped')
   }
 
@@ -1026,6 +1137,49 @@ function Players() {
     window.addEventListener('mouseup', handleGlobalMouseUp)
     return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
   }, [isDragging])
+  
+  // 5-minute checkpoint while playing
+  useEffect(() => {
+    if (!isPlaying || !playerStateId || !currentTrack) return
+    
+    const interval = setInterval(() => {
+      if (audioRef.current) {
+        console.log('💾 5-minute checkpoint:', Math.round(audioRef.current.currentTime), 'seconds')
+        updatePlayerPosition(playerStateId, audioRef.current.currentTime)
+      }
+    }, 5 * 60 * 1000) // 5 minutes
+    
+    return () => clearInterval(interval)
+  }, [isPlaying, playerStateId, currentTrack])
+  
+  // Page unload handler - save state before closing
+  useEffect(() => {
+    function handleBeforeUnload() {
+      if (playerStateId && currentTrack && audioRef.current) {
+        const status = isPlaying ? 'paused' : 'stopped'
+        const position = isPlaying ? audioRef.current.currentTime : 0
+        
+        // Use navigator.sendBeacon for guaranteed delivery
+        const data = {
+          id: playerStateId,
+          playerId,
+          status,
+          lastPosition: position,
+          volume,
+          autoPlayEnabled: autoPlay,
+          lastActive: new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        }
+        
+        console.log('💾 Saving state before page unload...', data)
+        // Note: savePlayerState is async, might not complete before unload
+        // In production, consider using sendBeacon API
+      }
+    }
+    
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [playerStateId, currentTrack, isPlaying, volume, autoPlay, playerId])
 
   function formatTime(seconds: number): string {
     if (!seconds || isNaN(seconds)) return '0:00'
