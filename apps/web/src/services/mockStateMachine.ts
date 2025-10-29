@@ -29,14 +29,22 @@ export async function startMockStateMachine() {
   isRunning = true
 
   try {
-    // Subscribe to ALL player commands (wildcard)
-    const topic = 'radio/player/+/command'
+    // Subscribe to ALL player command REQUESTS (wildcard)
+    // Listen to: radio/player/+/command-request
+    // Respond to: radio/player/{playerId}/command
+    const topic = 'radio/player/+/command-request'
     console.log(`🎧 Mock State Machine subscribing to: ${topic}`)
+    console.log('📝 This simulates the backend State Machine')
+    console.log('📥 Listens: command-request')
+    console.log('📤 Responds: command')
 
     subscription = await pubsubService.subscribe(
       { topic },
       async (message: any) => {
-        console.log('🤖 Mock State Machine received command:', message)
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('🤖 MOCK STATE MACHINE RECEIVED')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Message:', message)
         await handleCommand(message)
       },
       (error: any) => {
@@ -44,7 +52,9 @@ export async function startMockStateMachine() {
       }
     )
 
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     console.log('✅ Mock State Machine started!')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   } catch (error) {
     console.error('❌ Failed to start Mock State Machine:', error)
     isRunning = false
@@ -75,15 +85,17 @@ export function stopMockStateMachine() {
  * Handle incoming command
  */
 async function handleCommand(data: any) {
-  const { value } = data
-  const command = value?.command
-  const playerId = value?.playerId
-  const params = value?.params
+  // PubSub wraps message in { value: ... }
+  const message = data?.value || data
+  const command = message?.command
+  const playerId = message?.playerId
+  const params = message?.params
 
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🤖 PROCESSING COMMAND:', command)
   console.log('   Player:', playerId)
   console.log('   Params:', params)
+  console.log('   Raw data:', data)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
   switch (command) {
@@ -114,14 +126,33 @@ async function handleCommand(data: any) {
 
 /**
  * Handle LOAD command
- * Fetch playlist, get first track, send back complete track data
+ * Determines playlist based on current time (TODO: implement schedule logic)
+ * Fetches playlist, gets first track, sends back complete track data
  */
 async function handleLoadCommand(playerId: string, params: any) {
-  const playlistId = params?.playlistId
-
+  console.log('📋 Determining playlist for LOAD command...')
+  
+  // For now, use hardcoded playlistId or fetch from schedule
+  // TODO: Implement schedule lookup based on current time
+  let playlistId = params?.playlistId
+  
   if (!playlistId) {
-    console.error('❌ LOAD command missing playlistId')
-    return
+    console.log('⚠️ No playlistId in params, fetching first available playlist...')
+    // Get first playlist as fallback
+    try {
+      // @ts-ignore
+      const { data: playlists } = await getClient().models.Playlist.list({ limit: 1 })
+      if (playlists && playlists.length > 0) {
+        playlistId = playlists[0].id
+        console.log('✅ Using first playlist:', playlistId)
+      } else {
+        console.error('❌ No playlists found')
+        return
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch playlists:', error)
+      return
+    }
   }
 
   console.log('📋 Fetching playlist:', playlistId)
