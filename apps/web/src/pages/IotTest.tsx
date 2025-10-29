@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth'
 import { useAuthenticator } from '@aws-amplify/ui-react'
 import { isEnabled as pubsubEnabled, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from '../services/pubsub'
+import { attachIoTPolicyToCurrentUser } from '../services/iotPolicyAttacher'
 
 const INPUT_TOPIC = 'gforce/libery/input'
 const OUTPUT_TOPIC = 'gforce/libery/output'
@@ -11,6 +12,8 @@ function App() {
   const [identityId, setIdentityId] = useState<string>('')
   const { signOut } = useAuthenticator()
   const [iotStatus, setIotStatus] = useState<'idle'|'connecting'|'connected'|'error'>(pubsubEnabled() ? 'idle' : 'error')
+  const [isAttachingPolicy, setIsAttachingPolicy] = useState(false)
+  const [policyAttached, setPolicyAttached] = useState(false)
   
   // Input panel state (send messages to INPUT_TOPIC)
   const [inputMessage, setInputMessage] = useState<string>('')
@@ -90,6 +93,28 @@ function App() {
     }
   }, [isSubscribed])
 
+  const handleAttachPolicy = async () => {
+    setIsAttachingPolicy(true)
+    try {
+      const success = await attachIoTPolicyToCurrentUser()
+      setPolicyAttached(success)
+      if (success) {
+        alert('✅ IoT Policy attached! Now retry the connection.')
+        // Auto-retry connection
+        setIotStatus('connecting')
+        resetPubSub()
+        const ok = await testConnect('iot/demo/topic')
+        setIotStatus(ok ? 'connected' : 'error')
+      } else {
+        alert('❌ Failed to attach IoT Policy. Check console for details.')
+      }
+    } catch (error) {
+      alert(`❌ Error: ${error}`)
+    } finally {
+      setIsAttachingPolicy(false)
+    }
+  }
+
   const handleSendInput = async () => {
     if (!inputMessage.trim()) return
     try {
@@ -114,9 +139,22 @@ function App() {
                 IoT: {iotStatus}
               </span>
               <button
+                disabled={isAttachingPolicy}
+                onClick={handleAttachPolicy}
+                className={`rounded border px-2 py-1 text-[11px] hover:opacity-80 disabled:opacity-60 ${
+                  policyAttached 
+                    ? 'bg-green-100 border-green-300 text-green-800' 
+                    : 'bg-orange-100 border-orange-300 text-orange-800'
+                }`}
+                title="Attach IoT Policy to enable MQTT connection"
+              >
+                {isAttachingPolicy ? '⏳ Attaching...' : policyAttached ? '✅ Policy OK' : '🔧 Attach Policy'}
+              </button>
+              <button
                 disabled={iotStatus === 'connecting'}
                 onClick={async () => {
                   setIotStatus('connecting')
+                  resetPubSub()
                   const ok = await testConnect('iot/demo/topic')
                   setIotStatus(ok ? 'connected' : 'error')
                 }}
