@@ -225,6 +225,21 @@ function Players() {
             console.log('📋 Setting playlistId from LOAD command:', command.params.playlist.id)
             setCurrentPlaylistId(command.params.playlist.id)
           }
+          
+          // Extract schedule info from Lambda response
+          if (command.params.schedule) {
+            console.log('📅 Setting schedule info from LOAD command:', command.params.schedule.name)
+            setActiveSlot({
+              id: command.params.schedule.id,
+              name: command.params.schedule.name,
+              time: command.params.schedule.startTime,
+              playlistId: command.params.playlist?.id || null,
+              days: [], // Not used in display
+              duration: 60, // Default, could calculate from start/endTime
+              active: true
+            })
+          }
+          
           executeLoad(command.params.track)
         } else {
           console.error('❌ LOAD command missing track data')
@@ -1036,22 +1051,47 @@ function Players() {
           {/* Audio is created dynamically via new Audio() in handlePlay */}
         </div>
 
-        {/* Current Playlist */}
-        {currentPlaylistId && (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+        {/* Schedule Info Card */}
+        {activeSlot && currentPlaylistId && (
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-lg overflow-hidden border border-purple-200">
+            <div className="p-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600">
               <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">📻 Current Schedule</h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Now playing from scheduled playlist
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">Current Time</div>
-                  <div className="text-lg font-bold text-indigo-600">
-                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                    <span className="text-3xl">📻</span>
                   </div>
+                  <div>
+                    <h3 className="font-bold text-white text-lg">Now Playing Schedule</h3>
+                    <p className="text-white/80 text-sm">{activeSlot.name}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg text-sm font-bold text-gray-800 shadow-lg">
+                    ⏰ {activeSlot.time}
+                  </div>
+                  <div className="px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-lg text-sm font-bold text-white shadow-lg border border-white/30">
+                    ⏱️ {activeSlot.duration}m
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20 mt-3">
+                <div className="text-lg font-bold text-white mb-1">
+                  {playlists.find(p => p.id === currentPlaylistId)?.name || 'Loading...'}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-white/90">
+                  <span className="flex items-center gap-1">
+                    <span className="text-green-300">▶️</span>
+                    Auto-loaded from schedule
+                  </span>
+                  <span className="text-white/50">•</span>
+                  <span className="flex items-center gap-1">
+                    🎧 Click track to preview
+                  </span>
+                  <span className="text-white/50">•</span>
+                  <span className="font-mono text-white/80">
+                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </span>
                 </div>
               </div>
             </div>
