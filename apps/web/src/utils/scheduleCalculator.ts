@@ -49,6 +49,9 @@ export function findActiveSlot(
   const currentMinute = currentTime.getMinutes()
   const currentTimeMinutes = currentHour * 60 + currentMinute
   
+  console.log('🔍 Finding active slot for time:', `${currentHour.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')}`, `(${currentTimeMinutes} minutes)`)
+  console.log('📋 Total slots:', slots.length)
+  
   // Sorteer slots op tijd
   const sortedSlots = [...slots]
     .filter(slot => slot.active && slot.playlistId)
@@ -58,6 +61,9 @@ export function findActiveSlot(
       return (aHour * 60 + aMin) - (bHour * 60 + bMin)
     })
   
+  console.log('✅ Active slots with playlist:', sortedSlots.length)
+  sortedSlots.forEach(s => console.log(`   - ${s.time} ${s.name} (duration: ${s.duration}m)`))
+  
   // Vind de slot die nu actief is
   for (let i = sortedSlots.length - 1; i >= 0; i--) {
     const slot = sortedSlots[i]
@@ -65,14 +71,34 @@ export function findActiveSlot(
     const slotStartMinutes = slotHour * 60 + slotMin
     
     if (currentTimeMinutes >= slotStartMinutes) {
-      // Check of we binnen de duration zijn
-      const slotEndMinutes = slotStartMinutes + slot.duration
-      if (currentTimeMinutes < slotEndMinutes) {
-        return slot
+      // Als duration = 0, betekent dit "tot volgende slot" of "tot einde dag"
+      if (slot.duration === 0) {
+        // Check of er een volgende slot is
+        const nextSlot = sortedSlots[i + 1]
+        if (nextSlot) {
+          const [nextHour, nextMin] = nextSlot.time.split(':').map(Number)
+          const nextSlotMinutes = nextHour * 60 + nextMin
+          if (currentTimeMinutes < nextSlotMinutes) {
+            console.log('✅ Found active slot (duration=0, until next):', slot.name, `${slot.time} - ${nextSlot.time}`)
+            return slot
+          }
+        } else {
+          // Laatste slot van de dag - actief tot einde dag
+          console.log('✅ Found active slot (duration=0, until end of day):', slot.name, slot.time)
+          return slot
+        }
+      } else {
+        // Check of we binnen de duration zijn
+        const slotEndMinutes = slotStartMinutes + slot.duration
+        if (currentTimeMinutes < slotEndMinutes) {
+          console.log('✅ Found active slot (with duration):', slot.name, `${slot.time} + ${slot.duration}m`)
+          return slot
+        }
       }
     }
   }
   
+  console.log('❌ No active slot found for current time')
   return null
 }
 
