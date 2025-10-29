@@ -129,6 +129,10 @@ function Planner() {
   }
 
   async function handlePlaylistSelect(slotId: string, playlistId: string) {
+    // Get current slot before updating
+    const currentSlot = timeSlots.find(s => s.id === slotId)
+    const isNewSlot = currentSlot?.playlistId === null
+    
     // Update local state immediately
     setTimeSlots(slots => slots.map(slot => 
       slot.id === slotId ? { ...slot, playlistId } : slot
@@ -136,15 +140,26 @@ function Planner() {
     
     // Persist to DynamoDB
     try {
-      const slot = timeSlots.find(s => s.id === slotId)
-      if (slot) {
-        // Update all schedule entries for this slot (one per day)
-        // For now, just update the first one we find
+      if (isNewSlot && currentSlot) {
+        // First time selecting playlist - CREATE in DynamoDB
+        console.log('📝 Creating new schedule in DynamoDB...')
+        await createSchedule({
+          name: currentSlot.name,
+          startTime: currentSlot.time,
+          endTime: null,
+          playlistId: playlistId,
+          dayOfWeek: null, // null = every day
+          isActive: currentSlot.active,
+          priority: 0
+        })
+        console.log('✅ New schedule created in DynamoDB with playlist!')
+      } else {
+        // Already exists - UPDATE in DynamoDB
         await updateSchedule(slotId, { playlistId })
         console.log('✅ Playlist updated in DynamoDB')
       }
     } catch (error) {
-      console.error('❌ Failed to update playlist:', error)
+      console.error('❌ Failed to save playlist:', error)
       alert('Failed to save playlist selection')
     }
   }
@@ -183,6 +198,7 @@ function Planner() {
   }
 
   async function addNewSlot() {
+    // IMPORTANT: Don't save to DynamoDB yet - user needs to set playlist first!
     const newSlot: TimeSlot = {
       id: Date.now().toString(),
       time: '00:00',
@@ -193,28 +209,14 @@ function Planner() {
       active: true
     }
     
-    // Add to local state immediately
+    // Add to local state only
     setTimeSlots([...timeSlots, newSlot])
     setShowAddSlot(false)
+    setSelectedSlot(newSlot) // Auto-select so user can set playlist
     
-    // Persist to DynamoDB
-    try {
-      // Create a schedule entry for each day
-      // For simplicity, create one entry for all days (dayOfWeek=null means every day)
-      await createSchedule({
-        name: newSlot.name,
-        startTime: newSlot.time,
-        endTime: null, // Until next slot
-        playlistId: newSlot.playlistId || '',
-        dayOfWeek: null, // null = every day
-        isActive: newSlot.active,
-        priority: 0
-      })
-      console.log('✅ New schedule created in DynamoDB')
-    } catch (error) {
-      console.error('❌ Failed to create schedule:', error)
-      alert('Failed to save new slot')
-    }
+    console.log('⚠️ New slot created locally - select a playlist and it will auto-save to DynamoDB')
+    
+    // NOTE: DynamoDB save happens when user selects playlist via handlePlaylistSelect()
   }
 
   async function deleteSlot(slotId: string) {

@@ -12,6 +12,13 @@ function getClient() {
     // @ts-ignore - Amplify Gen 2 client will have models at runtime
     client = generateClient()
     console.log('[Schedules] Client generated')
+    console.log('[Schedules] Available models:', Object.keys(client.models || {}))
+    
+    // Check if Schedule model exists
+    if (!client.models?.Schedule) {
+      console.error('[Schedules] ❌ Schedule model NOT found in client!')
+      console.error('[Schedules] Available models:', client.models)
+    }
   }
   return client
 }
