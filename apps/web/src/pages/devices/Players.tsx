@@ -52,6 +52,18 @@ function Players() {
     loadPlaylists()
     loadSchedule()
     
+    // Auto-load playlist after schedule is loaded
+    setTimeout(() => {
+      console.log('🎵 Auto-loading playlist from schedule...')
+      if (activeSlot && activeSlot.playlistId) {
+        console.log('✅ Found active slot:', activeSlot.name)
+        console.log('📋 Setting playlist:', activeSlot.playlistId)
+        setCurrentPlaylistId(activeSlot.playlistId)
+      } else {
+        console.log('⚠️ No active slot yet, will try again...')
+      }
+    }, 1000) // Wait 1 second for loadSchedule to complete
+    
     // Test IoT connection on startup
     import('../../services/pubsub').then(({ testConnect }) => {
       console.log('🔌 Testing IoT connection...')
@@ -71,11 +83,31 @@ function Players() {
   // Update active slot every minute
   useEffect(() => {
     const interval = setInterval(() => {
+      console.log('⏰ Minute tick - checking for schedule changes...')
       loadSchedule()
     }, 60000) // Check every minute
     
     return () => clearInterval(interval)
   }, [])
+  
+  // Auto-switch playlist when activeSlot changes
+  useEffect(() => {
+    if (activeSlot && activeSlot.playlistId) {
+      console.log('🔄 Active slot changed to:', activeSlot.name, `(${activeSlot.time})`)
+      console.log('📋 Auto-switching to playlist:', activeSlot.playlistId)
+      
+      // Only update if it's different from current
+      if (activeSlot.playlistId !== currentPlaylistId) {
+        console.log('✅ Switching playlist!')
+        setCurrentPlaylistId(activeSlot.playlistId)
+        
+        // TODO: Optionally auto-load new track when slot changes
+        // handleLoad() 
+      } else {
+        console.log('ℹ️ Same playlist, no switch needed')
+      }
+    }
+  }, [activeSlot])
 
   // Calculate scheduled track every second
   useEffect(() => {
