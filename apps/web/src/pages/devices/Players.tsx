@@ -59,6 +59,10 @@ function Players() {
   // PlayerState for persistence
   const [playerStateId, setPlayerStateId] = useState<string | null>(null)
   const [isRestoringState, setIsRestoringState] = useState(false)
+  
+  // Station mode (IoT-driven vs Manual)
+  const [stationMode, setStationMode] = useState<'manual' | 'station'>('manual')
+  const [scheduledPlayback, setScheduledPlayback] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     loadPlaylists()
@@ -304,6 +308,114 @@ function Players() {
       }
     }
   }, [playerId]) // Only re-run if playerId changes
+
+  // Station Broadcast Subscription (IoT-driven playback)
+  useEffect(() => {
+    if (!iotServiceRef.current) return
+    
+    console.log('📻 Setting up Station Broadcast subscription...')
+    
+    async function setupStationSubscription() {
+      try {
+        const { subscribe } = await import('../../services/pubsub')
+        const subscription = await subscribe(
+          { topic: 'radio/station/current-track' },
+          async (message: any) => {
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            console.log('📻 STATION BROADCAST RECEIVED')
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+            console.log('Command:', message.command)
+            console.log('Track:', message.track?.title)
+            console.log('Mode:', message.mode || 'station')
+            
+            if (message.command === 'LOAD_AND_SCHEDULE') {
+              // Cancel any existing scheduled playback
+              if (scheduledPlayback) {
+                console.log('⏹️ Cancelling previous scheduled playback')
+                clearTimeout(scheduledPlayback)
+                setScheduledPlayback(null)
+              }
+              
+              // Switch to station mode
+              setStationMode('station')
+              
+              // Load track
+              console.log('📥 Loading track from station...')
+              await loadTrackIntoPlayer(message.track)
+              
+              // Set playlist context
+              if (message.playlist?.id) {
+                setCurrentPlaylistId(message.playlist.id)
+              }
+              
+              // Calculate timing
+              const startTime = new Date(message.timing.startAt)
+              const now = new Date()
+              const delay = startTime.getTime() - now.getTime()
+              
+              console.log('⏱️ Start scheduled at:', message.timing.startAt)
+              console.log('   Current time:', now.toISOString())
+              console.log('   Delay:', Math.round(delay / 1000), 'seconds')
+              
+              // Schedule playback with 5-sec buffer
+              if (delay > 0) {
+                console.log('🎯 Scheduling playback in', Math.round(delay / 1000), 'seconds')
+                
+                const timeout = setTimeout(() => {
+                  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+                  console.log('🎵 STARTING STATION PLAYBACK!')
+                  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+                  
+                  if (audioRef.current) {
+                    audioRef.current.play()
+                    setIsPlaying(true)
+                    setIsPaused(false)
+                    
+                    // Save state
+                    if (playerStateId) {
+                      savePlayerState(playerStateId, {
+                        playerId,
+                        currentTrackId: message.track.id,
+                        currentTrackTitle: message.track.title,
+                        currentTrackArtist: message.track.artist,
+                        currentPlaylistId: message.playlist?.id,
+                        status: 'playing',
+                        lastPosition: 0,
+                        duration: message.track.duration,
+                        volume,
+                        autoPlayEnabled: autoPlay
+                      })
+                    }
+                  }
+                }, delay)
+                
+                setScheduledPlayback(timeout)
+              } else {
+                console.warn('⚠️ Start time has passed! Starting immediately')
+                if (audioRef.current) {
+                  audioRef.current.play()
+                  setIsPlaying(true)
+                  setIsPaused(false)
+                }
+              }
+            }
+          }
+        )
+        
+        console.log('✅ Station broadcast subscription active')
+        
+        return subscription
+      } catch (error) {
+        console.error('❌ Failed to subscribe to station broadcast:', error)
+      }
+    }
+    
+    const cleanup = setupStationSubscription()
+    
+    return () => {
+      cleanup.then(sub => sub?.unsubscribe?.())
+    }
+  }, [iotServiceRef.current, scheduledPlayback, playerStateId, volume, autoPlay, playerId])
 
   // Update clock every second
   useEffect(() => {
