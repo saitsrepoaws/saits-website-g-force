@@ -9,6 +9,9 @@
 
 import { generateClient } from 'aws-amplify/data'
 import * as pubsubService from './pubsub'
+import { loadScheduleAndDeterminePlaylist } from './scheduleService'
+import { calculateCurrentTrack } from '../utils/scheduleCalculator'
+import type { PlaylistTrack } from '../utils/scheduleCalculator'
 
 const getClient = () => generateClient()
 
@@ -126,38 +129,31 @@ async function handleCommand(data: any) {
 
 /**
  * Handle LOAD command
- * Determines playlist based on current time (TODO: implement schedule logic)
- * Fetches playlist, gets first track, sends back complete track data
+ * Backend determines which track should play NOW based on schedule
+ * Player sends LOAD → Backend calculates → Backend sends track data back
+ * 
+ * @param playerId - The player requesting the track
+ * @param _params - Not used, backend determines everything from schedule
  */
-async function handleLoadCommand(playerId: string, params: any) {
-  console.log('📋 Determining playlist for LOAD command...')
+async function handleLoadCommand(playerId: string, _params?: any) {
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+  console.log('🤖 BACKEND: Determining scheduled track...')
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   
-  // For now, use hardcoded playlistId or fetch from schedule
-  // TODO: Implement schedule lookup based on current time
-  let playlistId = params?.playlistId
+  // Step 1: Load schedule and find active slot
+  const { activeSlot, playlistId } = loadScheduleAndDeterminePlaylist()
   
-  if (!playlistId) {
-    console.log('⚠️ No playlistId in params, fetching first available playlist...')
-    // Get first playlist as fallback
-    try {
-      // @ts-ignore
-      const { data: playlists } = await getClient().models.Playlist.list({ limit: 1 })
-      if (playlists && playlists.length > 0) {
-        playlistId = playlists[0].id
-        console.log('✅ Using first playlist:', playlistId)
-      } else {
-        console.error('❌ No playlists found')
-        return
-      }
-    } catch (error) {
-      console.error('❌ Failed to fetch playlists:', error)
-      return
-    }
+  if (!activeSlot || !playlistId) {
+    console.error('❌ No active schedule slot found')
+    console.error('   Player cannot determine track - needs schedule!')
+    return
   }
-
-  console.log('📋 Fetching playlist:', playlistId)
+  
+  console.log('✅ Active slot:', activeSlot.name, `(${activeSlot.time})`)
+  console.log('📋 Scheduled playlist:', playlistId)
 
   try {
+    // Step 2: Fetch playlist data
     // @ts-ignore - Playlist model exists at runtime
     const { data: playlistData } = await getClient().models.Playlist.get({ id: playlistId })
     
@@ -168,8 +164,8 @@ async function handleLoadCommand(playerId: string, params: any) {
 
     console.log('✅ Playlist fetched:', playlistData.name)
 
-    // Parse tracks from JSON string
-    let parsedTracks: any[] = []
+    // Step 3: Parse tracks from JSON string
+    let parsedTracks: PlaylistTrack[] = []
     
     if (typeof playlistData.tracks === 'string') {
       parsedTracks = JSON.parse(playlistData.tracks)
@@ -182,24 +178,38 @@ async function handleLoadCommand(playerId: string, params: any) {
       return
     }
 
-    // Sort by order and get first track
-    const sortedTracks = [...parsedTracks].sort((a, b) => {
-      return (a.order ?? 0) - (b.order ?? 0)
-    })
+    // Step 4: Calculate which track should be playing NOW
+    const currentTrackInfo = calculateCurrentTrack(
+      activeSlot,
+      parsedTracks,
+      playlistData.name || 'Unnamed Playlist'
+    )
 
-    const firstPlaylistTrack = sortedTracks[0]
-    console.log('🎵 First track in playlist:', firstPlaylistTrack)
-
-    if (!firstPlaylistTrack.trackId) {
-      console.error('❌ No trackId in playlist track')
+    if (!currentTrackInfo) {
+      console.error('❌ Could not calculate current track')
       return
     }
 
-    // Fetch complete track data from library
-    console.log('🔍 Fetching track from library...')
+    console.log('🎯 Scheduled track (GREEN ROW):')
+    console.log('   Index:', currentTrackInfo.trackIndex)
+    console.log('   Title:', currentTrackInfo.track.trackTitle || 'Unknown')
+    console.log('   Progress:', `${currentTrackInfo.percentComplete}%`)
+    console.log('   Start:', currentTrackInfo.trackStartTime)
+    console.log('   End:', currentTrackInfo.trackEndTime)
+
+    const scheduledTrack = currentTrackInfo.track
+
+    if (!scheduledTrack.trackId) {
+      console.error('❌ No trackId in scheduled track')
+      return
+    }
+
+    // Step 5: Fetch complete track data from library
+    console.log('🔍 Fetching complete track data from library...')
+    console.log('   Track ID:', scheduledTrack.trackId)
     // @ts-ignore - Track model exists at runtime
     const { data: trackData } = await getClient().models.Track.get({ 
-      id: firstPlaylistTrack.trackId 
+      id: scheduledTrack.trackId 
     })
 
     if (!trackData) {
@@ -207,9 +217,12 @@ async function handleLoadCommand(playerId: string, params: any) {
       return
     }
 
-    console.log('✅ Track fetched:', trackData.title)
+    console.log('✅ Complete track data fetched!')
+    console.log('   Artist:', trackData.artist)
+    console.log('   Title:', trackData.title)
+    console.log('   Duration:', trackData.duration, 'sec')
 
-    // Send LOAD command back with complete track data
+    // Step 6: Send LOAD command back with complete track data + schedule info
     const responseTopic = `radio/player/${playerId}/command`
     const responseMessage = {
       command: 'LOAD',
@@ -217,6 +230,13 @@ async function handleLoadCommand(playerId: string, params: any) {
       timestamp: new Date().toISOString(),
       params: {
         playlistId: playlistId,
+        playlistName: playlistData.name,
+        slotName: activeSlot.name,
+        slotStartTime: activeSlot.time,
+        trackIndex: currentTrackInfo.trackIndex,
+        trackStartTime: currentTrackInfo.trackStartTime,
+        trackEndTime: currentTrackInfo.trackEndTime,
+        percentComplete: currentTrackInfo.percentComplete,
         track: {
           id: trackData.id,
           title: trackData.title,
@@ -236,6 +256,7 @@ async function handleLoadCommand(playerId: string, params: any) {
       }
     }
 
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     console.log('📤 Sending LOAD response to player...')
     await pubsubService.publish({
       topic: responseTopic,
@@ -243,6 +264,7 @@ async function handleLoadCommand(playerId: string, params: any) {
     })
 
     console.log('✅ LOAD response sent!')
+    console.log('🎯 Backend determined scheduled track!')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   } catch (error) {
     console.error('❌ Failed to handle LOAD command:', error)
