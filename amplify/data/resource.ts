@@ -30,6 +30,22 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
 
+  // Schedule model - time-based playlist scheduling
+  // Maps time slots to playlists for automatic playback
+  Schedule: a
+    .model({
+      name: a.string().required(), // "Morning Show", "Peak Time", etc.
+      dayOfWeek: a.integer(), // 0=Sunday, 1=Monday, ... 6=Saturday (null = every day)
+      startTime: a.string().required(), // "09:00"
+      endTime: a.string(), // "12:00" (null = until next slot)
+      playlistId: a.string().required(), // References Playlist.id
+      isActive: a.boolean().default(true),
+      priority: a.integer().default(0), // Higher priority wins if slots overlap
+      createdAt: a.datetime(),
+      updatedAt: a.datetime(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
   // Track model - audio tracks in the Libery system
   // Format: Artist - Title (Version) [Label]
   Track: a

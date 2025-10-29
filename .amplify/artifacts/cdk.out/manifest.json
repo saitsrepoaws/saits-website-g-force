@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fa56c38c3559d1b8ae78535f703854febb15cf899ff67352e1c489ab25f09d5c.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4ab7813e7475452030312339856144f57ce35f0bb2ce86f9f44c5f83b70801f2.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -921,6 +921,524 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/DynamoDBModelTableReadIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableReadIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/DynamoDBModelTableWriteIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableWriteIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/DynamoDBBillingMode": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBBillingMode"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/DynamoDBEnablePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnablePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/DynamoDBEnableServerSideEncryption": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnableServerSideEncryption"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/HasEnvironmentParameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HasEnvironmentParameter"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ShouldUsePayPerRequestBilling": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePayPerRequestBilling"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ShouldUsePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Schedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleTable/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ScheduleTable"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Schedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/CustomTableScheduleTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Schedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/GetAttScheduleTableStreamArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttScheduleTableStreamArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/GetAttScheduleTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttScheduleTableName"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleIAMRole": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ScheduleIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleIAMRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ScheduleIAMRole8815045B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ScheduleIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleDataSource": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ScheduleTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/ScheduleDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ScheduleDataSource"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ScheduleTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerygetScheduleauth0Function/QuerygetScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetScheduleauth0FunctionQuerygetScheduleauth0FunctionAppSyncFunction7199C5AA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerygetSchedulepostAuth0Function/QuerygetSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetSchedulepostAuth0FunctionQuerygetSchedulepostAuth0FunctionAppSyncFunction0AB394A4"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QueryGetScheduleDataResolverFn/QueryGetScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryGetScheduleDataResolverFnQueryGetScheduleDataResolverFnAppSyncFunctionBF969319"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryGetScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/queryGetScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.getSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerylistSchedulesauth0Function/QuerylistSchedulesauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistSchedulesauth0FunctionQuerylistSchedulesauth0FunctionAppSyncFunction97391883"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistSchedulesauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerylistSchedulespostAuth0Function/QuerylistSchedulespostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistSchedulespostAuth0FunctionQuerylistSchedulespostAuth0FunctionAppSyncFunction8948C807"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistSchedulespostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QueryListSchedulesDataResolverFn/QueryListSchedulesDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListSchedulesDataResolverFnQueryListSchedulesDataResolverFnAppSyncFunctionE4B07DF5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListSchedulesDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/queryListSchedulesResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listSchedules"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationcreateScheduleinit0Function/MutationcreateScheduleinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateScheduleinit0FunctionMutationcreateScheduleinit0FunctionAppSyncFunction71827116"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateScheduleinit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationcreateScheduleinit1Function/MutationcreateScheduleinit1Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateScheduleinit1FunctionMutationcreateScheduleinit1FunctionAppSyncFunctionD0F5CFEE"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateScheduleinit1Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationcreateScheduleauth0Function/MutationcreateScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateScheduleauth0FunctionMutationcreateScheduleauth0FunctionAppSyncFunctionC7D31541"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationcreateSchedulepostAuth0Function/MutationcreateSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateSchedulepostAuth0FunctionMutationcreateSchedulepostAuth0FunctionAppSyncFunction7879E991"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationCreateScheduleDataResolverFn/MutationCreateScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationCreateScheduleDataResolverFnMutationCreateScheduleDataResolverFnAppSyncFunction541BA043"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationCreateScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/mutationCreateScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.createSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationupdateScheduleinit0Function/MutationupdateScheduleinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateScheduleinit0FunctionMutationupdateScheduleinit0FunctionAppSyncFunctionA4586CB4"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateScheduleinit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationupdateScheduleauth0Function/MutationupdateScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateScheduleauth0FunctionMutationupdateScheduleauth0FunctionAppSyncFunction33F6651B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationupdateSchedulepostAuth0Function/MutationupdateSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateSchedulepostAuth0FunctionMutationupdateSchedulepostAuth0FunctionAppSyncFunction2475224B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationUpdateScheduleDataResolverFn/MutationUpdateScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationUpdateScheduleDataResolverFnMutationUpdateScheduleDataResolverFnAppSyncFunctionB0AB39DF"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationUpdateScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/mutationUpdateScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.updateSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationdeleteScheduleauth0Function/MutationdeleteScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteScheduleauth0FunctionMutationdeleteScheduleauth0FunctionAppSyncFunction0D44F2D5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationdeleteSchedulepostAuth0Function/MutationdeleteSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteSchedulepostAuth0FunctionMutationdeleteSchedulepostAuth0FunctionAppSyncFunction4BE48EE7"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/MutationDeleteScheduleDataResolverFn/MutationDeleteScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationDeleteScheduleDataResolverFnMutationDeleteScheduleDataResolverFnAppSyncFunction55935049"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationDeleteScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/mutationDeleteScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeleteScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.deleteSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononCreateScheduleauth0Function/SubscriptiononCreateScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateScheduleauth0FunctionSubscriptiononCreateScheduleauth0FunctionAppSyncFunctionE3317DBA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononCreateSchedulepostAuth0Function/SubscriptiononCreateSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateSchedulepostAuth0FunctionSubscriptiononCreateSchedulepostAuth0FunctionAppSyncFunction54243C96"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptionOnCreateScheduleDataResolverFn/SubscriptionOnCreateScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnCreateScheduleDataResolverFnSubscriptionOnCreateScheduleDataResolverFnAppSyncFunction374392C7"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnCreateScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/subscriptionOnCreateScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onCreateSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononUpdateScheduleauth0Function/SubscriptiononUpdateScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateScheduleauth0FunctionSubscriptiononUpdateScheduleauth0FunctionAppSyncFunction076E2689"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononUpdateSchedulepostAuth0Function/SubscriptiononUpdateSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateSchedulepostAuth0FunctionSubscriptiononUpdateSchedulepostAuth0FunctionAppSyncFunction29744260"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptionOnUpdateScheduleDataResolverFn/SubscriptionOnUpdateScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnUpdateScheduleDataResolverFnSubscriptionOnUpdateScheduleDataResolverFnAppSyncFunction9074943C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnUpdateScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/subscriptionOnUpdateScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onUpdateSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononDeleteScheduleauth0Function/SubscriptiononDeleteScheduleauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteScheduleauth0FunctionSubscriptiononDeleteScheduleauth0FunctionAppSyncFunction17D52E68"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteScheduleauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptiononDeleteSchedulepostAuth0Function/SubscriptiononDeleteSchedulepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteSchedulepostAuth0FunctionSubscriptiononDeleteSchedulepostAuth0FunctionAppSyncFunctionFCD47A2B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteSchedulepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/SubscriptionOnDeleteScheduleDataResolverFn/SubscriptionOnDeleteScheduleDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnDeleteScheduleDataResolverFnSubscriptionOnDeleteScheduleDataResolverFnAppSyncFunctionC609661D"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnDeleteScheduleDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/subscriptionOnDeleteScheduleResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteScheduleResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onDeleteSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule.NestedStack/Schedule.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/DynamoDBModelTableReadIOPS": [
@@ -2197,12 +2715,6 @@
             "data": "StateMachineTrigger27A3F693"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE=": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Role/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -2221,22 +2733,10 @@
             "data": "PlayerStateMachineDF3FE3FD"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerCommandRule": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerCommandRule"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachineArn": [
           {
             "type": "aws:cdk:logicalId",
             "data": "PlayerStateMachineArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/IoTRuleArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IoTRuleArn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default": [

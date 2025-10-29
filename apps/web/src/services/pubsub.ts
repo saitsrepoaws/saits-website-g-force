@@ -103,8 +103,10 @@ async function getPubSubInstance(): Promise<PubSub> {
         endpoint: wssUrl,
         clientId: clientId,
         // MQTT keepalive settings to prevent connection timeout
-        keepAliveTimeoutMs: 60000, // 60 seconds - send ping if no activity
-        reconnectTimeoutMs: 5000,   // Auto-reconnect after 5 seconds
+        // 10 second ping keeps socket VERY stable (prevents idle timeouts)
+        keepAliveTimeoutMs: 10000,  // 10 seconds - aggressive ping to keep socket alive
+        reconnectTimeoutMs: 5000,   // Auto-reconnect after 5 seconds if disconnected
+        connectTimeoutMs: 10000,    // 10 seconds to establish initial connection
       })
       
       // Listen to connection state changes (ONLY ONCE for entire app!)
@@ -124,11 +126,11 @@ async function getPubSubInstance(): Promise<PubSub> {
                 connectionStateTimeout = null
               }
               
-              // Start keepalive logging (shows ping activity every 60 seconds)
+              // Start keepalive logging (shows ping activity every 10 seconds)
               if (keepaliveInterval) clearInterval(keepaliveInterval)
               keepaliveInterval = setInterval(() => {
-                log('info', '📡 MQTT keepalive ping (connection active)')
-              }, 60000) // Every 60 seconds
+                log('info', '📡 MQTT keepalive ping (socket alive)')
+              }, 10000) // Every 10 seconds - matches keepAliveTimeoutMs
               
             } else if (connectionState === ConnectionState.Disconnected) {
               // Stop keepalive logging when disconnected

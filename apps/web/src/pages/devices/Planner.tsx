@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import { listPlaylists } from '../../services/playlists'
+import { listSchedules, createSchedule, updateSchedule, deleteSchedule } from '../../services/schedules'
 import type { Playlist } from '../../types/playlist'
 
 interface TimeSlot {
@@ -26,22 +27,30 @@ const DEFAULT_TIME_SLOTS: TimeSlot[] = [
   { id: '6', time: '21:00', name: 'Night Vibes', playlistId: null, days: ['FRI', 'SAT'], duration: 240, active: true },
 ]
 
-// Load from localStorage or use default
-function loadTimeSlotsFromStorage(): TimeSlot[] {
-  try {
-    const stored = localStorage.getItem('planner-time-slots')
-    if (stored) {
-      return JSON.parse(stored)
-    }
-  } catch (error) {
-    console.error('Failed to load time slots from localStorage:', error)
-  }
-  return DEFAULT_TIME_SLOTS
+// DAY mapping: Index to code
+const DAY_INDEX_TO_CODE: Record<number, string> = {
+  0: 'SUN',
+  1: 'MON',
+  2: 'TUE',
+  3: 'WED',
+  4: 'THU',
+  5: 'FRI',
+  6: 'SAT'
+}
+
+const DAY_CODE_TO_INDEX: Record<string, number> = {
+  SUN: 0,
+  MON: 1,
+  TUE: 2,
+  WED: 3,
+  THU: 4,
+  FRI: 5,
+  SAT: 6
 }
 
 function Planner() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(loadTimeSlotsFromStorage())
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [showAddSlot, setShowAddSlot] = useState(false)
   const [currentDay, setCurrentDay] = useState<string>('MON')
@@ -51,19 +60,66 @@ function Planner() {
   const [bulkSlots, setBulkSlots] = useState<string[]>([])
   const [bulkTimes, setBulkTimes] = useState<string[]>([])
   const [bulkMode, setBulkMode] = useState<'existing' | 'create'>('existing')
+  const [isLoading, setIsLoading] = useState(true)
 
+  // Load playlists and schedules from DynamoDB on mount
   useEffect(() => {
     loadPlaylists()
+    loadSchedulesFromDB()
   }, [])
 
-  // Save timeSlots to localStorage whenever they change
-  useEffect(() => {
+  async function loadSchedulesFromDB() {
     try {
-      localStorage.setItem('planner-time-slots', JSON.stringify(timeSlots))
+      console.log('📅 Loading schedules from DynamoDB...')
+      setIsLoading(true)
+      
+      const { data: schedules } = await listSchedules()
+      
+      if (!schedules || schedules.length === 0) {
+        console.log('⚠️ No schedules found - using empty list')
+        setTimeSlots([])
+        return
+      }
+      
+      // Group schedules by time+name to reconstruct TimeSlot with days array
+      const slotMap = new Map<string, TimeSlot>()
+      
+      schedules.forEach((schedule: any) => {
+        const key = `${schedule.startTime}-${schedule.name}`
+        
+        if (!slotMap.has(key)) {
+          // Create new TimeSlot
+          slotMap.set(key, {
+            id: schedule.id,
+            time: schedule.startTime,
+            name: schedule.name,
+            playlistId: schedule.playlistId,
+            days: schedule.dayOfWeek !== null ? [DAY_INDEX_TO_CODE[schedule.dayOfWeek]] : DAYS,
+            duration: 0, // TODO: calculate from start/end time
+            active: schedule.isActive !== false
+          })
+        } else {
+          // Add day to existing slot
+          const slot = slotMap.get(key)!
+          if (schedule.dayOfWeek !== null) {
+            const dayCode = DAY_INDEX_TO_CODE[schedule.dayOfWeek]
+            if (!slot.days.includes(dayCode)) {
+              slot.days.push(dayCode)
+            }
+          }
+        }
+      })
+      
+      const slots = Array.from(slotMap.values())
+      console.log('✅ Loaded', slots.length, 'time slots from DynamoDB')
+      setTimeSlots(slots)
     } catch (error) {
-      console.error('Failed to save time slots to localStorage:', error)
+      console.error('❌ Failed to load schedules:', error)
+      setTimeSlots([])
+    } finally {
+      setIsLoading(false)
     }
-  }, [timeSlots])
+  }
 
   async function loadPlaylists() {
     try {

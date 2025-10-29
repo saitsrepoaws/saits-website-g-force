@@ -331,24 +331,33 @@ triggerLambda.addEnvironment('STATE_MACHINE_ARN', playerStateMachine.stateMachin
 // Grant trigger Lambda permission to start State Machine
 playerStateMachine.grantStartExecution(triggerLambda)
 
+// =============================================================================
+// IoT Rule DISABLED - Using Mock State Machine instead
+// =============================================================================
+// 
+// REASON: Lambda's need schedule data from DynamoDB
+// Currently schedule is in localStorage (frontend only)
+// 
+// TODO: Migrate schedule to DynamoDB, then re-enable this
+//
 // Create IoT Rule to trigger Lambda (which then starts State Machine)
-triggerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
-
-const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
-  ruleName: 'RadioPlayerCommandRuleV2', // Changed name to avoid conflict with old stack
-  topicRulePayload: {
-    sql: "SELECT * FROM 'radio/player/+/command-request'",
-    description: 'Trigger Lambda for player command requests',
-    actions: [
-      {
-        lambda: {
-          functionArn: triggerLambda.functionArn,
-        },
-      },
-    ],
-    awsIotSqlVersion: '2016-03-23',
-  },
-})
+// triggerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
+//
+// const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
+//   ruleName: 'RadioPlayerCommandRuleV2',
+//   topicRulePayload: {
+//     sql: "SELECT * FROM 'radio/player/+/command-request'",
+//     description: 'Trigger Lambda for player command requests',
+//     actions: [
+//       {
+//         lambda: {
+//           functionArn: triggerLambda.functionArn,
+//         },
+//       },
+//     ],
+//     awsIotSqlVersion: '2016-03-23',
+//   },
+// })
 
 // Output State Machine ARN
 new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
@@ -357,8 +366,9 @@ new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
   exportName: 'PlayerStateMachineArn',
 })
 
-new CfnOutput(stateMachineStack, 'IoTRuleArn', {
-  value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${iotRule.ruleName}`,
-  description: 'ARN of the IoT Rule for player commands',
-  exportName: 'PlayerCommandIoTRuleArn',
-})
+// IoT Rule output disabled (rule is commented out)
+// new CfnOutput(stateMachineStack, 'IoTRuleArn', {
+//   value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/RadioPlayerCommandRuleV2`,
+//   description: 'ARN of the IoT Rule for player commands',
+//   exportName: 'PlayerCommandIoTRuleArn',
+// })

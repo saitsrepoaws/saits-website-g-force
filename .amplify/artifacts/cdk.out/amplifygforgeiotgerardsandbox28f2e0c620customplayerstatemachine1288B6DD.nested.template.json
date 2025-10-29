@@ -126,24 +126,6 @@
     "aws:asset:property": "Code"
    }
   },
-  "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "StateMachineTrigger27A3F693",
-      "Arn"
-     ]
-    },
-    "Principal": "iot.amazonaws.com"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
-   }
-  },
   "PlayerStateMachineRoleD8681A5A": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -337,48 +319,10 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Resource"
    }
   },
-  "PlayerCommandRule": {
-   "Type": "AWS::IoT::TopicRule",
-   "Properties": {
-    "RuleName": "RadioPlayerCommandRuleV2",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "TopicRulePayload": {
-     "Actions": [
-      {
-       "Lambda": {
-        "FunctionArn": {
-         "Fn::GetAtt": [
-          "StateMachineTrigger27A3F693",
-          "Arn"
-         ]
-        }
-       }
-      }
-     ],
-     "AwsIotSqlVersion": "2016-03-23",
-     "Description": "Trigger Lambda for player command requests",
-     "Sql": "SELECT * FROM 'radio/player/+/command-request'"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerCommandRule"
-   }
-  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02PwW6DQAxEvyV349LNFzRIvTWpoHfkLCZ1gF2EvY0qxL9XQFX19DyyZkbj0Lkc8wM9NPNNl/VyxfnMatxURr4Demg99zRcG6pDbPiueN7wmoI3iQGEBpzL2DMUbdj4Hnvx36vcrwX0WJMqm+LLCtAjnpLv2E6kDHs8zkUb/lJXM0+DqEoMC6jx2P7+FOfKyPiN/KeErfa/XkCiYdGGjziKL1PPC5SsMU2eYauvjG4SbqvxkmxMtsA6De/69OUcumfMD3cVyaYUTAbGcucPEiQKVS0BAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OS27CQAxAz8LeccNwgoLEDlolB4jMxAHnM4OwB4Si3L1KUlVdPT/JerZD53LMN/TSzNdd1ssFxzOrcV0a+Q7opdXY03CpqQqx5lbxvOCYgjeJAYQGHIvYMxyasPA79uLfs67TBLqrSJVN8XMG6A73yXdse1KGNY+HJvxF1fje/IriWBoZn8jfJCxn/vs0QcEa08MzLPXS6CrhOu99Jbsnm2D+HFv9eDqHbov5plWR7JGCycBYrPwBTIy1FwwBAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default"
@@ -394,28 +338,6 @@
    },
    "Export": {
     "Name": "PlayerStateMachineArn"
-   }
-  },
-  "IoTRuleArn": {
-   "Description": "ARN of the IoT Rule for player commands",
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "arn:aws:iot:",
-      {
-       "Ref": "AWS::Region"
-      },
-      ":",
-      {
-       "Ref": "AWS::AccountId"
-      },
-      ":rule/RadioPlayerCommandRuleV2"
-     ]
-    ]
-   },
-   "Export": {
-    "Name": "PlayerCommandIoTRuleArn"
    }
   }
  },

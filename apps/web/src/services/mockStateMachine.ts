@@ -17,18 +17,22 @@ const getClient = () => generateClient()
 
 let isRunning = false
 let subscription: any = null
+let instanceCount = 0 // Track how many times Mock State Machine was started
 
 /**
  * Start the mock state machine
  * Listens to all player commands and responds
  */
 export async function startMockStateMachine() {
+  instanceCount++
+  
   if (isRunning) {
-    console.log('⚠️ Mock State Machine already running')
+    console.log(`⚠️ Mock State Machine already running (attempt #${instanceCount})`)
+    console.log(`⚠️ MULTIPLE START ATTEMPTS DETECTED!`)
     return
   }
 
-  console.log('🤖 Starting Mock State Machine...')
+  console.log(`🤖 Starting Mock State Machine (instance #${instanceCount})...`)
   isRunning = true
 
   try {
@@ -138,6 +142,8 @@ async function handleCommand(data: any) {
 async function handleLoadCommand(playerId: string, _params?: any) {
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   console.log('🤖 BACKEND: Determining scheduled track...')
+  console.log(`📍 Player ID: ${playerId}`)
+  console.log(`📍 Timestamp: ${new Date().toISOString()}`)
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   
   // Step 1: Load schedule and find active slot
