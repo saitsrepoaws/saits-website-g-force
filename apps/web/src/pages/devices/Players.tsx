@@ -27,9 +27,15 @@ function Players() {
   const [isPaused, setIsPaused] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [autoPlay, setAutoPlay] = useState(false)
+  const [volume, setVolume] = useState(0.7)
+  
+  // Seekbar state
+  const [isDragging, setIsDragging] = useState(false)
+  const [hoverTime, setHoverTime] = useState<number | null>(null)
+  const [hoverPosition, setHoverPosition] = useState<number | null>(null)
+  const seekbarRef = useRef<HTMLDivElement>(null)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.7)
   const [coverArtUrl, setCoverArtUrl] = useState<string | null>(null)
   const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
@@ -914,11 +920,46 @@ function Players() {
     
     const bounds = e.currentTarget.getBoundingClientRect()
     const x = e.clientX - bounds.left
-    const percentage = x / bounds.width
+    const percentage = Math.max(0, Math.min(1, x / bounds.width))
     const newTime = percentage * duration
     
     audioRef.current.currentTime = newTime
     setCurrentTime(newTime)
+    
+    // TODO: Send seek position to IoT for sync (optional)
+  }
+  
+  function handleSeekMouseDown(e: React.MouseEvent<HTMLDivElement>) {
+    setIsDragging(true)
+    handleSeek(e)
+  }
+  
+  function handleSeekMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    // Show hover preview
+    const bounds = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - bounds.left
+    const percentage = Math.max(0, Math.min(1, x / bounds.width))
+    const time = percentage * duration
+    
+    setHoverTime(time)
+    setHoverPosition(x)
+    
+    // Update position if dragging
+    if (isDragging) {
+      handleSeek(e)
+    }
+  }
+  
+  function handleSeekMouseUp() {
+    if (isDragging) {
+      setIsDragging(false)
+      // TODO: Send final seek position to IoT
+    }
+  }
+  
+  function handleSeekMouseLeave() {
+    setHoverTime(null)
+    setHoverPosition(null)
   }
 
   function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -928,6 +969,63 @@ function Players() {
       audioRef.current.volume = newVolume
     }
   }
+  
+  // Keyboard shortcuts for seeking
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (!audioRef.current || !duration) return
+      
+      // Don't trigger if typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
+      }
+      
+      let seekAmount = 0
+      
+      switch(e.key) {
+        case 'ArrowLeft':
+          seekAmount = e.shiftKey ? -30 : -5
+          break
+        case 'ArrowRight':
+          seekAmount = e.shiftKey ? 30 : 5
+          break
+        case 'Home':
+          audioRef.current.currentTime = 0
+          setCurrentTime(0)
+          return
+        case 'End':
+          audioRef.current.currentTime = duration
+          setCurrentTime(duration)
+          return
+        default:
+          return
+      }
+      
+      if (seekAmount !== 0) {
+        e.preventDefault()
+        const newTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seekAmount))
+        audioRef.current.currentTime = newTime
+        setCurrentTime(newTime)
+        
+        // TODO: Send keyboard seek to IoT
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [duration])
+  
+  // Global mouse up handler for drag
+  useEffect(() => {
+    function handleGlobalMouseUp() {
+      if (isDragging) {
+        setIsDragging(false)
+      }
+    }
+    
+    window.addEventListener('mouseup', handleGlobalMouseUp)
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
+  }, [isDragging])
 
   function formatTime(seconds: number): string {
     if (!seconds || isNaN(seconds)) return '0:00'
@@ -1100,17 +1198,47 @@ function Players() {
 
                 {/* Progress Bar */}
                 <div className="mb-6">
-                  <div 
-                    className="h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden mb-2"
-                    onClick={handleSeek}
-                  >
+                  <div className="relative">
                     <div 
-                      className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-100"
-                      style={{ width: `${progress}%` }}
-                    />
+                      ref={seekbarRef}
+                      className={`h-3 bg-white/10 rounded-full cursor-pointer overflow-visible mb-2 relative ${isDragging ? 'scale-y-125' : ''} transition-transform`}
+                      onMouseDown={handleSeekMouseDown}
+                      onMouseMove={handleSeekMouseMove}
+                      onMouseUp={handleSeekMouseUp}
+                      onMouseLeave={handleSeekMouseLeave}
+                    >
+                      {/* Progress */}
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all rounded-full"
+                        style={{ width: `${progress}%`, transitionDuration: isDragging ? '0ms' : '100ms' }}
+                      />
+                      
+                      {/* Thumb */}
+                      <div 
+                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg transition-all"
+                        style={{ 
+                          left: `${progress}%`,
+                          transform: `translate(-50%, -50%) scale(${isDragging ? 1.3 : 1})`,
+                          boxShadow: isDragging ? '0 0 0 4px rgba(255,255,255,0.3)' : '0 2px 4px rgba(0,0,0,0.2)'
+                        }}
+                      />
+                      
+                      {/* Hover Preview */}
+                      {hoverTime !== null && hoverPosition !== null && !isDragging && (
+                        <div 
+                          className="absolute bottom-full mb-2 -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none"
+                          style={{ left: `${hoverPosition}px` }}
+                        >
+                          {formatTime(hoverTime)}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90" />
+                        </div>
+                      )}
+                    </div>
                   </div>
+                  
                   <div className="flex justify-between text-sm text-blue-300">
                     <span>{formatTime(currentTime)}</span>
+                    <span className="text-xs opacity-75">⌨️ ←/→: ±5s | Shift+←/→: ±30s</span>
                     <span>{formatTime(duration)}</span>
                   </div>
                 </div>
