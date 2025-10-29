@@ -478,11 +478,36 @@ function Players() {
       setCurrentTrackInfo(trackInfo)
       
       // Load the actual track data
+      console.log('🔍 Looking for track with ID:', trackInfo.track.trackId)
       const { data: tracks } = await listTracks()
+      console.log('📚 Total tracks in library:', tracks?.length || 0)
+      
+      if (tracks && tracks.length > 0) {
+        console.log('🔍 First few track IDs:')
+        tracks.slice(0, 3).forEach((t: any) => console.log('   -', t.id, t.title))
+      }
+      
       const fullTrack = tracks?.find((t: any) => t.id === trackInfo.track.trackId)
       
       if (!fullTrack) {
-        throw new Error('Track not found in library')
+        console.error('❌ Track not found!')
+        console.error('   Looking for ID:', trackInfo.track.trackId)
+        console.error('   Track title from playlist:', trackInfo.track.trackTitle)
+        console.error('   Available tracks:', tracks?.length || 0)
+        
+        // Try to find by title as fallback
+        const trackByTitle = tracks?.find((t: any) => 
+          t.title?.toLowerCase() === trackInfo.track.trackTitle?.toLowerCase()
+        )
+        
+        if (trackByTitle) {
+          console.log('✅ Found track by title fallback:', trackByTitle.title)
+          await loadTrackIntoPlayer(trackByTitle)
+          console.log('✅✅✅ LOAD COMPLETE (via title match)! ✅✅✅')
+          return
+        }
+        
+        throw new Error(`Track not found in library (ID: ${trackInfo.track.trackId})`)
       }
       
       // Load track into player
