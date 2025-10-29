@@ -54,6 +54,9 @@ function Planner() {
   const [bulkMode, setBulkMode] = useState<'existing' | 'create'>('existing')
   const [timeRangeStart, setTimeRangeStart] = useState<string>('09:00')
   const [timeRangeEnd, setTimeRangeEnd] = useState<string>('17:00')
+  const [dateRangeStart, setDateRangeStart] = useState<string>('')
+  const [dateRangeEnd, setDateRangeEnd] = useState<string>('')
+  const [useDateRange, setUseDateRange] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState(true)
 
   // Load playlists and schedules from DynamoDB on mount
@@ -328,6 +331,8 @@ function Planner() {
             name: `Slot ${time}`,
             startTime: time,
             endTime: null,
+            startDate: useDateRange && dateRangeStart ? dateRangeStart : null,
+            endDate: useDateRange && dateRangeEnd ? dateRangeEnd : null,
             playlistId: bulkPlaylistId,
             dayOfWeek: null, // null = all selected days (handled by backend)
             isActive: true,
@@ -1113,10 +1118,66 @@ function Planner() {
                   </div>
                 )}
 
-                {/* Step 4: Select Days */}
+                {/* Step 4: Date Range (Optional) */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <label className="block text-sm font-medium text-gray-700">
+                      4️⃣ Datum Periode (Optioneel)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useDateRange}
+                        onChange={(e) => setUseDateRange(e.target.checked)}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-600">Enable date range</span>
+                    </label>
+                  </div>
+                  
+                  {useDateRange && (
+                    <div className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border-2 border-blue-200">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            📅 Start Datum
+                          </label>
+                          <input
+                            type="date"
+                            value={dateRangeStart}
+                            onChange={(e) => setDateRangeStart(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-2">
+                            📅 Eind Datum
+                          </label>
+                          <input
+                            type="date"
+                            value={dateRangeEnd}
+                            onChange={(e) => setDateRangeEnd(e.target.value)}
+                            min={dateRangeStart}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                      {dateRangeStart && dateRangeEnd && (
+                        <div className="mt-3 p-2 bg-blue-100 rounded text-sm text-blue-800 font-medium">
+                          ✅ Periode: {new Date(dateRangeStart).toLocaleDateString('nl-NL')} tot {new Date(dateRangeEnd).toLocaleDateString('nl-NL')}
+                        </div>
+                      )}
+                      <div className="mt-2 text-xs text-gray-600">
+                        💡 <strong>Tip:</strong> Laat leeg voor permanent schema, of vul in voor tijdelijke periodes (bijv. vakantie, feestdagen)
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Step 5: Select Days */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    4️⃣ Select Days
+                    5️⃣ Select Days
                   </label>
                   <div className="flex gap-2">
                     {DAYS.map(day => (

@@ -212,6 +212,20 @@
               "isRequired": false,
               "attributes": []
             },
+            "startDate": {
+              "name": "startDate",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "endDate": {
+              "name": "endDate",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
             "playlistId": {
               "name": "playlistId",
               "isArray": false,

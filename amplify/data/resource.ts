@@ -38,6 +38,8 @@ const schema = a.schema({
       dayOfWeek: a.integer(), // 0=Sunday, 1=Monday, ... 6=Saturday (null = every day)
       startTime: a.string().required(), // "09:00"
       endTime: a.string(), // "12:00" (null = until next slot)
+      startDate: a.string(), // "2025-01-01" (null = starts immediately)
+      endDate: a.string(), // "2025-01-31" (null = runs indefinitely)
       playlistId: a.string().required(), // References Playlist.id
       isActive: a.boolean().default(true),
       priority: a.integer().default(0), // Higher priority wins if slots overlap
