@@ -8,6 +8,7 @@ import { playlistGenerator } from './functions/playlist-generator/resource'
 import { playerLoadHandler } from './functions/player-load-handler/resource'
 import { playerIotPublisher } from './functions/player-iot-publisher/resource'
 import { playerSimpleHandler } from './functions/player-simple-handler/resource'
+import { radioScheduler } from './functions/radio-scheduler/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -25,9 +26,11 @@ import * as iam from 'aws-cdk-lib/aws-iam'
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions'
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks'
 import * as iot from 'aws-cdk-lib/aws-iot'
+import * as events from 'aws-cdk-lib/aws-events'
+import * as targets from 'aws-cdk-lib/aws-events-targets'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
-import { dirname, join } from 'path'
+import { dirname, join} from 'path'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -43,6 +46,7 @@ export const backend = defineBackend({
   playerLoadHandler,
   playerIotPublisher,
   playerSimpleHandler,
+  radioScheduler,
   // audioAnalyzer - replaced with container Lambda below
 })
 
@@ -54,6 +58,7 @@ const playlistGeneratorLambda = backend.playlistGenerator.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
 const playlistTable = backend.data.resources.tables['Playlist']
 const scheduleTable = backend.data.resources.tables['Schedule']
+const radioSchedulerLambda = backend.radioScheduler.resources.lambda
 
 // Create Docker-based Lambda for audio analysis with FFmpeg
 // Lookup ECR repository that we created with build-container.sh
@@ -95,6 +100,26 @@ trackTable.grantReadWriteData(waveformLambda)
 // Grant playlist generator Lambda permissions
 trackTable.grantReadData(playlistGeneratorLambda)
 playlistTable.grantReadWriteData(playlistGeneratorLambda)
+
+// Grant radio scheduler Lambda permissions
+scheduleTable.grantReadData(radioSchedulerLambda)
+playlistTable.grantReadData(radioSchedulerLambda)
+trackTable.grantReadData(radioSchedulerLambda)
+
+// Add environment variables for radio scheduler
+backend.radioScheduler.addEnvironment('SCHEDULE_TABLE_NAME', scheduleTable.tableName)
+backend.radioScheduler.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
+backend.radioScheduler.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+backend.radioScheduler.addEnvironment('IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
+
+// Grant IoT publish permission to radio scheduler
+radioSchedulerLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/station/*'],
+  })
+)
 
 // Grant waveform Lambda S3 permissions
 storageBucket.grantRead(waveformLambda)
@@ -380,3 +405,26 @@ new CfnOutput(stateMachineStack, 'IoTRuleArn', {
   description: 'ARN of the IoT Rule for player commands',
   exportName: 'PlayerCommandIoTRuleArn',
 })
+
+// =============================================================================
+// Radio Scheduler - EventBridge Schedule (runs every minute)
+// =============================================================================
+
+// Create EventBridge rule to trigger radio scheduler every minute
+const schedulerRule = new events.Rule(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRule', {
+  ruleName: 'RadioSchedulerEveryMinute',
+  description: 'Triggers radio scheduler Lambda every minute to broadcast next track',
+  schedule: events.Schedule.rate(Duration.minutes(1)),
+})
+
+// Add Lambda as target
+schedulerRule.addTarget(new targets.LambdaFunction(radioSchedulerLambda))
+
+// Output scheduler info
+new CfnOutput(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRuleArn', {
+  value: schedulerRule.ruleArn,
+  description: 'EventBridge rule that triggers radio scheduler every minute',
+  exportName: 'RadioSchedulerRuleArn',
+})
+
+console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minute)')
