@@ -143,7 +143,7 @@ function Planner() {
       if (isNewSlot && currentSlot) {
         // First time selecting playlist - CREATE in DynamoDB
         console.log('📝 Creating new schedule in DynamoDB...')
-        await createSchedule({
+        const result = await createSchedule({
           name: currentSlot.name,
           startTime: currentSlot.time,
           endTime: null,
@@ -152,7 +152,15 @@ function Planner() {
           isActive: currentSlot.active,
           priority: 0
         })
-        console.log('✅ New schedule created in DynamoDB with playlist!')
+        
+        // IMPORTANT: Update local slot with DynamoDB-generated ID!
+        const dbId = result.data?.id
+        if (dbId) {
+          setTimeSlots(slots => slots.map(slot => 
+            slot.id === slotId ? { ...slot, id: dbId } : slot
+          ))
+          console.log('✅ New schedule created in DynamoDB with ID:', dbId)
+        }
       } else {
         // Already exists - UPDATE in DynamoDB
         await updateSchedule(slotId, { playlistId })
