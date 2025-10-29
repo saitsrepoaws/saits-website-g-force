@@ -1046,44 +1046,6 @@ function Players() {
                 </div>
               </div>
             </div>
-            <PlaylistViewer
-              playlistId={currentPlaylistId}
-              showHeader={false}
-              compact={false}
-              maxHeight="600px"
-              allowPlay={true}
-              allowReorder={true}
-              allowRemove={false}
-              showDragHandle={true}
-              highlightTrackId={scheduledTrackId}
-              currentTrackIndex={currentTrackInfo?.trackIndex ?? null}
-              scheduleSlot={activeSlot ? { time: activeSlot.time, duration: activeSlot.duration } : null}
-              loadedTrackId={currentTrack?.id ?? null}
-              onTracksLoaded={(tracks) => {
-                console.log('📋 Playlist tracks loaded:', tracks.length)
-                setPlaylistTracksCache(tracks)
-              }}
-              onTrackSelect={async (playlistTrack) => {
-                // Stop current playback if playing
-                if (isPlaying) {
-                  handleStop()
-                }
-                
-                // Load track by ID
-                if (playlistTrack.trackId) {
-                  try {
-                    const { data: tracks } = await listTracks()
-                    const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
-                    if (track) {
-                      await loadTrackIntoPlayer(track)
-                      console.log(`✅ Track loaded from playlist: ${track.title}`)
-                    }
-                  } catch (error) {
-                    console.error('Failed to load track from playlist:', error)
-                  }
-                }
-              }}
-            />
           </div>
         )}
       </div>
@@ -1099,6 +1061,50 @@ function Players() {
         />
       </div>
     </div>
+
+    {/* Playlist Viewer - Full Width Below */}
+    {currentPlaylistId && (
+      <div className="mt-6">
+        <PlaylistViewer
+          playlistId={currentPlaylistId}
+          showHeader={true}
+          compact={false}
+          maxHeight="600px"
+          allowPlay={true}
+          allowReorder={true}
+          allowRemove={false}
+          showDragHandle={true}
+          highlightTrackId={scheduledTrackId}
+          currentTrackIndex={currentTrackInfo?.trackIndex ?? null}
+          scheduleSlot={activeSlot ? { time: activeSlot.time, duration: activeSlot.duration } : null}
+          loadedTrackId={currentTrack?.id ?? null}
+          onTracksLoaded={(tracks) => {
+            console.log('📋 Playlist tracks loaded:', tracks.length)
+            setPlaylistTracksCache(tracks)
+          }}
+          onTrackSelect={async (playlistTrack) => {
+            // Stop current playback if playing
+            if (isPlaying) {
+              handleStop()
+            }
+            
+            // Load track by ID
+            if (playlistTrack.trackId) {
+              try {
+                const { data: tracks } = await listTracks()
+                const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
+                if (track) {
+                  await loadTrackIntoPlayer(track)
+                  console.log(`✅ Track loaded from playlist: ${track.title}`)
+                }
+              } catch (error) {
+                console.error('Failed to load track from playlist:', error)
+              }
+            }
+          }}
+        />
+      </div>
+    )}
 
   </div>
 
