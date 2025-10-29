@@ -457,27 +457,40 @@ function Players() {
       // Get playlist tracks
       const { getPlaylist } = await import('../../services/playlists')
       const result = await getPlaylist(activeSlot.playlistId)
-      if (!result.data || !result.data.tracks) {
-        throw new Error('Could not load playlist tracks')
+      if (!result.data) {
+        throw new Error('Could not load playlist')
       }
       
-      console.log('📋 Playlist has', result.data.tracks.length, 'tracks')
+      console.log('📋 Raw playlist data:', result.data)
+      console.log('   tracks type:', typeof result.data.tracks)
+      console.log('   tracks value:', result.data.tracks)
+      
+      // Parse tracks if it's a JSON string
+      let playlistTracks = result.data.tracks
+      if (typeof playlistTracks === 'string') {
+        console.log('🔧 Parsing tracks from JSON string...')
+        playlistTracks = JSON.parse(playlistTracks)
+      }
+      
+      if (!playlistTracks || !Array.isArray(playlistTracks) || playlistTracks.length === 0) {
+        throw new Error('Playlist has no tracks')
+      }
+      
+      console.log('📋 Playlist has', playlistTracks.length, 'tracks')
       
       // Debug playlist tracks
-      if (result.data.tracks.length > 0) {
-        const firstTrack = result.data.tracks[0]
-        console.log('🔍 First playlist track:', firstTrack)
-        console.log('   Fields:', Object.keys(firstTrack))
-        console.log('   Sample values:')
-        console.log('     - trackId:', firstTrack.trackId)
-        console.log('     - id:', firstTrack.id)
-        console.log('     - trackTitle:', firstTrack.trackTitle)
-        console.log('     - title:', firstTrack.title)
-      }
+      const firstTrack = playlistTracks[0]
+      console.log('🔍 First playlist track:', firstTrack)
+      console.log('   Fields:', Object.keys(firstTrack))
+      console.log('   Sample values:')
+      console.log('     - trackId:', firstTrack.trackId)
+      console.log('     - id:', firstTrack.id)
+      console.log('     - trackTitle:', firstTrack.trackTitle)
+      console.log('     - title:', firstTrack.title)
       
       // Calculate current track based on schedule time
       const now = new Date()
-      const trackInfo = calculateCurrentTrack(activeSlot, result.data.tracks, currentPlaylist.name, now)
+      const trackInfo = calculateCurrentTrack(activeSlot, playlistTracks, currentPlaylist.name, now)
       
       if (!trackInfo) {
         throw new Error('No track playing at current time')
