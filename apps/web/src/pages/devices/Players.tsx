@@ -117,59 +117,87 @@ function Players() {
     return () => clearInterval(interval)
   }, [activeSlot, currentPlaylistId, playlistTracksCache, playlists])
 
-  // Separate effect for IoT service - always re-subscribe
+  // IoT Service - PERSISTENT setup (only once)
   useEffect(() => {
-    console.log('🔌 Setting up IoT service...')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🔌 INITIALIZING IoT SERVICE')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
-    // Initialize IoT service if needed
+    // Create IoT service (only once)
     if (!iotServiceRef.current) {
-      console.log('🆕 Creating new IoT service')
+      console.log('🆕 Creating new IoT service for player:', playerId)
       iotServiceRef.current = createRadioPlayerIoT(playerId)
+      console.log('✅ IoT service created')
+    } else {
+      console.log('♻️ IoT service already exists, reusing')
     }
     
-    // Always subscribe to log updates (even if service already exists)
+    // Register log callback (persistent)
     console.log('📝 Registering log callback')
     const unsubscribeLog = iotServiceRef.current.onLog((log) => {
-      console.log('🔔 Log callback triggered!', log.type)
+      console.log('🔔 New log entry:', log.type)
       setIoTLogs(prev => [log, ...prev.slice(0, 99)])
     })
     
     // Subscribe to commands (IoT → Player)
-    console.log('🎧 Subscribing to IoT commands...')
-    console.log('📡 Topic:', `radio/player/${playerId}/command`)
+    console.log('🎧 Setting up command subscription...')
+    console.log('📡 Topic: radio/player/' + playerId + '/command')
+    
     let unsubscribeCommands: (() => void) | null = null
+    let isSubscribed = false
     
-    iotServiceRef.current.subscribeToCommands((command) => {
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('📥 COMMAND RECEIVED FROM IoT!')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log('Command:', command)
-      console.log('Command type:', command.command)
-      console.log('Params:', command.params)
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      
-      // Execute command (accept own commands for now - State Machine will process later)
-      handleCommand(command)
-    }).then(unsub => {
-      console.log('✅ Successfully subscribed to commands')
-      console.log('📡 Listening on: radio/player/' + playerId + '/command')
-      unsubscribeCommands = unsub
-    }).catch(err => {
-      console.error('❌ Failed to subscribe to commands:', err)
-    })
+    const setupSubscription = async () => {
+      try {
+        console.log('⏳ Subscribing to IoT commands...')
+        const unsub = await iotServiceRef.current!.subscribeToCommands((command) => {
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+          console.log('📥 COMMAND RECEIVED FROM IoT!')
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+          console.log('Command:', command.command)
+          console.log('Params:', command.params)
+          console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+          
+          // Execute command
+          handleCommand(command)
+        })
+        
+        unsubscribeCommands = unsub
+        isSubscribed = true
+        console.log('✅ SUBSCRIBED to IoT commands!')
+        console.log('📡 Active on: radio/player/' + playerId + '/command')
+      } catch (err) {
+        console.error('❌ Failed to subscribe:', err)
+        
+        // Retry after 2 seconds
+        console.log('🔄 Retrying subscription in 2s...')
+        setTimeout(() => {
+          if (!isSubscribed) {
+            setupSubscription()
+          }
+        }, 2000)
+      }
+    }
     
-    // Get existing logs
+    setupSubscription()
+    
+    // Load existing logs
     const existingLogs = iotServiceRef.current.getLogs()
-    console.log('📚 Loading existing logs:', existingLogs.length)
+    console.log('📚 Loading', existingLogs.length, 'existing logs')
     setIoTLogs(existingLogs)
     
-    // Cleanup: unsubscribe callbacks
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('✅ IoT SERVICE READY')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    
+    // Cleanup on unmount
     return () => {
-      console.log('🧹 Unsubscribing callbacks')
+      console.log('🧹 Component unmounting - cleaning up subscriptions')
       unsubscribeLog()
-      if (unsubscribeCommands) unsubscribeCommands()
+      if (unsubscribeCommands) {
+        unsubscribeCommands()
+      }
     }
-  }, [playerId])
+  }, [playerId]) // Only re-run if playerId changes
 
   // Update clock every second
   useEffect(() => {
@@ -394,17 +422,9 @@ function Players() {
   }
 
   async function handlePause() {
-    console.log('⏸️ PAUSE button clicked - publishing command to IoT...')
-    
-    try {
-      await iotServiceRef.current?.publishCommand({
-        command: 'PAUSE',
-        timestamp: new Date().toISOString()
-      })
-      console.log('✅ PAUSE command published')
-    } catch (error) {
-      console.error('❌ Failed to publish PAUSE command:', error)
-    }
+    console.log('⏸️ PAUSE button clicked - executing locally...')
+    // PAUSE is local - no IoT needed, just pause the audio element
+    executePause()
   }
   
   // Execute UNLOAD when command comes from IoT
@@ -447,18 +467,10 @@ function Players() {
     console.log('✅ Paused')
   }
 
-  async function handlePlay() {
-    console.log('▶️ PLAY button clicked - publishing command to IoT...')
-    
-    try {
-      await iotServiceRef.current?.publishCommand({
-        command: 'PLAY',
-        timestamp: new Date().toISOString()
-      })
-      console.log('✅ PLAY command published')
-    } catch (error) {
-      console.error('❌ Failed to publish PLAY command:', error)
-    }
+  function handlePlay() {
+    console.log('▶️ PLAY button clicked - executing locally...')
+    // PLAY is local - no IoT needed, just control the audio element
+    executePlay()
   }
   
   // Execute PLAY when command comes from IoT
@@ -682,18 +694,10 @@ function Players() {
     }
   }
 
-  async function handleStop() {
-    console.log('⏹️ STOP button clicked - publishing command to IoT...')
-    
-    try {
-      await iotServiceRef.current?.publishCommand({
-        command: 'STOP',
-        timestamp: new Date().toISOString()
-      })
-      console.log('✅ STOP command published')
-    } catch (error) {
-      console.error('❌ Failed to publish STOP command:', error)
-    }
+  function handleStop() {
+    console.log('⏹️ STOP button clicked - executing locally...')
+    // STOP is local - no IoT needed, just stop the audio element
+    executeStop()
   }
   
   // Execute STOP when command comes from IoT
