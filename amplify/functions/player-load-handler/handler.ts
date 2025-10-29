@@ -95,17 +95,60 @@ export const handler = async (event: any) => {
 
     console.log('✅ Complete track data retrieved')
 
-    // Step 6: Return response
+    // Step 6: Build rich context for player
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const currentDay = dayNames[now.getDay()]
+    const currentDate = now.toISOString().split('T')[0]
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`
+
+    console.log('📊 Context:')
+    console.log('   Day:', currentDay)
+    console.log('   Date:', currentDate)
+    console.log('   Time:', currentTime)
+    console.log('   Schedule:', activeSchedule.name)
+    console.log('   Playlist:', playlist.name, `(${tracks.length} tracks)`)
+    console.log('   Track:', `${trackInfo.trackIndex + 1}/${tracks.length}`)
+
+    // Step 7: Return response with full context
     return {
       success: true,
-      playlistId: activeSchedule.playlistId,
-      playlistName: playlist.name,
-      slotName: activeSchedule.name,
-      slotStartTime: activeSchedule.startTime,
-      trackIndex: trackInfo.trackIndex,
-      trackStartTime: trackInfo.trackStartTime,
-      trackEndTime: trackInfo.trackEndTime,
-      percentComplete: trackInfo.percentComplete,
+      
+      // Context Info
+      context: {
+        currentTime: currentTime,
+        currentDate: currentDate,
+        currentDay: currentDay,
+        dayOfWeek: now.getDay()
+      },
+      
+      // Schedule Info
+      schedule: {
+        id: activeSchedule.id,
+        name: activeSchedule.name,
+        startTime: activeSchedule.startTime,
+        endTime: activeSchedule.endTime,
+        startDate: activeSchedule.startDate || null,
+        endDate: activeSchedule.endDate || null,
+        isTemporary: !!(activeSchedule.startDate || activeSchedule.endDate)
+      },
+      
+      // Playlist Info
+      playlist: {
+        id: activeSchedule.playlistId,
+        name: playlist.name,
+        totalTracks: tracks.length
+      },
+      
+      // Current Track Info
+      currentTrack: {
+        index: trackInfo.trackIndex,
+        position: `${trackInfo.trackIndex + 1}/${tracks.length}`,
+        startTime: trackInfo.trackStartTime,
+        endTime: trackInfo.trackEndTime,
+        percentComplete: trackInfo.percentComplete
+      },
+      
+      // Full Track Data
       track: {
         id: fullTrack.id,
         title: fullTrack.title,

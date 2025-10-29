@@ -173,7 +173,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "3de120c6914561f0903083f039f18913c1a99f833824c2a7390eab7926a29fce.zip"
+     "S3Key": "b8b954df21b02406318221fd146d9e2954914b20b1d010339806b366fc98b8b8.zip"
     },
     "Environment": {
      "Variables": {
@@ -287,7 +287,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/Resource",
-    "aws:asset:path": "asset.3de120c6914561f0903083f039f18913c1a99f833824c2a7390eab7926a29fce",
+    "aws:asset:path": "asset.b8b954df21b02406318221fd146d9e2954914b20b1d010339806b366fc98b8b8",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
