@@ -17,15 +17,7 @@ interface TimeSlot {
 
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 
-// Default mock schedule (only used if localStorage is empty)
-const DEFAULT_TIME_SLOTS: TimeSlot[] = [
-  { id: '1', time: '06:00', name: 'Morning Show', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-  { id: '2', time: '09:00', name: 'Midday Mix', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-  { id: '3', time: '12:00', name: 'Lunch Hour', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 60, active: true },
-  { id: '4', time: '15:00', name: 'Afternoon Drive', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], duration: 180, active: true },
-  { id: '5', time: '18:00', name: 'Evening Session', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'], duration: 180, active: true },
-  { id: '6', time: '21:00', name: 'Night Vibes', playlistId: null, days: ['FRI', 'SAT'], duration: 240, active: true },
-]
+// Schedule data is loaded from DynamoDB - no hardcoded defaults needed!
 
 // DAY mapping: Index to code
 const DAY_INDEX_TO_CODE: Record<number, string> = {

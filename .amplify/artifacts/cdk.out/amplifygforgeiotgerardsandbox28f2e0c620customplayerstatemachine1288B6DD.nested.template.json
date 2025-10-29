@@ -395,6 +395,28 @@
    "Export": {
     "Name": "PlayerStateMachineArn"
    }
+  },
+  "IoTRuleArn": {
+   "Description": "ARN of the IoT Rule for player commands",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:iot:",
+      {
+       "Ref": "AWS::Region"
+      },
+      ":",
+      {
+       "Ref": "AWS::AccountId"
+      },
+      ":rule/RadioPlayerCommandRuleV2"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "PlayerCommandIoTRuleArn"
+   }
   }
  },
  "Conditions": {

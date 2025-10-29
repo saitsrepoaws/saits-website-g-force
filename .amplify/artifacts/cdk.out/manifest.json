@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/939cbc1616c7b9ae13545afb8725b378e528c57c43b43da038787f4c629c445d.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/67d1c4e16485c229d24ef6576ee88f91330640d0a4a851f2084a637203b0f171.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -2785,6 +2785,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "PlayerStateMachineArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/IoTRuleArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IoTRuleArn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default": [

@@ -6,9 +6,8 @@ import IoTLogPanel from '../../components/IoTLogPanel'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 import { listPlaylists } from '../../services/playlists'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
-import { startMockStateMachine, stopMockStateMachine } from '../../services/mockStateMachine'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
-import { loadTrackAssets, resolveAudioUrl, formatTime } from '../../services/playerService'
+import { loadTrackAssets } from '../../services/playerService'
 import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
 import { PlayerState } from '../../types/player'
 import { getUrl } from 'aws-amplify/storage'
@@ -18,15 +17,7 @@ import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalcula
 import type { Track } from '../../services/playerService'
 import { listTracks } from '../../services/tracks'
 
-// Mock schedule - later vervangen met echte data
-const MOCK_SCHEDULE = [
-  { time: '06:00', name: 'Morning Show', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'] },
-  { time: '09:00', name: 'Midday Mix', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'] },
-  { time: '12:00', name: 'Lunch Hour', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'] },
-  { time: '15:00', name: 'Afternoon Drive', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'] },
-  { time: '18:00', name: 'Evening Session', playlistId: null, days: ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] },
-  { time: '21:00', name: 'Night Vibes', playlistId: null, days: ['FRI', 'SAT'] },
-]
+// Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
 function Players() {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
@@ -73,14 +64,8 @@ function Players() {
       })
     })
     
-    // Start Mock State Machine (re-enabled after fixing client ID issue)
-    console.log('🤖 Starting Mock State Machine...')
-    startMockStateMachine()
-    
-    return () => {
-      console.log('🛑 Stopping Mock State Machine...')
-      stopMockStateMachine()
-    }
+    // Real AWS State Machine is now active via IoT Rule
+    // No mock needed - Lambda handles all schedule logic
   }, [])
   
   // Update active slot every minute
@@ -293,12 +278,12 @@ function Players() {
     }
   }
   
-  function loadSchedule() {
-    const result = loadScheduleAndDeterminePlaylist()
+  async function loadSchedule() {
+    const result = await loadScheduleAndDeterminePlaylist()
     setScheduleSlots(result.slots)
     setActiveSlot(result.activeSlot)
     
-    if (result.playlistId) {
+    if (result.playlistId && result.playlistId !== currentPlaylistId) {
       setCurrentPlaylistId(result.playlistId)
     }
   }
@@ -325,23 +310,7 @@ function Players() {
     }
   }
 
-  function determineCurrentPlaylist() {
-    const now = new Date()
-    const currentHour = now.getHours()
-    const currentMinute = now.getMinutes()
-    const currentTimeStr = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`
-    
-    // Find matching slot
-    const matchingSlot = MOCK_SCHEDULE
-      .filter(slot => slot.time <= currentTimeStr)
-      .sort((a, b) => b.time.localeCompare(a.time))[0]
-
-    if (matchingSlot?.playlistId) {
-      setCurrentPlaylistId(matchingSlot.playlistId)
-    } else if (playlists.length > 0) {
-      setCurrentPlaylistId(playlists[0].id)
-    }
-  }
+  // determineCurrentPlaylist removed - now using DynamoDB via loadSchedule()
 
   async function handleLoad() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
