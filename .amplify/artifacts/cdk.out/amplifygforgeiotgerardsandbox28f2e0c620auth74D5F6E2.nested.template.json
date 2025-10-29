@@ -324,14 +324,13 @@
       },
       {
        "Action": [
-        "iot:CreatePolicy",
         "iot:AttachPolicy",
         "iot:DetachPolicy",
         "iot:ListAttachedPolicies"
        ],
        "Effect": "Allow",
        "Resource": [
-        "arn:aws:iot:eu-west-1:*:policy/CognitoIoTPolicy",
+        "arn:aws:iot:eu-west-1:*:policy/RadioPlayerCognitoPolicy",
         "arn:aws:iot:eu-west-1:*:cert/*"
        ]
       },

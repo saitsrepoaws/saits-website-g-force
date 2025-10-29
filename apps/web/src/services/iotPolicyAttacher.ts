@@ -5,10 +5,10 @@
  */
 
 import { fetchAuthSession } from 'aws-amplify/auth'
-import { IoTClient, AttachPolicyCommand, CreatePolicyCommand } from '@aws-sdk/client-iot'
+import { IoTClient, AttachPolicyCommand } from '@aws-sdk/client-iot'
 
 const REGION = 'eu-west-1'
-const POLICY_NAME = 'CognitoIoTPolicy'
+const POLICY_NAME = 'RadioPlayerCognitoPolicy' // Production-ready policy for radio/player/* topics
 
 /**
  * Attach IoT Policy to current user's Cognito Identity
@@ -32,42 +32,9 @@ export async function attachIoTPolicyToCurrentUser(): Promise<boolean> {
       credentials: session.credentials,
     })
 
-    // First, ensure policy exists (create if not)
-    try {
-      console.log('📋 Creating IoT Policy (if not exists)...')
-      await iotClient.send(new CreatePolicyCommand({
-        policyName: POLICY_NAME,
-        policyDocument: JSON.stringify({
-          Version: '2012-10-17',
-          Statement: [
-            {
-              Effect: 'Allow',
-              Action: 'iot:Connect',
-              Resource: `arn:aws:iot:${REGION}:*:client/\${cognito-identity.amazonaws.com:sub}`,
-            },
-            {
-              Effect: 'Allow',
-              Action: ['iot:Subscribe'],
-              Resource: `arn:aws:iot:${REGION}:*:topicfilter/*`,
-            },
-            {
-              Effect: 'Allow',
-              Action: ['iot:Publish', 'iot:Receive'],
-              Resource: `arn:aws:iot:${REGION}:*:topic/*`,
-            },
-          ],
-        }),
-      }))
-      console.log('✅ IoT Policy created')
-    } catch (error: any) {
-      if (error.name === 'ResourceAlreadyExistsException') {
-        console.log('✅ IoT Policy already exists')
-      } else {
-        console.error('⚠️  Failed to create policy:', error.message)
-        // Continue anyway - policy might exist
-      }
-    }
-
+    // RadioPlayerCognitoPolicy already exists in AWS, just attach it
+    console.log(`📋 Using existing IoT Policy: ${POLICY_NAME}`)
+    
     // Attach policy to identity
     console.log('🔗 Attaching policy to identity...')
     try {

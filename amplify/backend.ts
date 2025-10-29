@@ -160,18 +160,17 @@ authenticatedRole.attachInlinePolicy(
         ],
       }),
       
-      // IoT Policy Management - allow creating and attaching policies
+      // IoT Policy Management - allow attaching existing RadioPlayerCognitoPolicy
       // Required for frontend to attach IoT policy to Cognito Identity
       new PolicyStatement({
         effect: Effect.ALLOW,
         actions: [
-          'iot:CreatePolicy',
           'iot:AttachPolicy',
           'iot:DetachPolicy',
           'iot:ListAttachedPolicies',
         ],
         resources: [
-          'arn:aws:iot:eu-west-1:*:policy/CognitoIoTPolicy',
+          'arn:aws:iot:eu-west-1:*:policy/RadioPlayerCognitoPolicy',
           'arn:aws:iot:eu-west-1:*:cert/*',  // For attaching to identities
         ],
       }),
