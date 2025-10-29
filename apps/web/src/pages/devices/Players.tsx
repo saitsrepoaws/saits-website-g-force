@@ -463,6 +463,12 @@ function Players() {
       
       console.log('📋 Playlist has', result.data.tracks.length, 'tracks')
       
+      // Debug playlist tracks
+      if (result.data.tracks.length > 0) {
+        console.log('🔍 First playlist track:', result.data.tracks[0])
+        console.log('   Fields:', Object.keys(result.data.tracks[0]))
+      }
+      
       // Calculate current track based on schedule time
       const now = new Date()
       const trackInfo = calculateCurrentTrack(activeSlot, result.data.tracks, currentPlaylist.name, now)
@@ -473,6 +479,10 @@ function Players() {
       
       console.log('🎯 Current track index:', trackInfo.trackIndex)
       console.log('🎵 Track:', trackInfo.track.trackTitle)
+      console.log('🔍 Track object:', trackInfo.track)
+      console.log('   - trackId:', trackInfo.track.trackId)
+      console.log('   - trackTitle:', trackInfo.track.trackTitle)
+      console.log('   - trackArtist:', trackInfo.track.trackArtist)
       
       // Set current track info for purple/green highlighting
       setCurrentTrackInfo(trackInfo)
