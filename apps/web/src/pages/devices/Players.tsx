@@ -240,6 +240,32 @@ function Players() {
             })
           }
           
+          // Extract current track info from Lambda response (for purple/green highlighting)
+          if (command.params.currentTrack) {
+            console.log('🎯 Setting currentTrackInfo from LOAD command:', {
+              index: command.params.currentTrack.index,
+              position: command.params.currentTrack.position,
+              percentComplete: command.params.currentTrack.percentComplete
+            })
+            setCurrentTrackInfo({
+              trackIndex: command.params.currentTrack.index,
+              track: {
+                trackId: command.params.track.id,
+                trackTitle: command.params.track.title,
+                trackArtist: command.params.track.artist,
+                order: command.params.currentTrack.index
+              } as any,
+              playlistName: command.params.playlist?.name || '',
+              slotName: command.params.schedule?.name || '',
+              slotStartTime: command.params.schedule?.startTime || '',
+              trackStartTime: command.params.currentTrack.startTime,
+              trackEndTime: command.params.currentTrack.endTime,
+              percentComplete: command.params.currentTrack.percentComplete,
+              elapsedInTrack: 0,
+              remainingInTrack: 0
+            } as any)
+          }
+          
           executeLoad(command.params.track)
         } else {
           console.error('❌ LOAD command missing track data')
