@@ -216,6 +216,7 @@ function Players() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     console.log('🎛️ COMMAND RECEIVED:', command.command)
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📦 Full command params:', JSON.stringify(command.params, null, 2))
 
     switch (command.command) {
       case 'LOAD':
@@ -224,6 +225,9 @@ function Players() {
           if (command.params.playlist?.id) {
             console.log('📋 Setting playlistId from LOAD command:', command.params.playlist.id)
             setCurrentPlaylistId(command.params.playlist.id)
+          } else {
+            console.warn('⚠️ No playlist.id in LOAD command params!')
+            console.log('   command.params:', command.params)
           }
           
           // Extract schedule info from Lambda response
@@ -1138,7 +1142,7 @@ function Players() {
     </div>
 
     {/* Playlist Viewer - Full Width Below */}
-    {currentPlaylistId && (
+    {currentPlaylistId ? (
       <div className="mt-6">
         <PlaylistViewer
           playlistId={currentPlaylistId}
@@ -1178,6 +1182,12 @@ function Players() {
             }
           }}
         />
+      </div>
+    ) : (
+      <div className="mt-6 p-6 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-center">
+        <p className="text-yellow-800 font-semibold">⚠️ No playlist loaded</p>
+        <p className="text-yellow-600 text-sm mt-2">Click LOAD to load the scheduled track and playlist</p>
+        <p className="text-xs text-gray-500 mt-2">currentPlaylistId: {currentPlaylistId || 'null'}</p>
       </div>
     )}
 
