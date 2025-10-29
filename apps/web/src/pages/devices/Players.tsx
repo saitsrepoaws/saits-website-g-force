@@ -396,23 +396,72 @@ function Players() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
     try {
-      // IoT-driven: Send LOAD command, backend determines track based on time
-      console.log('📤 Publishing LOAD command to IoT...')
-      console.log('🎯 Backend will determine playlist AND track based on current time')
-      console.log('⏰ Timestamp:', new Date().toISOString())
+      // Use schedule data we already loaded
+      console.log('📅 Checking active schedule...')
+      await loadSchedule() // Refresh schedule data
       
-      await iotServiceRef.current?.publishCommand({
-        command: 'LOAD',
-        timestamp: new Date().toISOString()
-        // No params needed! Backend determines everything based on time
-      })
+      if (!activeSlot) {
+        throw new Error('No active schedule found for current time')
+      }
       
-      console.log('✅ LOAD command published')
-      console.log('⏳ Waiting for backend to send track data via IoT...')
+      if (!activeSlot.playlistId) {
+        throw new Error('Active schedule has no playlist')
+      }
+      
+      console.log('✅ Active schedule:', activeSlot.name)
+      console.log('📋 Playlist ID:', activeSlot.playlistId)
+      
+      // Set current playlist ID (this will show the playlist!)
+      setCurrentPlaylistId(activeSlot.playlistId)
+      
+      // Find the playlist
+      const currentPlaylist = playlists.find(p => p.id === activeSlot.playlistId)
+      if (!currentPlaylist) {
+        throw new Error('Playlist not found')
+      }
+      
+      console.log('📋 Playlist:', currentPlaylist.name)
+      
+      // Get playlist tracks
+      const { getPlaylist } = await import('../../services/playlists')
+      const result = await getPlaylist(activeSlot.playlistId)
+      if (!result.data || !result.data.tracks) {
+        throw new Error('Could not load playlist tracks')
+      }
+      
+      console.log('📋 Playlist has', result.data.tracks.length, 'tracks')
+      
+      // Calculate current track based on schedule time
+      const now = new Date()
+      const trackInfo = calculateCurrentTrack(activeSlot, result.data.tracks, currentPlaylist.name, now)
+      
+      if (!trackInfo) {
+        throw new Error('No track playing at current time')
+      }
+      
+      console.log('🎯 Current track index:', trackInfo.trackIndex)
+      console.log('🎵 Track:', trackInfo.track.trackTitle)
+      
+      // Set current track info for purple/green highlighting
+      setCurrentTrackInfo(trackInfo)
+      
+      // Load the actual track data
+      const { data: tracks } = await listTracks()
+      const fullTrack = tracks?.find((t: any) => t.id === trackInfo.track.trackId)
+      
+      if (!fullTrack) {
+        throw new Error('Track not found in library')
+      }
+      
+      // Load track into player
+      await loadTrackIntoPlayer(fullTrack)
+      
+      console.log('✅✅✅ LOAD COMPLETE! ✅✅✅')
+      
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
-      console.error('❌ Failed to publish LOAD command:', error)
-      alert(`❌ Failed to send LOAD command: ${error}`)
+      console.error('❌ Failed to load track:', error)
+      alert(`❌ Failed to load track: ${error}`)
     }
   }
 
