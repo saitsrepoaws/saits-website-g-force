@@ -48,6 +48,40 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
 
+  // PlayerState model - persistent player state for recovery
+  // Hybrid approach: IoT for real-time, DynamoDB for snapshots
+  PlayerState: a
+    .model({
+      playerId: a.string().required(), // "player-main-001" (unique identifier)
+      
+      // Current Track Info
+      currentTrackId: a.string(), // Currently loaded track
+      currentTrackTitle: a.string(), // For display
+      currentTrackArtist: a.string(), // For display
+      currentPlaylistId: a.string(), // Current playlist
+      
+      // Playback State
+      status: a.string().default('idle'), // "playing", "paused", "stopped", "idle"
+      lastPosition: a.float().default(0), // Last known position in seconds
+      duration: a.float().default(0), // Track duration
+      volume: a.float().default(0.7), // Volume level (0-1)
+      
+      // Settings
+      autoPlayEnabled: a.boolean().default(false),
+      
+      // Schedule Context
+      currentScheduleSlotId: a.string(), // Current schedule slot
+      currentScheduleSlotName: a.string(), // "Slot 21:00"
+      
+      // Timestamps (for recovery and monitoring)
+      lastActive: a.datetime(), // Last activity (any interaction)
+      lastUpdated: a.datetime(), // Last state update
+      
+      // Metadata
+      deviceInfo: a.string(), // JSON: browser, OS, etc. (optional)
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
   // Track model - audio tracks in the Libery system
   // Format: Artist - Title (Version) [Label]
   Track: a
