@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
-import IoTLogPanel from '../../components/IoTLogPanel'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 import { listPlaylists } from '../../services/playlists'
 import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
@@ -361,12 +360,18 @@ function Players() {
     
     console.log('📻 Setting up Station Broadcast subscription...')
     
+    let isActive = true
+    let subscription: any = null
+    
     async function setupStationSubscription() {
+      if (!isActive) return
+      
       try {
         const { subscribe } = await import('../../services/pubsub')
-        const subscription = await subscribe(
+        subscription = await subscribe(
           { topic: 'radio/station/current-track' },
           async (message: any) => {
+            if (!isActive) return
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
             console.log('📻 STATION BROADCAST RECEIVED')
             console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -449,19 +454,21 @@ function Players() {
         )
         
         console.log('✅ Station broadcast subscription active')
-        
-        return subscription
       } catch (error) {
         console.error('❌ Failed to subscribe to station broadcast:', error)
       }
     }
     
-    const cleanup = setupStationSubscription()
+    setupStationSubscription()
     
     return () => {
-      cleanup.then(sub => sub?.unsubscribe?.())
+      console.log('🧹 Cleaning up station broadcast subscription')
+      isActive = false
+      if (subscription?.unsubscribe) {
+        subscription.unsubscribe()
+      }
     }
-  }, [iotServiceRef.current, scheduledPlayback, playerStateId, volume, autoPlay, playerId])
+  }, []) // Empty deps - only setup once on mount
 
   // Update clock every second
   useEffect(() => {
@@ -1759,20 +1766,74 @@ function Players() {
         {/* IoT Logs */}
         <div className="bg-gray-900 rounded-xl shadow-lg border border-white/10">
           <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              📡 IoT Messages
-              <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">
-                {iotLogs.length}
-              </span>
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                📡 IoT Messages
+                <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">
+                  {iotLogs.length}
+                </span>
+              </h3>
+              <button
+                onClick={() => {
+                  iotServiceRef.current?.clearLogs()
+                  setIoTLogs([])
+                }}
+                className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10"
+              >
+                Clear
+              </button>
+            </div>
           </div>
-          <IoTLogPanel
-            logs={iotLogs}
-            onClearLogs={() => {
-              iotServiceRef.current?.clearLogs()
-              setIoTLogs([])
-            }}
-          />
+          <div className="p-3 max-h-[150px] overflow-y-auto bg-black/30">
+            {iotLogs.length === 0 ? (
+              <div className="text-center text-gray-500 text-sm py-8">
+                No IoT messages yet
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {iotLogs.map((log, index) => (
+                  <div
+                    key={index}
+                    className={`p-2 rounded text-xs border-l-2 ${
+                      log.direction === 'OUT' 
+                        ? 'bg-blue-900/20 border-blue-500' 
+                        : 'bg-green-900/20 border-green-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                          log.direction === 'OUT' 
+                            ? 'text-blue-400 bg-blue-900/30' 
+                            : 'text-green-400 bg-green-900/30'
+                        }`}>
+                          {log.direction === 'OUT' ? '📤' : '📥'}
+                        </span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                          log.type === 'command' 
+                            ? 'text-purple-400 bg-purple-900/30' 
+                            : log.type === 'state'
+                            ? 'text-yellow-400 bg-yellow-900/30'
+                            : 'text-gray-400 bg-gray-900/30'
+                        }`}>
+                          {log.type || 'data'}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-500">
+                        {new Date(log.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-gray-400 mb-1 truncate">
+                      {log.topic}
+                    </div>
+                    <pre className="text-[10px] text-gray-300 overflow-x-auto whitespace-pre-wrap break-all max-h-20">
+                      {JSON.stringify(log.message, null, 1)}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Console Logs */}

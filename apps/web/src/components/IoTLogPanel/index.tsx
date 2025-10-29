@@ -13,7 +13,7 @@ interface IoTLogPanelProps {
 
 export default function IoTLogPanel({ logs, onClearLogs }: IoTLogPanelProps) {
   return (
-    <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden sticky top-6 max-h-[calc(100vh-8rem)]">
+    <div className="bg-gray-900 rounded-xl shadow-lg overflow-hidden">
       <div className="px-4 py-3 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <div>
@@ -29,7 +29,7 @@ export default function IoTLogPanel({ logs, onClearLogs }: IoTLogPanelProps) {
         </div>
       </div>
 
-      <div className="p-3 h-[calc(100vh-12rem)] overflow-y-auto">
+      <div className="p-3 max-h-[150px] overflow-y-auto">
         {logs.length === 0 ? (
           <div className="text-center text-gray-500 py-8 text-sm">
             No messages yet
