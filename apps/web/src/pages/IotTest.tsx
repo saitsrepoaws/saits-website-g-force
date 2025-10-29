@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth'
 import { useAuthenticator } from '@aws-amplify/ui-react'
-import { isEnabled as pubsubEnabled, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from '../services/pubsub'
+import { isEnabled as pubsubEnabled, autoConnect, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from '../services/pubsub'
 import { attachIoTPolicyToCurrentUser } from '../services/iotPolicyAttacher'
 
 const INPUT_TOPIC = 'gforce/libery/input'
@@ -42,7 +42,7 @@ function App() {
       // Auto-connect to IoT after auth is ready
       if (pubsubEnabled() && mounted) {
         setIotStatus('connecting')
-        const ok = await testConnect('iot/demo/topic')
+        const ok = await autoConnect() // Auto-connect with keepalive
         if (mounted) setIotStatus(ok ? 'connected' : 'error')
       }
     })()

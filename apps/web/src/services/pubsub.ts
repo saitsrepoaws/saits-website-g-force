@@ -94,6 +94,9 @@ async function getPubSubInstance(): Promise<PubSub> {
         region: 'eu-west-1',
         endpoint: wssUrl,
         clientId: clientId,
+        // MQTT keepalive settings to prevent connection timeout
+        keepAliveTimeoutMs: 60000, // 60 seconds - send ping if no activity
+        reconnectTimeoutMs: 5000,   // Auto-reconnect after 5 seconds
       })
       
       // Listen to connection state changes (ONLY ONCE for entire app!)
@@ -194,6 +197,33 @@ export async function subscribe(
     log('error', `Subscribe setup failed: ${err}`)
     onError?.(err)
     return null
+  }
+}
+
+/**
+ * Auto-connect to IoT - initializes PubSub and waits for connection
+ * Call this on app startup to ensure connection is ready
+ */
+export async function autoConnect(): Promise<boolean> {
+  if (!isEnabled()) {
+    log('warn', 'autoConnect() called but PubSub is disabled')
+    return false
+  }
+  
+  log('info', '🔌 Auto-connecting to AWS IoT...')
+  
+  try {
+    // Initialize PubSub instance (creates connection)
+    await getPubSubInstance()
+    
+    // Wait a bit for connection to establish
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // Test with a dummy subscribe
+    return await testConnect('iot/health-check', 3000)
+  } catch (err) {
+    log('error', `Auto-connect failed: ${err}`)
+    return false
   }
 }
 
