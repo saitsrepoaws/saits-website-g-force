@@ -168,12 +168,23 @@ export class RadioPlayerIoT {
   ): Promise<() => void> {
     const topic = `radio/player/${this.playerId}/command`
 
-    console.log(`📡 Subscribing to commands: ${topic}`)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📡 SUBSCRIBING TO COMMANDS')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Player ID:', this.playerId)
+    console.log('Topic:', topic)
+    console.log('Policy Required: radio/player/*')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     const subscription = await pubsub.subscribe(
       { topic },
       (message: any) => {
-        console.log(`📩 Command received:`, message)
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('📩 COMMAND RECEIVED VIA IoT!')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Topic:', topic)
+        console.log('Message:', message)
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         
         // Log incoming message
         this.addLog('IN', topic, message, 'command')
@@ -198,6 +209,13 @@ export class RadioPlayerIoT {
     if (subscription) {
       this.subscriptions.set('commands', subscription)
     }
+
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('✅ SUBSCRIPTION SUCCESSFUL!')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Listening on:', topic)
+    console.log('Waiting for commands...')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     // Return unsubscribe function
     return () => {
@@ -273,7 +291,15 @@ export class RadioPlayerIoT {
       timestamp: new Date().toISOString()
     }
 
-    console.log(`🎛️ Publishing command to backend: ${command.command}`, message)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📤 PUBLISHING COMMAND TO BACKEND')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Command:', command.command)
+    console.log('Player ID:', this.playerId)
+    console.log('Topic:', topic)
+    console.log('Message:', message)
+    console.log('Policy Required: radio/player/*')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     try {
       await pubsub.publish({
@@ -284,9 +310,14 @@ export class RadioPlayerIoT {
       // Log outgoing command
       this.addLog('OUT', topic, message, 'command')
 
-      console.log(`✅ Command published to backend: ${command.command}`)
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('✅ COMMAND PUBLISHED SUCCESSFULLY')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
-      console.error(`❌ Failed to publish command:`, error)
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('❌ FAILED TO PUBLISH COMMAND')
+      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.error('Error:', error)
       throw error
     }
   }
