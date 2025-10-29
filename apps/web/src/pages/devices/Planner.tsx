@@ -52,6 +52,8 @@ function Planner() {
   const [bulkSlots, setBulkSlots] = useState<string[]>([])
   const [bulkTimes, setBulkTimes] = useState<string[]>([])
   const [bulkMode, setBulkMode] = useState<'existing' | 'create'>('existing')
+  const [timeRangeStart, setTimeRangeStart] = useState<string>('09:00')
+  const [timeRangeEnd, setTimeRangeEnd] = useState<string>('17:00')
   const [isLoading, setIsLoading] = useState(true)
 
   // Load playlists and schedules from DynamoDB on mount
@@ -273,7 +275,7 @@ function Planner() {
   }
 
   // Bulk Edit Functions
-  function applyBulkEdit() {
+  async function applyBulkEdit() {
     if (!bulkPlaylistId || bulkDays.length === 0) {
       alert('Please select playlist and days')
       return
@@ -298,7 +300,18 @@ function Planner() {
         return slot
       }))
 
-      alert(`✅ Bulk edit applied to ${bulkSlots.length} slots!`)
+      // Update in DynamoDB
+      try {
+        const updatePromises = bulkSlots.map(slotId => 
+          updateSchedule(slotId, { playlistId: bulkPlaylistId, isActive: true })
+        )
+        await Promise.all(updatePromises)
+        console.log('✅ Bulk update saved to DynamoDB')
+        alert(`✅ Bulk edit applied to ${bulkSlots.length} slots!`)
+      } catch (error) {
+        console.error('❌ Failed to bulk update:', error)
+        alert('Failed to save bulk updates')
+      }
     } else {
       // Create new slots from selected times
       if (bulkTimes.length === 0) {
@@ -306,18 +319,43 @@ function Planner() {
         return
       }
 
-      const newSlots: TimeSlot[] = bulkTimes.map((time, index) => ({
-        id: `${Date.now()}-${index}`,
-        time,
-        name: `Slot ${time}`,
-        playlistId: bulkPlaylistId,
-        days: bulkDays,
-        duration: 60,
-        active: true
-      }))
+      console.log('📝 Creating', bulkTimes.length, 'slots in DynamoDB...')
+      
+      try {
+        // Create in DynamoDB first, then add to local state
+        const createPromises = bulkTimes.map(time => 
+          createSchedule({
+            name: `Slot ${time}`,
+            startTime: time,
+            endTime: null,
+            playlistId: bulkPlaylistId,
+            dayOfWeek: null, // null = all selected days (handled by backend)
+            isActive: true,
+            priority: 0
+          })
+        )
+        
+        const results = await Promise.all(createPromises)
+        
+        // Add to local state with DynamoDB IDs
+        const newSlots: TimeSlot[] = results.map((result, index) => ({
+          id: result.data?.id || `${Date.now()}-${index}`,
+          time: bulkTimes[index],
+          name: `Slot ${bulkTimes[index]}`,
+          playlistId: bulkPlaylistId,
+          days: bulkDays,
+          duration: 60,
+          active: true
+        }))
 
-      setTimeSlots([...timeSlots, ...newSlots])
-      alert(`✅ Created ${newSlots.length} new slots!`)
+        setTimeSlots([...timeSlots, ...newSlots])
+        console.log('✅', newSlots.length, 'schedules created in DynamoDB')
+        alert(`✅ Created ${newSlots.length} new slots in DynamoDB!`)
+      } catch (error) {
+        console.error('❌ Failed to bulk create:', error)
+        alert('Failed to create slots in database')
+        return
+      }
     }
 
     setShowBulkEdit(false)
@@ -362,6 +400,30 @@ function Planner() {
       active: true
     })))
     alert('✅ All slots filled with playlist for all days!')
+  }
+
+  // Generate time slots from range
+  function generateTimeRange() {
+    const [startH, startM] = timeRangeStart.split(':').map(Number)
+    const [endH, endM] = timeRangeEnd.split(':').map(Number)
+    
+    const startMinutes = startH * 60 + startM
+    const endMinutes = endH * 60 + endM
+    
+    if (startMinutes >= endMinutes) {
+      alert('⚠️ End time must be after start time!')
+      return
+    }
+    
+    const times: string[] = []
+    for (let minutes = startMinutes; minutes < endMinutes; minutes += 60) {
+      const h = Math.floor(minutes / 60)
+      const m = minutes % 60
+      times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+    }
+    
+    setBulkTimes(times)
+    console.log(`✅ Generated ${times.length} time slots from ${timeRangeStart} to ${timeRangeEnd}`)
   }
 
   function duplicateSlot(slotId: string) {
@@ -940,6 +1002,48 @@ function Planner() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       3️⃣ Select Times (00:00 - 23:00)
                     </label>
+                    
+                    {/* Time Range Selector (Van-Tot) */}
+                    <div className="mb-4 p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-lg border-2 border-green-200">
+                      <h5 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <span>⏰</span>
+                        <span>Quick Time Range (Van - Tot)</span>
+                      </h5>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1">
+                          <label className="block text-xs text-gray-600 mb-1">Start Tijd</label>
+                          <input
+                            type="time"
+                            value={timeRangeStart}
+                            onChange={(e) => setTimeRangeStart(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          />
+                        </div>
+                        <div className="pt-6 text-gray-400 font-bold">→</div>
+                        <div className="flex-1">
+                          <label className="block text-xs text-gray-600 mb-1">Eind Tijd</label>
+                          <input
+                            type="time"
+                            value={timeRangeEnd}
+                            onChange={(e) => setTimeRangeEnd(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                          />
+                        </div>
+                        <div className="pt-6">
+                          <button
+                            onClick={generateTimeRange}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium shadow-sm"
+                          >
+                            Generate
+                          </button>
+                        </div>
+                      </div>
+                      {bulkTimes.length > 0 && (
+                        <div className="mt-2 text-sm text-green-700 font-medium">
+                          ✅ {bulkTimes.length} uur slots gegenereerd
+                        </div>
+                      )}
+                    </div>
                     
                     {/* Time Presets */}
                     <div className="mb-3 flex flex-wrap gap-2">
