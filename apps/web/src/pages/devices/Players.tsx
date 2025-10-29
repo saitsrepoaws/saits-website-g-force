@@ -465,8 +465,14 @@ function Players() {
       
       // Debug playlist tracks
       if (result.data.tracks.length > 0) {
-        console.log('🔍 First playlist track:', result.data.tracks[0])
-        console.log('   Fields:', Object.keys(result.data.tracks[0]))
+        const firstTrack = result.data.tracks[0]
+        console.log('🔍 First playlist track:', firstTrack)
+        console.log('   Fields:', Object.keys(firstTrack))
+        console.log('   Sample values:')
+        console.log('     - trackId:', firstTrack.trackId)
+        console.log('     - id:', firstTrack.id)
+        console.log('     - trackTitle:', firstTrack.trackTitle)
+        console.log('     - title:', firstTrack.title)
       }
       
       // Calculate current track based on schedule time
