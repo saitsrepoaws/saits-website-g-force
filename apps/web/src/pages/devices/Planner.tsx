@@ -1248,6 +1248,25 @@ function Planner() {
                       <li>
                         <strong>Days:</strong> {bulkDays.length > 0 ? bulkDays.join(', ') : 'None'}
                       </li>
+                      {useDateRange && (dateRangeStart || dateRangeEnd) && (
+                        <li>
+                          <strong>📅 Periode:</strong>{' '}
+                          {dateRangeStart && dateRangeEnd ? (
+                            <span className="text-blue-900 font-semibold">
+                              {new Date(dateRangeStart).toLocaleDateString('nl-NL')} tot {new Date(dateRangeEnd).toLocaleDateString('nl-NL')}
+                            </span>
+                          ) : dateRangeStart ? (
+                            <span>Vanaf {new Date(dateRangeStart).toLocaleDateString('nl-NL')}</span>
+                          ) : (
+                            <span>Tot {new Date(dateRangeEnd).toLocaleDateString('nl-NL')}</span>
+                          )}
+                        </li>
+                      )}
+                      {!useDateRange && (
+                        <li>
+                          <strong>📅 Periode:</strong> <span className="text-green-700">Permanent (altijd actief)</span>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 )}
