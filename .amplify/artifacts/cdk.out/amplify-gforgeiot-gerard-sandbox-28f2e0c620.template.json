@@ -399,7 +399,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/cd348cbebc33ab74e0417429d56245b96547364b6409b9df44625f63196554cf.json"
+       "/adc1afb86309d792ec09ac8ed288c48d11d7b0f6ac3387b21109429d854cfe2c.json"
       ]
      ]
     }
@@ -483,6 +483,24 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+      ]
      }
     },
     "Tags": [
@@ -511,7 +529,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/6d4cf715a54fb2e4a1ab722a7cdc314a2d1e5d7ef1ec94a1a7aec0a06caac13a.json"
+       "/9449c0d3ed00a56fe908488d92d35680dbf90991a4e1f2d04bec259fd270625f.json"
       ]
      ]
     }

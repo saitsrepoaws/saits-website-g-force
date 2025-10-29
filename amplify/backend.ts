@@ -53,6 +53,7 @@ const waveformLambda = backend.waveformGenerator.resources.lambda
 const playlistGeneratorLambda = backend.playlistGenerator.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
 const playlistTable = backend.data.resources.tables['Playlist']
+const scheduleTable = backend.data.resources.tables['Schedule']
 
 // Create Docker-based Lambda for audio analysis with FFmpeg
 // Lookup ECR repository that we created with build-container.sh
@@ -251,6 +252,10 @@ const simpleHandlerLambda = backend.playerSimpleHandler.resources.lambda
 const loadHandlerCfn = loadHandlerLambda.node.defaultChild as any
 loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_ENDPOINT', 'https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql')
 loadHandlerCfn.addPropertyOverride('Environment.Variables.APPSYNC_API_KEY', '')
+// Add DynamoDB table names for schedule-based track loading
+loadHandlerCfn.addPropertyOverride('Environment.Variables.SCHEDULE_TABLE_NAME', backend.data.resources.tables['Schedule'].tableName)
+loadHandlerCfn.addPropertyOverride('Environment.Variables.PLAYLIST_TABLE_NAME', playlistTable.tableName)
+loadHandlerCfn.addPropertyOverride('Environment.Variables.TRACK_TABLE_NAME', trackTable.tableName)
 
 const iotPublisherCfn = iotPublisherLambda.node.defaultChild as any
 iotPublisherCfn.addPropertyOverride('Environment.Variables.IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
@@ -266,6 +271,11 @@ loadHandlerLambda.addToRolePolicy(
     ],
   })
 )
+
+// Grant DynamoDB read access to load handler for Schedule, Playlist, and Track tables
+scheduleTable.grantReadData(loadHandlerLambda)
+playlistTable.grantReadData(loadHandlerLambda)
+trackTable.grantReadData(loadHandlerLambda)
 
 // Grant IoT publish permission to IoT publisher (all player topics)
 iotPublisherLambda.addToRolePolicy(

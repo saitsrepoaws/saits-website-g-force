@@ -83,6 +83,69 @@
          ]
         }
        ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -116,7 +179,76 @@
      "Variables": {
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
       "APPSYNC_ENDPOINT": "https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql",
-      "APPSYNC_API_KEY": ""
+      "APPSYNC_API_KEY": "",
+      "SCHEDULE_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "PLAYLIST_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "TRACK_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
      }
     },
     "EphemeralStorage": {
@@ -722,6 +854,15 @@
  },
  "Parameters": {
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
    "Type": "String"
   }
  }

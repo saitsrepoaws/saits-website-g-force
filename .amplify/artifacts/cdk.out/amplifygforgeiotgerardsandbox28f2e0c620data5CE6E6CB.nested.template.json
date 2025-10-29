@@ -535,7 +535,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/69bc0c15c708b22eda33f47ece5376e773c4927d3b8aa9fef9086064e4de1e34.json"
+       "/e677ba732dd5be15a2009f639a984408a6016e95b0e0c07c484ef8595430bb3c.json"
       ]
      ]
     }
@@ -2014,6 +2014,22 @@
     "Fn::GetAtt": [
      "amplifyDataGraphQLAPI42A6FA33",
      "Arn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
     ]
    }
   }

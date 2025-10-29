@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4ab7813e7475452030312339856144f57ce35f0bb2ce86f9f44c5f83b70801f2.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1fd1f100fb38cf0da2731cb1a14ec5885dd9f649f85da682801c98ce755936cd.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1435,6 +1435,12 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule.NestedStack/Schedule.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -2319,6 +2325,18 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data.NestedStack/data.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -2671,6 +2689,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": [
