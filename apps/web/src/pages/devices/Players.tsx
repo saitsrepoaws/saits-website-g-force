@@ -73,13 +73,13 @@ function Players() {
       })
     })
     
-    // TEMPORARILY DISABLED Mock State Machine to test connection stability
-    // TODO: Re-enable when Amplify PubSub socket closed issue is fixed
-    console.log('⚠️ Mock State Machine DISABLED (testing connection stability)')
-    // startMockStateMachine()
+    // Start Mock State Machine (re-enabled after fixing client ID issue)
+    console.log('🤖 Starting Mock State Machine...')
+    startMockStateMachine()
     
     return () => {
-      // stopMockStateMachine()
+      console.log('🛑 Stopping Mock State Machine...')
+      stopMockStateMachine()
     }
   }, [])
   
