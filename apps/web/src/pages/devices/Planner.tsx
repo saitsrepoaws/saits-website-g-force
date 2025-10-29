@@ -136,10 +136,25 @@ function Planner() {
     setSelectedSlot(selectedSlot?.id === slot.id ? null : slot)
   }
 
-  function handlePlaylistSelect(slotId: string, playlistId: string) {
+  async function handlePlaylistSelect(slotId: string, playlistId: string) {
+    // Update local state immediately
     setTimeSlots(slots => slots.map(slot => 
       slot.id === slotId ? { ...slot, playlistId } : slot
     ))
+    
+    // Persist to DynamoDB
+    try {
+      const slot = timeSlots.find(s => s.id === slotId)
+      if (slot) {
+        // Update all schedule entries for this slot (one per day)
+        // For now, just update the first one we find
+        await updateSchedule(slotId, { playlistId })
+        console.log('✅ Playlist updated in DynamoDB')
+      }
+    } catch (error) {
+      console.error('❌ Failed to update playlist:', error)
+      alert('Failed to save playlist selection')
+    }
   }
 
   function toggleDay(slotId: string, day: string) {
@@ -154,13 +169,28 @@ function Planner() {
     }))
   }
 
-  function toggleSlotActive(slotId: string) {
-    setTimeSlots(slots => slots.map(slot =>
-      slot.id === slotId ? { ...slot, active: !slot.active } : slot
+  async function toggleSlotActive(slotId: string) {
+    const slot = timeSlots.find(s => s.id === slotId)
+    if (!slot) return
+    
+    const newActive = !slot.active
+    
+    // Update local state immediately
+    setTimeSlots(slots => slots.map(s =>
+      s.id === slotId ? { ...s, active: newActive } : s
     ))
+    
+    // Persist to DynamoDB
+    try {
+      await updateSchedule(slotId, { isActive: newActive })
+      console.log('✅ Schedule active status updated in DynamoDB')
+    } catch (error) {
+      console.error('❌ Failed to toggle active:', error)
+      alert('Failed to save active status')
+    }
   }
 
-  function addNewSlot() {
+  async function addNewSlot() {
     const newSlot: TimeSlot = {
       id: Date.now().toString(),
       time: '00:00',
@@ -170,30 +200,72 @@ function Planner() {
       duration: 60,
       active: true
     }
+    
+    // Add to local state immediately
     setTimeSlots([...timeSlots, newSlot])
     setShowAddSlot(false)
+    
+    // Persist to DynamoDB
+    try {
+      // Create a schedule entry for each day
+      // For simplicity, create one entry for all days (dayOfWeek=null means every day)
+      await createSchedule({
+        name: newSlot.name,
+        startTime: newSlot.time,
+        endTime: null, // Until next slot
+        playlistId: newSlot.playlistId || '',
+        dayOfWeek: null, // null = every day
+        isActive: newSlot.active,
+        priority: 0
+      })
+      console.log('✅ New schedule created in DynamoDB')
+    } catch (error) {
+      console.error('❌ Failed to create schedule:', error)
+      alert('Failed to save new slot')
+    }
   }
 
-  function deleteSlot(slotId: string) {
+  async function deleteSlot(slotId: string) {
     if (confirm('Remove this time slot?')) {
+      // Remove from local state immediately
       setTimeSlots(slots => slots.filter(s => s.id !== slotId))
       if (selectedSlot?.id === slotId) {
         setSelectedSlot(null)
+      }
+      
+      // Delete from DynamoDB
+      try {
+        await deleteSchedule(slotId)
+        console.log('✅ Schedule deleted from DynamoDB')
+      } catch (error) {
+        console.error('❌ Failed to delete schedule:', error)
+        alert('Failed to delete slot from database')
       }
     }
   }
 
   // Clear All Slots
-  function clearAllSlots() {
+  async function clearAllSlots() {
     const confirmMessage = `⚠️ WARNING: This will delete ALL ${timeSlots.length} time slots and planning!\n\nThis action cannot be undone.\n\nAre you sure?`
     
     if (confirm(confirmMessage)) {
       const doubleCheck = confirm('🚨 FINAL CONFIRMATION\n\nDelete ALL slots and start fresh?\n\nClick OK to proceed.')
       
       if (doubleCheck) {
+        // Clear local state
         setTimeSlots([])
         setSelectedSlot(null)
-        alert('✅ All slots cleared! Starting fresh.')
+        
+        // Delete all from DynamoDB
+        try {
+          const deletePromises = timeSlots.map(slot => deleteSchedule(slot.id))
+          await Promise.all(deletePromises)
+          console.log('✅ All schedules deleted from DynamoDB')
+          alert('✅ All slots cleared! Starting fresh.')
+        } catch (error) {
+          console.error('❌ Failed to clear all schedules:', error)
+          alert('Some slots may not have been deleted from database')
+        }
       }
     }
   }
