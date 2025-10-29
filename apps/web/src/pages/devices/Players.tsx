@@ -220,6 +220,11 @@ function Players() {
     switch (command.command) {
       case 'LOAD':
         if (command.params?.track) {
+          // Extract playlist info from Lambda response
+          if (command.params.playlist?.id) {
+            console.log('📋 Setting playlistId from LOAD command:', command.params.playlist.id)
+            setCurrentPlaylistId(command.params.playlist.id)
+          }
           executeLoad(command.params.track)
         } else {
           console.error('❌ LOAD command missing track data')
