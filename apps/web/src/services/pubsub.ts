@@ -91,9 +91,12 @@ async function getPubSubInstance(): Promise<PubSub> {
         throw new Error('No identityId in session - user may not be authenticated')
       }
       
-      // Use identityId as client ID to match IoT policy
-      const clientId = identityId.replace(':', '-') // IoT doesn't allow : in client ID
+      // Use identityId + timestamp as client ID to avoid duplicates
+      // AWS IoT Core kicks duplicate client IDs → causes socket closed loop
+      const timestamp = Date.now()
+      const clientId = `${identityId.replace(':', '-')}-${timestamp}`
       log('info', `Using client ID: ${clientId}`)
+      log('info', `🔑 Unique ID with timestamp to prevent duplicate connection kicks`)
       
       pubsubInstance = new PubSub({
         region: 'eu-west-1',
