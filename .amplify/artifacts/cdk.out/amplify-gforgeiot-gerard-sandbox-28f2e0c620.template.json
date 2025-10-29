@@ -197,6 +197,13 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -529,7 +536,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/8c50e1c0a62e525e47116f873db841e57a057fba1b43fc617563c8c30a453332.json"
+       "/d848c256b04eebbc5cbddb8b23d1e0e9e60d6980c1ac6da78f9310f910da9b32.json"
       ]
      ]
     }

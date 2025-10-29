@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9d811c70425b8713913f4cc93f5f6a9852ec0862c5db552f01bce38a77ed193f.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ded3b1cc9fe56fe723fef9e73e8447eb27a10ada2456fd6992d59222f0bb4bea.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -3173,6 +3173,42 @@
             "data": "playersimplehandlerlambdaC2FF27C5"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "radioschedulerlambdaServiceRole43393D2F"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "radioschedulerlambda7B148CC5"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RadioSchedulerRule661B6F57"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RadioSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26A64A6AE8"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRuleArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RadioSchedulerRuleArn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
@@ -3201,6 +3237,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": [

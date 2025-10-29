@@ -534,15 +534,399 @@
     "aws:asset:property": "Code"
    }
   },
+  "radioschedulerlambdaServiceRole43393D2F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "radio-scheduler"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/Resource"
+   }
+  },
+  "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": "iot:Publish",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:*:*:topic/radio/station/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD",
+    "Roles": [
+     {
+      "Ref": "radioschedulerlambdaServiceRole43393D2F"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "radioschedulerlambda7B148CC5": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "16ca6ff3caaf93149b4db40df1f1cb317e25a753b470d6251a5d4213f9333acc.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "SCHEDULE_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "PLAYLIST_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "TRACK_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 512,
+    "Role": {
+     "Fn::GetAtt": [
+      "radioschedulerlambdaServiceRole43393D2F",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "radio-scheduler"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD",
+    "radioschedulerlambdaServiceRole43393D2F"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/Resource",
+    "aws:asset:path": "asset.16ca6ff3caaf93149b4db40df1f1cb317e25a753b470d6251a5d4213f9333acc",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "RadioSchedulerRule661B6F57": {
+   "Type": "AWS::Events::Rule",
+   "Properties": {
+    "Description": "Triggers radio scheduler Lambda every minute to broadcast next track",
+    "Name": "RadioSchedulerEveryMinute",
+    "ScheduleExpression": "rate(1 minute)",
+    "State": "ENABLED",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Targets": [
+     {
+      "Arn": {
+       "Fn::GetAtt": [
+        "radioschedulerlambda7B148CC5",
+        "Arn"
+       ]
+      },
+      "Id": "Target0"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/Resource"
+   }
+  },
+  "RadioSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26A64A6AE8": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "radioschedulerlambda7B148CC5",
+      "Arn"
+     ]
+    },
+    "Principal": "events.amazonaws.com",
+    "SourceArn": {
+     "Fn::GetAtt": [
+      "RadioSchedulerRule661B6F57",
+      "Arn"
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zWOTQqDMBCFz9L9OLXxBFXoUooeQMZklPiTgJNUinj3otLV997ifTyFSqWY3miVRJsxmWyLW8kS2NSB9Ai0SrNNNLeGGucND4LliVd0OljvwNKMW+UnhqJzJ99+svp71CvtIFlDIhwEnwdAMsyjHjnkJAyXHovO/aU7VCw+LprhHNSBeuv6HY4LOMj9oxSqB6a3QaxNluiCnRmriz8pbZ6m1QAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/z2O0W7CMAxFv4V31+vCFwDSHhkqH1CF1CC3aTLVDmiK8u8o7bSncy3L59qgMS22O/uSxg1T4/mG+UyiNFzVugnsS/rs7XwbbB/iQKPgecVXCk45BmA7Y+6iJzjdw8pL9Ox+67ilArLvrQip4KECZI/H5CbSoxWCTY/5dA//1npMy8wiHEMBelJQwdylv57kqRToSGJaHMGqvap9cHjU/XfSn6QF6ss4ysfTGDSf2O5GYW6WFJRnwm7jG7wgG04FAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "RadioSchedulerRuleArn": {
+   "Description": "EventBridge rule that triggers radio scheduler every minute",
+   "Value": {
+    "Fn::GetAtt": [
+     "RadioSchedulerRule661B6F57",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "RadioSchedulerRuleArn"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Ref": {
+   "Value": {
+    "Ref": "playerloadhandlerlambdaB45DE213"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCRef": {
+   "Value": {
+    "Ref": "playeriotpublisherlambda59AC52A2"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref": {
+   "Value": {
+    "Ref": "playersimplehandlerlambdaC2FF27C5"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref": {
+   "Value": {
+    "Ref": "radioschedulerlambda7B148CC5"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "playerloadhandlerlambdaB45DE213",
+     "Arn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "playeriotpublisherlambda59AC52A2",
+     "Arn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "playersimplehandlerlambdaC2FF27C5",
+     "Arn"
+    ]
+   }
   }
  },
  "Conditions": {
@@ -809,47 +1193,6 @@
      ]
     }
    ]
-  }
- },
- "Outputs": {
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Ref": {
-   "Value": {
-    "Ref": "playerloadhandlerlambdaB45DE213"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCRef": {
-   "Value": {
-    "Ref": "playeriotpublisherlambda59AC52A2"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref": {
-   "Value": {
-    "Ref": "playersimplehandlerlambdaC2FF27C5"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playerloadhandlerlambdaB45DE213",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playeriotpublisherlambda59AC52A2",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playersimplehandlerlambdaC2FF27C5",
-     "Arn"
-    ]
-   }
   }
  },
  "Parameters": {
