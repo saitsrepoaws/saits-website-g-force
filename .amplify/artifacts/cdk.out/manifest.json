@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1fd1f100fb38cf0da2731cb1a14ec5885dd9f649f85da682801c98ce755936cd.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/939cbc1616c7b9ae13545afb8725b378e528c57c43b43da038787f4c629c445d.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -2751,6 +2751,12 @@
             "data": "StateMachineTrigger27A3F693"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE=": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Role/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -2767,6 +2773,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "PlayerStateMachineDF3FE3FD"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerCommandRule": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlayerCommandRule"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachineArn": [
