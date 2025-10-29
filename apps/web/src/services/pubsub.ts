@@ -219,8 +219,8 @@ export async function autoConnect(): Promise<boolean> {
     // Wait a bit for connection to establish
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // Test with a dummy subscribe
-    return await testConnect('iot/health-check', 3000)
+    // Test with a radio/player/* topic (allowed by RadioPlayerCognitoPolicy)
+    return await testConnect('radio/player/health-check', 3000)
   } catch (err) {
     log('error', `Auto-connect failed: ${err}`)
     return false

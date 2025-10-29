@@ -4,8 +4,8 @@ import { useAuthenticator } from '@aws-amplify/ui-react'
 import { isEnabled as pubsubEnabled, autoConnect, testConnect, publish, subscribe, getLogs, clearLogs, resetPubSub, type LogEntry } from '../services/pubsub'
 import { attachIoTPolicyToCurrentUser } from '../services/iotPolicyAttacher'
 
-const INPUT_TOPIC = 'gforce/libery/input'
-const OUTPUT_TOPIC = 'gforce/libery/output'
+const INPUT_TOPIC = 'radio/player/test-001/input'
+const OUTPUT_TOPIC = 'radio/player/test-001/output'
 
 function App() {
   const [email, setEmail] = useState<string>('')
@@ -100,10 +100,10 @@ function App() {
       setPolicyAttached(success)
       if (success) {
         alert('✅ IoT Policy attached! Now retry the connection.')
-        // Auto-retry connection
+        // Auto-retry connection with radio/player/* topic
         setIotStatus('connecting')
         resetPubSub()
-        const ok = await testConnect('iot/demo/topic')
+        const ok = await testConnect('radio/player/connection-test')
         setIotStatus(ok ? 'connected' : 'error')
       } else {
         alert('❌ Failed to attach IoT Policy. Check console for details.')
@@ -155,7 +155,7 @@ function App() {
                 onClick={async () => {
                   setIotStatus('connecting')
                   resetPubSub()
-                  const ok = await testConnect('iot/demo/topic')
+                  const ok = await testConnect('radio/player/connection-test')
                   setIotStatus(ok ? 'connected' : 'error')
                 }}
                 className="rounded border border-gray-300 px-2 py-1 text-[11px] hover:bg-gray-50 disabled:opacity-60"
