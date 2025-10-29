@@ -45,12 +45,17 @@ export function resetPubSub() {
     clearTimeout(connectionStateTimeout)
     connectionStateTimeout = null
   }
+  if (keepaliveInterval) {
+    clearInterval(keepaliveInterval)
+    keepaliveInterval = null
+  }
 }
 
 // PubSub instance - initialized lazily (SINGLETON for entire app!)
 let pubsubInstance: PubSub | null = null
 let connectionStateTimeout: NodeJS.Timeout | null = null
 let hubListenerRegistered = false // Track if Hub listener is already registered
+let keepaliveInterval: NodeJS.Timeout | null = null // Track keepalive logging
 
 // Reset PubSub instance if connection stays disrupted
 function scheduleConnectionCheck() {
@@ -115,7 +120,19 @@ async function getPubSubInstance(): Promise<PubSub> {
                 clearTimeout(connectionStateTimeout)
                 connectionStateTimeout = null
               }
+              
+              // Start keepalive logging (shows ping activity every 60 seconds)
+              if (keepaliveInterval) clearInterval(keepaliveInterval)
+              keepaliveInterval = setInterval(() => {
+                log('info', '📡 MQTT keepalive ping (connection active)')
+              }, 60000) // Every 60 seconds
+              
             } else if (connectionState === ConnectionState.Disconnected) {
+              // Stop keepalive logging when disconnected
+              if (keepaliveInterval) {
+                clearInterval(keepaliveInterval)
+                keepaliveInterval = null
+              }
               log('warn', 'PubSub disconnected')
             } else if (connectionState === ConnectionState.Connecting) {
               log('info', 'PubSub connecting...')
