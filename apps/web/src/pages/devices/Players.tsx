@@ -3,9 +3,9 @@ import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
-import IoTConnectionStatus from '../../components/IoTConnectionStatus'
+// import IoTConnectionStatus from '../../components/IoTConnectionStatus' // DISABLED
 import { listPlaylists } from '../../services/playlists'
-import { createRadioPlayerIoT } from '../../services/radioPlayerIoT'
+// import { createRadioPlayerIoT } from '../../services/radioPlayerIoT' // DISABLED
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
 import { loadTrackAssets } from '../../services/playerService'
 import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
@@ -18,7 +18,7 @@ import type { Track } from '../../services/playerService'
 import { listTracks } from '../../services/tracks'
 import { getPlayerState, savePlayerState, updatePlayerPosition, clearPlayerState } from '../../services/playerState'
 import type { PlayerStateData } from '../../services/playerState'
-import { useIoT } from '../../contexts/IoTContext'
+// import { useIoT } from '../../contexts/IoTContext' // DISABLED
 
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
@@ -129,17 +129,18 @@ function Players() {
       }
     }, 1000) // Wait 1 second for loadSchedule to complete
     
-    // Test IoT connection on startup
-    import('../../services/pubsub').then(({ testConnect }) => {
-      console.log('🔌 Testing IoT connection...')
-      testConnect('radio/player/connection-test').then((ok: boolean) => {
-        if (ok) {
-          console.log('✅ IoT connection test PASSED')
-        } else {
-          console.error('❌ IoT connection test FAILED')
-        }
-      })
-    })
+    // Test IoT connection on startup - DISABLED
+    // import('../../services/pubsub').then(({ testConnect }) => {
+    //   console.log('🔌 Testing IoT connection...')
+    //   testConnect('radio/player/connection-test').then((ok: boolean) => {
+    //     if (ok) {
+    //       console.log('✅ IoT connection test PASSED')
+    //     } else {
+    //       console.error('❌ IoT connection test FAILED')
+    //     }
+    //   })
+    // })
+    console.log('🚫 IoT connection test DISABLED')
     
     // Real AWS State Machine is now active via IoT Rule
     // No mock needed - Lambda handles all schedule logic
