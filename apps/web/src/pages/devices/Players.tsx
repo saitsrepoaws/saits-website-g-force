@@ -792,10 +792,10 @@ function Players() {
         const stateData = {
           playerId,
           currentTrackId: fullTrack.id,
-          currentTrackTitle: fullTrack.title,
-          currentTrackArtist: fullTrack.artist,
+          currentTrackTitle: fullTrack.title || undefined,
+          currentTrackArtist: fullTrack.artist || undefined,
           currentPlaylistId: currentPlaylistId || undefined,
-          status: 'stopped' as const,
+          status: 'idle' as const,  // Track loaded, ready to play (not playing yet)
           lastPosition: 0,
           duration: fullTrack.duration || 0,
           volume,
@@ -805,7 +805,7 @@ function Players() {
         }
         await savePlayerState(playerStateId, stateData)
         setBackendPlayerState({...stateData, id: playerStateId, lastUpdated: new Date().toISOString()})
-        console.log('💾 PlayerState saved (LOAD)')
+        console.log('💾 PlayerState saved (LOAD) - status: idle (ready)')
       }
       
       console.log('✅✅✅ LOAD COMPLETE! ✅✅✅')
@@ -1082,7 +1082,28 @@ function Players() {
       setIsPlaying(true)
       setIsPaused(false)
       
-      // Publish PLAYING state
+      // Save to backend PlayerState
+      if (playerStateId) {
+        const stateData = {
+          playerId,
+          currentTrackId: currentTrack.id,
+          currentTrackTitle: currentTrack.title || undefined,
+          currentTrackArtist: currentTrack.artist || undefined,
+          currentPlaylistId: currentPlaylistId || undefined,
+          status: 'playing' as const,
+          lastPosition: audio.currentTime,
+          duration: audio.duration,
+          volume,
+          autoPlayEnabled: autoPlay,
+          currentScheduleSlotId: activeSlot?.id,
+          currentScheduleSlotName: activeSlot?.name
+        }
+        await savePlayerState(playerStateId, stateData)
+        setBackendPlayerState({...stateData, id: playerStateId, lastUpdated: new Date().toISOString()})
+        console.log('💾 Backend PlayerState saved (PLAY) - status: playing')
+      }
+      
+      // Publish PLAYING state to IoT
       await iotServiceRef.current?.publishState(PlayerState.PLAYING, {
         trackId: currentTrack.id,
         playlistId: currentPlaylistId || undefined,
