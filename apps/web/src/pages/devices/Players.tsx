@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
@@ -27,9 +27,6 @@ function Players() {
   const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
   
-  // IoT service disabled - keeping ref for backwards compatibility
-  const iotServiceRef = useRef<any | null>(null)
-  
   // 🎵 AUDIO PLAYER HOOK - Manages all audio state & controls
   const audioPlayer = useAudioPlayer()
   const {
@@ -41,32 +38,24 @@ function Players() {
     currentTime,
     duration,
     currentTrack,
+    audioRef,
     coverArtUrl,
     waveformUrl,
-    audioRef,
     pause: pauseAudio,
     stop: stopAudio,
-    // play, togglePlay - keeping custom versions below (legacy IoT integration)
     load: loadTrack,
     unload: unloadTrack,
     setVolume: setPlayerVolume,
     setAutoPlay,
     setCurrentTime,
-    _setCurrentTrack,
     _setIsPlaying,
     _setIsPaused,
-    _setIsLoaded,
     _setDuration
   } = audioPlayer
   
   // 📅 SCHEDULE HOOK - Manages schedule & track calculation
-  const schedule = useSchedule({
-    playlistTracksCache,
-    playlistName: playlists.find(p => p.id === currentPlaylistId)?.name || 'Playlist',
-    autoRefresh: true
-  })
+  const schedule = useSchedule()
   const {
-    scheduleSlots,
     activeSlot,
     currentTrackInfo,
     scheduledTrackId
@@ -85,10 +74,7 @@ function Players() {
   const {
     playerStateId,
     backendState: backendPlayerState,
-    isRestoring: isRestoringState,
-    saveState,
-    restoreState,
-    updatePosition
+    saveState
   } = playerState
   
   // Station mode removed - using hooks now
@@ -624,12 +610,6 @@ function Players() {
     
     if (!audioRef.current) return
     stop()
-    
-    // Publish STOPPED state
-    await iotServiceRef.current?.publishState(PlayerState.STOPPED, {
-      trackId: currentTrack?.id,
-      position: 0
-    })
     
     // Save to PlayerState
     if (playerStateId && currentTrack) {
