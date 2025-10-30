@@ -122,14 +122,32 @@ async function getPubSubInstance(): Promise<PubSub> {
         console.log('🎧 REGISTERING HUB LISTENER (SINGLETON)')
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         log('info', '🎧 Registering Hub listener (once for entire app)')
+        
+        // Track previous state to suppress normal handshake disruptions
+        let previousState: ConnectionState | null = null
+        
         Hub.listen('pubsub', (data) => {
           const { payload } = data
           if (payload.event === CONNECTION_STATE_CHANGE) {
             const connectionState = (payload.data as any).connectionState as ConnectionState
+            
+            // Suppress "ConnectionDisrupted" during normal handshake (Connecting → Disrupted → Connected)
+            if (connectionState === ConnectionState.ConnectionDisrupted && 
+                previousState === ConnectionState.Connecting) {
+              // This is normal TLS/WebSocket handshake, don't log it
+              previousState = connectionState
+              return
+            }
+            
+            // Only log meaningful state changes
             log('info', `Connection state: ${connectionState}`)
             
             if (connectionState === ConnectionState.Connected) {
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+              console.log('✅ IoT CONNECTED - Ready to Send/Receive')
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
               log('info', '✅ PubSub connected - ready to send/receive')
+              
               // Clear timeout when connected
               if (connectionStateTimeout) {
                 clearTimeout(connectionStateTimeout)
@@ -146,19 +164,32 @@ async function getPubSubInstance(): Promise<PubSub> {
               }, 10000) // Every 10 seconds - matches keepAliveTimeoutMs
               
             } else if (connectionState === ConnectionState.Disconnected) {
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+              console.log('⚠️ IoT DISCONNECTED')
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+              
               // Stop keepalive logging when disconnected
               if (keepaliveInterval) {
                 clearInterval(keepaliveInterval)
                 keepaliveInterval = null
               }
               log('warn', 'PubSub disconnected')
+              
             } else if (connectionState === ConnectionState.Connecting) {
+              console.log('🔌 IoT Connecting...')
               log('info', 'PubSub connecting...')
+              
             } else if (connectionState === ConnectionState.ConnectionDisrupted) {
-              log('info', 'PubSub connection disrupted (normal during handshake)')
+              // Only log if it's NOT during handshake (we already filtered that above)
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+              console.log('⚠️ IoT Connection DISRUPTED (unexpected)')
+              console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+              log('warn', 'PubSub connection disrupted (unexpected)')
               // Schedule reset if stays disrupted
               scheduleConnectionCheck()
             }
+            
+            previousState = connectionState
           }
         })
         hubListenerRegistered = true
