@@ -99,12 +99,6 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
     const checkInterval = setInterval(() => {
       const currentLogs = pubsub.getLogs()
       
-      console.log('🔍 IoTContext: Checking logs...', {
-        totalLogs: currentLogs.length,
-        isConnected,
-        recentMessages: currentLogs.slice(0, 3).map(l => l.message)
-      })
-      
       // Update logs
       setLogs(currentLogs)
       
@@ -128,13 +122,6 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
          log.message.toLowerCase().includes('disrupted')) &&
         log.level === 'warn'
       )
-      
-      console.log('🔍 Detection:', {
-        hasConnectedLog,
-        hasDisconnectedLog,
-        hasConnectingLog,
-        willSetConnected: hasConnectedLog && !hasDisconnectedLog && !isConnected
-      })
       
       // Update state based on logs
       if (hasConnectedLog && !hasDisconnectedLog) {

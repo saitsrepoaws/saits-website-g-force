@@ -277,8 +277,12 @@ function Players() {
     return () => clearInterval(interval)
   }, [activeSlot, currentPlaylistId, playlistTracksCache, playlists])
 
-  // IoT Service - PERSISTENT setup (only once per playerId)
+  // IoT Service - DISABLED - Using Central IoTContext instead!
+  // TODO: Refactor to use IoTContext for subscriptions
   useEffect(() => {
+    console.log('⚠️ OLD IoT Setup DISABLED - Using Central IoTContext')
+    // Disabled - all code below is unreachable
+    if (false) {
     let unsubscribeLog: (() => void) | null = null
     let unsubscribeCommands: (() => void) | null = null
     let isSubscribed = false
@@ -363,10 +367,15 @@ function Players() {
         iotServiceRef.current = null
       }
     }
+    } // End of if (false) block
   }, [playerId]) // Only re-run if playerId changes
 
-  // Station Broadcast Subscription (IoT-driven playback)
+  // Station Broadcast Subscription - DISABLED (using central IoT)
   useEffect(() => {
+    console.log('⚠️ Station Broadcast DISABLED - Using Central IoTContext')
+    return // Disabled
+    
+    // eslint-disable-next-line no-unreachable
     if (!iotServiceRef.current) return
     
     console.log('📻 Setting up Station Broadcast subscription...')
