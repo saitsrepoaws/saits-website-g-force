@@ -7,6 +7,9 @@ import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 import SeekBar from '../../components/SeekBar'
 import PlayerControls from '../../components/PlayerControls'
 import TrackDisplay from '../../components/TrackDisplay'
+import { useAudioPlayer } from '../../hooks/useAudioPlayer'
+import { useSchedule } from '../../hooks/useSchedule'
+import { usePlayerState } from '../../hooks/usePlayerState'
 import { listPlaylists } from '../../services/playlists'
 // import { createRadioPlayerIoT } from '../../services/radioPlayerIoT' // DISABLED
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
@@ -26,43 +29,79 @@ import type { PlayerStateData } from '../../services/playerState'
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
 function Players() {
-  // IoT Context - DISABLED
-  // const { isConnected: iotContextConnected, connectionUptime, lastPingTime } = useIoT()
+  const playerId = 'player-main-001'
   
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
+  // Remaining local state (not in hooks)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
   const [currentPlaylistId, setCurrentPlaylistId] = useState<string | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [autoPlay, setAutoPlay] = useState(false)
-  const [volume, setVolume] = useState(0.7)
-  
-  // Seekbar state (extracted to SeekBar component, only keeping essential state)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [coverArtUrl, setCoverArtUrl] = useState<string | null>(null)
-  const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
+  const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
-  const audioRef = useRef<HTMLAudioElement | null>(null)
   
-  // IoT Log Modal
+  // IoT Log Modal (temporary - will be moved later)
   const [showIoTLog, setShowIoTLog] = useState(false)
   const [iotLogs, setIoTLogs] = useState<IoTLogEntry[]>([])
   const iotServiceRef = useRef<ReturnType<typeof createRadioPlayerIoT> | null>(null)
-  const playerId = 'player-main-001'
   
-  // Schedule & Current Track
-  const [scheduleSlots, setScheduleSlots] = useState<ScheduleSlot[]>([])
-  const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
-  const [currentTrackInfo, setCurrentTrackInfo] = useState<CurrentTrackInfo | null>(null)
-  const [scheduledTrackId, setScheduledTrackId] = useState<string | null>(null)
-  const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
+  // 🎵 AUDIO PLAYER HOOK - Manages all audio state & controls
+  const audioPlayer = useAudioPlayer()
+  const {
+    isPlaying,
+    isPaused,
+    isLoaded,
+    volume,
+    autoPlay,
+    currentTime,
+    duration,
+    currentTrack,
+    coverArtUrl,
+    waveformUrl,
+    audioRef,
+    play,
+    pause,
+    stop,
+    togglePlay,
+    load: loadTrack,
+    unload: unloadTrack,
+    setVolume: setPlayerVolume,
+    setAutoPlay,
+    setCurrentTime,
+    _setCurrentTrack,
+    _setIsPlaying,
+    _setIsPaused,
+    _setIsLoaded
+  } = audioPlayer
   
-  // PlayerState for persistence
-  const [playerStateId, setPlayerStateId] = useState<string | null>(null)
-  const [isRestoringState, setIsRestoringState] = useState(false)
-  const [backendPlayerState, setBackendPlayerState] = useState<any>(null)
+  // 📅 SCHEDULE HOOK - Manages schedule & track calculation
+  const schedule = useSchedule({
+    playlistTracksCache,
+    playlistName: playlists.find(p => p.id === currentPlaylistId)?.name || 'Playlist',
+    autoRefresh: true
+  })
+  const {
+    scheduleSlots,
+    activeSlot,
+    currentTrackInfo,
+    scheduledTrackId
+  } = schedule
+  
+  // 💾 PLAYER STATE HOOK - Manages persistence
+  const playerState = usePlayerState({
+    playerId,
+    currentTrack,
+    isPlaying,
+    volume,
+    autoPlay,
+    activeSlotId: activeSlot?.id,
+    activeSlotName: activeSlot?.name
+  })
+  const {
+    playerStateId,
+    backendState: backendPlayerState,
+    isRestoring: isRestoringState,
+    saveState,
+    restoreState,
+    updatePosition
+  } = playerState
   
   // Console logs capture
   const [consoleLogs, setConsoleLogs] = useState<Array<{type: string, message: string, timestamp: Date}>>([])
