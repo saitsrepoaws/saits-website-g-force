@@ -1708,20 +1708,18 @@ function Players() {
       </div>
     )}
 
-      </div>
-
-      {/* IoT Log Modal - Keep for optional full screen view */}
-      <IoTLogModal
-        isOpen={showIoTLog}
-        onClose={() => setShowIoTLog(false)}
-        logs={iotLogs}
-        playerId={playerId}
-        onClearLogs={() => {
-          iotServiceRef.current?.clearLogs()
-          setIoTLogs([])
-        }}
-      />
-    </Layout>
+    {/* IoT Log Modal - Keep for optional full screen view */}
+    <IoTLogModal
+      isOpen={showIoTLog}
+      onClose={() => setShowIoTLog(false)}
+      logs={iotLogs}
+      playerId={playerId}
+      onClearLogs={() => {
+        iotServiceRef.current?.clearLogs()
+        setIoTLogs([])
+      }}
+    />
+  </Layout>
   )
 }
 
