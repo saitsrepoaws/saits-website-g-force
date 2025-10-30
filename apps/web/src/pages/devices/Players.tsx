@@ -1339,6 +1339,14 @@ function Players() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [playerStateId, currentTrack, isPlaying, volume, autoPlay, playerId])
 
+  // Helper: Format time for display (used outside SeekBar)
+  function formatTime(seconds: number): string {
+    if (!seconds || isNaN(seconds)) return '0:00'
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${String(secs).padStart(2, '0')}`
+  }
+
   return (
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
