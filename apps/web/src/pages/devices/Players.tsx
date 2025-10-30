@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
-import IoTLogModal from '../../components/IoTLogModal'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
-// import IoTConnectionStatus from '../../components/IoTConnectionStatus' // DISABLED
 import SeekBar from '../../components/SeekBar'
 import PlayerControls from '../../components/PlayerControls'
 import TrackDisplay from '../../components/TrackDisplay'
@@ -11,16 +9,12 @@ import { useAudioPlayer } from '../../hooks/useAudioPlayer'
 import { useSchedule } from '../../hooks/useSchedule'
 import { usePlayerState } from '../../hooks/usePlayerState'
 import { listPlaylists } from '../../services/playlists'
-// import { createRadioPlayerIoT } from '../../services/radioPlayerIoT' // DISABLED
 import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
-import { PlayerState } from '../../types/player'
 import { getUrl } from 'aws-amplify/storage'
 import type { Playlist } from '../../types/playlist'
-import type { IoTLogEntry } from '../../services/radioPlayerIoT'
 import type { Track } from '../../services/playerService'
 import { listTracks } from '../../services/tracks'
-import { getPlayerState, savePlayerState } from '../../services/playerState'
-// import { useIoT } from '../../contexts/IoTContext' // DISABLED
+import { getPlayerState } from '../../services/playerState'
 
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
@@ -33,9 +27,6 @@ function Players() {
   const [playlistTracksCache, setPlaylistTracksCache] = useState<any[]>([])
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState(new Date())
   
-  // IoT Log Modal (temporary - will be moved later)
-  const [showIoTLog, setShowIoTLog] = useState(false)
-  const [iotLogs, setIoTLogs] = useState<IoTLogEntry[]>([])
   // IoT service disabled - keeping ref for backwards compatibility
   const iotServiceRef = useRef<any | null>(null)
   
@@ -108,28 +99,10 @@ function Players() {
     
     // Auto-load playlist after schedule is loaded
     setTimeout(() => {
-      console.log('🎵 Auto-loading playlist from schedule...')
-      if (activeSlot && activeSlot.playlistId) {
-        console.log('✅ Found active slot:', activeSlot.name)
-        console.log('📋 Setting playlist:', activeSlot.playlistId)
+      if (activeSlot?.playlistId) {
         setCurrentPlaylistId(activeSlot.playlistId)
-      } else {
-        console.log('⚠️ No active slot yet, will try again...')
       }
-    }, 1000) // Wait 1 second for loadSchedule to complete
-    
-    // Test IoT connection on startup - DISABLED
-    // import('../../services/pubsub').then(({ testConnect }) => {
-    //   console.log('🔌 Testing IoT connection...')
-    //   testConnect('radio/player/connection-test').then((ok: boolean) => {
-    //     if (ok) {
-    //       console.log('✅ IoT connection test PASSED')
-    //     } else {
-    //       console.error('❌ IoT connection test FAILED')
-    //     }
-    //   })
-    // })
-    console.log('🚫 IoT connection test DISABLED')
+    }, 1000)
     
     // Real AWS State Machine is now active via IoT Rule
     // No mock needed - Lambda handles all schedule logic
@@ -138,9 +111,8 @@ function Players() {
   // Update active slot every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log('⏰ Minute tick - checking for schedule changes...')
       loadSchedule()
-    }, 60000) // Check every minute
+    }, 60000)
     
     return () => clearInterval(interval)
   }, [])
@@ -149,7 +121,6 @@ function Players() {
   useEffect(() => {
     async function initPlayerState() {
       try {
-        console.log('💾 Initializing PlayerState...')
         const { data, errors } = await getPlayerState(playerId)
         
         if (errors || !data) {
@@ -157,33 +128,18 @@ function Players() {
           return
         }
         
-        // PlayerState is managed by usePlayerState hook now
-        // Backend state will be available via playerState.backendState
-        console.log('✅ PlayerState loaded:', data.id)
-        
         // Restore state if was playing/paused
         if (data.status === 'paused' && data.currentTrackId && data.lastPosition > 0) {
-          console.log('🔄 Restoring playback state...')
-          console.log('   Track:', data.currentTrackTitle)
-          console.log('   Position:', Math.round(data.lastPosition), 'seconds')
-          
-          // Restoring state - this will be handled by the hook
-          
-          // Load the track
           const { data: tracks } = await listTracks()
           const track = tracks?.find((t: any) => t.id === data.currentTrackId)
           
           if (track) {
             await loadTrackIntoPlayer(track)
-            
-            // Wait for audio to load
             setTimeout(() => {
               if (audioRef.current) {
                 audioRef.current.currentTime = data.lastPosition
                 setCurrentTime(data.lastPosition)
-                console.log('✅ Playback restored to:', Math.round(data.lastPosition), 'seconds')
               }
-              // Restore complete
             }, 1000)
           }
         }
@@ -210,22 +166,10 @@ function Players() {
   
   // Auto-switch playlist when activeSlot changes
   useEffect(() => {
-    if (activeSlot && activeSlot.playlistId) {
-      console.log('🔄 Active slot changed to:', activeSlot.name, `(${activeSlot.time})`)
-      console.log('📋 Auto-switching to playlist:', activeSlot.playlistId)
-      
-      // Only update if it's different from current
-      if (activeSlot.playlistId !== currentPlaylistId) {
-        console.log('✅ Switching playlist!')
-        setCurrentPlaylistId(activeSlot.playlistId)
-        
-        // TODO: Optionally auto-load new track when slot changes
-        // handleLoad() 
-      } else {
-        console.log('ℹ️ Same playlist, no switch needed')
-      }
+    if (activeSlot?.playlistId && activeSlot.playlistId !== currentPlaylistId) {
+      setCurrentPlaylistId(activeSlot.playlistId)
     }
-  }, [activeSlot])
+  }, [activeSlot, currentPlaylistId])
 
   // NOTE: Scheduled track calculation is now handled by useSchedule hook
   // It auto-refreshes every second and calculates currentTrackInfo and scheduledTrackId
@@ -444,40 +388,9 @@ function Players() {
     }
   }
   
-  // Execute PAUSE when command comes from IoT
-  async function executePause() {
-    console.log('⚙️ Executing PAUSE...')
-    
-    if (!audioRef.current || !isPlaying) return
-    
-    pause()
-    
-    // Publish PAUSED state
-    await iotServiceRef.current?.publishState(PlayerState.PAUSED, {
-      trackId: currentTrack?.id,
-      position: audioRef.current.currentTime,
-      duration: audioRef.current.duration
-    })
-    
-    // Save to PlayerState
-    if (playerStateId && currentTrack) {
-      const stateData = {
-        playerId,
-        status: 'paused' as const,
-        lastPosition: audioRef.current.currentTime,
-        volume,
-        autoPlayEnabled: autoPlay
-      }
-      await saveState(stateData)
-      console.log('💾 PlayerState saved (PAUSE) at', Math.round(audioRef.current.currentTime), 'seconds')
-    }
-    
-    console.log('✅ Paused')
-  }
+  // executePause removed - using handlePause directly
 
   function handlePlay() {
-    console.log('▶️ PLAY button clicked - executing locally...')
-    // PLAY is local - no IoT needed, just control the audio element
     executePlay()
   }
   
@@ -645,28 +558,7 @@ function Players() {
         console.log('💾 Backend PlayerState saved (PLAY) - status: playing')
       }
       
-      // Publish PLAYING state to IoT
-      await iotServiceRef.current?.publishState(PlayerState.PLAYING, {
-        trackId: currentTrack.id,
-        playlistId: currentPlaylistId || undefined,
-        position: audio.currentTime,
-        duration: audio.duration,
-        volume: volume
-      })
-      
-      // Publish track info
-      await iotServiceRef.current?.publishTrackInfo({
-        trackId: currentTrack.id,
-        title: currentTrack.title || 'Unknown',
-        artist: currentTrack.artist || 'Unknown',
-        album: currentTrack.album || undefined,
-        duration: audio.duration,
-        bpm: currentTrack.bpm || undefined,
-        key: currentTrack.key || undefined,
-        genre: currentTrack.genre || undefined,
-        playlistId: currentPlaylistId || undefined,
-        position: 0
-      })
+      // IoT publish removed - using hooks only
       
       console.log('✅✅✅ PLAYBACK STARTED SUCCESSFULLY! ✅✅✅')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -723,8 +615,6 @@ function Players() {
   }
 
   function handleStop() {
-    console.log('⏹️ STOP button clicked - executing locally...')
-    // STOP is local - no IoT needed, just stop the audio element
     executeStop()
   }
   
@@ -1039,82 +929,6 @@ function Players() {
         )}
       </div>
 
-      {/* Logs - Right Column (Split into 2) */}
-      <div className="lg:col-span-1 space-y-4">
-        {/* IoT Logs */}
-        <div className="bg-gray-900 rounded-xl shadow-lg border border-white/10">
-          <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                📡 IoT Messages
-                <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">
-                  {iotLogs.length}
-                </span>
-              </h3>
-              <button
-                onClick={() => {
-                  iotServiceRef.current?.clearLogs()
-                  setIoTLogs([])
-                }}
-                className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          <div className="p-3 max-h-[150px] overflow-y-auto bg-black/30">
-            {iotLogs.length === 0 ? (
-              <div className="text-center text-gray-500 text-sm py-8">
-                No IoT messages yet
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {iotLogs.map((log, index) => (
-                  <div
-                    key={index}
-                    className={`p-2 rounded text-xs border-l-2 ${
-                      log.direction === 'OUT' 
-                        ? 'bg-blue-900/20 border-blue-500' 
-                        : 'bg-green-900/20 border-green-500'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                          log.direction === 'OUT' 
-                            ? 'text-blue-400 bg-blue-900/30' 
-                            : 'text-green-400 bg-green-900/30'
-                        }`}>
-                          {log.direction === 'OUT' ? '📤' : '📥'}
-                        </span>
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                          log.type === 'command' 
-                            ? 'text-purple-400 bg-purple-900/30' 
-                            : log.type === 'state'
-                            ? 'text-yellow-400 bg-yellow-900/30'
-                            : 'text-gray-400 bg-gray-900/30'
-                        }`}>
-                          {log.type || 'data'}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-gray-500">
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-gray-400 mb-1 truncate">
-                      {log.topic}
-                    </div>
-                    <pre className="text-[10px] text-gray-300 overflow-x-auto whitespace-pre-wrap break-all max-h-20">
-                      {JSON.stringify(log.message, null, 1)}
-                    </pre>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-      </div>
     </div>
 
     {/* Playlist Viewer - Full Width Below */}
@@ -1167,17 +981,6 @@ function Players() {
       </div>
     )}
 
-    {/* IoT Log Modal - Keep for optional full screen view */}
-    <IoTLogModal
-      isOpen={showIoTLog}
-      onClose={() => setShowIoTLog(false)}
-      logs={iotLogs}
-      playerId={playerId}
-      onClearLogs={() => {
-        iotServiceRef.current?.clearLogs()
-        setIoTLogs([])
-      }}
-    />
   </Layout>
   )
 }
