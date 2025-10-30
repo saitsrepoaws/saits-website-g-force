@@ -2,7 +2,6 @@ interface PlayerControlsProps {
   // State
   isPlaying: boolean
   isPaused: boolean
-  isLoaded: boolean
   volume: number
   autoPlay: boolean
   
@@ -10,8 +9,6 @@ interface PlayerControlsProps {
   onPlay: () => void
   onPause: () => void
   onStop: () => void
-  onLoad: () => void
-  onUnload: () => void
   onVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onAutoPlayToggle: () => void
 }
@@ -19,20 +16,17 @@ interface PlayerControlsProps {
 export default function PlayerControls({
   isPlaying,
   isPaused,
-  isLoaded,
   volume,
   autoPlay,
   onPlay,
   onPause,
   onStop,
-  onLoad,
-  onUnload,
   onVolumeChange,
   onAutoPlayToggle,
 }: PlayerControlsProps) {
   return (
     <div className="space-y-6">
-      {/* Top Controls: Auto, Load/Unload, Pause */}
+      {/* Top Controls: Auto, Pause */}
       <div className="flex items-center gap-3">
         {/* Auto Button */}
         <button
@@ -47,24 +41,6 @@ export default function PlayerControls({
           {autoPlay ? '🔄 AUTO' : '⏸️ MANUAL'}
         </button>
 
-        {/* Load/Unload Buttons */}
-        <button
-          onClick={onLoad}
-          disabled={isLoaded}
-          className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-bold hover:from-blue-600 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 active:scale-95"
-          title="Load track"
-        >
-          📥 LOAD
-        </button>
-        <button
-          onClick={onUnload}
-          disabled={!isLoaded}
-          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-orange-500/50 transform hover:scale-105 active:scale-95"
-          title="Unload track"
-        >
-          ⏏️ UNLOAD
-        </button>
-
         {/* Pause Button */}
         <button
           onClick={onPause}
@@ -77,11 +53,6 @@ export default function PlayerControls({
 
         {/* Status Indicators */}
         <div className="flex-1 flex items-center gap-3 justify-end">
-          {isLoaded && (
-            <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-semibold border border-green-500/50">
-              ✓ Loaded
-            </span>
-          )}
           {isPaused && (
             <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded-full text-sm font-semibold border border-yellow-500/50">
               ⏸️ Paused
@@ -94,8 +65,7 @@ export default function PlayerControls({
       <div className="flex items-center gap-6">
         <button
           onClick={onPlay}
-          disabled={!isLoaded}
-          className="w-20 h-20 bg-gradient-to-br from-white to-gray-200 rounded-full flex items-center justify-center text-4xl hover:scale-110 transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_40px_-5px_rgba(255,255,255,0.3)] disabled:from-gray-600 disabled:to-gray-700 disabled:scale-100 disabled:cursor-not-allowed transform active:scale-95 border-4 border-white/30"
+          className="w-20 h-20 bg-gradient-to-br from-white to-gray-200 rounded-full flex items-center justify-center text-4xl hover:scale-110 transition-all shadow-[0_10px_30px_-5px_rgba(0,0,0,0.5)] hover:shadow-[0_15px_40px_-5px_rgba(255,255,255,0.3)] transform active:scale-95 border-4 border-white/30"
         >
           {isPlaying ? '⏸️' : '▶️'}
         </button>

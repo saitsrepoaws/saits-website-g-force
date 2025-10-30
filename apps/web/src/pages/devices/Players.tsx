@@ -8,11 +8,8 @@ import { useAudioPlayer } from '../../hooks/useAudioPlayer'
 import { useSchedule } from '../../hooks/useSchedule'
 import { usePlayerState } from '../../hooks/usePlayerState'
 import { listPlaylists } from '../../services/playlists'
-import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
 import { getUrl } from 'aws-amplify/storage'
 import type { Playlist } from '../../types/playlist'
-import type { Track } from '../../services/playerService'
-import { listTracks } from '../../services/tracks'
 import { getPlayerState } from '../../services/playerState'
 
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
@@ -31,7 +28,6 @@ function Players() {
   const {
     isPlaying,
     isPaused,
-    isLoaded,
     volume,
     autoPlay,
     currentTime,
@@ -40,8 +36,6 @@ function Players() {
     audioRef,
     coverArtUrl,
     waveformUrl,
-    load: loadTrack,
-    unload: unloadTrack,
     setVolume: setPlayerVolume,
     setAutoPlay,
     setCurrentTime,
@@ -108,21 +102,8 @@ function Players() {
           return
         }
         
-        // Restore state if was playing/paused
-        if (data.status === 'paused' && data.currentTrackId && data.lastPosition > 0) {
-          const { data: tracks } = await listTracks()
-          const track = tracks?.find((t: any) => t.id === data.currentTrackId)
-          
-          if (track) {
-            await loadTrackIntoPlayer(track)
-            setTimeout(() => {
-              if (audioRef.current) {
-                audioRef.current.currentTime = data.lastPosition
-                setCurrentTime(data.lastPosition)
-              }
-            }, 1000)
-          }
-        }
+        // Track loading removed - controlled by IoT
+        // Only restore volume and autoPlay settings
         
         // Restore volume
         if (data.volume) {
@@ -181,110 +162,7 @@ function Players() {
     }
   }
 
-  async function loadTrackIntoPlayer(track: any) {
-    try {
-      await loadTrack(track as Track)
-    } catch (error) {
-      console.error('❌ Failed to load track:', error)
-    }
-  }
-
-  // determineCurrentPlaylist removed - now using DynamoDB via loadSchedule()
-
-  async function handleLoad() {
-    try {
-      await loadSchedule()
-      
-      if (!activeSlot) {
-        throw new Error('No active schedule found for current time')
-      }
-      
-      if (!activeSlot.playlistId) {
-        throw new Error('Active schedule has no playlist')
-      }
-      
-      setCurrentPlaylistId(activeSlot.playlistId)
-      
-      // Find the playlist
-      const currentPlaylist = playlists.find(p => p.id === activeSlot.playlistId)
-      if (!currentPlaylist) {
-        throw new Error('Playlist not found')
-      }
-      
-      // Get playlist tracks
-      const { getPlaylist } = await import('../../services/playlists')
-      const result = await getPlaylist(activeSlot.playlistId)
-      if (!result.data) {
-        throw new Error('Could not load playlist')
-      }
-      
-      // Parse tracks if it's a JSON string
-      let playlistTracks = result.data.tracks
-      if (typeof playlistTracks === 'string') {
-        playlistTracks = JSON.parse(playlistTracks)
-      }
-      
-      if (!playlistTracks || !Array.isArray(playlistTracks) || playlistTracks.length === 0) {
-        throw new Error('Playlist has no tracks')
-      }
-      
-      // Calculate current track based on schedule time
-      const now = new Date()
-      const trackInfo = calculateCurrentTrack(activeSlot, playlistTracks, currentPlaylist.name, now)
-      
-      if (!trackInfo) {
-        throw new Error('No track playing at current time')
-      }
-      
-      const { data: tracks } = await listTracks()
-      
-      const fullTrack = tracks?.find((t: any) => t.id === trackInfo.track.trackId)
-      
-      if (!fullTrack) {
-        console.error('❌ Track not found!')
-        console.error('   Looking for ID:', trackInfo.track.trackId)
-        console.error('   Track title from playlist:', trackInfo.track.trackTitle)
-        console.error('   Available tracks:', tracks?.length || 0)
-        
-        // Try to find by title as fallback
-        const trackByTitle = tracks?.find((t: any) => 
-          t.title?.toLowerCase() === trackInfo.track.trackTitle?.toLowerCase()
-        )
-        
-        if (trackByTitle) {
-          await loadTrackIntoPlayer(trackByTitle)
-          return
-        }
-        
-        throw new Error(`Track not found in library (ID: ${trackInfo.track.trackId})`)
-      }
-      
-      // Load track into player
-      await loadTrackIntoPlayer(fullTrack)
-      
-      // Save to PlayerState
-      if (playerStateId) {
-        const stateData = {
-          playerId,
-          currentTrackId: fullTrack.id,
-          currentTrackTitle: fullTrack.title || undefined,
-          currentTrackArtist: fullTrack.artist || undefined,
-          currentPlaylistId: currentPlaylistId || undefined,
-          status: 'idle' as const,  // Track loaded, ready to play (not playing yet)
-          lastPosition: 0,
-          duration: fullTrack.duration || 0,
-          volume,
-          autoPlayEnabled: autoPlay,
-          currentScheduleSlotId: activeSlot?.id,
-          currentScheduleSlotName: activeSlot?.name
-        }
-        await saveState(stateData)
-      }
-    } catch (error) {
-      console.error('❌ Failed to load track:', error)
-      alert(`❌ Failed to load track: ${error}`)
-    }
-  }
+  // Load/Unload logic removed - controlled by IoT
 
   async function handlePause() {
     // PAUSE uses hook directly
@@ -306,8 +184,8 @@ function Players() {
   }
   
   async function executePlay() {
-    if (!isLoaded || !currentTrack) {
-      alert('⚠️ Please load a track first')
+    if (!currentTrack) {
+      alert('⚠️ No track available')
       return
     }
     
@@ -393,11 +271,6 @@ function Players() {
   }
 
   function togglePlay() {
-    if (!audioRef.current && isLoaded) {
-      handlePlay()
-      return
-    }
-    
     if (audioRef.current) {
       if (isPlaying) {
         handlePause()
@@ -604,14 +477,11 @@ function Players() {
             <PlayerControls
               isPlaying={isPlaying}
               isPaused={isPaused}
-              isLoaded={isLoaded}
               volume={volume}
               autoPlay={autoPlay}
               onPlay={togglePlay}
               onPause={handlePause}
               onStop={handleStop}
-              onLoad={handleLoad}
-              onUnload={unloadTrack}
               onVolumeChange={handleVolumeChange}
               onAutoPlayToggle={toggleAuto}
             />
@@ -689,31 +559,15 @@ function Players() {
             setPlaylistTracksCache(tracks)
           }}
           onTrackSelect={async (playlistTrack) => {
-            // Stop current playback if playing
-            if (isPlaying) {
-              handleStop()
-            }
-            
-            // Load track by ID
-            if (playlistTrack.trackId) {
-              try {
-                const { data: tracks } = await listTracks()
-                const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
-                if (track) {
-                  await loadTrackIntoPlayer(track)
-                }
-              } catch (error) {
-                console.error('Failed to load track from playlist:', error)
-              }
-            }
+            // Track selection will be handled by IoT
+            console.log('Track selected:', playlistTrack.trackTitle)
           }}
         />
       </div>
     ) : (
       <div className="mt-6 p-6 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-center">
         <p className="text-yellow-800 font-semibold">⚠️ No playlist loaded</p>
-        <p className="text-yellow-600 text-sm mt-2">Click LOAD to load the scheduled track and playlist</p>
-        <p className="text-xs text-gray-500 mt-2">currentPlaylistId: {currentPlaylistId || 'null'}</p>
+        <p className="text-yellow-600 text-sm mt-2">Playlist will be loaded via IoT</p>
       </div>
     )}
 
