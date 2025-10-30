@@ -9,13 +9,6 @@ function App() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <NavigationCard
-            to="/iot-test"
-            icon="🔌"
-            title="IoT Test"
-            description="Test AWS IoT Core PubSub functionality. Send and receive messages on configured topics."
-          />
-          
-          <NavigationCard
             to="/devices"
             icon="⚙️"
             title="Device Management"

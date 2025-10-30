@@ -5,7 +5,6 @@ import { Authenticator } from '@aws-amplify/ui-react'
 import './index.css'
 import './styles/theme.css'
 import App from './App.tsx'
-import IotTest from './pages/IotTest'
 import IoTContextTest from './pages/IoTContextTest'
 import MqttTest from './pages/MqttTest'
 import DeviceManagement from './pages/DeviceManagement'
@@ -27,14 +26,6 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <App />
-      </AuthGate>
-    )
-  },
-  { 
-    path: '/iot-test', 
-    element: (
-      <AuthGate>
-        <IotTest />
       </AuthGate>
     )
   },

@@ -2,6 +2,7 @@
   "name": "g-forge-iot",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.19.0",
   "main": "index.js",
   "description": "Monorepo for Forge IoT with Turborepo, React, Tailwind, Amplify Gen 2",
   "scripts": {
