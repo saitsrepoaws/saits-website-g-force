@@ -431,78 +431,17 @@ function Players() {
     }
   }
 
-  // Execute LOAD when command comes back from State Machine
-  async function executeLoad(track: any) {
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('⚙️ EXECUTING LOAD COMMAND')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📦 Track data from IoT payload:', track)
-
-    try {
-      // Publish LOADING state
-      console.log('📤 Publishing LOADING state...')
-      await iotServiceRef.current?.publishState(PlayerState.LOADING, {
-        playlistId: currentPlaylistId || undefined,
-        trackId: track.id
-      })
-
-      // Load track (data already complete from IoT payload!)
-      console.log('📥 Loading track into player...')
-      await loadTrackIntoPlayer(track)
-      
-      console.log('📤 Publishing LOADED state...')
-      await iotServiceRef.current?.publishState(PlayerState.LOADED, {
-        trackId: track.id,
-        playlistId: currentPlaylistId || undefined,
-        duration: track.duration || 0
-      })
-      
-      console.log('✅✅✅ TRACK LOADED SUCCESSFULLY! ✅✅✅')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.log(`✅ Track loaded: ${track.title}`)
-    } catch (error) {
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('❌❌❌ LOAD EXECUTION FAILED ❌❌❌')
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('Error:', error)
-      await iotServiceRef.current?.publishState(PlayerState.ERROR, {
-        error: String(error)
-      })
-      alert(`❌ Failed to load track: ${error}`)
-    }
-  }
-
-  async function handleUnload() {
-    console.log('⏏️ UNLOAD button clicked - publishing command to IoT...')
-    
-    try {
-      await iotServiceRef.current?.publishCommand({
-        command: 'UNLOAD',
-        timestamp: new Date().toISOString()
-      })
-      console.log('✅ UNLOAD command published')
-    } catch (error) {
-      console.error('❌ Failed to publish UNLOAD command:', error)
-    }
-  }
-
   async function handlePause() {
-    console.log('⏸️ PAUSE button clicked - executing locally...')
-    // PAUSE is local - no IoT needed, just pause the audio element
-    executePause()
-  }
-  
-  // Execute UNLOAD when command comes from IoT
-  async function executeUnload() {
-    console.log('⚙️ Executing UNLOAD...')
+    // PAUSE uses hook directly
+    if (!audioRef.current || !isPlaying) return
     
-    // Unload using hook
-    unloadTrack()
+    audioRef.current.pause()
+    _setIsPlaying(false)
+    _setIsPaused(true)
     
-    // Publish IDLE state
-    await iotServiceRef.current?.publishState(PlayerState.IDLE)
-    
-    console.log('✅ Track unloaded')
+    if (playerStateId) {
+      await saveState({ status: 'paused', lastPosition: audioRef.current.currentTime })
+    }
   }
   
   // Execute PAUSE when command comes from IoT
