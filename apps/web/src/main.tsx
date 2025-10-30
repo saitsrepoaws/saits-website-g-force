@@ -6,6 +6,7 @@ import './index.css'
 import './styles/theme.css'
 import App from './App.tsx'
 import IotTest from './pages/IotTest'
+import IoTContextTest from './pages/IoTContextTest'
 import MqttTest from './pages/MqttTest'
 import DeviceManagement from './pages/DeviceManagement'
 import Libery from './pages/devices/Libery'
@@ -34,6 +35,14 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <IotTest />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/iot-context-test', 
+    element: (
+      <AuthGate>
+        <IoTContextTest />
       </AuthGate>
     )
   },
