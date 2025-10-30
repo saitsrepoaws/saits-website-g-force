@@ -165,32 +165,19 @@ function Players() {
   // Load/Unload logic removed - controlled by IoT
 
   async function handlePause() {
-    // PAUSE uses hook directly
     if (!audioRef.current || !isPlaying) return
-    
     audioRef.current.pause()
     _setIsPlaying(false)
     _setIsPaused(true)
-    
     if (playerStateId) {
       await saveState({ status: 'paused', lastPosition: audioRef.current.currentTime })
     }
   }
-  
-  // executePause removed - using handlePause directly
 
-  function handlePlay() {
-    executePlay()
-  }
-  
-  async function executePlay() {
-    if (!currentTrack) {
-      alert('⚠️ No track available')
-      return
-    }
+  async function handlePlay() {
+    if (!currentTrack) return
     
     try {
-      // Resume if already exists
       if (audioRef.current?.paused && audioRef.current.src) {
         await audioRef.current.play()
         _setIsPlaying(true)
@@ -200,25 +187,17 @@ function Players() {
       
       if (audioRef.current && !audioRef.current.paused) return
       
-      // Get audio URL
       const trackUrl = (currentTrack as any).fileUrl || currentTrack.audioUrl
-      if (!trackUrl) {
-        alert('⚠️ No audio file available')
-        return
-      }
+      if (!trackUrl) return
       
-      // Handle legacy URLs
       let s3Path = trackUrl
       if (s3Path.includes('amazonaws.com')) {
         const url = new URL(s3Path)
         s3Path = url.pathname.replace(/^\//, '')
       }
       
-      // Get signed URL and create audio
       const result = await getUrl({ path: s3Path })
       const audio = new Audio(result.url.toString())
-      
-      // Event listeners
       audio.addEventListener('loadedmetadata', () => {
         _setDuration(audio.duration)
         audio.volume = volume
@@ -230,19 +209,15 @@ function Players() {
         setCurrentTime(0)
       })
       audio.addEventListener('error', () => {
-        console.error('Audio playback error')
-        alert('⚠️ Failed to load audio file')
         _setIsPlaying(false)
       })
       
-      // Play
-      // @ts-ignore - audioRef is readonly but we need to set it
+      // @ts-ignore
       audioRef.current = audio
       await audio.play()
       _setIsPlaying(true)
       _setIsPaused(false)
       
-      // Save state
       if (playerStateId) {
         await saveState({
           playerId,
@@ -260,13 +235,7 @@ function Players() {
         })
       }
     } catch (error: any) {
-      console.error('Playback failed:', error)
-      const errorMsg = error.name === 'NotAllowedError' 
-        ? 'Browser blocked autoplay. Try clicking play again.'
-        : error.name === 'NotSupportedError'
-        ? 'Audio format not supported'
-        : error.message || 'Playback failed'
-      alert(`⚠️ ${errorMsg}`)
+      _setIsPlaying(false)
     }
   }
 
@@ -280,14 +249,8 @@ function Players() {
     }
   }
 
-  function handleStop() {
-    executeStop()
-  }
-  
-  async function executeStop() {
+  async function handleStop() {
     if (!audioRef.current) return
-    
-    // Stop playback
     audioRef.current.pause()
     audioRef.current.currentTime = 0
     _setIsPlaying(false)
