@@ -70,7 +70,6 @@ function Players() {
   })
   const {
     playerStateId,
-    backendState: backendPlayerState,
     saveState
   } = playerState
   
@@ -532,45 +531,6 @@ function Players() {
   return (
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
-        
-        {/* Backend PlayerState Display */}
-        {backendPlayerState && (
-          <div className="mb-6 bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl shadow-lg border border-white/20 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                💾 Backend Player State
-                <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded border border-green-500/50">
-                  SYNCED
-                </span>
-              </h3>
-              {/* Close button disabled - state managed by hook now */}
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-              <div className="bg-white/10 rounded p-2 border border-white/20">
-                <div className="text-blue-300 text-xs mb-1">Status</div>
-                <div className="text-white font-semibold">{backendPlayerState.status || 'idle'}</div>
-              </div>
-              <div className="bg-white/10 rounded p-2 border border-white/20">
-                <div className="text-blue-300 text-xs mb-1">Track</div>
-                <div className="text-white font-semibold truncate" title={backendPlayerState.currentTrackTitle}>
-                  {backendPlayerState.currentTrackTitle || 'None'}
-                </div>
-              </div>
-              <div className="bg-white/10 rounded p-2 border border-white/20">
-                <div className="text-blue-300 text-xs mb-1">Last Position</div>
-                <div className="text-white font-semibold">
-                  {backendPlayerState.lastPosition ? formatTime(backendPlayerState.lastPosition) : '0:00'}
-                </div>
-              </div>
-              <div className="bg-white/10 rounded p-2 border border-white/20">
-                <div className="text-blue-300 text-xs mb-1">Last Updated</div>
-                <div className="text-white font-semibold text-xs">
-                  {backendPlayerState.lastUpdated ? new Date(backendPlayerState.lastUpdated).toLocaleTimeString() : 'N/A'}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         {/* Main Player */}
         <div className="mb-6">
             <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transform hover:scale-[1.01] transition-transform duration-300">
