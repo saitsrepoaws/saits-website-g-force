@@ -126,6 +126,7 @@ async function getPubSubInstance(): Promise<PubSub> {
         // Track previous state to suppress normal handshake disruptions
         let previousState: ConnectionState | null = null
         let lastDisruptionTime = 0
+        let lastConnectedTime = 0
         
         Hub.listen('pubsub', (data) => {
           const { payload } = data
@@ -133,17 +134,25 @@ async function getPubSubInstance(): Promise<PubSub> {
             const connectionState = (payload.data as any).connectionState as ConnectionState
             const now = Date.now()
             
+            // Track when we connected
+            if (connectionState === ConnectionState.Connected) {
+              lastConnectedTime = now
+            }
+            
             // Suppress ConnectionDisrupted if:
             // 1. Previous state was Connecting (normal handshake)
             // 2. It happens within 3 seconds of last disruption (reconnect loop)
             // 3. Previous state was ConnectedPendingDisconnect (token refresh)
+            // 4. Previous state was Connected AND < 5 seconds ago (credentials refresh!)
             if (connectionState === ConnectionState.ConnectionDisrupted) {
               const timeSinceLastDisruption = now - lastDisruptionTime
+              const timeSinceConnected = now - lastConnectedTime
               
               if (previousState === ConnectionState.Connecting ||
                   previousState === ConnectionState.ConnectedPendingDisconnect ||
-                  timeSinceLastDisruption < 3000) {
-                // This is normal - don't log
+                  timeSinceLastDisruption < 3000 ||
+                  (previousState === ConnectionState.Connected && timeSinceConnected < 5000)) {
+                // This is normal - credentials refresh or reconnect loop
                 previousState = connectionState
                 lastDisruptionTime = now
                 return
