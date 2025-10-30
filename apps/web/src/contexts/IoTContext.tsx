@@ -69,9 +69,13 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
   const uptimeInterval = useRef<NodeJS.Timeout | null>(null)
   const subscriptions = useRef<Map<string, any>>(new Map())
 
-  // Initialize connection
+  // Initialize connection (only if autoConnect=true)
   useEffect(() => {
-    if (!autoConnect) return
+    if (!autoConnect) {
+      console.log('📊 IoTProvider: Passive mode - monitoring existing connection')
+      setIsInitialized(true)
+      return
+    }
     
     console.log('🔌 IoTProvider: Initializing connection...')
     
