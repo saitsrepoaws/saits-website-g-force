@@ -239,7 +239,7 @@ function Players() {
         
         // Restore volume
         if (data.volume) {
-          setVolume(data.volume)
+          setPlayerVolume(data.volume)
           if (audioRef.current) {
             audioRef.current.volume = data.volume
           }
@@ -700,16 +700,8 @@ function Players() {
     try {
       console.log('📥 loadTrackIntoPlayer called with track:', track.title)
       
-      // Store track AS-IS (don't resolve audio URL yet - we do that in handlePlay)
-      setCurrentTrack(track as Track)
-      
-      // Load assets (cover art and waveform)
-      const assets = await loadTrackAssets(track as Track)
-      setCoverArtUrl(assets.coverArtUrl)
-      setWaveformUrl(assets.waveformUrl)
-
-      // Mark as loaded
-      setIsLoaded(true)
+      // Load track using hook
+      await loadTrack(track as Track)
       
       console.log('✅ Track loaded into player:', track.title)
       console.log('   - Audio URL will be resolved when PLAY is clicked')
@@ -935,15 +927,8 @@ function Players() {
   async function executeUnload() {
     console.log('⚙️ Executing UNLOAD...')
     
-    // Clear player state
-    setIsPlaying(false)
-    setIsPaused(false)
-    setIsLoaded(false)
-    setCurrentTrack(null)
-    setCoverArtUrl(null)
-    setWaveformUrl(null)
-    setCurrentTime(0)
-    setDuration(0)
+    // Unload using hook
+    unloadTrack()
     
     // Publish IDLE state
     await iotServiceRef.current?.publishState(PlayerState.IDLE)
@@ -957,9 +942,7 @@ function Players() {
     
     if (!audioRef.current || !isPlaying) return
     
-    audioRef.current.pause()
-    setIsPlaying(false)
-    setIsPaused(true)
+    pause()
     
     // Publish PAUSED state
     await iotServiceRef.current?.publishState(PlayerState.PAUSED, {
@@ -1244,11 +1227,7 @@ function Players() {
     console.log('⚙️ Executing STOP...')
     
     if (!audioRef.current) return
-    audioRef.current.pause()
-    audioRef.current.currentTime = 0
-    setIsPlaying(false)
-    setIsPaused(false)
-    setCurrentTime(0)
+    stop()
     
     // Publish STOPPED state
     await iotServiceRef.current?.publishState(PlayerState.STOPPED, {
@@ -1286,10 +1265,7 @@ function Players() {
 
   function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newVolume = parseFloat(e.target.value)
-    setVolume(newVolume)
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume
-    }
+    setPlayerVolume(newVolume)
   }
   
   // Keyboard shortcuts for seeking
