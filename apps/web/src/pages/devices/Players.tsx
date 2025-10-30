@@ -41,8 +41,6 @@ function Players() {
     audioRef,
     coverArtUrl,
     waveformUrl,
-    pause: pauseAudio,
-    stop: stopAudio,
     load: loadTrack,
     unload: unloadTrack,
     setVolume: setPlayerVolume,
@@ -82,17 +80,15 @@ function Players() {
   useEffect(() => {
     loadPlaylists()
     loadSchedule()
-    
-    // Auto-load playlist after schedule is loaded
-    setTimeout(() => {
-      if (activeSlot?.playlistId) {
-        setCurrentPlaylistId(activeSlot.playlistId)
-      }
-    }, 1000)
-    
-    // Real AWS State Machine is now active via IoT Rule
-    // No mock needed - Lambda handles all schedule logic
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  
+  // Auto-load playlist when activeSlot changes
+  useEffect(() => {
+    if (activeSlot?.playlistId && activeSlot.playlistId !== currentPlaylistId) {
+      setCurrentPlaylistId(activeSlot.playlistId)
+    }
+  }, [activeSlot, currentPlaylistId])
   
   // Update active slot every minute
   useEffect(() => {
@@ -428,7 +424,13 @@ function Players() {
   
   async function executeStop() {
     if (!audioRef.current) return
-    stop()
+    
+    // Stop playback
+    audioRef.current.pause()
+    audioRef.current.currentTime = 0
+    _setIsPlaying(false)
+    _setIsPaused(false)
+    setCurrentTime(0)
     
     if (playerStateId && currentTrack) {
       await saveState({
@@ -742,7 +744,6 @@ function Players() {
           scheduleSlot={activeSlot ? { time: activeSlot.time, duration: activeSlot.duration } : null}
           loadedTrackId={currentTrack?.id ?? null}
           onTracksLoaded={(tracks) => {
-            console.log('📋 Playlist tracks loaded:', tracks.length)
             setPlaylistTracksCache(tracks)
           }}
           onTrackSelect={async (playlistTrack) => {
@@ -758,7 +759,6 @@ function Players() {
                 const track = tracks?.find((t: any) => t.id === playlistTrack.trackId)
                 if (track) {
                   await loadTrackIntoPlayer(track)
-                  console.log(`✅ Track loaded from playlist: ${track.title}`)
                 }
               } catch (error) {
                 console.error('Failed to load track from playlist:', error)
