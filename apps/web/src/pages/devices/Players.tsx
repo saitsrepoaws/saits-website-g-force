@@ -4,6 +4,7 @@ import PlaylistViewer from '../../components/PlaylistViewer'
 import IoTLogModal from '../../components/IoTLogModal'
 import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 // import IoTConnectionStatus from '../../components/IoTConnectionStatus' // DISABLED
+import SeekBar from '../../components/SeekBar'
 import { listPlaylists } from '../../services/playlists'
 // import { createRadioPlayerIoT } from '../../services/radioPlayerIoT' // DISABLED
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
@@ -35,11 +36,7 @@ function Players() {
   const [autoPlay, setAutoPlay] = useState(false)
   const [volume, setVolume] = useState(0.7)
   
-  // Seekbar state
-  const [isDragging, setIsDragging] = useState(false)
-  const [hoverTime, setHoverTime] = useState<number | null>(null)
-  const [hoverPosition, setHoverPosition] = useState<number | null>(null)
-  const seekbarRef = useRef<HTMLDivElement>(null)
+  // Seekbar state (extracted to SeekBar component, only keeping essential state)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [coverArtUrl, setCoverArtUrl] = useState<string | null>(null)
@@ -1239,51 +1236,11 @@ function Players() {
     setAutoPlay(!autoPlay)
   }
 
-  function handleSeek(e: React.MouseEvent<HTMLDivElement>) {
+  // Seek handler for SeekBar component
+  function handleSeek(time: number) {
     if (!audioRef.current) return
-    
-    const bounds = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - bounds.left
-    const percentage = Math.max(0, Math.min(1, x / bounds.width))
-    const newTime = percentage * duration
-    
-    audioRef.current.currentTime = newTime
-    setCurrentTime(newTime)
-    
-    // TODO: Send seek position to IoT for sync (optional)
-  }
-  
-  function handleSeekMouseDown(e: React.MouseEvent<HTMLDivElement>) {
-    setIsDragging(true)
-    handleSeek(e)
-  }
-  
-  function handleSeekMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    // Show hover preview
-    const bounds = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - bounds.left
-    const percentage = Math.max(0, Math.min(1, x / bounds.width))
-    const time = percentage * duration
-    
-    setHoverTime(time)
-    setHoverPosition(x)
-    
-    // Update position if dragging
-    if (isDragging) {
-      handleSeek(e)
-    }
-  }
-  
-  function handleSeekMouseUp() {
-    if (isDragging) {
-      setIsDragging(false)
-      // TODO: Send final seek position to IoT
-    }
-  }
-  
-  function handleSeekMouseLeave() {
-    setHoverTime(null)
-    setHoverPosition(null)
+    audioRef.current.currentTime = time
+    setCurrentTime(time)
   }
 
   function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -1339,18 +1296,6 @@ function Players() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [duration])
   
-  // Global mouse up handler for drag
-  useEffect(() => {
-    function handleGlobalMouseUp() {
-      if (isDragging) {
-        setIsDragging(false)
-      }
-    }
-    
-    window.addEventListener('mouseup', handleGlobalMouseUp)
-    return () => window.removeEventListener('mouseup', handleGlobalMouseUp)
-  }, [isDragging])
-  
   // 5-minute checkpoint while playing
   useEffect(() => {
     if (!isPlaying || !playerStateId || !currentTrack) return
@@ -1393,15 +1338,6 @@ function Players() {
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [playerStateId, currentTrack, isPlaying, volume, autoPlay, playerId])
-
-  function formatTime(seconds: number): string {
-    if (!seconds || isNaN(seconds)) return '0:00'
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${String(secs).padStart(2, '0')}`
-  }
-
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
     <Layout title="Player" showBackButton backTo="/devices">
@@ -1646,52 +1582,13 @@ function Players() {
                   </div>
                 )}
 
-                {/* Progress Bar */}
-                <div className="mb-6">
-                  <div className="relative">
-                    <div 
-                      ref={seekbarRef}
-                      className={`h-3 bg-white/10 rounded-full cursor-pointer overflow-visible mb-2 relative ${isDragging ? 'scale-y-125' : ''} transition-transform`}
-                      onMouseDown={handleSeekMouseDown}
-                      onMouseMove={handleSeekMouseMove}
-                      onMouseUp={handleSeekMouseUp}
-                      onMouseLeave={handleSeekMouseLeave}
-                    >
-                      {/* Progress */}
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all rounded-full"
-                        style={{ width: `${progress}%`, transitionDuration: isDragging ? '0ms' : '100ms' }}
-                      />
-                      
-                      {/* Thumb */}
-                      <div 
-                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg transition-all"
-                        style={{ 
-                          left: `${progress}%`,
-                          transform: `translate(-50%, -50%) scale(${isDragging ? 1.3 : 1})`,
-                          boxShadow: isDragging ? '0 0 0 4px rgba(255,255,255,0.3)' : '0 2px 4px rgba(0,0,0,0.2)'
-                        }}
-                      />
-                      
-                      {/* Hover Preview */}
-                      {hoverTime !== null && hoverPosition !== null && !isDragging && (
-                        <div 
-                          className="absolute bottom-full mb-2 -translate-x-1/2 bg-black/90 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none"
-                          style={{ left: `${hoverPosition}px` }}
-                        >
-                          {formatTime(hoverTime)}
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/90" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between text-sm text-blue-300">
-                    <span>{formatTime(currentTime)}</span>
-                    <span className="text-xs opacity-75">⌨️ ←/→: ±5s | Shift+←/→: ±30s</span>
-                    <span>{formatTime(duration)}</span>
-                  </div>
-                </div>
+                {/* SeekBar Component */}
+                <SeekBar
+                  currentTime={currentTime}
+                  duration={duration}
+                  onSeek={handleSeek}
+                  className="mb-6"
+                />
 
                 {/* Top Controls: Auto, Load/Unload, Pause */}
                 <div className="flex items-center gap-3 mb-6">
