@@ -125,16 +125,40 @@ async function getPubSubInstance(): Promise<PubSub> {
         
         // Track previous state to suppress normal handshake disruptions
         let previousState: ConnectionState | null = null
+        let lastDisruptionTime = 0
         
         Hub.listen('pubsub', (data) => {
           const { payload } = data
           if (payload.event === CONNECTION_STATE_CHANGE) {
             const connectionState = (payload.data as any).connectionState as ConnectionState
+            const now = Date.now()
             
-            // Suppress "ConnectionDisrupted" during normal handshake (Connecting → Disrupted → Connected)
-            if (connectionState === ConnectionState.ConnectionDisrupted && 
-                previousState === ConnectionState.Connecting) {
-              // This is normal TLS/WebSocket handshake, don't log it
+            // Suppress ConnectionDisrupted if:
+            // 1. Previous state was Connecting (normal handshake)
+            // 2. It happens within 3 seconds of last disruption (reconnect loop)
+            // 3. Previous state was ConnectedPendingDisconnect (token refresh)
+            if (connectionState === ConnectionState.ConnectionDisrupted) {
+              const timeSinceLastDisruption = now - lastDisruptionTime
+              
+              if (previousState === ConnectionState.Connecting ||
+                  previousState === ConnectionState.ConnectedPendingDisconnect ||
+                  timeSinceLastDisruption < 3000) {
+                // This is normal - don't log
+                previousState = connectionState
+                lastDisruptionTime = now
+                return
+              }
+              
+              // Real disruption - update time
+              lastDisruptionTime = now
+            }
+            
+            // Suppress noisy "Pending" states (these are internal AWS IoT transitions)
+            if (connectionState === ConnectionState.ConnectedPendingDisconnect ||
+                connectionState === ConnectionState.ConnectedPendingKeepAlive ||
+                connectionState === ConnectionState.ConnectedPendingNetwork ||
+                connectionState === ConnectionState.ConnectionDisruptedPendingNetwork) {
+              // These are internal state transitions, don't log them
               previousState = connectionState
               return
             }
