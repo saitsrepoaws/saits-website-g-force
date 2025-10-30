@@ -32,6 +32,7 @@ export interface UseAudioPlayerReturn {
   _setIsPlaying: (playing: boolean) => void
   _setIsPaused: (paused: boolean) => void
   _setIsLoaded: (loaded: boolean) => void
+  _setDuration: (duration: number) => void
 }
 
 export function useAudioPlayer(): UseAudioPlayerReturn {
@@ -233,5 +234,6 @@ export function useAudioPlayer(): UseAudioPlayerReturn {
     _setIsPlaying: setIsPlaying,
     _setIsPaused: setIsPaused,
     _setIsLoaded: setIsLoaded,
+    _setDuration: setDuration,
   }
 }

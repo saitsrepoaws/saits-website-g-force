@@ -12,18 +12,14 @@ import { useSchedule } from '../../hooks/useSchedule'
 import { usePlayerState } from '../../hooks/usePlayerState'
 import { listPlaylists } from '../../services/playlists'
 // import { createRadioPlayerIoT } from '../../services/radioPlayerIoT' // DISABLED
-import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
-import { loadTrackAssets } from '../../services/playerService'
 import { calculateCurrentTrack } from '../../utils/scheduleCalculator'
 import { PlayerState } from '../../types/player'
 import { getUrl } from 'aws-amplify/storage'
 import type { Playlist } from '../../types/playlist'
 import type { IoTLogEntry } from '../../services/radioPlayerIoT'
-import type { ScheduleSlot, CurrentTrackInfo } from '../../utils/scheduleCalculator'
 import type { Track } from '../../services/playerService'
 import { listTracks } from '../../services/tracks'
-import { getPlayerState, savePlayerState, updatePlayerPosition, clearPlayerState } from '../../services/playerState'
-import type { PlayerStateData } from '../../services/playerState'
+import { getPlayerState, savePlayerState } from '../../services/playerState'
 // import { useIoT } from '../../contexts/IoTContext' // DISABLED
 
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
@@ -40,7 +36,8 @@ function Players() {
   // IoT Log Modal (temporary - will be moved later)
   const [showIoTLog, setShowIoTLog] = useState(false)
   const [iotLogs, setIoTLogs] = useState<IoTLogEntry[]>([])
-  const iotServiceRef = useRef<ReturnType<typeof createRadioPlayerIoT> | null>(null)
+  // IoT service disabled - keeping ref for backwards compatibility
+  const iotServiceRef = useRef<any | null>(null)
   
   // 🎵 AUDIO PLAYER HOOK - Manages all audio state & controls
   const audioPlayer = useAudioPlayer()
@@ -67,7 +64,8 @@ function Players() {
     _setCurrentTrack,
     _setIsPlaying,
     _setIsPaused,
-    _setIsLoaded
+    _setIsLoaded,
+    _setDuration
   } = audioPlayer
   
   // 📅 SCHEDULE HOOK - Manages schedule & track calculation
@@ -205,8 +203,8 @@ function Players() {
           return
         }
         
-        setPlayerStateId(data.id)
-        setBackendPlayerState(data) // Show in UI
+        // PlayerState is managed by usePlayerState hook now
+        // Backend state will be available via playerState.backendState
         console.log('✅ PlayerState loaded:', data.id)
         
         // Restore state if was playing/paused
@@ -215,7 +213,7 @@ function Players() {
           console.log('   Track:', data.currentTrackTitle)
           console.log('   Position:', Math.round(data.lastPosition), 'seconds')
           
-          setIsRestoringState(true)
+          // Restoring state - this will be handled by the hook
           
           // Load the track
           const { data: tracks } = await listTracks()
@@ -231,7 +229,7 @@ function Players() {
                 setCurrentTime(data.lastPosition)
                 console.log('✅ Playback restored to:', Math.round(data.lastPosition), 'seconds')
               }
-              setIsRestoringState(false)
+              // Restore complete
             }, 1000)
           }
         }
@@ -275,45 +273,8 @@ function Players() {
     }
   }, [activeSlot])
 
-  // Calculate scheduled track every second
-  useEffect(() => {
-    function updateScheduledTrack() {
-      if (!activeSlot || !currentPlaylistId || playlistTracksCache.length === 0) {
-        setScheduledTrackId(null)
-        return
-      }
-
-      // Find current playlist
-      const currentPlaylist = playlists.find(p => p.id === currentPlaylistId)
-      if (!currentPlaylist) {
-        setScheduledTrackId(null)
-        return
-      }
-
-      // Calculate current track
-      const trackInfo = calculateCurrentTrack(
-        activeSlot,
-        playlistTracksCache,
-        currentPlaylist.name || 'Playlist'
-      )
-
-      if (trackInfo) {
-        setCurrentTrackInfo(trackInfo)
-        setScheduledTrackId(trackInfo.track.trackId)
-        console.log('🎯 Scheduled track:', trackInfo.track.trackTitle, `(${trackInfo.percentComplete}%)`)
-      } else {
-        setScheduledTrackId(null)
-      }
-    }
-
-    // Update immediately
-    updateScheduledTrack()
-
-    // Then update every second
-    const interval = setInterval(updateScheduledTrack, 1000)
-    
-    return () => clearInterval(interval)
-  }, [activeSlot, currentPlaylistId, playlistTracksCache, playlists])
+  // NOTE: Scheduled track calculation is now handled by useSchedule hook
+  // It auto-refreshes every second and calculates currentTrackInfo and scheduledTrackId
 
   // IoT Service - DISABLED - Using Central IoTContext instead!
   // TODO: Refactor to use IoTContext for subscriptions
@@ -477,8 +438,8 @@ function Players() {
                   
                   if (audioRef.current) {
                     audioRef.current.play()
-                    setIsPlaying(true)
-                    setIsPaused(false)
+                    _setIsPlaying(true)
+                    _setIsPaused(false)
                     
                     // Save state
                     if (playerStateId) {
@@ -503,8 +464,8 @@ function Players() {
                 console.warn('⚠️ Start time has passed! Starting immediately')
                 if (audioRef.current) {
                   audioRef.current.play()
-                  setIsPlaying(true)
-                  setIsPaused(false)
+                  _setIsPlaying(true)
+                  _setIsPaused(false)
                 }
               }
             }
@@ -686,12 +647,12 @@ function Players() {
   }
   
   async function loadSchedule() {
-    const result = await loadScheduleAndDeterminePlaylist()
-    setScheduleSlots(result.slots)
-    setActiveSlot(result.activeSlot)
+    // Schedule loading is now handled by useSchedule hook
+    // Call schedule.reload() if needed to force refresh
+    await schedule.reload()
     
-    if (result.playlistId && result.playlistId !== currentPlaylistId) {
-      setCurrentPlaylistId(result.playlistId)
+    if (activeSlot?.playlistId && activeSlot.playlistId !== currentPlaylistId) {
+      setCurrentPlaylistId(activeSlot.playlistId)
     }
   }
 
@@ -792,8 +753,8 @@ function Players() {
       console.log('   - trackTitle:', trackInfo.track.trackTitle)
       console.log('   - trackArtist:', trackInfo.track.trackArtist)
       
-      // Set current track info for purple/green highlighting
-      setCurrentTrackInfo(trackInfo)
+      // Current track info is now managed by useSchedule hook
+      // It's available via currentTrackInfo from the hook
       
       // Load the actual track data
       console.log('🔍 Looking for track with ID:', trackInfo.track.trackId)
@@ -847,8 +808,7 @@ function Players() {
           currentScheduleSlotId: activeSlot?.id,
           currentScheduleSlotName: activeSlot?.name
         }
-        await savePlayerState(playerStateId, stateData)
-        setBackendPlayerState({...stateData, id: playerStateId, lastUpdated: new Date().toISOString()})
+        await saveState(stateData)
         console.log('💾 PlayerState saved (LOAD) - status: idle (ready)')
       }
       
@@ -959,8 +919,7 @@ function Players() {
         volume,
         autoPlayEnabled: autoPlay
       }
-      await savePlayerState(playerStateId, stateData)
-      setBackendPlayerState((prev: any) => ({...prev, ...stateData, lastUpdated: new Date().toISOString()}))
+      await saveState(stateData)
       console.log('💾 PlayerState saved (PAUSE) at', Math.round(audioRef.current.currentTime), 'seconds')
     }
     
@@ -1013,8 +972,8 @@ function Players() {
       if (audioRef.current && audioRef.current.paused && audioRef.current.src) {
         console.log('▶️ Resuming paused playback')
         await audioRef.current.play()
-        setIsPlaying(true)
-        setIsPaused(false)
+        _setIsPlaying(true)
+        _setIsPaused(false)
         console.log('✅ Resumed successfully!')
         return
       }
@@ -1066,7 +1025,7 @@ function Players() {
       // Set up event listeners (EXACT SAME AS PLAYLISTVIEWER)
       audio.addEventListener('loadedmetadata', () => {
         console.log('✅ LOADEDMETADATA - Duration:', audio.duration, 'seconds')
-        setDuration(audio.duration)
+        _setDuration(audio.duration)
         audio.volume = volume
         console.log('🔊 Volume set to:', volume)
       })
@@ -1077,8 +1036,8 @@ function Players() {
       
       audio.addEventListener('ended', () => {
         console.log('🏁 ENDED - Track finished playing')
-        setIsPlaying(false)
-        setIsPaused(false)
+        _setIsPlaying(false)
+        _setIsPaused(false)
         setCurrentTime(0)
       })
       
@@ -1092,7 +1051,7 @@ function Players() {
           readyState: audio.readyState
         })
         alert('⚠️ Failed to load audio file')
-        setIsPlaying(false)
+        _setIsPlaying(false)
       })
       
       audio.addEventListener('canplay', () => {
@@ -1114,8 +1073,8 @@ function Players() {
       // Play (EXACT SAME AS PLAYLISTVIEWER)
       console.log('▶️ Calling audio.play()...')
       await audio.play()
-      setIsPlaying(true)
-      setIsPaused(false)
+      _setIsPlaying(true)
+      _setIsPaused(false)
       
       // Save to backend PlayerState
       if (playerStateId) {
@@ -1133,8 +1092,7 @@ function Players() {
           currentScheduleSlotId: activeSlot?.id,
           currentScheduleSlotName: activeSlot?.name
         }
-        await savePlayerState(playerStateId, stateData)
-        setBackendPlayerState({...stateData, id: playerStateId, lastUpdated: new Date().toISOString()})
+        await saveState(stateData)
         console.log('💾 Backend PlayerState saved (PLAY) - status: playing')
       }
       
@@ -1243,8 +1201,7 @@ function Players() {
         volume,
         autoPlayEnabled: autoPlay
       }
-      await savePlayerState(playerStateId, stateData)
-      setBackendPlayerState((prev: any) => ({...prev, ...stateData, lastUpdated: new Date().toISOString()}))
+      await saveState(stateData)
       console.log('💾 PlayerState saved (STOP)')
     }
     
@@ -1314,17 +1271,6 @@ function Players() {
   
   // 5-minute checkpoint while playing
   useEffect(() => {
-    if (!isPlaying || !playerStateId || !currentTrack) return
-    
-    const interval = setInterval(() => {
-      if (audioRef.current) {
-        console.log('💾 5-minute checkpoint:', Math.round(audioRef.current.currentTime), 'seconds')
-        updatePlayerPosition(playerStateId, audioRef.current.currentTime)
-      }
-    }, 5 * 60 * 1000) // 5 minutes
-    
-    return () => clearInterval(interval)
-  }, [isPlaying, playerStateId, currentTrack])
   
   // Page unload handler - save state before closing
   useEffect(() => {
@@ -1416,12 +1362,7 @@ function Players() {
                   SYNCED
                 </span>
               </h3>
-              <button
-                onClick={() => setBackendPlayerState(null)}
-                className="text-white/60 hover:text-white text-sm"
-              >
-                ✕
-              </button>
+              {/* Close button disabled - state managed by hook now */}
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
               <div className="bg-white/10 rounded p-2 border border-white/20">
