@@ -23,8 +23,8 @@ import { useIoT } from '../../contexts/IoTContext'
 // Schedule data is now loaded from DynamoDB via loadScheduleAndDeterminePlaylist()
 
 function Players() {
-  // IoT Context - for connection status display (NIET voor player control!)
-  const { isConnected: iotContextConnected, connectionUptime, lastPingTime } = useIoT()
+  // IoT Context - DISABLED
+  // const { isConnected: iotContextConnected, connectionUptime, lastPingTime } = useIoT()
   
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
   const [playlists, setPlaylists] = useState<Playlist[]>([])
@@ -1406,7 +1406,8 @@ function Players() {
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
         
-        {/* IoT Connection Status - Central */}
+        {/* IoT Connection Status - DISABLED */}
+        {false && (
         <div className="mb-4 bg-gradient-to-r from-green-900 to-teal-900 rounded-xl shadow-lg border border-white/20 p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1442,6 +1443,7 @@ function Players() {
             {' '} • This connection is shared across the entire app
           </div>
         </div>
+        )}
         
         {/* Backend PlayerState Display */}
         {backendPlayerState && (
