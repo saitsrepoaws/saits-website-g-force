@@ -380,221 +380,103 @@ function Players() {
     executePlay()
   }
   
-  // Execute PLAY when command comes from IoT
   async function executePlay() {
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('⚙️ EXECUTING PLAY COMMAND')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('Current state:', {
-      isLoaded,
-      hasCurrentTrack: !!currentTrack,
-      currentTrackId: currentTrack?.id,
-      currentTrackTitle: currentTrack?.title,
-      hasAudioRef: !!audioRef.current,
-      isCurrentlyPlaying: isPlaying,
-      isPaused
-    })
-    
-    if (!isLoaded) {
-      console.warn('⚠️ Track not loaded - user needs to click LOAD first')
-      alert('⚠️ Please load a track first (click LOAD button)')
+    if (!isLoaded || !currentTrack) {
+      alert('⚠️ Please load a track first')
       return
     }
-    
-    if (!currentTrack) {
-      console.error('❌ No currentTrack object available')
-      alert('⚠️ No track available')
-      return
-    }
-    
-    console.log('📋 Current track object:', currentTrack)
     
     try {
-      // If already playing, just resume
-      if (audioRef.current && !audioRef.current.paused) {
-        console.log('✅ Already playing, nothing to do')
-        return
-      }
-      
-      // If paused, resume
-      if (audioRef.current && audioRef.current.paused && audioRef.current.src) {
-        console.log('▶️ Resuming paused playback')
+      // Resume if already exists
+      if (audioRef.current?.paused && audioRef.current.src) {
         await audioRef.current.play()
         _setIsPlaying(true)
         _setIsPaused(false)
-        console.log('✅ Resumed successfully!')
         return
       }
       
-      // EXACT SAME AS PLAYLISTVIEWER - Use fileUrl!
-      console.log('🎵 Creating new audio element for:', currentTrack.title)
-      console.log('🔍 Checking track properties:', {
-        hasFileUrl: !!(currentTrack as any).fileUrl,
-        hasAudioUrl: !!currentTrack.audioUrl,
-        fileUrl: (currentTrack as any).fileUrl,
-        audioUrl: currentTrack.audioUrl
-      })
+      if (audioRef.current && !audioRef.current.paused) return
       
-      // Use fileUrl (like PlaylistViewer) as primary, fallback to audioUrl
+      // Get audio URL
       const trackUrl = (currentTrack as any).fileUrl || currentTrack.audioUrl
-      
       if (!trackUrl) {
-        console.error('❌ No fileUrl or audioUrl in currentTrack')
-        console.error('Track object:', currentTrack)
-        alert('⚠️ No audio file available for this track')
+        alert('⚠️ No audio file available')
         return
       }
       
-      console.log('📂 Using track URL:', trackUrl)
-      
-      // EXACT SAME AS PLAYLISTVIEWER - Handle legacy amazonaws.com URLs
+      // Handle legacy URLs
       let s3Path = trackUrl
       if (s3Path.includes('amazonaws.com')) {
-        console.log('🔧 Detected legacy amazonaws.com URL, extracting path...')
-        try {
-          const url = new URL(s3Path)
-          s3Path = url.pathname.replace(/^\//, '')
-          console.log('✅ Extracted S3 path:', s3Path)
-        } catch (e) {
-          console.error('❌ Failed to parse legacy URL:', e)
-        }
+        const url = new URL(s3Path)
+        s3Path = url.pathname.replace(/^\//, '')
       }
       
-      console.log('🔗 Resolving S3 path to signed URL:', s3Path)
+      // Get signed URL and create audio
       const result = await getUrl({ path: s3Path })
-      const audioUrl = result.url.toString()
-      console.log('✅ S3 signed URL obtained:', audioUrl.substring(0, 120) + '...')
+      const audio = new Audio(result.url.toString())
       
-      console.log('🎵 Creating new Audio() object...')
-      const audio = new Audio(audioUrl)
-      
-      console.log('📡 Setting up event listeners...')
-      
-      // Set up event listeners (EXACT SAME AS PLAYLISTVIEWER)
+      // Event listeners
       audio.addEventListener('loadedmetadata', () => {
-        console.log('✅ LOADEDMETADATA - Duration:', audio.duration, 'seconds')
         _setDuration(audio.duration)
         audio.volume = volume
-        console.log('🔊 Volume set to:', volume)
       })
-      
-      audio.addEventListener('timeupdate', () => {
-        setCurrentTime(audio.currentTime)
-      })
-      
+      audio.addEventListener('timeupdate', () => setCurrentTime(audio.currentTime))
       audio.addEventListener('ended', () => {
-        console.log('🏁 ENDED - Track finished playing')
         _setIsPlaying(false)
         _setIsPaused(false)
         setCurrentTime(0)
       })
-      
-      audio.addEventListener('error', (e) => {
-        console.error('❌ AUDIO ERROR EVENT:', e)
-        console.error('Error details:', {
-          error: audio.error,
-          code: audio.error?.code,
-          message: audio.error?.message,
-          networkState: audio.networkState,
-          readyState: audio.readyState
-        })
+      audio.addEventListener('error', () => {
+        console.error('Audio playback error')
         alert('⚠️ Failed to load audio file')
         _setIsPlaying(false)
       })
       
-      audio.addEventListener('canplay', () => {
-        console.log('✅ CANPLAY - Audio ready to start')
-      })
-      
-      audio.addEventListener('playing', () => {
-        console.log('✅ PLAYING - Playback actually started')
-      })
-      
-      audio.addEventListener('pause', () => {
-        console.log('⏸️ PAUSE event')
-      })
-      
-      // Store reference
+      // Play
+      // @ts-ignore - audioRef is readonly but we need to set it
       audioRef.current = audio
-      console.log('✅ Audio reference stored in audioRef.current')
-      
-      // Play (EXACT SAME AS PLAYLISTVIEWER)
-      console.log('▶️ Calling audio.play()...')
       await audio.play()
       _setIsPlaying(true)
       _setIsPaused(false)
       
-      // Save to backend PlayerState
+      // Save state
       if (playerStateId) {
-        const stateData = {
+        await saveState({
           playerId,
           currentTrackId: currentTrack.id,
           currentTrackTitle: currentTrack.title || undefined,
           currentTrackArtist: currentTrack.artist || undefined,
           currentPlaylistId: currentPlaylistId || undefined,
-          status: 'playing' as const,
+          status: 'playing',
           lastPosition: audio.currentTime,
           duration: audio.duration,
           volume,
           autoPlayEnabled: autoPlay,
           currentScheduleSlotId: activeSlot?.id,
           currentScheduleSlotName: activeSlot?.name
-        }
-        await saveState(stateData)
-        console.log('💾 Backend PlayerState saved (PLAY) - status: playing')
+        })
       }
-      
-      // IoT publish removed - using hooks only
-      
-      console.log('✅✅✅ PLAYBACK STARTED SUCCESSFULLY! ✅✅✅')
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      
     } catch (error: any) {
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('❌❌❌ PLAYBACK FAILED ❌❌❌')
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-      console.error('Error object:', error)
-      console.error('Error name:', error.name)
-      console.error('Error message:', error.message)
-      console.error('Error stack:', error.stack)
-      
-      let errorMsg = 'Playback failed'
-      if (error.name === 'NotAllowedError') {
-        errorMsg = 'Browser blocked autoplay. Try clicking play again.'
-        console.error('💡 This is usually a browser autoplay policy issue')
-      } else if (error.name === 'NotSupportedError') {
-        errorMsg = 'Audio format not supported'
-        console.error('💡 The audio file format may not be supported by this browser')
-      } else if (error.message) {
-        errorMsg = error.message
-      }
-      
+      console.error('Playback failed:', error)
+      const errorMsg = error.name === 'NotAllowedError' 
+        ? 'Browser blocked autoplay. Try clicking play again.'
+        : error.name === 'NotSupportedError'
+        ? 'Audio format not supported'
+        : error.message || 'Playback failed'
       alert(`⚠️ ${errorMsg}`)
-      console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     }
   }
 
   function togglePlay() {
-    console.log('🎛️ togglePlay called', {
-      hasAudioRef: !!audioRef.current,
-      isPlaying,
-      isPaused
-    })
-    
-    // If no audio yet but track is loaded, create new audio
     if (!audioRef.current && isLoaded) {
-      console.log('▶️ No audio yet, calling handlePlay to create new Audio()')
       handlePlay()
       return
     }
     
-    // If audio exists, toggle play/pause
     if (audioRef.current) {
       if (isPlaying) {
-        console.log('⏸️ Currently playing, pausing...')
         handlePause()
       } else {
-        console.log('▶️ Currently paused, playing...')
         handlePlay()
       }
     }
@@ -604,27 +486,19 @@ function Players() {
     executeStop()
   }
   
-  // Execute STOP when command comes from IoT
   async function executeStop() {
-    console.log('⚙️ Executing STOP...')
-    
     if (!audioRef.current) return
     stop()
     
-    // Save to PlayerState
     if (playerStateId && currentTrack) {
-      const stateData = {
+      await saveState({
         playerId,
-        status: 'stopped' as const,
+        status: 'stopped',
         lastPosition: 0,
         volume,
         autoPlayEnabled: autoPlay
-      }
-      await saveState(stateData)
-      console.log('💾 PlayerState saved (STOP)')
+      })
     }
-    
-    console.log('✅ Stopped')
   }
 
   function toggleAuto() {
