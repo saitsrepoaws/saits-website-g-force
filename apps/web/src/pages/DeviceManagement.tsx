@@ -45,6 +45,13 @@ function DeviceManagement() {
             title="Audio Settings"
             description="Adjust volume, equalizer, and audio quality settings."
           />
+          
+          <NavigationCard
+            to="/devices/network"
+            icon="🌐"
+            title="Network"
+            description="Configure IoT connection, network settings, and monitor connection status."
+          />
         </div>
       </div>
     </Layout>
