@@ -56,10 +56,9 @@ function Players() {
     coverArtUrl,
     waveformUrl,
     audioRef,
-    play,
-    pause,
-    stop,
-    togglePlay,
+    pause: pauseAudio,
+    stop: stopAudio,
+    // play, togglePlay - keeping custom versions below (legacy IoT integration)
     load: loadTrack,
     unload: unloadTrack,
     setVolume: setPlayerVolume,
