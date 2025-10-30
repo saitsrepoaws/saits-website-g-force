@@ -17,6 +17,7 @@ import AudioSettings from './pages/devices/AudioSettings'
 import { configureAmplify } from './amplify-config'
 import Login from './pages/Login'
 import AuthGate from './routes/AuthGate'
+import { IoTProvider } from './contexts/IoTContext'
 
 const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
@@ -125,7 +126,9 @@ async function boot() {
   root.render(
     <StrictMode>
       <Authenticator.Provider>
-        <RouterProvider router={router} />
+        <IoTProvider autoConnect={true}>
+          <RouterProvider router={router} />
+        </IoTProvider>
       </Authenticator.Provider>
     </StrictMode>
   )
