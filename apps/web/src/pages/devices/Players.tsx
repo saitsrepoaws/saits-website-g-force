@@ -278,14 +278,15 @@ function Players() {
     console.log('🔌 INITIALIZING IoT SERVICE')
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     
-    // Create IoT service (only once)
-    if (!iotServiceRef.current) {
-      console.log('🆕 Creating new IoT service for player:', playerId)
-      iotServiceRef.current = createRadioPlayerIoT(playerId)
-      console.log('✅ IoT service created')
-    } else {
-      console.log('♻️ IoT service already exists, reusing')
+    // ALWAYS create fresh IoT service to avoid stale subscriptions
+    if (iotServiceRef.current) {
+      console.log('🧹 Cleaning up old IoT service')
+      iotServiceRef.current.cleanup()
     }
+    
+    console.log('🆕 Creating new IoT service for player:', playerId)
+    iotServiceRef.current = createRadioPlayerIoT(playerId)
+    console.log('✅ IoT service created')
     
     // Register log callback (persistent)
     console.log('📝 Registering log callback')
@@ -346,10 +347,15 @@ function Players() {
     
     // Cleanup on unmount
     return () => {
-      console.log('🧹 Component unmounting - cleaning up subscriptions')
+      console.log('🧹 Component unmounting - cleaning up IoT service')
       unsubscribeLog()
       if (unsubscribeCommands) {
         unsubscribeCommands()
+      }
+      // Full cleanup of IoT service
+      if (iotServiceRef.current) {
+        iotServiceRef.current.cleanup()
+        iotServiceRef.current = null
       }
     }
   }, [playerId]) // Only re-run if playerId changes
