@@ -38,9 +38,10 @@ export function clearLogs() {
 }
 
 export function resetPubSub() {
+  console.log('🔄 RESETTING PUBSUB INSTANCE')
   log('warn', 'Manually resetting PubSub instance')
-  pubsubInstance = null
-  hubListenerRegistered = false // Allow re-registration
+  
+  // Stop intervals first
   if (connectionStateTimeout) {
     clearTimeout(connectionStateTimeout)
     connectionStateTimeout = null
@@ -49,6 +50,12 @@ export function resetPubSub() {
     clearInterval(keepaliveInterval)
     keepaliveInterval = null
   }
+  
+  // Reset instance
+  pubsubInstance = null
+  hubListenerRegistered = false // Allow re-registration
+  
+  console.log('✅ PubSub reset complete')
 }
 
 // PubSub instance - initialized lazily (SINGLETON for entire app!)
@@ -111,6 +118,9 @@ async function getPubSubInstance(): Promise<PubSub> {
       
       // Listen to connection state changes (ONLY ONCE for entire app!)
       if (!hubListenerRegistered) {
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('🎧 REGISTERING HUB LISTENER (SINGLETON)')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
         log('info', '🎧 Registering Hub listener (once for entire app)')
         Hub.listen('pubsub', (data) => {
           const { payload } = data
@@ -129,6 +139,9 @@ async function getPubSubInstance(): Promise<PubSub> {
               // Start keepalive logging (shows ping activity every 10 seconds)
               if (keepaliveInterval) clearInterval(keepaliveInterval)
               keepaliveInterval = setInterval(() => {
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+                console.log('💚 IoT PING - Connection Alive')
+                console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
                 log('info', '📡 MQTT keepalive ping (socket alive)')
               }, 10000) // Every 10 seconds - matches keepAliveTimeoutMs
               

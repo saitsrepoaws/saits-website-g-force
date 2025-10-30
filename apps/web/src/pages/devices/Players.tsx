@@ -272,25 +272,28 @@ function Players() {
     return () => clearInterval(interval)
   }, [activeSlot, currentPlaylistId, playlistTracksCache, playlists])
 
-  // IoT Service - PERSISTENT setup (only once)
+  // IoT Service - PERSISTENT setup (only once per playerId)
   useEffect(() => {
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('🔌 INITIALIZING IoT SERVICE')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    let unsubscribeLog: (() => void) | null = null
+    let unsubscribeCommands: (() => void) | null = null
+    let isSubscribed = false
     
-    // ALWAYS create fresh IoT service to avoid stale subscriptions
+    // Skip if already initialized for this playerId
     if (iotServiceRef.current) {
-      console.log('🧹 Cleaning up old IoT service')
-      iotServiceRef.current.cleanup()
+      console.log('♻️ IoT service already exists, re-using it')
+    } else {
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('🔌 INITIALIZING IoT SERVICE (ONCE)')
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+      console.log('Player ID:', playerId)
+      
+      iotServiceRef.current = createRadioPlayerIoT(playerId)
+      console.log('✅ IoT service created')
     }
-    
-    console.log('🆕 Creating new IoT service for player:', playerId)
-    iotServiceRef.current = createRadioPlayerIoT(playerId)
-    console.log('✅ IoT service created')
     
     // Register log callback (persistent)
     console.log('📝 Registering log callback')
-    const unsubscribeLog = iotServiceRef.current.onLog((log) => {
+    unsubscribeLog = iotServiceRef.current.onLog((log) => {
       console.log('🔔 New log entry:', log.type)
       setIoTLogs(prev => [log, ...prev.slice(0, 99)])
     })
@@ -298,9 +301,6 @@ function Players() {
     // Subscribe to commands (IoT → Player)
     console.log('🎧 Setting up command subscription...')
     console.log('📡 Topic: radio/player/' + playerId + '/command')
-    
-    let unsubscribeCommands: (() => void) | null = null
-    let isSubscribed = false
     
     const setupSubscription = async () => {
       try {
