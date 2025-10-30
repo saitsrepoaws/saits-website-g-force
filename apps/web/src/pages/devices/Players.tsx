@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import PlaylistViewer from '../../components/PlaylistViewer'
-import IoTStatusIndicator from '../../components/IoTStatusIndicator'
 import SeekBar from '../../components/SeekBar'
 import PlayerControls from '../../components/PlayerControls'
 import TrackDisplay from '../../components/TrackDisplay'
@@ -153,13 +152,6 @@ function Players() {
     }
   }, [activeSlot, currentPlaylistId])
 
-  // NOTE: Scheduled track calculation is now handled by useSchedule hook
-  // It auto-refreshes every second and calculates currentTrackInfo and scheduledTrackId
-
-  // IoT Service removed - using hooks architecture
-
-  // IoT broadcast removed - using hooks architecture now
-
   // Update clock every second
   useEffect(() => {
     const interval = setInterval(() => {
@@ -168,8 +160,6 @@ function Players() {
 
     return () => clearInterval(interval)
   }, [])
-
-  // IoT command handlers removed - direct hook usage now
 
   async function loadPlaylists() {
     try {
@@ -495,8 +485,6 @@ function Players() {
         const newTime = Math.max(0, Math.min(duration, audioRef.current.currentTime + seekAmount))
         audioRef.current.currentTime = newTime
         setCurrentTime(newTime)
-        
-        // TODO: Send keyboard seek to IoT
       }
     }
     
@@ -583,10 +571,8 @@ function Players() {
             </div>
           </div>
         )}
-        {/* Player + IoT Log Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Main Player - 2 columns */}
-          <div className="lg:col-span-2">
+        {/* Main Player */}
+        <div className="mb-6">
             <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transform hover:scale-[1.01] transition-transform duration-300">
           {/* Header */}
           <div className="px-6 py-4 border-b border-white/20 bg-gradient-to-r from-purple-800/30 to-blue-800/30 backdrop-blur-sm">
@@ -596,8 +582,6 @@ function Players() {
                   <h2 className="text-xl font-bold text-white mb-1">🎵 Now Playing</h2>
                   <p className="text-sm text-blue-200">Live Audio Player</p>
                 </div>
-                {/* IoT Status Indicator */}
-                <IoTStatusIndicator />
               </div>
               <div className="flex items-center gap-2">
                 {/* Track Elapsed Time */}
@@ -724,8 +708,6 @@ function Players() {
           </div>
         )}
       </div>
-
-    </div>
 
     {/* Playlist Viewer - Full Width Below */}
     {currentPlaylistId ? (
