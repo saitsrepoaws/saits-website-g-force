@@ -859,45 +859,6 @@ function Players() {
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
         
-        {/* IoT Connection Status - DISABLED */}
-        {false && (
-        <div className="mb-4 bg-gradient-to-r from-green-900 to-teal-900 rounded-xl shadow-lg border border-white/20 p-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              🌐 Central IoT Connection
-              <span className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded border border-blue-500/50">
-                SHARED
-              </span>
-            </h3>
-            <IoTConnectionStatus showDetails={true} className="text-white" />
-          </div>
-          <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
-            <div className="bg-white/10 rounded p-2 border border-white/20">
-              <div className="text-green-300 text-xs mb-1">Status</div>
-              <div className="text-white font-semibold">
-                {iotContextConnected ? '✅ Connected' : '❌ Disconnected'}
-              </div>
-            </div>
-            <div className="bg-white/10 rounded p-2 border border-white/20">
-              <div className="text-green-300 text-xs mb-1">Uptime</div>
-              <div className="text-white font-semibold">
-                {connectionUptime ? `${Math.floor(connectionUptime / 60)}m ${connectionUptime % 60}s` : 'N/A'}
-              </div>
-            </div>
-            <div className="bg-white/10 rounded p-2 border border-white/20">
-              <div className="text-green-300 text-xs mb-1">Last Ping</div>
-              <div className="text-white font-semibold">
-                {lastPingTime ? `${Math.floor((Date.now() - lastPingTime) / 1000)}s ago` : 'N/A'}
-              </div>
-            </div>
-          </div>
-          <div className="mt-2 text-xs text-white/60">
-            📍 Player ID: <span className="font-mono text-white/80">{playerId}</span>
-            {' '} • This connection is shared across the entire app
-          </div>
-        </div>
-        )}
-        
         {/* Backend PlayerState Display */}
         {backendPlayerState && (
           <div className="mb-6 bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl shadow-lg border border-white/20 p-4">
@@ -1020,7 +981,7 @@ function Players() {
               onPause={handlePause}
               onStop={handleStop}
               onLoad={handleLoad}
-              onUnload={handleUnload}
+              onUnload={unloadTrack}
               onVolumeChange={handleVolumeChange}
               onAutoPlayToggle={toggleAuto}
             />
@@ -1153,54 +1114,6 @@ function Players() {
           </div>
         </div>
 
-        {/* Console Logs */}
-        <div className="bg-gray-900 rounded-xl shadow-lg border border-white/10">
-          <div className="px-4 py-3 border-b border-white/10 bg-gradient-to-r from-green-900/50 to-teal-900/50">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                💻 Console Logs
-                <span className="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded">
-                  {consoleLogs.length}
-                </span>
-              </h3>
-              <button
-                onClick={() => setConsoleLogs([])}
-                className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10"
-              >
-                Clear
-              </button>
-            </div>
-          </div>
-          <div className="p-3 max-h-[300px] overflow-y-auto bg-black/30">
-            {consoleLogs.length === 0 ? (
-              <div className="text-center text-gray-500 text-sm py-8">
-                No console logs yet
-              </div>
-            ) : (
-              <div className="space-y-1">
-                {consoleLogs.slice(-20).reverse().map((log, idx) => (
-                  <div
-                    key={idx}
-                    className={`text-xs font-mono p-2 rounded border ${
-                      log.type === 'error' 
-                        ? 'bg-red-900/20 border-red-500/30 text-red-300'
-                        : log.type === 'warn'
-                        ? 'bg-yellow-900/20 border-yellow-500/30 text-yellow-300'
-                        : 'bg-gray-800/50 border-gray-700/50 text-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      <span className="text-gray-500 flex-shrink-0">
-                        {log.timestamp.toLocaleTimeString()}
-                      </span>
-                      <span className="flex-1 break-all">{log.message}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
     </div>
 
