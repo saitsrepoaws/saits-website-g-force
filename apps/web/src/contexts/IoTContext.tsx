@@ -102,32 +102,52 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
       // Update logs
       setLogs(currentLogs)
       
-      // Check last log for connection state
-      if (currentLogs.length > 0) {
-        const latestLog = currentLogs[0]
-        
-        // Detect connection state from logs
-        if (latestLog.message.includes('connected') && latestLog.level === 'info') {
-          if (!isConnected) {
-            setIsConnected(true)
-            setConnectionState(ConnectionState.Connected)
-            connectionStartTime.current = Date.now()
-            console.log('✅ IoTContext: Connected')
-          }
-        } else if (latestLog.message.includes('disconnected') || latestLog.message.includes('disrupted')) {
-          if (isConnected && latestLog.level === 'warn') {
-            setIsConnected(false)
-            setConnectionState(ConnectionState.ConnectionDisrupted)
-            console.log('⚠️ IoTContext: Connection disrupted')
-          }
-        } else if (latestLog.message.includes('connecting')) {
-          setConnectionState(ConnectionState.Connecting)
+      // Scan recent logs (last 10) for connection state
+      const recentLogs = currentLogs.slice(0, 10)
+      
+      // Check if we have any "connected" logs recently
+      const hasConnectedLog = recentLogs.some(log => 
+        log.level === 'info' && 
+        (log.message.toLowerCase().includes('connected') || 
+         log.message.includes('Ready to Send/Receive'))
+      )
+      
+      // Check if we have "connecting" or "disconnected" logs
+      const hasConnectingLog = recentLogs.some(log => 
+        log.message.toLowerCase().includes('connecting')
+      )
+      
+      const hasDisconnectedLog = recentLogs.some(log => 
+        (log.message.toLowerCase().includes('disconnected') || 
+         log.message.toLowerCase().includes('disrupted')) &&
+        log.level === 'warn'
+      )
+      
+      // Update state based on logs
+      if (hasConnectedLog && !hasDisconnectedLog) {
+        if (!isConnected) {
+          setIsConnected(true)
+          setConnectionState(ConnectionState.Connected)
+          connectionStartTime.current = Date.now()
+          console.log('✅ IoTContext: Detected connection from logs')
         }
-        
-        // Detect ping (keepalive)
-        if (latestLog.message.includes('keepalive ping')) {
-          setLastPingTime(Date.now())
+      } else if (hasDisconnectedLog) {
+        if (isConnected) {
+          setIsConnected(false)
+          setConnectionState(ConnectionState.ConnectionDisrupted)
+          console.log('⚠️ IoTContext: Connection disrupted')
         }
+      } else if (hasConnectingLog && !isConnected) {
+        setConnectionState(ConnectionState.Connecting)
+      }
+      
+      // Detect ping (keepalive) - check last 3 logs
+      const hasPingLog = currentLogs.slice(0, 3).some(log =>
+        log.message.includes('keepalive ping') || log.message.includes('PING')
+      )
+      
+      if (hasPingLog) {
+        setLastPingTime(Date.now())
       }
     }, 1000) // Check every second
     
@@ -162,12 +182,14 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
 
   // Publish method
   const publish = useCallback(async (topic: string, message: unknown) => {
-    if (!isInitialized) {
-      throw new Error('IoT not initialized')
+    // In passive mode, we can still publish if PubSub is available
+    try {
+      await pubsub.publish({ topic, message })
+    } catch (err) {
+      console.error('❌ IoTContext: Publish failed', err)
+      throw err
     }
-    
-    await pubsub.publish({ topic, message })
-  }, [isInitialized])
+  }, [])
 
   // Subscribe method
   const subscribe = useCallback(async (
@@ -175,33 +197,35 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
     onMessage: (data: unknown) => void,
     onError?: (err: unknown) => void
   ) => {
-    if (!isInitialized) {
-      throw new Error('IoT not initialized')
-    }
-    
-    // Check if already subscribed to this topic
-    if (subscriptions.current.has(topic)) {
-      console.warn(`⚠️ Already subscribed to ${topic}, returning existing subscription`)
-      return subscriptions.current.get(topic).unsubscribe
-    }
-    
-    const sub = await pubsub.subscribe({ topic }, onMessage, onError)
-    
-    if (sub) {
-      subscriptions.current.set(topic, sub)
-      console.log(`📡 IoTContext: Subscribed to ${topic}`)
-      
-      // Return unsubscribe function
-      return () => {
-        console.log(`📡 IoTContext: Unsubscribing from ${topic}`)
-        sub.unsubscribe()
-        subscriptions.current.delete(topic)
+    // In passive mode, we can still subscribe if PubSub is available
+    try {
+      // Check if already subscribed to this topic
+      if (subscriptions.current.has(topic)) {
+        console.warn(`⚠️ Already subscribed to ${topic}, returning existing subscription`)
+        return subscriptions.current.get(topic).unsubscribe
       }
+      
+      const sub = await pubsub.subscribe({ topic }, onMessage, onError)
+      
+      if (sub) {
+        subscriptions.current.set(topic, sub)
+        console.log(`📡 IoTContext: Subscribed to ${topic}`)
+        
+        // Return unsubscribe function
+        return () => {
+          console.log(`📡 IoTContext: Unsubscribing from ${topic}`)
+          sub.unsubscribe()
+          subscriptions.current.delete(topic)
+        }
+      }
+      
+      // Return no-op if subscription failed
+      return () => {}
+    } catch (err) {
+      console.error('❌ IoTContext: Subscribe failed', err)
+      throw err
     }
-    
-    // Return no-op if subscription failed
-    return () => {}
-  }, [isInitialized])
+  }, [])
 
   // Clear logs
   const clearLogs = useCallback(() => {
