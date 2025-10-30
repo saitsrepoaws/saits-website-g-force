@@ -198,13 +198,7 @@ function Players() {
 
   async function loadTrackIntoPlayer(track: any) {
     try {
-      console.log('📥 loadTrackIntoPlayer called with track:', track.title)
-      
-      // Load track using hook
       await loadTrack(track as Track)
-      
-      console.log('✅ Track loaded into player:', track.title)
-      console.log('   - Audio URL will be resolved when PLAY is clicked')
     } catch (error) {
       console.error('❌ Failed to load track:', error)
     }
@@ -213,14 +207,8 @@ function Players() {
   // determineCurrentPlaylist removed - now using DynamoDB via loadSchedule()
 
   async function handleLoad() {
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log('📥 LOAD BUTTON CLICKED')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    
     try {
-      // Use schedule data we already loaded
-      console.log('📅 Checking active schedule...')
-      await loadSchedule() // Refresh schedule data
+      await loadSchedule()
       
       if (!activeSlot) {
         throw new Error('No active schedule found for current time')
@@ -230,10 +218,6 @@ function Players() {
         throw new Error('Active schedule has no playlist')
       }
       
-      console.log('✅ Active schedule:', activeSlot.name)
-      console.log('📋 Playlist ID:', activeSlot.playlistId)
-      
-      // Set current playlist ID (this will show the playlist!)
       setCurrentPlaylistId(activeSlot.playlistId)
       
       // Find the playlist
@@ -242,8 +226,6 @@ function Players() {
         throw new Error('Playlist not found')
       }
       
-      console.log('📋 Playlist:', currentPlaylist.name)
-      
       // Get playlist tracks
       const { getPlaylist } = await import('../../services/playlists')
       const result = await getPlaylist(activeSlot.playlistId)
@@ -251,32 +233,15 @@ function Players() {
         throw new Error('Could not load playlist')
       }
       
-      console.log('📋 Raw playlist data:', result.data)
-      console.log('   tracks type:', typeof result.data.tracks)
-      console.log('   tracks value:', result.data.tracks)
-      
       // Parse tracks if it's a JSON string
       let playlistTracks = result.data.tracks
       if (typeof playlistTracks === 'string') {
-        console.log('🔧 Parsing tracks from JSON string...')
         playlistTracks = JSON.parse(playlistTracks)
       }
       
       if (!playlistTracks || !Array.isArray(playlistTracks) || playlistTracks.length === 0) {
         throw new Error('Playlist has no tracks')
       }
-      
-      console.log('📋 Playlist has', playlistTracks.length, 'tracks')
-      
-      // Debug playlist tracks
-      const firstTrack = playlistTracks[0]
-      console.log('🔍 First playlist track:', firstTrack)
-      console.log('   Fields:', Object.keys(firstTrack))
-      console.log('   Sample values:')
-      console.log('     - trackId:', firstTrack.trackId)
-      console.log('     - id:', firstTrack.id)
-      console.log('     - trackTitle:', firstTrack.trackTitle)
-      console.log('     - title:', firstTrack.title)
       
       // Calculate current track based on schedule time
       const now = new Date()
@@ -286,25 +251,7 @@ function Players() {
         throw new Error('No track playing at current time')
       }
       
-      console.log('🎯 Current track index:', trackInfo.trackIndex)
-      console.log('🎵 Track:', trackInfo.track.trackTitle)
-      console.log('🔍 Track object:', trackInfo.track)
-      console.log('   - trackId:', trackInfo.track.trackId)
-      console.log('   - trackTitle:', trackInfo.track.trackTitle)
-      console.log('   - trackArtist:', trackInfo.track.trackArtist)
-      
-      // Current track info is now managed by useSchedule hook
-      // It's available via currentTrackInfo from the hook
-      
-      // Load the actual track data
-      console.log('🔍 Looking for track with ID:', trackInfo.track.trackId)
       const { data: tracks } = await listTracks()
-      console.log('📚 Total tracks in library:', tracks?.length || 0)
-      
-      if (tracks && tracks.length > 0) {
-        console.log('🔍 First few track IDs:')
-        tracks.slice(0, 3).forEach((t: any) => console.log('   -', t.id, t.title))
-      }
       
       const fullTrack = tracks?.find((t: any) => t.id === trackInfo.track.trackId)
       
@@ -320,9 +267,7 @@ function Players() {
         )
         
         if (trackByTitle) {
-          console.log('✅ Found track by title fallback:', trackByTitle.title)
           await loadTrackIntoPlayer(trackByTitle)
-          console.log('✅✅✅ LOAD COMPLETE (via title match)! ✅✅✅')
           return
         }
         
@@ -349,12 +294,7 @@ function Players() {
           currentScheduleSlotName: activeSlot?.name
         }
         await saveState(stateData)
-        console.log('💾 PlayerState saved (LOAD) - status: idle (ready)')
       }
-      
-      console.log('✅✅✅ LOAD COMPLETE! ✅✅✅')
-      
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     } catch (error) {
       console.error('❌ Failed to load track:', error)
       alert(`❌ Failed to load track: ${error}`)
