@@ -156,6 +156,47 @@ storageBucket.addEventNotification(
 // Open policy for development - see /docs/IOT_TOPICS_SPECIFICATION.md for production policy
 const authenticatedRole = backend.auth.resources.authenticatedUserIamRole
 
+// Attach AWS managed policies for IoT access
+authenticatedRole.addManagedPolicy(
+  iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTDataAccess')
+)
+authenticatedRole.addManagedPolicy(
+  iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTConfigAccess')
+)
+
+// Create IoT Policy for Cognito Identities (required for PubSub to work!)
+// This policy allows actual MQTT operations (connect, subscribe, publish)
+const cognitoIoTPolicy = new iot.CfnPolicy(backend.auth.stack, 'CognitoIoTPolicy', {
+  policyName: 'RadioPlayerCognitoPolicy',
+  policyDocument: {
+    Version: '2012-10-17',
+    Statement: [
+      {
+        Effect: 'Allow',
+        Action: ['iot:Connect'],
+        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:client/\${cognito-identity.amazonaws.com:sub}`],
+      },
+      {
+        Effect: 'Allow',
+        Action: ['iot:Subscribe'],
+        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:topicfilter/*`],
+      },
+      {
+        Effect: 'Allow',
+        Action: ['iot:Publish', 'iot:Receive'],
+        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:topic/*`],
+      },
+    ],
+  },
+})
+
+// Output IoT Policy name for frontend to use
+new CfnOutput(backend.auth.stack, 'IoTCognitoPolicyName', {
+  value: cognitoIoTPolicy.policyName!,
+  description: 'IoT Policy name that needs to be attached to Cognito Identity',
+  exportName: 'IoTCognitoPolicyName',
+})
+
 authenticatedRole.attachInlinePolicy(
   new Policy(authenticatedRole.stack, 'IotPubSubPolicy', {
     statements: [

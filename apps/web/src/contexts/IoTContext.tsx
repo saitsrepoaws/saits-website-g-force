@@ -15,6 +15,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 import * as pubsub from '../services/pubsub'
 import type { LogEntry } from '../services/pubsub'
+import { attachIoTPolicyToCurrentUser } from '../services/iotPolicyAttacher'
 
 // Connection states from AWS IoT SDK
 export enum ConnectionState {
@@ -81,7 +82,14 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
     
     const initialize = async () => {
       try {
-        // Auto-connect will initialize PubSub singleton
+        // First attach IoT Policy to Cognito Identity (required for MQTT!)
+        console.log('🔗 Attaching IoT Policy to identity...')
+        const attached = await attachIoTPolicyToCurrentUser()
+        if (!attached) {
+          console.warn('⚠️ Failed to attach IoT Policy - connection may fail')
+        }
+        
+        // Then auto-connect will initialize PubSub singleton
         const connected = await pubsub.autoConnect()
         setIsInitialized(true)
         console.log('✅ IoTProvider: Connection initialized:', connected)

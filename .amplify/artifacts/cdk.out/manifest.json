@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e6b4b6f18ebba38b2dc80188e3c4b9ec4d0da40a463e0056df02fb7110fb0b87.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/71e7a8c48811933b50c974e1fd781571fca1c732402cf46a1a2dab239b379e7e.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -99,6 +99,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyAuthIdentityPoolRoleAttachment045F17C8"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CognitoIoTPolicy": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoIoTPolicy"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IoTCognitoPolicyName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IoTCognitoPolicyName"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicy/Resource": [
