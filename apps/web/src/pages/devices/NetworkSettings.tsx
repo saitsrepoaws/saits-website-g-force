@@ -35,25 +35,32 @@ function NetworkSettings() {
 
   const handleTestConnection = async () => {
     setTestStatus('testing')
-    setTestMessage('Testing IoT connection...')
+    setTestMessage('Testing connection...')
     
     try {
-      // Test publish
-      await iot.publish('radio/test/ping', {
+      // Simple publish test (no subscribe to avoid disconnect)
+      await iot.publish('radio/system/health-check', {
         timestamp: new Date().toISOString(),
-        message: 'Connection test'
+        message: 'Connection health check',
+        source: 'NetworkSettings',
+        connectionState: iot.connectionState
       })
       
       setTestStatus('success')
-      setTestMessage('✅ Connection test successful!')
+      setTestMessage('✅ Connection test successful! Message published to radio/system/health-check')
       
       setTimeout(() => {
         setTestStatus('idle')
         setTestMessage('')
-      }, 3000)
+      }, 5000)
     } catch (error: any) {
       setTestStatus('error')
       setTestMessage(`❌ Test failed: ${error.message}`)
+      
+      setTimeout(() => {
+        setTestStatus('idle')
+        setTestMessage('')
+      }, 5000)
     }
   }
 

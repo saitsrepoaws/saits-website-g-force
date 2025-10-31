@@ -325,105 +325,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/amplifyAuth/IdentityPoolRoleAttachment"
    }
   },
-  "CognitoIoTPolicy": {
-   "Type": "AWS::IoT::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Version": "2012-10-17",
-     "Statement": [
-      {
-       "Effect": "Allow",
-       "Action": [
-        "iot:Connect"
-       ],
-       "Resource": [
-        {
-         "Fn::Join": [
-          "",
-          [
-           "arn:aws:iot:",
-           {
-            "Ref": "AWS::Region"
-           },
-           ":",
-           {
-            "Ref": "AWS::AccountId"
-           },
-           ":client/${cognito-identity.amazonaws.com:sub}"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Effect": "Allow",
-       "Action": [
-        "iot:Subscribe"
-       ],
-       "Resource": [
-        {
-         "Fn::Join": [
-          "",
-          [
-           "arn:aws:iot:",
-           {
-            "Ref": "AWS::Region"
-           },
-           ":",
-           {
-            "Ref": "AWS::AccountId"
-           },
-           ":topicfilter/*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Effect": "Allow",
-       "Action": [
-        "iot:Publish",
-        "iot:Receive"
-       ],
-       "Resource": [
-        {
-         "Fn::Join": [
-          "",
-          [
-           "arn:aws:iot:",
-           {
-            "Ref": "AWS::Region"
-           },
-           ":",
-           {
-            "Ref": "AWS::AccountId"
-           },
-           ":topic/*"
-          ]
-         ]
-        }
-       ]
-      }
-     ]
-    },
-    "PolicyName": "RadioPlayerCognitoPolicy",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CognitoIoTPolicy"
-   }
-  },
   "IotPubSubPolicy43AD4595": {
    "Type": "AWS::IAM::Policy",
    "Properties": {
@@ -489,7 +390,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LQQ6CMBBFz8K+jNgbGFZulGBcm1pGHSgdQwcJIdzdAEFZ/ff+zNegdQJJZLoQ26KKHd1hOGEQLC5ibKVMF26D5acnYRiuAZuM2an04X+8QuoIvWxP/+ZYoBeSfh1vPWeHBxFjXzV6GRWZGoapnB7nzNiR7SddaFTEAhvNMXDb2HlxbuXdyqg8Fwhl2H20Br2HJCoDUdy0XqhGyJf8AuZoUe0AAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LTQ6CMBCFz8K+jNgbGFZulGBcm1pGHSitoYOENL27AYKyet/7kyBlBlmiBp/qqkkN3SGc0DNWF1a6EWrwt6Dd0xI7CFePXeGcEfnD/niF3BBa3lb/5FihZeJxPW996QwemJV+tWg5ClIthCmchrMWzpAeJ7tQjKJE7/pOz5tzz++eo7CuQqj97iMlyD1kSe2J0q63TC1CuegXM8s83PIAAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default"
@@ -499,7 +400,7 @@
  },
  "Outputs": {
   "IoTCognitoPolicyName": {
-   "Description": "IoT Policy name that needs to be attached to Cognito Identity",
+   "Description": "IoT Policy name (existing) that gets attached to Cognito Identity",
    "Value": "RadioPlayerCognitoPolicy",
    "Export": {
     "Name": "IoTCognitoPolicyName"
