@@ -315,13 +315,34 @@ export async function autoConnect(): Promise<boolean> {
     // Initialize PubSub instance (creates connection)
     await getPubSubInstance()
     
-    // Wait for connection to establish (Hub listener will detect Connected state)
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Wait for Hub listener to detect Connected state (max 10 seconds)
+    const connected = await new Promise<boolean>((resolve) => {
+      let attempts = 0
+      const maxAttempts = 20 // 10 seconds total (500ms * 20)
+      
+      const checkConnection = setInterval(() => {
+        attempts++
+        
+        // Check recent logs for "connected" message
+        const recentLogs = getLogs().slice(0, 5)
+        const hasConnected = recentLogs.some(log => 
+          log.message.includes('PubSub connected') || 
+          log.message.includes('Ready to Send/Receive')
+        )
+        
+        if (hasConnected) {
+          clearInterval(checkConnection)
+          log('info', '✅ Auto-connect confirmed - connection established!')
+          resolve(true)
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkConnection)
+          log('warn', '⚠️ Auto-connect timeout - connection may still be establishing')
+          resolve(true) // Assume success, Hub listener will update state
+        }
+      }, 500)
+    })
     
-    // Connection established! Hub listener handles state updates
-    // No need for testConnect - it causes unnecessary subscribe/unsubscribe/disconnect
-    log('info', '✅ Auto-connect initialized - connection ready')
-    return true
+    return connected
   } catch (err) {
     log('error', `Auto-connect failed: ${err}`)
     return false
