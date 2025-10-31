@@ -51,9 +51,20 @@ export function resetPubSub() {
     keepaliveInterval = null
   }
   
-  // Reset instance
+  // Unsubscribe keepalive
+  if (keepaliveSubscription) {
+    try {
+      keepaliveSubscription.unsubscribe()
+    } catch (e) {
+      console.warn('Failed to unsubscribe keepalive:', e)
+    }
+    keepaliveSubscription = null
+  }
+  
+  // Reset instance and flags
   pubsubInstance = null
   hubListenerRegistered = false // Allow re-registration
+  isAutoConnecting = false // Reset auto-connect flag
   
   console.log('✅ PubSub reset complete')
 }
@@ -63,6 +74,8 @@ let pubsubInstance: PubSub | null = null
 let connectionStateTimeout: NodeJS.Timeout | null = null
 let hubListenerRegistered = false // Track if Hub listener is already registered
 let keepaliveInterval: NodeJS.Timeout | null = null // Track keepalive logging
+let isAutoConnecting = false // Prevent duplicate autoConnect calls
+let keepaliveSubscription: any = null // Store keepalive subscription
 
 // Reset PubSub instance if connection stays disrupted
 function scheduleConnectionCheck() {
@@ -309,6 +322,18 @@ export async function autoConnect(): Promise<boolean> {
     return false
   }
   
+  // Prevent duplicate autoConnect calls (singleton pattern)
+  if (isAutoConnecting) {
+    log('info', '⏳ AutoConnect already in progress, skipping duplicate call')
+    return true
+  }
+  
+  if (keepaliveSubscription) {
+    log('info', '✅ AutoConnect already completed, connection active')
+    return true
+  }
+  
+  isAutoConnecting = true
   log('info', '🔌 Auto-connecting to AWS IoT...')
   
   try {
@@ -318,7 +343,7 @@ export async function autoConnect(): Promise<boolean> {
     // Trigger connection by subscribing to a keepalive topic
     // In Amplify PubSub v6, WebSocket only opens on first subscribe/publish!
     log('info', '📡 Triggering connection with keepalive subscribe...')
-    const keepaliveSub = pubsub.subscribe({ 
+    keepaliveSubscription = pubsub.subscribe({ 
       topics: 'radio/system/keepalive' 
     }).subscribe({
       next: () => {}, // Ignore messages
@@ -360,6 +385,8 @@ export async function autoConnect(): Promise<boolean> {
   } catch (err) {
     log('error', `Auto-connect failed: ${err}`)
     return false
+  } finally {
+    isAutoConnecting = false
   }
 }
 
