@@ -312,8 +312,18 @@ export async function autoConnect(): Promise<boolean> {
   log('info', '🔌 Auto-connecting to AWS IoT...')
   
   try {
-    // Initialize PubSub instance (creates connection)
-    await getPubSubInstance()
+    // Initialize PubSub instance
+    const pubsub = await getPubSubInstance()
+    
+    // Trigger connection by subscribing to a keepalive topic
+    // In Amplify PubSub v6, WebSocket only opens on first subscribe/publish!
+    log('info', '📡 Triggering connection with keepalive subscribe...')
+    const keepaliveSub = pubsub.subscribe({ 
+      topics: 'radio/system/keepalive' 
+    }).subscribe({
+      next: () => {}, // Ignore messages
+      error: (err) => log('warn', `Keepalive sub error: ${err}`)
+    })
     
     // Wait for Hub listener to detect Connected state (max 10 seconds)
     const connected = await new Promise<boolean>((resolve) => {
@@ -327,7 +337,7 @@ export async function autoConnect(): Promise<boolean> {
         const recentLogs = getLogs().slice(0, 5)
         const hasConnected = recentLogs.some(log => 
           log.message.includes('PubSub connected') || 
-          log.message.includes('Ready to Send/Receive')
+          log.message.includes('ready to send/receive')
         )
         
         if (hasConnected) {
@@ -341,6 +351,10 @@ export async function autoConnect(): Promise<boolean> {
         }
       }, 500)
     })
+    
+    // Keep the keepalive subscription alive (don't unsubscribe!)
+    // This maintains the WebSocket connection
+    log('info', '🔗 Keepalive subscription active - connection maintained')
     
     return connected
   } catch (err) {
