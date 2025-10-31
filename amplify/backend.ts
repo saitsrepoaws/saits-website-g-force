@@ -164,36 +164,14 @@ authenticatedRole.addManagedPolicy(
   iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTConfigAccess')
 )
 
-// Create IoT Policy for Cognito Identities (required for PubSub to work!)
-// This policy allows actual MQTT operations (connect, subscribe, publish)
-const cognitoIoTPolicy = new iot.CfnPolicy(backend.auth.stack, 'CognitoIoTPolicy', {
-  policyName: 'RadioPlayerCognitoPolicy',
-  policyDocument: {
-    Version: '2012-10-17',
-    Statement: [
-      {
-        Effect: 'Allow',
-        Action: ['iot:Connect'],
-        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:client/\${cognito-identity.amazonaws.com:sub}`],
-      },
-      {
-        Effect: 'Allow',
-        Action: ['iot:Subscribe'],
-        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:topicfilter/*`],
-      },
-      {
-        Effect: 'Allow',
-        Action: ['iot:Publish', 'iot:Receive'],
-        Resource: [`arn:aws:iot:${backend.auth.stack.region}:${backend.auth.stack.account}:topic/*`],
-      },
-    ],
-  },
-})
+// Note: RadioPlayerCognitoPolicy already exists in AWS IoT
+// We use the existing policy created earlier, no need to create via CDK
+// The iotPolicyAttacher service will attach this existing policy to identities
 
-// Output IoT Policy name for frontend to use
+// Output IoT Policy name for frontend to use (existing policy)
 new CfnOutput(backend.auth.stack, 'IoTCognitoPolicyName', {
-  value: cognitoIoTPolicy.policyName!,
-  description: 'IoT Policy name that needs to be attached to Cognito Identity',
+  value: 'RadioPlayerCognitoPolicy',
+  description: 'IoT Policy name (existing) that gets attached to Cognito Identity',
   exportName: 'IoTCognitoPolicyName',
 })
 
