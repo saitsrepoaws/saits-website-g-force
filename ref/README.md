@@ -1,5 +1,14 @@
 # Reference Index: Amplify Gen 2 & PubSub
 
+## ⭐ **NIEUW: Complete Setup Analyse**
+
+- **`SETUP_ANALYSE_2025.md`** - **Complete review van onze IoT setup vs Amplify docs**
+  - Score: **9.5/10** 🌟🌟🌟🌟✨
+  - Vergelijking met officiële Amplify Gen 2 docs
+  - Best practices die we volgen
+  - Kleine verbeteringen
+  - Production checklist
+
 ## 📖 **Quick Reference Guides**
 
 - **`iot-pubsub-naslagwerk.md`** - **COMPLETE IoT & PubSub naslagwerk** (patterns, best practices, examples)
@@ -11,6 +20,7 @@
 
 ## 🎯 **Start Here**
 
-**Voor IoT/PubSub implementatie:** Begin met `iot-pubsub-naslagwerk.md`  
+**Voor Setup Review:** Begin met `SETUP_ANALYSE_2025.md` ⭐ **AANBEVOLEN!**  
+**Voor IoT/PubSub implementatie:** Check `iot-pubsub-naslagwerk.md`  
 **Voor Amplify setup:** Start met `amplify-gen2-overview.md`  
 **Voor commands:** Check `backend-cli-commands.md`

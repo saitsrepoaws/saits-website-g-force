@@ -2,6 +2,18 @@
 
 **Reference Guide voor AWS IoT Core en PubSub implementatie**
 
+> **✨ UPDATE 31 Oct 2025:** Complete setup analyse toegevoegd!  
+> **Score: 9.5/10** - Zie `/ref/SETUP_ANALYSE_2025.md` voor volledige vergelijking met Amplify docs.
+
+---
+
+## 🎯 QUICK LINKS
+
+- **Complete Setup Review:** `SETUP_ANALYSE_2025.md` ⭐ **NEW!**
+- **Amplify Gen 2 Overview:** `amplify-gen2-overview.md`
+- **Backend CLI Commands:** `backend-cli-commands.md`
+- **PubSub Gen 2 Setup:** `pubsub-gen2-react.md`
+
 ---
 
 ## 📚 **INHOUDSOPGAVE**

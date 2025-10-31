@@ -135,7 +135,7 @@ async function boot() {
   root.render(
     <StrictMode>
       <Authenticator.Provider>
-        <IoTProvider autoConnect={false}>
+        <IoTProvider autoConnect={true}>
           <RouterProvider router={router} />
         </IoTProvider>
       </Authenticator.Provider>
