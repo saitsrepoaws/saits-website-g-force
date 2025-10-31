@@ -1,12 +1,26 @@
 # Reference Index: Amplify Gen 2 & PubSub
 
-## ⭐ **NIEUW: Complete Setup Analyse**
+## ⭐ **NIEUW: Complete IoT Setup Documentatie (31 Oct 2025)**
 
-- **`SETUP_ANALYSE_2025.md`** - **Complete review van onze IoT setup vs Amplify docs**
+### **Quick Start:**
+- **`IOT_QUICK_REFERENCE.md`** ⚡ **START HIER!**
+  - Snelle naslagwerk
+  - Common patterns
+  - Troubleshooting guide
+  - Critical do's and don'ts
+
+### **Complete Guides:**
+- **`IOT_SETUP_JOURNEY_31OCT2025.md`** 📖 **VOLLEDIGE JOURNEY**
+  - Alle 8 problemen + oplossingen
+  - Timeline van troubleshooting
+  - Code changes met uitleg
+  - Testing checklist
+  - Lessons learned
+
+- **`SETUP_ANALYSE_2025.md`** 📊 **SETUP REVIEW**
   - Score: **9.5/10** 🌟🌟🌟🌟✨
-  - Vergelijking met officiële Amplify Gen 2 docs
+  - Vergelijking met Amplify Gen 2 docs
   - Best practices die we volgen
-  - Kleine verbeteringen
   - Production checklist
 
 ## 📖 **Quick Reference Guides**
