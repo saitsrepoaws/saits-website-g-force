@@ -315,11 +315,13 @@ export async function autoConnect(): Promise<boolean> {
     // Initialize PubSub instance (creates connection)
     await getPubSubInstance()
     
-    // Wait a bit for connection to establish
+    // Wait for connection to establish (Hub listener will detect Connected state)
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // Test with a radio/player/* topic (allowed by RadioPlayerCognitoPolicy)
-    return await testConnect('radio/player/health-check', 3000)
+    // Connection established! Hub listener handles state updates
+    // No need for testConnect - it causes unnecessary subscribe/unsubscribe/disconnect
+    log('info', '✅ Auto-connect initialized - connection ready')
+    return true
   } catch (err) {
     log('error', `Auto-connect failed: ${err}`)
     return false
