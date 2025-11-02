@@ -381,6 +381,24 @@ export async function autoConnect(): Promise<boolean> {
     // This maintains the WebSocket connection
     log('info', '🔗 Keepalive subscription active - connection maintained')
     
+    // Start publishing keepalive pings every 30 seconds
+    // This prevents AWS IoT from closing idle connections
+    if (keepaliveInterval) clearInterval(keepaliveInterval)
+    keepaliveInterval = setInterval(async () => {
+      try {
+        await pubsub.publish({
+          topics: 'radio/system/keepalive',
+          message: {
+            timestamp: Date.now(),
+            type: 'ping'
+          }
+        })
+        console.log('💚 IoT PING - Connection Alive')
+      } catch (err) {
+        console.warn('⚠️ Keepalive ping failed:', err)
+      }
+    }, 30000) // Every 30 seconds
+    
     return connected
   } catch (err) {
     log('error', `Auto-connect failed: ${err}`)
