@@ -125,10 +125,15 @@ function NetworkSettings() {
               
               <button
                 onClick={handleReconnect}
-                disabled={iot.isConnected}
-                className="px-6 py-2 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
+                disabled={iot.connectionState === 'Connecting'}
+                className={`px-6 py-2 text-white rounded-lg font-semibold transition-all ${
+                  iot.isConnected 
+                    ? 'bg-orange-600 hover:bg-orange-700' 
+                    : 'bg-green-600 hover:bg-green-700'
+                } disabled:bg-gray-400 disabled:cursor-not-allowed`}
               >
-                🔄 Reconnect
+                {iot.connectionState === 'Connecting' ? '⏳ Connecting...' : 
+                 iot.isConnected ? '🔄 Reconnect' : '🔌 Connect'}
               </button>
               
               <button
@@ -138,6 +143,13 @@ function NetworkSettings() {
                 🗑️ Clear Logs
               </button>
             </div>
+
+            {/* Connection Help Message */}
+            {!iot.isConnected && iot.connectionState === 'Disconnected' && !testMessage && (
+              <div className="p-4 rounded-lg bg-blue-50 text-blue-800 border border-blue-200">
+                ℹ️ Click <strong>🔌 Connect</strong> to establish IoT connection
+              </div>
+            )}
 
             {/* Test Status Message */}
             {testMessage && (
