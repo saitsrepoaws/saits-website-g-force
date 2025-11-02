@@ -111,12 +111,16 @@ function SortableTrackRow({
       )}
       
       {/* Artist - Always show */}
-      <div className="text-sm font-semibold text-gray-700 truncate">
+      <div className={`text-sm font-semibold truncate ${
+        trackStatus === 'past' ? 'text-gray-400' : 'text-gray-700'
+      }`}>
         {track.trackArtist || 'Unknown Artist'}
       </div>
       
       {/* Title - Always show */}
-      <div className="text-sm font-medium text-gray-900 truncate">
+      <div className={`text-sm font-medium truncate ${
+        trackStatus === 'past' ? 'text-gray-400' : 'text-gray-900'
+      }`}>
         {track.trackTitle || 'Unknown'}
       </div>
 
@@ -125,7 +129,11 @@ function SortableTrackRow({
         <>
           <div className="text-center">
             {track.trackBpm ? (
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-bold">
+              <span className={`px-2 py-1 rounded text-xs font-bold ${
+                trackStatus === 'past' 
+                  ? 'bg-gray-100 text-gray-400' 
+                  : 'bg-blue-100 text-blue-700'
+              }`}>
                 {track.trackBpm} BPM
               </span>
             ) : (
@@ -134,7 +142,11 @@ function SortableTrackRow({
           </div>
           <div className="text-center">
             {(track as any).trackKey ? (
-              <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">
+              <span className={`px-2 py-1 rounded text-xs font-bold ${
+                trackStatus === 'past' 
+                  ? 'bg-gray-100 text-gray-400' 
+                  : 'bg-green-100 text-green-700'
+              }`}>
                 {(track as any).trackKey}
               </span>
             ) : (
@@ -143,7 +155,11 @@ function SortableTrackRow({
           </div>
           <div className="text-center">
             {(track as any).trackYear ? (
-              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-semibold">
+              <span className={`px-2 py-1 rounded text-xs font-bold ${
+                trackStatus === 'past' 
+                  ? 'bg-gray-100 text-gray-400' 
+                  : 'bg-purple-100 text-purple-700'
+              }`}>
                 {(track as any).trackYear}
               </span>
             ) : (
@@ -177,8 +193,14 @@ function SortableTrackRow({
 
       {/* Scheduled Time */}
       {scheduledTime && (
-        <div className={`text-xs font-mono ${compact ? 'text-gray-600' : 'text-gray-700 bg-blue-50 px-2 py-1 rounded border border-blue-200'} whitespace-nowrap`}>
-          {compact ? scheduledTime.start.substring(0, 5) : `${scheduledTime.start} - ${scheduledTime.end}`}
+        <div className={`text-xs font-mono whitespace-nowrap ${
+          trackStatus === 'past' 
+            ? 'text-gray-400' 
+            : trackStatus === 'current'
+            ? 'text-green-600 font-semibold'
+            : 'text-gray-600'
+        } ${compact ? '' : 'bg-blue-50 px-2 py-1 rounded border border-blue-200'}`}>
+          {compact ? scheduledTime.start : `${scheduledTime.start} - ${scheduledTime.end}`}
         </div>
       )}
       
@@ -656,6 +678,8 @@ export function PlaylistViewer({
                         const trackDuration = track.trackDuration || 180 // Default 3 min
                         
                         // Calculate start time
+                        const now = new Date()
+                        const currentHour = now.getHours()
                         const startDate = new Date()
                         startDate.setHours(slotHour, slotMin, 0, 0)
                         startDate.setSeconds(startDate.getSeconds() + accumulatedSeconds)
@@ -664,9 +688,20 @@ export function PlaylistViewer({
                         const endDate = new Date(startDate)
                         endDate.setSeconds(endDate.getSeconds() + trackDuration)
                         
+                        // Format tijd: binnen hetzelfde uur als MM:SS, anders HH:MM
+                        const formatTrackTime = (date: Date) => {
+                          if (date.getHours() === currentHour) {
+                            // Binnen dit uur: toon MM:SS
+                            return `${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
+                          } else {
+                            // Ander uur: toon HH:MM
+                            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+                          }
+                        }
+                        
                         scheduledTime = {
-                          start: `${String(startDate.getHours()).padStart(2, '0')}:${String(startDate.getMinutes()).padStart(2, '0')}:${String(startDate.getSeconds()).padStart(2, '0')}`,
-                          end: `${String(endDate.getHours()).padStart(2, '0')}:${String(endDate.getMinutes()).padStart(2, '0')}:${String(endDate.getSeconds()).padStart(2, '0')}`
+                          start: formatTrackTime(startDate),
+                          end: formatTrackTime(endDate)
                         }
                         
                         accumulatedSeconds += trackDuration

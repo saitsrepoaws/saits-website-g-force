@@ -189,6 +189,15 @@ function formatTime(date: Date): string {
 }
 
 /**
+ * Format tijd als MM:SS (alleen minuten en seconden)
+ */
+export function formatTimeMinutesOnly(date: Date): string {
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const seconds = String(date.getSeconds()).padStart(2, '0')
+  return `${minutes}:${seconds}`
+}
+
+/**
  * Format seconden als MM:SS
  */
 export function formatDuration(seconds: number): string {
