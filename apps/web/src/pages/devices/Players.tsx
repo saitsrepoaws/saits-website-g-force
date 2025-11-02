@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Layout from '../../components/Layout'
+import IoTLogWindow from '../../components/IoTLogWindow'
 
 // Clean Players page - No IoT, No functionality
 // Will be rebuilt step by step with IoT commands later
@@ -14,7 +15,7 @@ export default function Players() {
 
   return (
     <Layout title="Player" showBackButton backTo="/devices">
-      <div className="max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
         {/* Placeholder Player Card */}
         <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-8">
           
@@ -75,6 +76,11 @@ export default function Players() {
             <p>IoT commands will control this player</p>
             <p className="mt-1">Configure IoT on the <a href="/devices/network" className="text-blue-400 hover:text-blue-300 underline">Network page</a></p>
           </div>
+        </div>
+
+        {/* IoT Log Window - Right Side */}
+        <div className="lg:sticky lg:top-6 lg:self-start">
+          <IoTLogWindow maxHeight="calc(100vh - 120px)" />
         </div>
       </div>
     </Layout>
