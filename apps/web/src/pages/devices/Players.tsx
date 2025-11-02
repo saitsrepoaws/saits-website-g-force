@@ -365,6 +365,10 @@ export default function Players() {
                   allowRemove={false}
                   allowPlay={false}
                   containerClassName="p-0"
+                  scheduleSlot={{
+                    time: activeSlot.time,
+                    duration: activeSlot.duration || 0
+                  }}
                 />
               ) : (
                 <div className="p-8 text-center">

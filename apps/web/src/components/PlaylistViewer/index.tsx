@@ -176,9 +176,9 @@ function SortableTrackRow({
       )}
 
       {/* Scheduled Time */}
-      {!compact && scheduledTime && (
-        <div className="text-xs font-mono text-gray-700 bg-blue-50 px-2 py-1 rounded border border-blue-200 whitespace-nowrap">
-          {scheduledTime.start} - {scheduledTime.end}
+      {scheduledTime && (
+        <div className={`text-xs font-mono ${compact ? 'text-gray-600' : 'text-gray-700 bg-blue-50 px-2 py-1 rounded border border-blue-200'} whitespace-nowrap`}>
+          {compact ? scheduledTime.start.substring(0, 5) : `${scheduledTime.start} - ${scheduledTime.end}`}
         </div>
       )}
       

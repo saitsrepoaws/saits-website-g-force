@@ -196,3 +196,53 @@ export function formatDuration(seconds: number): string {
   const secs = Math.floor(seconds % 60)
   return `${mins}:${String(secs).padStart(2, '0')}`
 }
+
+/**
+ * Bereken de geplande tijden voor alle tracks in een playlist
+ */
+export function calculateTrackSchedule(
+  slot: ScheduleSlot,
+  tracks: PlaylistTrack[]
+): Array<{ trackId: string; startTime: string; endTime: string; status: 'past' | 'current' | 'future' }> {
+  if (!tracks || tracks.length === 0 || !slot.time) {
+    return []
+  }
+
+  const [slotHour, slotMin] = slot.time.split(':').map(Number)
+  const now = new Date()
+  const slotStartTime = new Date(now)
+  slotStartTime.setHours(slotHour, slotMin, 0, 0)
+
+  const currentSeconds = Math.floor((now.getTime() - slotStartTime.getTime()) / 1000)
+  
+  const sortedTracks = [...tracks].sort((a, b) => a.order - b.order)
+  let accumulatedSeconds = 0
+  
+  return sortedTracks.map((track) => {
+    const trackDuration = track.trackDuration || 180 // Default 3 min
+    const trackStartSeconds = accumulatedSeconds
+    const trackEndSeconds = accumulatedSeconds + trackDuration
+    
+    const trackStartTime = new Date(slotStartTime.getTime() + trackStartSeconds * 1000)
+    const trackEndTime = new Date(slotStartTime.getTime() + trackEndSeconds * 1000)
+    
+    // Bepaal status
+    let status: 'past' | 'current' | 'future'
+    if (currentSeconds < trackStartSeconds) {
+      status = 'future'
+    } else if (currentSeconds >= trackStartSeconds && currentSeconds < trackEndSeconds) {
+      status = 'current'
+    } else {
+      status = 'past'
+    }
+    
+    accumulatedSeconds += trackDuration
+    
+    return {
+      trackId: track.trackId,
+      startTime: formatTime(trackStartTime),
+      endTime: formatTime(trackEndTime),
+      status
+    }
+  })
+}
