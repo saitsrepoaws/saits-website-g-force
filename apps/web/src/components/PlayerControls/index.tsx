@@ -71,14 +71,6 @@ export default function PlayerControls({
         >
           ⏹️
         </button>
-
-        {/* Volume fixed at 100% */}
-        <div className="flex items-center gap-3 flex-1">
-          <span className="text-white text-xl">🔊</span>
-          <span className="text-blue-300 text-sm font-semibold">
-            Volume: 100%
-          </span>
-        </div>
       </div>
     </div>
   )
