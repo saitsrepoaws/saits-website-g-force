@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Authenticator } from '@aws-amplify/ui-react'
@@ -117,29 +116,30 @@ async function boot() {
   const root = createRoot(document.getElementById('root')!)
   if (!configured) {
     root.render(
-      <StrictMode>
-        <div style={{ padding: 16, fontFamily: 'system-ui' }}>
-          <h1 style={{ margin: 0, fontSize: 18 }}>Amplify not configured</h1>
-          <p style={{ marginTop: 8, color: '#555' }}>
-            Could not load /amplify_outputs.json. Make sure you ran sandbox and copied the outputs.
-          </p>
-          <pre style={{ background:'#f5f5f5', padding:12, borderRadius:8 }}>
-            pnpm --package=@aws-amplify/backend-cli dlx ampx sandbox --once --outputs-format json --outputs-out-dir .{"\n"}
-            cp amplify_outputs.json apps/web/public/amplify_outputs.json
-          </pre>
-        </div>
-      </StrictMode>
+      <div style={{ padding: 16, fontFamily: 'system-ui' }}>
+        <h1 style={{ margin: 0, fontSize: 18 }}>Amplify not configured</h1>
+        <p style={{ marginTop: 8, color: '#555' }}>
+          Missing <code>amplify_outputs.json</code> in <code>apps/web/public/</code>
+        </p>
+        <p style={{ color: '#999', fontSize: 14, marginTop: 12 }}>Run:</p>
+        <pre style={{ background:'#f5f5f5', padding:12, borderRadius:8 }}>
+          pnpm --package=@aws-amplify/backend-cli dlx ampx sandbox --once --outputs-format json --outputs-out-dir .{"\n"}
+          cp amplify_outputs.json apps/web/public/amplify_outputs.json
+        </pre>
+      </div>
     )
     return
   }
   root.render(
-    <StrictMode>
+    // StrictMode disabled - causes IoT duplicate connection issues in development
+    // StrictMode double-mounts components → 2 IoT connections with same client ID → AWS kicks first connection
+    // <StrictMode>
       <Authenticator.Provider>
         <IoTProvider autoConnect={false}>
           <RouterProvider router={router} />
         </IoTProvider>
       </Authenticator.Provider>
-    </StrictMode>
+    // </StrictMode>
   )
 }
 
