@@ -268,9 +268,83 @@ export default function Players() {
           </div>
         </div>
 
-        {/* IoT Log Window - Right Side */}
-        <div className="lg:sticky lg:top-6 lg:self-start">
-          <IoTLogWindow maxHeight="calc(100vh - 120px)" />
+        {/* Right Side Column - IoT Log + Playlist */}
+        <div className="space-y-6">
+          {/* IoT Log Window - Top Half */}
+          <div className="lg:sticky lg:top-6">
+            <IoTLogWindow maxHeight="calc(50vh - 80px)" />
+          </div>
+
+          {/* Playlist View - Bottom Half */}
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-lg overflow-hidden border border-purple-200">
+            {/* Playlist Header */}
+            <div className="p-4 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                    <span className="text-2xl">📻</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white">Active Playlist</h3>
+                    <p className="text-white/80 text-xs">Current schedule slot</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Playlist Content */}
+            <div className="bg-white p-4" style={{ maxHeight: 'calc(50vh - 140px)', overflowY: 'auto' }}>
+              {/* Example tracks with green/purple bars */}
+              {[
+                { id: 1, artist: 'Artist 1', title: 'Track Title 1', duration: '3:45', status: 'past' },
+                { id: 2, artist: 'Artist 2', title: 'Track Title 2', duration: '4:20', status: 'current' },
+                { id: 3, artist: 'Artist 3', title: 'Track Title 3', duration: '3:12', status: 'future' },
+                { id: 4, artist: 'Artist 4', title: 'Track Title 4', duration: '5:03', status: 'future' },
+              ].map((track) => (
+                <div
+                  key={track.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg mb-2 border ${
+                    track.status === 'current'
+                      ? 'bg-green-50 border-green-300'
+                      : track.status === 'past'
+                      ? 'bg-purple-50 border-purple-200 opacity-60'
+                      : 'bg-gray-50 border-gray-200'
+                  }`}
+                >
+                  {/* Status Bar */}
+                  <div
+                    className={`w-1 h-12 rounded-full ${
+                      track.status === 'current'
+                        ? 'bg-green-500'
+                        : track.status === 'past'
+                        ? 'bg-purple-400'
+                        : 'bg-gray-300'
+                    }`}
+                  />
+
+                  {/* Track Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm truncate">
+                      {track.artist}
+                    </div>
+                    <div className="text-gray-600 text-xs truncate">
+                      {track.title}
+                    </div>
+                  </div>
+
+                  {/* Duration */}
+                  <div className="text-xs text-gray-500 font-mono">
+                    {track.duration}
+                  </div>
+
+                  {/* Current indicator */}
+                  {track.status === 'current' && (
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
