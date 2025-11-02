@@ -165,13 +165,17 @@ async function getPubSubInstance(): Promise<PubSub> {
                   previousState === ConnectionState.ConnectedPendingDisconnect ||
                   timeSinceLastDisruption < 3000 ||
                   (previousState === ConnectionState.Connected && timeSinceConnected < 5000)) {
-                // This is normal - credentials refresh or reconnect loop
+                // This is NORMAL behavior - don't spam console
+                // Reasons:
+                // - AWS credentials refresh (every ~1 hour)
+                // - TLS session renewal
+                // - Network idle timeout
+                // - Normal MQTT handshake flow
+                log('info', '🔄 Brief disconnect (credential refresh or network handshake) - auto-reconnecting...')
                 previousState = connectionState
                 lastDisruptionTime = now
                 return
               }
-              
-              // Real disruption - update time
               lastDisruptionTime = now
             }
             
