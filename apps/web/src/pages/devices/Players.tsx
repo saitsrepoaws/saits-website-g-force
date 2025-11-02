@@ -1,16 +1,164 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import IoTLogWindow from '../../components/IoTLogWindow'
+import { useIoT } from '../../contexts/IoTContext'
 
-// Clean Players page - No IoT, No functionality
-// Will be rebuilt step by step with IoT commands later
+// Players page - IoT subscriptions setup
+// Modulair gebouwd voor toekomstige uitbreidingen
 
 export default function Players() {
   const [autoLoad, setAutoLoad] = useState(false)
+  const iot = useIoT()
+  
+  const playerId = 'player-001' // TODO: Make dynamic later
 
-  const handleAutoLoadToggle = () => {
-    setAutoLoad(!autoLoad)
-    console.log('Auto Load:', !autoLoad ? 'ON' : 'OFF')
+  // ============================================
+  // 📡 IOT SUBSCRIPTIONS
+  // ============================================
+  useEffect(() => {
+    if (!iot.isConnected) {
+      console.log('⏳ IoT not connected yet, skipping subscriptions')
+      return
+    }
+
+    console.log('🎵 Player starting - setting up IoT subscriptions...')
+
+    let unsubCommands: (() => void) | undefined
+
+    // Subscribe to incoming commands (async)
+    const commandsTopic = `radio/players/${playerId}/commands`
+    
+    const setupSubscriptions = async () => {
+      try {
+        unsubCommands = await iot.subscribe(
+          commandsTopic,
+          (message) => {
+            console.log('📥 INCOMING command:', message)
+            
+            // Log to IoT window
+            if ((window as any).addIoTMessage) {
+              (window as any).addIoTMessage({
+                timestamp: Date.now(),
+                direction: 'incoming',
+                topic: commandsTopic,
+                message: message,
+                level: 'info'
+              })
+            }
+
+            // Handle command
+            handleIncomingCommand(message)
+          },
+          (error) => {
+            console.error('❌ Commands subscription error:', error)
+          }
+        )
+
+        console.log(`✅ Subscribed to: ${commandsTopic}`)
+      } catch (error) {
+        console.error('❌ Failed to setup subscriptions:', error)
+      }
+    }
+
+    setupSubscriptions()
+
+    // Cleanup subscriptions on unmount
+    return () => {
+      console.log('🧹 Player unmounting - cleaning up subscriptions')
+      if (unsubCommands) {
+        unsubCommands()
+      }
+    }
+  }, [iot.isConnected, playerId])
+
+  // ============================================
+  // 📤 PUBLISH STATE HELPER
+  // ============================================
+  const publishState = async (state: any) => {
+    const stateTopic = `radio/players/${playerId}/state`
+    
+    try {
+      await iot.publish(stateTopic, {
+        ...state,
+        timestamp: new Date().toISOString()
+      })
+
+      console.log('📤 OUTGOING state:', state)
+
+      // Log to IoT window
+      if ((window as any).addIoTMessage) {
+        (window as any).addIoTMessage({
+          timestamp: Date.now(),
+          direction: 'outgoing',
+          topic: stateTopic,
+          message: state,
+          level: 'info'
+        })
+      }
+    } catch (error) {
+      console.error('❌ Failed to publish state:', error)
+    }
+  }
+
+  // ============================================
+  // 🎮 COMMAND HANDLERS
+  // ============================================
+  const handleIncomingCommand = (message: any) => {
+    const { command } = message
+
+    console.log(`🎯 Processing command: ${command}`)
+
+    switch (command) {
+      case 'PLAY':
+        handlePlayCommand(message)
+        break
+      case 'PAUSE':
+        handlePauseCommand(message)
+        break
+      case 'STOP':
+        handleStopCommand(message)
+        break
+      case 'LOAD':
+        handleLoadCommand(message)
+        break
+      default:
+        console.warn(`⚠️ Unknown command: ${command}`)
+    }
+  }
+
+  const handlePlayCommand = (message: any) => {
+    console.log('▶️ PLAY command received')
+    // TODO: Implement play logic
+  }
+
+  const handlePauseCommand = (message: any) => {
+    console.log('⏸️ PAUSE command received')
+    // TODO: Implement pause logic
+  }
+
+  const handleStopCommand = (message: any) => {
+    console.log('⏹️ STOP command received')
+    // TODO: Implement stop logic
+  }
+
+  const handleLoadCommand = (message: any) => {
+    console.log('💿 LOAD command received:', message.trackId)
+    // TODO: Implement load track logic
+  }
+
+  // ============================================
+  // 🎚️ UI HANDLERS
+  // ============================================
+  const handleAutoLoadToggle = async () => {
+    const newValue = !autoLoad
+    setAutoLoad(newValue)
+    console.log('Auto Load:', newValue ? 'ON' : 'OFF')
+
+    // Publish state update
+    await publishState({
+      autoLoad: newValue,
+      status: 'idle'
+    })
   }
 
   return (
