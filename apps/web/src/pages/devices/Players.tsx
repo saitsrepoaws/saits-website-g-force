@@ -3,6 +3,7 @@ import Layout from '../../components/Layout'
 import SeekBar from '../../components/SeekBar'
 import PlayerControls from '../../components/PlayerControls'
 import TrackDisplay from '../../components/TrackDisplay'
+import IoTLogWindow from '../../components/IoTLogWindow'
 import { useAudioPlayer } from '../../hooks/useAudioPlayer'
 import { useSchedule } from '../../hooks/useSchedule'
 import { usePlayerState } from '../../hooks/usePlayerState'
@@ -22,7 +23,6 @@ function Players() {
   const {
     isPlaying,
     isPaused,
-    volume,
     autoPlay,
     currentTime,
     duration,
@@ -49,7 +49,7 @@ function Players() {
     playerId,
     currentTrack,
     isPlaying,
-    volume,
+    volume: 1.0, // Always 100%
     autoPlay,
     activeSlotId: activeSlot?.id,
     activeSlotName: activeSlot?.name
@@ -60,6 +60,14 @@ function Players() {
   } = playerState
   
   // Station mode removed - using hooks now
+
+  // Set volume to 100% on mount and keep it there
+  useEffect(() => {
+    setPlayerVolume(1.0)
+    if (audioRef.current) {
+      audioRef.current.volume = 1.0
+    }
+  }, [])
 
   useEffect(() => {
     loadSchedule()
@@ -89,12 +97,10 @@ function Players() {
         // Track loading removed - controlled by IoT
         // Only restore volume and autoPlay settings
         
-        // Restore volume
-        if (data.volume) {
-          setPlayerVolume(data.volume)
-          if (audioRef.current) {
-            audioRef.current.volume = data.volume
-          }
+        // Volume always 100%
+        setPlayerVolume(1.0)
+        if (audioRef.current) {
+          audioRef.current.volume = 1.0
         }
         
         // Restore autoPlay
@@ -162,7 +168,7 @@ function Players() {
       const audio = new Audio(result.url.toString())
       audio.addEventListener('loadedmetadata', () => {
         _setDuration(audio.duration)
-        audio.volume = volume
+        audio.volume = 1.0 // Always 100%
       })
       audio.addEventListener('timeupdate', () => setCurrentTime(audio.currentTime))
       audio.addEventListener('ended', () => {
@@ -189,7 +195,7 @@ function Players() {
           status: 'playing',
           lastPosition: audio.currentTime,
           duration: audio.duration,
-          volume,
+          volume: 1.0,
           autoPlayEnabled: autoPlay,
           currentScheduleSlotId: activeSlot?.id,
           currentScheduleSlotName: activeSlot?.name
@@ -223,7 +229,7 @@ function Players() {
         playerId,
         status: 'stopped',
         lastPosition: 0,
-        volume,
+        volume: 1.0,
         autoPlayEnabled: autoPlay
       })
     }
@@ -240,11 +246,6 @@ function Players() {
     setCurrentTime(time)
   }
 
-  function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const newVolume = parseFloat(e.target.value)
-    setPlayerVolume(newVolume)
-  }
-  
   // Keyboard shortcuts for seeking
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -301,7 +302,7 @@ function Players() {
           playerId,
           status,
           lastPosition: position,
-          volume,
+          volume: 1.0,
           autoPlayEnabled: autoPlay,
           lastActive: new Date().toISOString(),
           lastUpdated: new Date().toISOString()
@@ -315,7 +316,7 @@ function Players() {
     
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [playerStateId, currentTrack, isPlaying, volume, autoPlay, playerId])
+  }, [playerStateId, currentTrack, isPlaying, autoPlay, playerId])
 
   // Helper: Format time for display (used outside SeekBar)
   function formatTime(seconds: number): string {
@@ -328,8 +329,10 @@ function Players() {
   return (
     <Layout title="Player" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto">
-        {/* Main Player */}
-        <div className="mb-6">
+        {/* Grid Layout: Player left, Logs right */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Player - Takes 2 columns */}
+          <div className="lg:col-span-2">
             <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden border border-white/10 transform hover:scale-[1.01] transition-transform duration-300">
           {/* Header */}
           <div className="px-6 py-4 border-b border-white/20 bg-gradient-to-r from-purple-800/30 to-blue-800/30 backdrop-blur-sm">
@@ -401,19 +404,23 @@ function Players() {
             <PlayerControls
               isPlaying={isPlaying}
               isPaused={isPaused}
-              volume={volume}
               autoPlay={autoPlay}
               onPlay={togglePlay}
               onPause={handlePause}
               onStop={handleStop}
-              onVolumeChange={handleVolumeChange}
               onAutoPlayToggle={toggleAuto}
             />
           </div>
         </div>
-      </div>
+          </div>
 
-      {/* Audio is created dynamically via new Audio() in handlePlay */}
+          {/* IoT Log Window - Takes 1 column */}
+          <div className="lg:col-span-1">
+            <IoTLogWindow maxHeight="calc(100vh - 200px)" />
+          </div>
+        </div>
+
+        {/* Audio is created dynamically via new Audio() in handlePlay */}
       </div>
 
   </Layout>

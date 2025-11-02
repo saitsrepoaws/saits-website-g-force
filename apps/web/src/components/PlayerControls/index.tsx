@@ -2,26 +2,22 @@ interface PlayerControlsProps {
   // State
   isPlaying: boolean
   isPaused: boolean
-  volume: number
   autoPlay: boolean
   
   // Handlers
   onPlay: () => void
   onPause: () => void
   onStop: () => void
-  onVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onAutoPlayToggle: () => void
 }
 
 export default function PlayerControls({
   isPlaying,
   isPaused,
-  volume,
   autoPlay,
   onPlay,
   onPause,
   onStop,
-  onVolumeChange,
   onAutoPlayToggle,
 }: PlayerControlsProps) {
   return (
@@ -76,23 +72,11 @@ export default function PlayerControls({
           ⏹️
         </button>
 
-        {/* Volume */}
+        {/* Volume fixed at 100% */}
         <div className="flex items-center gap-3 flex-1">
           <span className="text-white text-xl">🔊</span>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={onVolumeChange}
-            className="flex-1 h-2 bg-white/20 rounded-full appearance-none cursor-pointer"
-            style={{
-              background: `linear-gradient(to right, #60a5fa 0%, #60a5fa ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%, rgba(255,255,255,0.2) 100%)`
-            }}
-          />
-          <span className="text-blue-300 text-sm font-mono w-12">
-            {Math.round(volume * 100)}%
+          <span className="text-blue-300 text-sm font-semibold">
+            Volume: 100%
           </span>
         </div>
       </div>
