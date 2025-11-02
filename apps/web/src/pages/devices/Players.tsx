@@ -8,6 +8,13 @@ import { useIoT } from '../../contexts/IoTContext'
 
 export default function Players() {
   const [autoLoad, setAutoLoad] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [playerState, setPlayerState] = useState({
+    status: 'idle',
+    autoLoad: false,
+    track: null,
+    volume: 100
+  })
   const iot = useIoT()
   
   const playerId = 'player-001' // TODO: Make dynamic later
@@ -55,8 +62,10 @@ export default function Players() {
         )
 
         console.log(`✅ Subscribed to: ${commandsTopic}`)
+        setIsSubscribed(true)
       } catch (error) {
         console.error('❌ Failed to setup subscriptions:', error)
+        setIsSubscribed(false)
       }
     }
 
@@ -65,6 +74,7 @@ export default function Players() {
     // Cleanup subscriptions on unmount
     return () => {
       console.log('🧹 Player unmounting - cleaning up subscriptions')
+      setIsSubscribed(false)
       if (unsubCommands) {
         unsubCommands()
       }
@@ -154,11 +164,16 @@ export default function Players() {
     setAutoLoad(newValue)
     console.log('Auto Load:', newValue ? 'ON' : 'OFF')
 
-    // Publish state update
-    await publishState({
+    // Update player state
+    const newState = {
+      ...playerState,
       autoLoad: newValue,
       status: 'idle'
-    })
+    }
+    setPlayerState(newState)
+
+    // Publish state update
+    await publishState(newState)
   }
 
   return (
@@ -168,9 +183,36 @@ export default function Players() {
         <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-8">
           
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h1 className="text-4xl font-bold text-white mb-2">🎵 Radio Player</h1>
-            <p className="text-blue-200">Ready for IoT integration</p>
+            <p className="text-blue-200">ID: {playerId}</p>
+          </div>
+
+          {/* Status LEDs */}
+          <div className="flex items-center justify-center gap-6 mb-6 pb-6 border-b border-white/10">
+            {/* IoT Connection LED */}
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${iot.isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="text-sm text-white font-medium">
+                IoT {iot.isConnected ? 'Connected' : 'Disconnected'}
+              </span>
+            </div>
+
+            {/* Subscription LED */}
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${isSubscribed ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+              <span className="text-sm text-white font-medium">
+                {isSubscribed ? 'Subscribed' : 'Not Subscribed'}
+              </span>
+            </div>
+          </div>
+
+          {/* Player State Display */}
+          <div className="mb-6 bg-black/30 rounded-lg p-4 border border-white/10">
+            <div className="text-xs text-gray-400 mb-2 font-mono">PLAYER STATE:</div>
+            <pre className="text-xs text-green-400 font-mono overflow-x-auto">
+              {JSON.stringify(playerState, null, 2)}
+            </pre>
           </div>
 
           {/* Auto Load Toggle */}
