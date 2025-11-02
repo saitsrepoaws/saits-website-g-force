@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import IoTLogWindow from '../../components/IoTLogWindow'
+import PlaylistViewer from '../../components/PlaylistViewer'
 import { useIoT } from '../../contexts/IoTContext'
+import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
+import { getPlaylist } from '../../services/playlists'
+import type { ScheduleSlot } from '../../utils/scheduleCalculator'
+import type { Playlist } from '../../types/playlist'
 
 // Players page - IoT subscriptions setup
 // Modulair gebouwd voor toekomstige uitbreidingen
@@ -15,9 +20,63 @@ export default function Players() {
     track: null,
     volume: 100
   })
+  const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
+  const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null)
+  const [isLoadingSchedule, setIsLoadingSchedule] = useState(true)
   const iot = useIoT()
   
   const playerId = 'player-001' // TODO: Make dynamic later
+
+  // ============================================
+  // 📅 LOAD SCHEDULE & PLAYLIST
+  // ============================================
+  useEffect(() => {
+    const loadScheduleData = async () => {
+      console.log('📅 Loading schedule and playlist...')
+      setIsLoadingSchedule(true)
+      
+      try {
+        const { activeSlot: slot, playlistId } = await loadScheduleAndDeterminePlaylist()
+        
+        if (slot) {
+          console.log('✅ Active slot:', slot.name, slot.time)
+          setActiveSlot(slot)
+          
+          // Load playlist data if playlistId exists
+          if (playlistId) {
+            console.log('📋 Loading playlist:', playlistId)
+            const result = await getPlaylist(playlistId)
+            if (result.data) {
+              console.log('✅ Playlist loaded:', result.data.name)
+              setActivePlaylist(result.data)
+            } else {
+              console.warn('⚠️ Playlist not found:', playlistId)
+              setActivePlaylist(null)
+            }
+          } else {
+            console.warn('⚠️ No playlist ID in active slot')
+            setActivePlaylist(null)
+          }
+        } else {
+          console.log('ℹ️ No active slot for current time')
+          setActiveSlot(null)
+          setActivePlaylist(null)
+        }
+      } catch (error) {
+        console.error('❌ Failed to load schedule:', error)
+        setActiveSlot(null)
+        setActivePlaylist(null)
+      } finally {
+        setIsLoadingSchedule(false)
+      }
+    }
+
+    loadScheduleData()
+    
+    // Reload every minute to check for schedule changes
+    const interval = setInterval(loadScheduleData, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   // ============================================
   // 📡 IOT SUBSCRIPTIONS
@@ -285,64 +344,43 @@ export default function Players() {
                     <span className="text-2xl">📻</span>
                   </div>
                   <div>
-                    <h3 className="font-bold text-white">Active Playlist</h3>
-                    <p className="text-white/80 text-xs">Current schedule slot</p>
+                    <h3 className="font-bold text-white">
+                      {isLoadingSchedule ? 'Loading...' : activePlaylist?.name || 'No Active Playlist'}
+                    </h3>
+                    <p className="text-white/80 text-xs">
+                      {activeSlot ? `${activeSlot.name} • ${activeSlot.time}` : 'No schedule slot active'}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Playlist Content */}
-            <div className="bg-white p-4" style={{ maxHeight: 'calc(50vh - 140px)', overflowY: 'auto' }}>
-              {/* Example tracks with green/purple bars */}
-              {[
-                { id: 1, artist: 'Artist 1', title: 'Track Title 1', duration: '3:45', status: 'past' },
-                { id: 2, artist: 'Artist 2', title: 'Track Title 2', duration: '4:20', status: 'current' },
-                { id: 3, artist: 'Artist 3', title: 'Track Title 3', duration: '3:12', status: 'future' },
-                { id: 4, artist: 'Artist 4', title: 'Track Title 4', duration: '5:03', status: 'future' },
-              ].map((track) => (
-                <div
-                  key={track.id}
-                  className={`flex items-center gap-3 p-2 rounded-lg mb-2 border ${
-                    track.status === 'current'
-                      ? 'bg-green-50 border-green-300'
-                      : track.status === 'past'
-                      ? 'bg-purple-50 border-purple-200 opacity-60'
-                      : 'bg-gray-50 border-gray-200'
-                  }`}
-                >
-                  {/* Status Bar */}
-                  <div
-                    className={`w-1 h-12 rounded-full ${
-                      track.status === 'current'
-                        ? 'bg-green-500'
-                        : track.status === 'past'
-                        ? 'bg-purple-400'
-                        : 'bg-gray-300'
-                    }`}
-                  />
-
-                  {/* Track Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-gray-900 text-sm truncate">
-                      {track.artist}
-                    </div>
-                    <div className="text-gray-600 text-xs truncate">
-                      {track.title}
-                    </div>
-                  </div>
-
-                  {/* Duration */}
-                  <div className="text-xs text-gray-500 font-mono">
-                    {track.duration}
-                  </div>
-
-                  {/* Current indicator */}
-                  {track.status === 'current' && (
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                  )}
+            <div className="bg-white" style={{ maxHeight: 'calc(50vh - 140px)', overflowY: 'auto' }}>
+              {isLoadingSchedule ? (
+                <div className="p-8 text-center text-gray-500">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-3"></div>
+                  <p>Loading schedule...</p>
                 </div>
-              ))}
+              ) : activePlaylist && activeSlot?.playlistId ? (
+                <PlaylistViewer
+                  playlistId={activeSlot.playlistId}
+                  compact={true}
+                  maxHeight="calc(50vh - 140px)"
+                  showHeader={false}
+                  showDragHandle={false}
+                  allowReorder={false}
+                  allowRemove={false}
+                  allowPlay={false}
+                  containerClassName="p-0"
+                />
+              ) : (
+                <div className="p-8 text-center text-gray-500">
+                  <div className="text-4xl mb-3">📭</div>
+                  <p className="font-semibold">No playlist scheduled</p>
+                  <p className="text-sm mt-1">No active schedule slot for current time</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
