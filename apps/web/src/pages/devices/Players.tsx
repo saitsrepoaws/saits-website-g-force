@@ -92,7 +92,8 @@ export default function Players() {
     let unsubCommands: (() => void) | undefined
 
     // Subscribe to incoming commands (async)
-    const commandsTopic = `radio/players/${playerId}/commands`
+    // NOTE: Backend publishes to 'radio/player/{id}/command' (singular!)
+    const commandsTopic = `radio/player/${playerId}/command`
     
     const setupSubscriptions = async () => {
       try {
