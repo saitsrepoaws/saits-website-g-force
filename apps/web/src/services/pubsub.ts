@@ -262,15 +262,7 @@ export type PublishParams = { topic: string; message: unknown }
 export type SubscribeParams = { topic: string }
 export type Subscription = { unsubscribe: () => void }
 
-export function isEnabled(): boolean {
-  return (import.meta as any).env?.VITE_ENABLE_PUBSUB === 'true'
-}
-
 export async function publish({ topic, message }: PublishParams): Promise<void> {
-  if (!isEnabled()) {
-    log('warn', 'publish() called but PubSub is disabled')
-    return
-  }
   try {
     log('info', `Publishing to topic: ${topic}`)
     const pubsub = await getPubSubInstance()
@@ -287,10 +279,6 @@ export async function subscribe(
   onMessage: (data: unknown) => void,
   onError?: (err: unknown) => void
 ): Promise<Subscription | null> {
-  if (!isEnabled()) {
-    log('warn', 'subscribe() called but PubSub is disabled')
-    return null
-  }
   try {
     log('info', `Subscribing to topic: ${topic}`)
     const pubsub = await getPubSubInstance()
@@ -321,11 +309,6 @@ export async function subscribe(
  * Call this on app startup to ensure connection is ready
  */
 export async function autoConnect(): Promise<boolean> {
-  if (!isEnabled()) {
-    log('warn', 'autoConnect() called but PubSub is disabled')
-    return false
-  }
-  
   // Prevent duplicate autoConnect calls (singleton pattern)
   if (isAutoConnecting) {
     log('info', '⏳ AutoConnect already in progress, skipping duplicate call')
@@ -413,10 +396,6 @@ export async function autoConnect(): Promise<boolean> {
 }
 
 export async function testConnect(topic: string, timeoutMs = 5000): Promise<boolean> {
-  if (!isEnabled()) {
-    log('warn', 'testConnect() called but PubSub is disabled')
-    return false
-  }
   log('info', `Testing connection to topic: ${topic} (timeout: ${timeoutMs}ms)`)
   
   return new Promise(async (resolve) => {
