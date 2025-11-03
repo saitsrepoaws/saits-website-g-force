@@ -95,7 +95,9 @@
             "playerId.$": "$.playerId",
             "timestamp.$": "$$.State.EnteredTime",
             "params": {
-              "playlistId.$": "$.loadResult.Payload.playlistId",
+              "playlist.$": "$.loadResult.Payload.playlist",
+              "schedule.$": "$.loadResult.Payload.schedule",
+              "currentTrack.$": "$.loadResult.Payload.currentTrack",
               "track.$": "$.loadResult.Payload.track"
             }
           }
