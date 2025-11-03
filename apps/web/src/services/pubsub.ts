@@ -280,24 +280,56 @@ export async function subscribe(
   onError?: (err: unknown) => void
 ): Promise<Subscription | null> {
   try {
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🔍 PUBSUB SUBSCRIBE CALLED')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Topic:', topic)
+    console.log('Timestamp:', new Date().toISOString())
+    
     log('info', `Subscribing to topic: ${topic}`)
+    
+    console.log('Getting PubSub instance...')
     const pubsub = await getPubSubInstance()
+    console.log('✅ PubSub instance obtained')
+    
+    console.log('Creating subscription...')
     const sub = pubsub.subscribe({ topics: [topic] }).subscribe({
       next: (data: any) => {
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('📥 MESSAGE RECEIVED IN PUBSUB.TS')
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        console.log('Topic:', topic)
+        console.log('Raw data:', data)
+        console.log('Data type:', typeof data)
+        console.log('Data keys:', Object.keys(data))
+        if (data.value) {
+          console.log('data.value type:', typeof data.value)
+          console.log('data.value:', data.value)
+        }
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+        
         log('info', `Message received on ${topic}`)
         onMessage(data)
       },
       error: (e: unknown) => {
+        console.error('❌ SUBSCRIPTION ERROR:', e)
         log('error', `Subscribe error on ${topic}: ${e}`)
         onError?.(e)
       },
     })
+    
+    console.log('✅ Subscription created successfully')
+    console.log('Subscription object:', sub)
     log('info', `Subscribed successfully to ${topic}`)
+    
     return { unsubscribe: () => {
+      console.log(`🧹 Unsubscribing from ${topic}`)
       log('info', `Unsubscribing from ${topic}`)
       sub.unsubscribe()
     }}
   } catch (err) {
+    console.error('❌ SUBSCRIBE FAILED:', err)
+    console.error('Error details:', err)
     log('error', `Subscribe setup failed: ${err}`)
     onError?.(err)
     return null

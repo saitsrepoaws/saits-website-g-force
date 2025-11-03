@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import IoTLogWindow from '../../components/IoTLogWindow'
-import IoTTestPanel from '../../components/IoTTestPanel'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import { useIoT } from '../../contexts/IoTContext'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
@@ -419,18 +418,11 @@ export default function Players() {
           </div>
         </div>
 
-        {/* Right Side Column - IoT Test + Log + Playlist */}
+        {/* Right Side Column - IoT Log + Playlist */}
         <div className="space-y-6">
-          {/* IoT Test Panel - Top */}
-          <IoTTestPanel
-            playerId={playerId}
-            onPublish={iot.publish}
-            isConnected={iot.isConnected}
-          />
-
-          {/* IoT Log Window - Middle */}
+          {/* IoT Log Window - Top */}
           <div className="lg:sticky lg:top-6">
-            <IoTLogWindow maxHeight="400px" />
+            <IoTLogWindow maxHeight="calc(50vh - 80px)" />
           </div>
 
           {/* Playlist View - Bottom */}
