@@ -135,7 +135,7 @@ async function boot() {
     // StrictMode double-mounts components → 2 IoT connections with same client ID → AWS kicks first connection
     // <StrictMode>
       <Authenticator.Provider>
-        <IoTProvider autoConnect={false}>
+        <IoTProvider autoConnect={true}>
           <RouterProvider router={router} />
         </IoTProvider>
       </Authenticator.Provider>
