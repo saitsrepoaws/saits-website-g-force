@@ -14,7 +14,7 @@ import type { Playlist } from '../../types/playlist'
 export default function Players() {
   const [autoLoad, setAutoLoad] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [playerState, setPlayerState] = useState({
+  const [playerState, setPlayerState] = useState<any>({
     status: 'idle',
     autoLoad: false,
     track: null,
@@ -211,8 +211,49 @@ export default function Players() {
   }
 
   const handleLoadCommand = (message: any) => {
-    console.log('💿 LOAD command received:', message.trackId)
-    // TODO: Implement load track logic
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('💿 LOAD COMMAND RECEIVED FROM BACKEND')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Full message:', JSON.stringify(message, null, 2))
+    
+    if (!message.params || !message.params.track) {
+      console.error('❌ No track data in LOAD command')
+      return
+    }
+
+    const { track, playlist, schedule, currentTrack } = message.params
+    
+    console.log('✅ Track from backend:')
+    console.log('   Title:', track.title)
+    console.log('   Artist:', track.artist)
+    console.log('   File:', track.fileUrl)
+    console.log('   Duration:', track.duration)
+    console.log('   Progress:', currentTrack?.percentComplete, '%')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+
+    // Update player state with loaded track
+    const newState = {
+      ...playerState,
+      status: 'loaded',
+      track: {
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        album: track.album,
+        fileUrl: track.fileUrl,
+        coverArtUrl: track.coverArtUrl,
+        duration: track.duration,
+        bpm: track.bpm,
+        key: track.key,
+        genre: track.genre
+      },
+      playlist: playlist,
+      schedule: schedule,
+      currentTrack: currentTrack
+    }
+    
+    setPlayerState(newState)
+    console.log('✅ Player state updated with track')
   }
 
   // ============================================
@@ -221,15 +262,54 @@ export default function Players() {
   const handleAutoLoadToggle = async () => {
     const newValue = !autoLoad
     setAutoLoad(newValue)
-    console.log('Auto Load:', newValue ? 'ON' : 'OFF')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🎚️ AUTO LOAD TOGGLE')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('New value:', newValue ? 'ON' : 'OFF')
+
+    if (newValue) {
+      // Auto Load turned ON → Publish LOAD command to backend
+      console.log('📤 Publishing LOAD command to backend...')
+      
+      const commandTopic = `radio/player/${playerId}/command-request`
+      const loadCommand = {
+        command: 'LOAD',
+        playerId: playerId,
+        timestamp: new Date().toISOString()
+      }
+
+      console.log('Topic:', commandTopic)
+      console.log('Command:', loadCommand)
+      
+      try {
+        await iot.publish(commandTopic, loadCommand)
+        
+        console.log('✅ LOAD command sent to backend')
+        console.log('⏳ Waiting for backend to determine track...')
+        
+        // Log to IoT window
+        if ((window as any).addIoTMessage) {
+          (window as any).addIoTMessage({
+            timestamp: Date.now(),
+            direction: 'outgoing',
+            topic: commandTopic,
+            message: loadCommand,
+            level: 'command'
+          })
+        }
+      } catch (error) {
+        console.error('❌ Failed to publish LOAD command:', error)
+      }
+    }
 
     // Update player state
     const newState = {
       ...playerState,
       autoLoad: newValue,
-      status: 'idle'
+      status: newValue ? 'loading' : 'idle'
     }
     setPlayerState(newState)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     // Publish state update
     await publishState(newState)
