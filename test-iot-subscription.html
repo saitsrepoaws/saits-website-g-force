@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IoT Subscription Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/aws-amplify@6/dist/aws-amplify.min.js"></script>
+</head>
+<body>
+  <h1>IoT Subscription Test</h1>
+  <div id="status">Initializing...</div>
+  <div id="logs" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px; max-height: 400px; overflow-y: scroll; font-family: monospace; font-size: 12px;"></div>
+  
+  <script type="module">
+    const { Amplify, fetchAuthSession } = window['aws-amplify'];
+    const { PubSub } = window['aws-amplify-pubsub'];
+    const { AWSIoTProvider } = window['aws-amplify-pubsub'];
+    
+    const config = {
+      Auth: {
+        Cognito: {
+          userPoolId: 'eu-west-1_qRZfuWuJF',
+          userPoolClientId: '5a1qbq9gfr59hmvpgmqc05p02q',
+          identityPoolId: 'eu-west-1:a4e0b4fb-c22c-448e-bcad-12b5e3e91cd3'
+        }
+      }
+    };
+    
+    const logDiv = document.getElementById('logs');
+    const statusDiv = document.getElementById('status');
+    
+    function log(msg) {
+      const time = new Date().toLocaleTimeString();
+      logDiv.innerHTML += `[${time}] ${msg}<br>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      console.log(msg);
+    }
+    
+    async function test() {
+      try {
+        log('📡 Configuring Amplify...');
+        Amplify.configure(config);
+        
+        log('🔑 Getting auth session...');
+        const session = await fetchAuthSession();
+        log(`✅ Auth session: ${session.identityId}`);
+        
+        log('📡 Adding IoT Provider...');
+        PubSub.addPluggable(new AWSIoTProvider({
+          aws_pubsub_region: 'eu-west-1',
+          aws_pubsub_endpoint: 'wss://acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com/mqtt'
+        }));
+        log('✅ Provider added');
+        
+        log('📡 Subscribing to: radio/player/player-001/command');
+        const sub = PubSub.subscribe({ 
+          topics: 'radio/player/player-001/command' 
+        }).subscribe({
+          next: (data) => {
+            log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+            log('📥 MESSAGE RECEIVED!');
+            log('Data: ' + JSON.stringify(data, null, 2));
+            log('Value: ' + data.value);
+            try {
+              const parsed = JSON.parse(data.value);
+              log('Parsed: ' + JSON.stringify(parsed, null, 2));
+            } catch (e) {
+              log('Parse error: ' + e);
+            }
+            log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+          },
+          error: (err) => {
+            log('❌ Subscribe error: ' + err);
+          }
+        });
+        
+        log('✅ Subscribed! Waiting for messages...');
+        statusDiv.innerHTML = '✅ Subscribed to radio/player/player-001/command';
+        
+      } catch (err) {
+        log('❌ ERROR: ' + err);
+        statusDiv.innerHTML = '❌ Error: ' + err.message;
+      }
+    }
+    
+    test();
+  </script>
+</body>
+</html>
