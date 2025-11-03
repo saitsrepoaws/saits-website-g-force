@@ -152,15 +152,22 @@ storageBucket.addEventNotification(
   { prefix: 'public/audio/' }
 )
 
-// Add IoT policy to authenticated role for PubSub access
+// Add IoT policy to BOTH authenticated AND unauthenticated roles for PubSub access
 // Open policy for development - see /docs/IOT_TOPICS_SPECIFICATION.md for production policy
 const authenticatedRole = backend.auth.resources.authenticatedUserIamRole
+const unauthenticatedRole = backend.auth.resources.unauthenticatedUserIamRole
 
-// Attach AWS managed policies for IoT access
+// Attach AWS managed policies for IoT access to BOTH roles
 authenticatedRole.addManagedPolicy(
   iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTDataAccess')
 )
 authenticatedRole.addManagedPolicy(
+  iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTConfigAccess')
+)
+unauthenticatedRole.addManagedPolicy(
+  iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTDataAccess')
+)
+unauthenticatedRole.addManagedPolicy(
   iam.ManagedPolicy.fromAwsManagedPolicyName('AWSIoTConfigAccess')
 )
 
@@ -175,9 +182,8 @@ new CfnOutput(backend.auth.stack, 'IoTCognitoPolicyName', {
   exportName: 'IoTCognitoPolicyName',
 })
 
-authenticatedRole.attachInlinePolicy(
-  new Policy(authenticatedRole.stack, 'IotPubSubPolicy', {
-    statements: [
+// Create policy statements that will be attached to BOTH roles
+const iotPolicyStatements = [
       // Connect - allow any client ID for development
       new PolicyStatement({
         effect: Effect.ALLOW,
@@ -232,7 +238,19 @@ authenticatedRole.attachInlinePolicy(
           'arn:aws:states:eu-west-1:*:execution:RadioPlayerStateMachine:*'
         ],
       }),
-    ],
+]
+
+// Attach policy to authenticated role
+authenticatedRole.attachInlinePolicy(
+  new Policy(authenticatedRole.stack, 'IotPubSubPolicy', {
+    statements: iotPolicyStatements,
+  })
+)
+
+// Attach same policy to unauthenticated role (CRITICAL FIX!)
+unauthenticatedRole.attachInlinePolicy(
+  new Policy(unauthenticatedRole.stack, 'IotPubSubPolicyUnauth', {
+    statements: iotPolicyStatements,
   })
 )
 
