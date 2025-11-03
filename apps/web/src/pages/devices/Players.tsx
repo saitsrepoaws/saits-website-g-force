@@ -99,8 +99,24 @@ export default function Players() {
       try {
         unsubCommands = await iot.subscribe(
           commandsTopic,
-          (message) => {
-            console.log('📥 INCOMING command:', message)
+          (data: any) => {
+            console.log('📥 INCOMING raw data:', data)
+            
+            // Parse Amplify PubSub message format
+            // Amplify returns: { value: '...json...', provider: 'AWSIoTProvider' }
+            let message
+            try {
+              if (typeof data.value === 'string') {
+                message = JSON.parse(data.value)
+              } else {
+                message = data.value || data
+              }
+            } catch (err) {
+              console.error('❌ Failed to parse incoming message:', err, data)
+              return
+            }
+            
+            console.log('📥 PARSED command:', message)
             
             // Log to IoT window
             if ((window as any).addIoTMessage) {
