@@ -680,6 +680,8 @@ export function PlaylistViewer({
                         // Calculate start time
                         const now = new Date()
                         const currentHour = now.getHours()
+                        const currentTimeMs = now.getTime()
+                        
                         const startDate = new Date()
                         startDate.setHours(slotHour, slotMin, 0, 0)
                         startDate.setSeconds(startDate.getSeconds() + accumulatedSeconds)
@@ -687,6 +689,20 @@ export function PlaylistViewer({
                         // Calculate end time
                         const endDate = new Date(startDate)
                         endDate.setSeconds(endDate.getSeconds() + trackDuration)
+                        
+                        // Bepaal STATUS op basis van ECHTE TIJD (override index-based status)
+                        if (!loadedTrackId && scheduleSlot) {
+                          const startTimeMs = startDate.getTime()
+                          const endTimeMs = endDate.getTime()
+                          
+                          if (currentTimeMs < startTimeMs) {
+                            trackStatus = 'future'
+                          } else if (currentTimeMs >= startTimeMs && currentTimeMs < endTimeMs) {
+                            trackStatus = 'current'
+                          } else {
+                            trackStatus = 'past'
+                          }
+                        }
                         
                         // Format tijd: binnen hetzelfde uur als MM:SS, anders HH:MM
                         const formatTrackTime = (date: Date) => {
