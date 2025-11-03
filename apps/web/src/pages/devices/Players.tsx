@@ -161,7 +161,7 @@ export default function Players() {
   // 📤 PUBLISH STATE HELPER
   // ============================================
   const publishState = async (state: any) => {
-    const stateTopic = `radio/players/${playerId}/state`
+    const stateTopic = `radio/player/${playerId}/state`
     
     try {
       await iot.publish(stateTopic, {
