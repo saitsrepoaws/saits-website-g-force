@@ -103,7 +103,11 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
   }, [autoConnect])
 
   // Monitor connection state via logs
+  // DEBOUNCED to prevent rapid state flipping
   useEffect(() => {
+    let stableConnectedCount = 0
+    let stableDisconnectedCount = 0
+    
     const checkInterval = setInterval(() => {
       const currentLogs = pubsub.getLogs()
       
@@ -131,22 +135,35 @@ export function IoTProvider({ children, autoConnect = true }: IoTProviderProps) 
         log.level === 'warn'
       )
       
-      // Update state based on logs
+      // DEBOUNCE: Require 3 consecutive checks before changing state
+      // This prevents rapid connect/disconnect flipping
       if (hasConnectedLog && !hasDisconnectedLog) {
-        if (!isConnected) {
+        stableConnectedCount++
+        stableDisconnectedCount = 0
+        
+        if (stableConnectedCount >= 3 && !isConnected) {
           setIsConnected(true)
           setConnectionState(ConnectionState.Connected)
           connectionStartTime.current = Date.now()
-          console.log('✅ IoTContext: Detected connection from logs')
+          console.log('✅ IoTContext: Stable connection detected')
+          stableConnectedCount = 0
         }
       } else if (hasDisconnectedLog) {
-        if (isConnected) {
+        stableDisconnectedCount++
+        stableConnectedCount = 0
+        
+        if (stableDisconnectedCount >= 5 && isConnected) {
           setIsConnected(false)
           setConnectionState(ConnectionState.ConnectionDisrupted)
-          console.log('⚠️ IoTContext: Connection disrupted')
+          console.log('⚠️ IoTContext: Confirmed disconnection after 5 checks')
+          stableDisconnectedCount = 0
         }
       } else if (hasConnectingLog && !isConnected) {
+        stableConnectedCount = 0
+        stableDisconnectedCount = 0
         setConnectionState(ConnectionState.Connecting)
+      } else {
+        // No clear state change, keep counters
       }
       
       // Detect ping (keepalive) - check last 3 logs
