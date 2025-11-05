@@ -375,6 +375,41 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerCommandRule"
    }
   },
+  "CrossFadeControlRule": {
+   "Type": "AWS::IoT::TopicRule",
+   "Properties": {
+    "RuleName": "RadioCrossFadeControlRule",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TopicRulePayload": {
+     "Actions": [
+      {
+       "Lambda": {
+        "FunctionArn": {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn"
+        }
+       }
+      }
+     ],
+     "AwsIotSqlVersion": "2016-03-23",
+     "Description": "Trigger cross-fade controller for START/STOP commands",
+     "Sql": "SELECT * FROM 'radio/crossfade/control'"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CrossFadeControlRule"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
@@ -411,6 +446,25 @@
        "Ref": "AWS::AccountId"
       },
       ":rule/RadioPlayerCommandRuleV2"
+     ]
+    ]
+   }
+  },
+  "CrossFadeIoTRuleArn": {
+   "Description": "ARN of the IoT Rule for cross-fade control",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:iot:",
+      {
+       "Ref": "AWS::Region"
+      },
+      ":",
+      {
+       "Ref": "AWS::AccountId"
+      },
+      ":rule/RadioCrossFadeControlRule"
      ]
     ]
    },
@@ -693,6 +747,9 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn": {
    "Type": "String"
   }
  }

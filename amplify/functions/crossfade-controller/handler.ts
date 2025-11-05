@@ -172,12 +172,24 @@ async function loadTracksData(playlistTracks: any[]): Promise<Track[]> {
 
   const tracks: Track[] = []
 
-  for (const playlistTrack of playlistTracks) {
+  // Limit to first 10 tracks for testing
+  const tracksToLoad = playlistTracks.slice(0, 10)
+  console.log(`📝 Processing first ${tracksToLoad.length} of ${playlistTracks.length} tracks`)
+
+  for (const playlistTrack of tracksToLoad) {
     try {
+      // Playlist tracks have format: { trackId: "...", trackTitle: "...", trackDuration: ... }
+      const trackId = playlistTrack.trackId || playlistTrack.id
+      
+      if (!trackId) {
+        console.warn('⚠️ Skipping track without ID:', playlistTrack)
+        continue
+      }
+
       const result = await dynamodb.send(
         new GetCommand({
           TableName: TRACK_TABLE,
-          Key: { id: playlistTrack.trackId }
+          Key: { id: trackId }
         })
       )
 
