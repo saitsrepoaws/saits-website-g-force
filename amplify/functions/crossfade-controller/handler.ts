@@ -16,7 +16,13 @@ import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-pla
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
 
-const iot = new IoTDataPlaneClient({})
+// Configure IoT client with endpoint
+const IOT_ENDPOINT = process.env.IOT_ENDPOINT || 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com'
+const iot = new IoTDataPlaneClient({
+  region: process.env.AWS_REGION || 'eu-west-1',
+  endpoint: `https://${IOT_ENDPOINT}`
+})
+
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE_NAME

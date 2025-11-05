@@ -136,6 +136,7 @@ trackTable.grantReadData(crossfadeControllerLambda)
 // Add environment variables for cross-fade controller
 backend.crossfadeController.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
 backend.crossfadeController.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+backend.crossfadeController.addEnvironment('IOT_ENDPOINT', 'acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com')
 
 // Grant IoT publish permission to cross-fade controller
 crossfadeControllerLambda.addToRolePolicy(
