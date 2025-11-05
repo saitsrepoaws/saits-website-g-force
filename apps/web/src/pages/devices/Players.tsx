@@ -116,21 +116,28 @@ export default function PlayersClean() {
     console.log('Topic:', commandTopic)
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
-    const subscription = iot.subscribe(commandTopic, (message: any) => {
+    let unsubscribe: (() => void) | undefined
+
+    iot.subscribe(commandTopic, (message: any) => {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.log('📥 INCOMING MESSAGE RECEIVED!')
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
       console.log('📥 INCOMING raw data:', message)
       
       handleIncomingCommand(message)
+    }).then((unsub) => {
+      unsubscribe = unsub
+      setIsSubscribed(true)
+      console.log('✅ SUBSCRIBED SUCCESSFULLY')
+    }).catch((error) => {
+      console.error('❌ Failed to subscribe:', error)
     })
 
-    setIsSubscribed(true)
-    console.log('✅ SUBSCRIBED SUCCESSFULLY')
-
     return () => {
-      subscription?.unsubscribe()
-      setIsSubscribed(false)
+      if (unsubscribe) {
+        unsubscribe()
+        setIsSubscribed(false)
+      }
     }
   }, [iot.connectionState, playerId, isSubscribed])
   
