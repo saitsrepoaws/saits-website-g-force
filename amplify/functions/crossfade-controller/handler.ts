@@ -68,7 +68,7 @@ async function startCrossFade(playlistId: string) {
     // Load playlist
     const playlist = await getPlaylist(playlistId)
     
-    if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
+    if (!playlist || !playlist.tracks) {
       console.error('❌ Playlist not found or empty')
       return {
         success: false,
@@ -77,10 +77,16 @@ async function startCrossFade(playlistId: string) {
     }
 
     console.log('✅ Playlist loaded:', playlist.name)
-    console.log('📋 Tracks count:', playlist.tracks.length)
+
+    // Parse tracks (might be JSON string)
+    const parsedTracks = typeof playlist.tracks === 'string' 
+      ? JSON.parse(playlist.tracks) 
+      : playlist.tracks
+
+    console.log('📋 Tracks count:', parsedTracks.length)
 
     // Load tracks data
-    const tracks = await loadTracksData(playlist.tracks)
+    const tracks = await loadTracksData(parsedTracks)
     
     if (tracks.length === 0) {
       console.error('❌ No valid tracks found')
