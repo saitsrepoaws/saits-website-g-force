@@ -652,25 +652,30 @@ export function PlaylistViewer({
                     console.log('   Total tracks:', playlistTracks.length)
                     
                     playlistTracks.forEach((track, index) => {
-                      // Determine track status based on currentTrackIndex
+                      // Determine track status based on loaded track or schedule
                       let trackStatus: 'past' | 'current' | 'future' | undefined
                       
-                      // If a track is loaded, the NEXT track becomes "current" (purple)
+                      // If a track is loaded in player
                       if (loadedTrackIndex >= 0) {
+                        // Loaded track itself = purple (handled by isLoadedInPlayer prop)
+                        // Track AFTER loaded = blue (current/next up)
+                        // Tracks before loaded = gray (past)
+                        // Tracks after next = green (future)
                         if (index < loadedTrackIndex) {
                           trackStatus = 'past'
                         } else if (index === loadedTrackIndex + 1) {
-                          trackStatus = 'current' // Next track after loaded = purple!
+                          trackStatus = 'current' // Next track after loaded = blue!
                         } else if (index > loadedTrackIndex + 1) {
                           trackStatus = 'future'
                         }
-                        // The loaded track itself will be orange (handled by isLoadedInPlayer)
-                      } else if (currentTrackIndex !== null && currentTrackIndex !== undefined) {
-                        // No loaded track, use schedule-based logic
-                        if (index < currentTrackIndex) {
-                          trackStatus = 'past'
-                        } else if (index === currentTrackIndex) {
-                          trackStatus = 'current'
+                        // Note: loaded track (index === loadedTrackIndex) has no trackStatus
+                        // because it gets purple via isLoadedInPlayer prop
+                      } else {
+                        // No track loaded yet
+                        // First track = blue (current/next up)
+                        // Rest = green (future)
+                        if (index === 0) {
+                          trackStatus = 'current' // First track = blue!
                         } else {
                           trackStatus = 'future'
                         }
