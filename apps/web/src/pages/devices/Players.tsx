@@ -3,6 +3,7 @@ import Layout from '../../components/Layout'
 import PlayerCard from '../../components/PlayerCard'
 import PlaylistViewer from '../../components/PlaylistViewer'
 import { useTabTitle } from '../../hooks/useTabTitle'
+import { useIoT } from '../../contexts/IoTContext'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
 import { getPlaylist } from '../../services/playlists'
 import type { ScheduleSlot } from '../../utils/scheduleCalculator'
@@ -16,6 +17,8 @@ import type { Playlist } from '../../types/playlist'
  */
 export default function Players() {
   useTabTitle('Players', '🎵')
+  
+  const iot = useIoT()
   
   // ============================================
   // 📊 SCHEDULE & PLAYLIST STATE
@@ -74,6 +77,57 @@ export default function Players() {
     const interval = setInterval(loadScheduleData, 60000)
     return () => clearInterval(interval)
   }, [])
+  
+  // ============================================
+  // 📡 IOT SUBSCRIPTION FOR LOAD COMMANDS
+  // ============================================
+  useEffect(() => {
+    if (iot.connectionState !== 'Connected') {
+      return
+    }
+
+    // Listen to player-001 commands to track loaded tracks
+    const commandTopic = 'radio/player/player-001/command'
+    
+    console.log('📡 Subscribing to player commands for playlist highlighting...')
+
+    let unsubscribe: (() => void) | undefined
+    let isMounted = true
+
+    iot.subscribe(commandTopic, (message: any) => {
+      console.log('📥 Player command received:', message)
+      
+      // When LOAD command is received, update loadedTrackId
+      if (message.command === 'LOAD' && message.params?.track?.id) {
+        const trackId = message.params.track.id
+        console.log('🎵 Track loaded in player:', trackId)
+        setLoadedTrackId(trackId)
+      }
+      
+      // When UNLOAD command is received, clear loadedTrackId
+      if (message.command === 'UNLOAD') {
+        console.log('🗑️ Track unloaded from player')
+        setLoadedTrackId(null)
+      }
+    }).then((unsub) => {
+      if (!isMounted) {
+        unsub()
+        return
+      }
+      
+      unsubscribe = unsub
+      console.log('✅ Subscribed to player commands for playlist')
+    }).catch((error) => {
+      console.error('❌ Failed to subscribe to player commands:', error)
+    })
+
+    return () => {
+      isMounted = false
+      if (unsubscribe) {
+        unsubscribe()
+      }
+    }
+  }, [iot.connectionState])
   
   // ============================================
   // 🎵 TRACK LOADING HANDLER
