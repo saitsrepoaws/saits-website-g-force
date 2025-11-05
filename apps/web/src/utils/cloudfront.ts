@@ -8,18 +8,18 @@
  * - Lower S3 transfer costs
  */
 
-const CLOUDFRONT_DOMAIN = 'd80d0cwbzav1v.cloudfront.net'
+const CLOUDFRONT_DOMAIN = 'd31p5rl3s8h3a0.cloudfront.net'
 
 /**
  * Convert S3 path to CloudFront URL
  * 
  * @param s3PathOrUrl - S3 object key (e.g., "public/audio/track.mp3") or full S3 URL
- * @returns CloudFront URL (e.g., "https://d80d0cwbzav1v.cloudfront.net/public/audio/track.mp3")
+ * @returns CloudFront URL (e.g., "https://d31p5rl3s8h3a0.cloudfront.net/public/audio/track.mp3")
  * 
  * @example
  * ```ts
  * const url = getCloudFrontUrl('public/audio/1234-track.mp3')
- * // Returns: https://d80d0cwbzav1v.cloudfront.net/public/audio/1234-track.mp3
+ * // Returns: https://d31p5rl3s8h3a0.cloudfront.net/public/audio/1234-track.mp3
  * ```
  */
 export function getCloudFrontUrl(s3PathOrUrl: string): string {
