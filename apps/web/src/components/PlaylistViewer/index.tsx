@@ -646,6 +646,11 @@ export function PlaylistViewer({
                       ? playlistTracks.findIndex(t => t.trackId === loadedTrackId)
                       : -1
                     
+                    console.log('🎨 PlaylistViewer render:')
+                    console.log('   loadedTrackId:', loadedTrackId)
+                    console.log('   loadedTrackIndex:', loadedTrackIndex)
+                    console.log('   Total tracks:', playlistTracks.length)
+                    
                     playlistTracks.forEach((track, index) => {
                       // Determine track status based on currentTrackIndex
                       let trackStatus: 'past' | 'current' | 'future' | undefined

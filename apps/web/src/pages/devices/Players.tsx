@@ -79,16 +79,29 @@ export default function Players() {
   // 🎵 TRACK LOADING HANDLER
   // ============================================
   const handleTracksLoaded = (tracks: any[]) => {
-    console.log('📋 Tracks loaded:', tracks.length)
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('📋 Tracks loaded callback triggered!')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('Tracks count:', tracks.length)
+    console.log('Current loadedTrackId:', loadedTrackId)
     
     // Auto-load first track if not already loaded
     if (tracks.length > 0 && !loadedTrackId) {
       const firstTrack = tracks[0]
-      console.log('🎵 Auto-loading first track:', firstTrack.track.title)
-      setLoadedTrackId(firstTrack.track.id)
+      console.log('First track object:', firstTrack)
+      console.log('Track ID:', firstTrack.trackId)
+      console.log('Track title:', firstTrack.track?.title)
+      
+      setLoadedTrackId(firstTrack.trackId)
+      console.log('✅ Set loadedTrackId to:', firstTrack.trackId)
       
       // TODO: Send LOAD command to player
       // For now, just highlight it
+    } else {
+      console.log('⚠️ Not loading track:', {
+        hasTrack: tracks.length > 0,
+        alreadyLoaded: !!loadedTrackId
+      })
     }
   }
   
