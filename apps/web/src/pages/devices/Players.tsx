@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
-import PlaylistViewer from '../../components/PlaylistViewer'
 import { useIoT } from '../../contexts/IoTContext'
 import { useTabTitle } from '../../hooks/useTabTitle'
 import { useAudioPlayer } from '../../hooks/useAudioPlayer'
-import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
-import { getPlaylist } from '../../services/playlists'
 import { getAudioUrl, getCoverArtUrl, getWaveformUrl } from '../../utils/mediaUrl'
-import type { ScheduleSlot } from '../../utils/scheduleCalculator'
-import type { Playlist } from '../../types/playlist'
 
 /**
  * Players Component - Clean Architecture
@@ -38,9 +33,6 @@ export default function PlayersClean() {
   // ============================================
   const [autoLoad, setAutoLoad] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
-  const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null)
-  const [isLoadingSchedule, setIsLoadingSchedule] = useState(true)
   
   // Track info for UI display (separate from audio hook)
   const [trackInfo, setTrackInfo] = useState<any>(null)
@@ -51,55 +43,9 @@ export default function PlayersClean() {
   // Player status for UI
   const [playerStatus, setPlayerStatus] = useState<'idle' | 'loading' | 'loaded' | 'playing' | 'paused' | 'stopped'>('idle')
   
-  // ============================================
-  // 📅 SCHEDULE & PLAYLIST LOADING
-  // ============================================
-  useEffect(() => {
-    const loadScheduleData = async () => {
-      console.log('📅 Loading schedule and playlist...')
-      setIsLoadingSchedule(true)
-      
-      try {
-        const { activeSlot: slot, playlistId } = await loadScheduleAndDeterminePlaylist()
-        
-        if (slot) {
-          console.log('✅ Active slot:', slot.name, slot.time)
-          setActiveSlot(slot)
-          
-          if (playlistId) {
-            console.log('📋 Loading playlist:', playlistId)
-            const result = await getPlaylist(playlistId)
-            if (result.data) {
-              console.log('✅ Playlist loaded:', result.data.name)
-              setActivePlaylist(result.data)
-            } else {
-              console.warn('⚠️ Playlist not found:', playlistId)
-              setActivePlaylist(null)
-            }
-          } else {
-            console.warn('⚠️ No playlist ID in active slot')
-            setActivePlaylist(null)
-          }
-        } else {
-          console.log('ℹ️ No active slot for current time')
-          setActiveSlot(null)
-          setActivePlaylist(null)
-        }
-      } catch (error) {
-        console.error('❌ Failed to load schedule:', error)
-        setActiveSlot(null)
-        setActivePlaylist(null)
-      } finally {
-        setIsLoadingSchedule(false)
-      }
-    }
-
-    loadScheduleData()
-    
-    // Reload every minute to check for schedule changes
-    const interval = setInterval(loadScheduleData, 60000)
-    return () => clearInterval(interval)
-  }, [])
+  // Progress tracking
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
   
   // ============================================
   // 📡 IOT SUBSCRIPTION
@@ -364,15 +310,34 @@ export default function PlayersClean() {
         <audio
           id="player-audio"
           src={audioUrl}
-          onPlay={() => console.log('🎵 Audio started playing')}
-          onPause={() => console.log('⏸️ Audio paused')}
-          onEnded={() => console.log('🏁 Audio ended')}
+          onPlay={() => {
+            console.log('🎵 Audio started playing')
+            setPlayerStatus('playing')
+          }}
+          onPause={() => {
+            console.log('⏸️ Audio paused')
+            setPlayerStatus('paused')
+          }}
+          onEnded={() => {
+            console.log('🏁 Audio ended')
+            setPlayerStatus('stopped')
+            setCurrentTime(0)
+          }}
+          onTimeUpdate={(e) => {
+            const audio = e.currentTarget
+            setCurrentTime(audio.currentTime)
+            setDuration(audio.duration)
+          }}
+          onLoadedMetadata={(e) => {
+            const audio = e.currentTarget
+            setDuration(audio.duration)
+          }}
           onError={(e) => console.error('❌ Audio error:', e)}
         />
       )}
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
-        {/* Player Card - Left Column */}
+      <div className="max-w-2xl mx-auto">
+        {/* Player Card */}
         <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-6 lg:p-8 space-y-6">
           
           {/* Header */}
@@ -434,6 +399,28 @@ export default function PlayersClean() {
                         console.log('✅ Waveform loaded successfully!')
                       }}
                     />
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                      <span className="font-mono">
+                        {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
+                      </span>
+                      <span className="font-mono">
+                        {Math.floor(duration / 60)}:{String(Math.floor(duration % 60)).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="relative h-2 bg-black/50 rounded-full overflow-hidden border border-white/10">
+                      <div 
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-linear"
+                        style={{ 
+                          width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` 
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -605,39 +592,6 @@ export default function PlayersClean() {
             })()}
           </div>
 
-        </div>
-
-        {/* Right Side Column - Playlist */}
-        <div className="space-y-6">
-          {/* Playlist View */}
-          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-lg overflow-hidden border border-purple-200">
-            {/* Playlist Header */}
-            <div className="px-4 py-3 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-2xl">📻</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-white truncate leading-tight">
-                    {isLoadingSchedule ? 'Loading...' : activePlaylist?.name || 'No Active Playlist'}
-                  </h3>
-                  {activeSlot && (
-                    <p className="text-xs text-white/80 truncate">
-                      {activeSlot.name} • {activeSlot.time}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Playlist Content */}
-            {activePlaylist && (
-              <PlaylistViewer
-                playlistId={activePlaylist.id}
-                maxHeight="calc(100vh - 300px)"
-              />
-            )}
-          </div>
         </div>
       </div>
     </Layout>
