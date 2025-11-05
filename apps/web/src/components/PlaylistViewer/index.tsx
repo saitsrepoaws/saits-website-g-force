@@ -76,9 +76,9 @@ function SortableTrackRow({
             : 'grid-cols-[auto,auto,2fr,2fr,1.5fr,60px,80px,80px,150px,auto,50px]'
         } gap-3 items-center p-3 border rounded-lg ${
           isLoadedInPlayer
-            ? 'bg-orange-100 border-orange-400 shadow-md' 
+            ? 'bg-purple-100 border-purple-400 shadow-md' 
             : trackStatus === 'current'
-              ? 'bg-purple-100 border-purple-400 shadow-md' 
+              ? 'bg-blue-100 border-blue-400 shadow-md' 
               : trackStatus === 'future'
                 ? 'bg-green-50 border-green-300'
                 : trackStatus === 'past'

@@ -23,6 +23,7 @@ export default function Players() {
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null)
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(true)
+  const [loadedTrackId, setLoadedTrackId] = useState<string | null>(null)
   
   // ============================================
   // 📅 SCHEDULE & PLAYLIST LOADING
@@ -74,6 +75,23 @@ export default function Players() {
     return () => clearInterval(interval)
   }, [])
   
+  // ============================================
+  // 🎵 TRACK LOADING HANDLER
+  // ============================================
+  const handleTracksLoaded = (tracks: any[]) => {
+    console.log('📋 Tracks loaded:', tracks.length)
+    
+    // Auto-load first track if not already loaded
+    if (tracks.length > 0 && !loadedTrackId) {
+      const firstTrack = tracks[0]
+      console.log('🎵 Auto-loading first track:', firstTrack.track.title)
+      setLoadedTrackId(firstTrack.track.id)
+      
+      // TODO: Send LOAD command to player
+      // For now, just highlight it
+    }
+  }
+  
   return (
     <Layout title="Players" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -118,6 +136,8 @@ export default function Players() {
             <PlaylistViewer
               playlistId={activePlaylist.id}
               maxHeight="500px"
+              loadedTrackId={loadedTrackId}
+              onTracksLoaded={handleTracksLoaded}
             />
           )}
         </div>
