@@ -52,6 +52,7 @@ export default function PlayersClean() {
   // ============================================
   useEffect(() => {
     if (iot.connectionState !== 'Connected') {
+      console.log('⏸️ IoT not connected, skipping subscription')
       return
     }
 
@@ -63,6 +64,7 @@ export default function PlayersClean() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
     let unsubscribe: (() => void) | undefined
+    let isMounted = true
 
     iot.subscribe(commandTopic, (message: any) => {
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
@@ -72,16 +74,25 @@ export default function PlayersClean() {
       
       handleIncomingCommand(message)
     }).then((unsub) => {
+      if (!isMounted) {
+        console.log('⚠️ Component unmounted before subscribe completed')
+        unsub()
+        return
+      }
+      
       unsubscribe = unsub
       setIsSubscribed(true)
       console.log('✅ SUBSCRIBED SUCCESSFULLY')
     }).catch((error) => {
       console.error('❌ Failed to subscribe:', error)
-      setIsSubscribed(false)
+      if (isMounted) {
+        setIsSubscribed(false)
+      }
     })
 
     return () => {
       console.log('🧹 Cleaning up subscription...')
+      isMounted = false
       if (unsubscribe) {
         unsubscribe()
       }
