@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Layout from '../../components/Layout'
 import { useIoT } from '../../contexts/IoTContext'
+import { useTabTitle } from '../../hooks/useTabTitle'
 
 interface NetworkConfig {
   iotEndpoint: string
@@ -25,6 +26,9 @@ function NetworkSettings() {
   
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [testMessage, setTestMessage] = useState('')
+
+  // Set browser tab title with Tab ID
+  useTabTitle('Network', '🌐')
 
   const connectionStateColors = {
     Connected: 'bg-green-500',

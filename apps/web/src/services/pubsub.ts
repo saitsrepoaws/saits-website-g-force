@@ -37,6 +37,10 @@ export function clearLogs() {
   logs.length = 0
 }
 
+export function getTabId(): string {
+  return TAB_ID
+}
+
 export function resetPubSub() {
   console.log('🔄 RESETTING PUBSUB INSTANCE')
   log('warn', 'Manually resetting PubSub instance')
@@ -77,6 +81,10 @@ let keepaliveInterval: NodeJS.Timeout | null = null // Track keepalive logging
 let isAutoConnecting = false // Prevent duplicate autoConnect calls
 let keepaliveSubscription: any = null // Store keepalive subscription
 
+// Generate unique tab ID (persists for this browser tab/window session)
+const TAB_ID = `tab-${Math.random().toString(36).substring(2, 9)}-${Date.now()}`
+console.log('🆔 Tab ID:', TAB_ID)
+
 // Reset PubSub instance if connection stays disrupted
 function scheduleConnectionCheck() {
   if (connectionStateTimeout) clearTimeout(connectionStateTimeout)
@@ -111,22 +119,22 @@ async function getPubSubInstance(): Promise<PubSub> {
         throw new Error('No identityId in session - user may not be authenticated')
       }
       
-      // Use identityId + timestamp as client ID to avoid duplicates
-      // AWS IoT Core kicks duplicate client IDs → causes socket closed loop
-      const timestamp = Date.now()
-      const clientId = `${identityId.replace(':', '-')}-${timestamp}`
+      // Use identityId + TAB_ID to allow multiple tabs/devices
+      // Each browser tab gets its own unique client ID
+      // AWS IoT Core kicks duplicate client IDs → this prevents that
+      const cleanIdentity = identityId.replace(/:/g, '-')
+      const clientId = `${cleanIdentity}-${TAB_ID}`
       log('info', `Using client ID: ${clientId}`)
-      log('info', `🔑 Unique ID with timestamp to prevent duplicate connection kicks`)
+      log('info', `🔑 Tab-specific ID allows multiple tabs/devices to connect simultaneously`)
       
       pubsubInstance = new PubSub({
         region: 'eu-west-1',
         endpoint: wssUrl,
         clientId: clientId,
         // MQTT keepalive settings to prevent connection timeout
-        // 10 second ping keeps socket VERY stable (prevents idle timeouts)
-        keepAliveTimeoutMs: 10000,  // 10 seconds - aggressive ping to keep socket alive
-        reconnectTimeoutMs: 5000,   // Auto-reconnect after 5 seconds if disconnected
-        connectTimeoutMs: 10000,    // 10 seconds to establish initial connection
+        keepAliveTimeoutMs: 30000,   // 30 seconds - keepalive ping interval
+        reconnectTimeoutMs: 10000,   // 10 seconds - wait before reconnect (less aggressive)
+        connectTimeoutMs: 15000,     // 15 seconds - initial connection timeout
       })
       
       // Listen to connection state changes (ONLY ONCE for entire app!)
@@ -204,14 +212,14 @@ async function getPubSubInstance(): Promise<PubSub> {
                 connectionStateTimeout = null
               }
               
-              // Start keepalive logging (shows ping activity every 10 seconds)
+              // Start keepalive logging (shows ping activity every 30 seconds)
               if (keepaliveInterval) clearInterval(keepaliveInterval)
               keepaliveInterval = setInterval(() => {
                 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
                 console.log('💚 IoT PING - Connection Alive')
                 console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
                 log('info', '📡 MQTT keepalive ping (socket alive)')
-              }, 10000) // Every 10 seconds - matches keepAliveTimeoutMs
+              }, 30000) // Every 30 seconds - matches keepAliveTimeoutMs
               
             } else if (connectionState === ConnectionState.Disconnected) {
               console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')

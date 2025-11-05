@@ -190,8 +190,8 @@ async function findActiveSchedule(now: Date) {
 
   if (!Items || Items.length === 0) return null
 
-  // Find schedule matching current time and day
-  return Items.find((schedule: any) => {
+  // Filter schedules that match current time and day
+  const matchingSchedules = Items.filter((schedule: any) => {
     // Check day (null = every day)
     if (schedule.dayOfWeek !== null && schedule.dayOfWeek !== undefined && schedule.dayOfWeek !== currentDay) {
       return false
@@ -203,6 +203,16 @@ async function findActiveSchedule(now: Date) {
 
     return currentTime >= startTime && currentTime < endTime
   })
+
+  if (matchingSchedules.length === 0) return null
+
+  // If multiple matches, find the one with the CLOSEST startTime (most recent)
+  // Sort by startTime descending and take the first (most recent before current time)
+  matchingSchedules.sort((a: any, b: any) => {
+    return b.startTime.localeCompare(a.startTime)
+  })
+
+  return matchingSchedules[0]
 }
 
 // Helper: Get playlist

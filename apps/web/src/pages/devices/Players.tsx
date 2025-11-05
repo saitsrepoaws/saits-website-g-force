@@ -26,7 +26,13 @@ export default function Players() {
   const [activeSlot, setActiveSlot] = useState<ScheduleSlot | null>(null)
   const [activePlaylist, setActivePlaylist] = useState<Playlist | null>(null)
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(true)
-  const [loadedTrackId, setLoadedTrackId] = useState<string | null>(null)
+  
+  // ============================================
+  // 🎵 PLAYER TRACKING (for playlist highlighting)
+  // ============================================
+  const [player1TrackId, setPlayer1TrackId] = useState<string | null>(null)
+  const [player2TrackId, setPlayer2TrackId] = useState<string | null>(null)
+  const [playedTrackIds, setPlayedTrackIds] = useState<Set<string>>(new Set())
   
   // ============================================
   // 📅 SCHEDULE & PLAYLIST LOADING
@@ -79,55 +85,79 @@ export default function Players() {
   }, [])
   
   // ============================================
-  // 📡 IOT SUBSCRIPTION FOR LOAD COMMANDS
+  // 📡 IOT SUBSCRIPTION FOR BOTH PLAYERS
   // ============================================
   useEffect(() => {
     if (iot.connectionState !== 'Connected') {
       return
     }
 
-    // Listen to player-001 commands to track loaded tracks
-    const commandTopic = 'radio/player/player-001/command'
-    
-    console.log('📡 Subscribing to player commands for playlist highlighting...')
+    console.log('📡 Subscribing to both player commands...')
 
-    let unsubscribe: (() => void) | undefined
+    let unsubscribe1: (() => void) | undefined
+    let unsubscribe2: (() => void) | undefined
     let isMounted = true
 
-    iot.subscribe(commandTopic, (message: any) => {
-      console.log('📥 Player command received:', message)
+    // Subscribe to Player 1
+    iot.subscribe('radio/player/player-001/command', (message: any) => {
+      console.log('📥 [Player 1] Command:', message.command)
       
-      // When LOAD command is received, update loadedTrackId
       if (message.command === 'LOAD' && message.params?.track?.id) {
         const trackId = message.params.track.id
-        console.log('🎵 Track loaded in player:', trackId)
-        setLoadedTrackId(trackId)
+        console.log('🎵 [Player 1] Track loaded:', trackId)
+        setPlayer1TrackId(trackId)
       }
       
-      // When UNLOAD command is received, clear loadedTrackId
       if (message.command === 'UNLOAD') {
-        console.log('🗑️ Track unloaded from player')
-        setLoadedTrackId(null)
+        console.log('🗑️ [Player 1] Track unloaded')
+        // Mark as played before clearing
+        if (player1TrackId) {
+          setPlayedTrackIds(prev => new Set(prev).add(player1TrackId))
+        }
+        setPlayer1TrackId(null)
       }
     }).then((unsub) => {
-      if (!isMounted) {
+      if (isMounted) {
+        unsubscribe1 = unsub
+        console.log('✅ Subscribed to Player 1')
+      } else {
         unsub()
-        return
+      }
+    })
+
+    // Subscribe to Player 2
+    iot.subscribe('radio/player/player-002/command', (message: any) => {
+      console.log('📥 [Player 2] Command:', message.command)
+      
+      if (message.command === 'LOAD' && message.params?.track?.id) {
+        const trackId = message.params.track.id
+        console.log('🎵 [Player 2] Track loaded:', trackId)
+        setPlayer2TrackId(trackId)
       }
       
-      unsubscribe = unsub
-      console.log('✅ Subscribed to player commands for playlist')
-    }).catch((error) => {
-      console.error('❌ Failed to subscribe to player commands:', error)
+      if (message.command === 'UNLOAD') {
+        console.log('🗑️ [Player 2] Track unloaded')
+        // Mark as played before clearing
+        if (player2TrackId) {
+          setPlayedTrackIds(prev => new Set(prev).add(player2TrackId))
+        }
+        setPlayer2TrackId(null)
+      }
+    }).then((unsub) => {
+      if (isMounted) {
+        unsubscribe2 = unsub
+        console.log('✅ Subscribed to Player 2')
+      } else {
+        unsub()
+      }
     })
 
     return () => {
       isMounted = false
-      if (unsubscribe) {
-        unsubscribe()
-      }
+      if (unsubscribe1) unsubscribe1()
+      if (unsubscribe2) unsubscribe2()
     }
-  }, [iot.connectionState])
+  }, [iot.connectionState, player1TrackId, player2TrackId])
   
   // ============================================
   // 🎵 TRACK LOADING HANDLER
@@ -183,8 +213,10 @@ export default function Players() {
             <PlaylistViewer
               playlistId={activePlaylist.id}
               maxHeight="500px"
-              loadedTrackId={loadedTrackId}
               onTracksLoaded={handleTracksLoaded}
+              player1TrackId={player1TrackId}
+              player2TrackId={player2TrackId}
+              playedTrackIds={playedTrackIds}
             />
           )}
         </div>

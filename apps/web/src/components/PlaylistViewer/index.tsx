@@ -328,6 +328,11 @@ export interface PlaylistViewerProps {
   scheduleSlot?: { time: string; duration: number } | null
   loadedTrackId?: string | null
   
+  // Multi-player support
+  player1TrackId?: string | null
+  player2TrackId?: string | null
+  playedTrackIds?: Set<string>
+  
   // Callbacks
   onTrackSelect?: (track: PlaylistTrackItem) => void
   onTrackRemove?: (trackId: string) => void
@@ -353,6 +358,9 @@ export function PlaylistViewer({
   currentTrackIndex = null,
   scheduleSlot = null,
   loadedTrackId = null,
+  player1TrackId = null,
+  player2TrackId = null,
+  playedTrackIds = new Set(),
   onTrackSelect,
   onTrackRemove,
   onPlaylistUpdate,
@@ -641,41 +649,49 @@ export function PlaylistViewer({
                     // Calculate accumulated time for schedule
                     let accumulatedSeconds = 0
                     
-                    // Find the index of the loaded track
-                    const loadedTrackIndex = loadedTrackId 
-                      ? playlistTracks.findIndex(t => t.trackId === loadedTrackId)
+                    // Find indices for both players
+                    const player1Index = player1TrackId 
+                      ? playlistTracks.findIndex(t => t.trackId === player1TrackId)
+                      : -1
+                    const player2Index = player2TrackId 
+                      ? playlistTracks.findIndex(t => t.trackId === player2TrackId)
                       : -1
                     
                     console.log('🎨 PlaylistViewer render:')
-                    console.log('   loadedTrackId:', loadedTrackId)
-                    console.log('   loadedTrackIndex:', loadedTrackIndex)
+                    console.log('   Player 1 track:', player1TrackId, 'index:', player1Index)
+                    console.log('   Player 2 track:', player2TrackId, 'index:', player2Index)
+                    console.log('   Played tracks:', playedTrackIds.size)
                     console.log('   Total tracks:', playlistTracks.length)
                     
+                    // Find the highest loaded index (furthest in playlist)
+                    const maxLoadedIndex = Math.max(player1Index, player2Index)
+                    
                     playlistTracks.forEach((track, index) => {
-                      // Determine track status based on loaded track or schedule
+                      // Determine track status based on multi-player state
                       let trackStatus: 'past' | 'current' | 'future' | undefined
                       
-                      // If a track is loaded in player
-                      if (loadedTrackIndex >= 0) {
-                        // Loaded track itself = purple (handled by isLoadedInPlayer prop)
-                        // Track AFTER loaded = blue (current/next up)
-                        // Tracks before loaded = gray (past)
+                      // Check if this track was already played (unloaded)
+                      const wasPlayed = playedTrackIds.has(track.trackId)
+                      
+                      if (wasPlayed) {
+                        // Track was played and unloaded = gray (past)
+                        trackStatus = 'past'
+                      } else if (player1Index >= 0 || player2Index >= 0) {
+                        // At least one player has a track loaded
+                        // Next track after highest loaded = blue (next up)
                         // Tracks after next = green (future)
-                        if (index < loadedTrackIndex) {
-                          trackStatus = 'past'
-                        } else if (index === loadedTrackIndex + 1) {
-                          trackStatus = 'current' // Next track after loaded = blue!
-                        } else if (index > loadedTrackIndex + 1) {
+                        if (index === maxLoadedIndex + 1) {
+                          trackStatus = 'current' // Next track = blue!
+                        } else if (index > maxLoadedIndex + 1) {
                           trackStatus = 'future'
                         }
-                        // Note: loaded track (index === loadedTrackIndex) has no trackStatus
-                        // because it gets purple via isLoadedInPlayer prop
+                        // Loaded tracks get purple via isLoadedInPlayer prop
                       } else {
-                        // No track loaded yet
-                        // First track = blue (current/next up)
+                        // No tracks loaded yet
+                        // First track = blue (next up)
                         // Rest = green (future)
                         if (index === 0) {
-                          trackStatus = 'current' // First track = blue!
+                          trackStatus = 'current'
                         } else {
                           trackStatus = 'future'
                         }
@@ -753,7 +769,7 @@ export function PlaylistViewer({
                           compact={compact}
                           trackStatus={trackStatus}
                           scheduledTime={scheduledTime}
-                          isLoadedInPlayer={loadedTrackId === track.trackId}
+                          isLoadedInPlayer={player1TrackId === track.trackId || player2TrackId === track.trackId}
                         />
                       )
 

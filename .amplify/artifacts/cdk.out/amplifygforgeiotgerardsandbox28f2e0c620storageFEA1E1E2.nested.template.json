@@ -833,7 +833,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "0ad29f96219460c3760a3021f8699496316a882cfc555477892a80a81f1a79bc.zip"
+     "S3Key": "fb83b80b214dd5802964080fde2f46eef966fa903fe7551c62879b8352556a3c.zip"
     },
     "Environment": {
      "Variables": {
@@ -908,7 +908,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/Resource",
-    "aws:asset:path": "asset.0ad29f96219460c3760a3021f8699496316a882cfc555477892a80a81f1a79bc",
+    "aws:asset:path": "asset.fb83b80b214dd5802964080fde2f46eef966fa903fe7551c62879b8352556a3c",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1074,7 +1074,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "94f7b3d64630c8c826836addbff403ad4acc7fbace535156c2fdf5116391fe43.zip"
+     "S3Key": "df85fa94911c46c955b418676f4a45c50afc64bf0968572afe68b4c7238be10a.zip"
     },
     "Environment": {
      "Variables": {
@@ -1143,7 +1143,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/waveform-generator-lambda/Resource",
-    "aws:asset:path": "asset.94f7b3d64630c8c826836addbff403ad4acc7fbace535156c2fdf5116391fe43",
+    "aws:asset:path": "asset.df85fa94911c46c955b418676f4a45c50afc64bf0968572afe68b4c7238be10a",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
