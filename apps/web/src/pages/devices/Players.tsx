@@ -51,7 +51,7 @@ export default function PlayersClean() {
   // 📡 IOT SUBSCRIPTION
   // ============================================
   useEffect(() => {
-    if (iot.connectionState !== 'Connected' || isSubscribed) {
+    if (iot.connectionState !== 'Connected') {
       return
     }
 
@@ -77,15 +77,17 @@ export default function PlayersClean() {
       console.log('✅ SUBSCRIBED SUCCESSFULLY')
     }).catch((error) => {
       console.error('❌ Failed to subscribe:', error)
+      setIsSubscribed(false)
     })
 
     return () => {
+      console.log('🧹 Cleaning up subscription...')
       if (unsubscribe) {
         unsubscribe()
-        setIsSubscribed(false)
       }
+      setIsSubscribed(false)
     }
-  }, [iot.connectionState, playerId, isSubscribed])
+  }, [iot.connectionState, playerId])
   
   // ============================================
   // 🎮 COMMAND HANDLERS
