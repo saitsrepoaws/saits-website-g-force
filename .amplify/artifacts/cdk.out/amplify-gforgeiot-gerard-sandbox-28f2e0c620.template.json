@@ -338,7 +338,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/fe4d07fd2909fb9039f0de0bdc4eb9cd187176c2f5f82ed176da7a5e0a649247.json"
+       "/fec45f06ce509b63074384f9d0bfcff1362a53d7604df4efd65a4c4640418a24.json"
       ]
      ]
     }
@@ -406,7 +406,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/a763d54cab4262376f8f6772aab43997dfe19414d90ca5691625691db975ef2a.json"
+       "/4a835f697b6f325c37002e74507ffaca7b8aea7ad39f89559560b4f85448d9ca.json"
       ]
      ]
     }
@@ -434,12 +434,6 @@
        "auth179371D7",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
       ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
-      "Fn::GetAtt": [
-       "data7552DF31",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-      ]
      }
     },
     "Tags": [
@@ -468,7 +462,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/81a0ccda879785b036b0f956979f6249ef57bc4f6cabc5d8d834351107d93314.json"
+       "/3053461f8638ea128b537fbdee2e2fcdf7414343dafa2da04e083c1ce9181900.json"
       ]
      ]
     }
@@ -484,32 +478,6 @@
   "function1351588B": {
    "Type": "AWS::CloudFormation::Stack",
    "Properties": {
-    "Parameters": {
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-      "Fn::GetAtt": [
-       "data7552DF31",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801": {
-      "Fn::GetAtt": [
-       "data7552DF31",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D": {
-      "Fn::GetAtt": [
-       "data7552DF31",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
-      "Fn::GetAtt": [
-       "data7552DF31",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-      ]
-     }
-    },
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -536,7 +504,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/8d2f48019cea36a50525e9ef048d4da48101907e3e3117050a61af54a095c9cb.json"
+       "/2179657474d66d524218a3ac08705ff0d1318c42be56ddc643bbac59d6fd039e.json"
       ]
      ]
     }
@@ -546,68 +514,6 @@
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function.NestedStack/function.NestedStackResource",
     "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620functionDC40D732.nested.template.json",
-    "aws:asset:property": "TemplateURL"
-   }
-  },
-  "customplayerstatemachine74B5C2ED": {
-   "Type": "AWS::CloudFormation::Stack",
-   "Properties": {
-    "Parameters": {
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-      ]
-     },
-     "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-      "Fn::GetAtt": [
-       "function1351588B",
-       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-      ]
-     }
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "TemplateURL": {
-     "Fn::Join": [
-      "",
-      [
-       "https://s3.",
-       {
-        "Ref": "AWS::Region"
-       },
-       ".",
-       {
-        "Ref": "AWS::URLSuffix"
-       },
-       "/",
-       {
-        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
-       },
-       "/e340781a4cc82b45726f99bb1ba2f23ddb473098c4de8d9db5e8ce46b1d06de7.json"
-      ]
-     ]
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine.NestedStack/custom-player-state-machine.NestedStackResource",
-    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620customplayerstatemachine1288B6DD.nested.template.json",
     "aws:asset:property": "TemplateURL"
    }
   },

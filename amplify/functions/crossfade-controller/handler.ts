@@ -12,13 +12,6 @@
  * 6. Unloads finished track and loads next
  */
 
-import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb'
-
-const iot = new IoTDataPlaneClient({})
-const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
-
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE_NAME
 const TRACK_TABLE = process.env.TRACK_TABLE_NAME
 
@@ -157,6 +150,12 @@ async function handleTrackEnded(event: any) {
 async function getPlaylist(playlistId: string) {
   console.log('📋 Loading playlist:', playlistId)
 
+  // Dynamic import - AWS SDK available in Lambda runtime
+  const { DynamoDBClient } = await import('@aws-sdk/client-dynamodb')
+  const { DynamoDBDocumentClient, GetCommand } = await import('@aws-sdk/lib-dynamodb')
+  
+  const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+
   const result = await dynamodb.send(
     new GetCommand({
       TableName: PLAYLIST_TABLE,
@@ -169,6 +168,12 @@ async function getPlaylist(playlistId: string) {
 
 async function loadTracksData(playlistTracks: any[]): Promise<Track[]> {
   console.log('📀 Loading track data for', playlistTracks.length, 'tracks')
+
+  // Dynamic import - AWS SDK available in Lambda runtime
+  const { DynamoDBClient } = await import('@aws-sdk/client-dynamodb')
+  const { DynamoDBDocumentClient, GetCommand } = await import('@aws-sdk/lib-dynamodb')
+  
+  const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
   const tracks: Track[] = []
 
@@ -203,6 +208,11 @@ async function loadTracksData(playlistTracks: any[]): Promise<Track[]> {
 async function sendLoadCommand(playerId: string, track: Track) {
   console.log(`📤 Sending LOAD command to ${playerId}:`, track.title)
 
+  // Dynamic import - AWS SDK available in Lambda runtime
+  const { IoTDataPlaneClient, PublishCommand } = await import('@aws-sdk/client-iot-data-plane')
+  
+  const iot = new IoTDataPlaneClient({})
+
   const topic = `radio/player/${playerId}/command`
   const message = {
     command: 'LOAD',
@@ -234,6 +244,11 @@ async function sendLoadCommand(playerId: string, track: Track) {
 
 async function sendStopCommand(playerId: string) {
   console.log(`📤 Sending STOP command to ${playerId}`)
+
+  // Dynamic import - AWS SDK available in Lambda runtime
+  const { IoTDataPlaneClient, PublishCommand } = await import('@aws-sdk/client-iot-data-plane')
+  
+  const iot = new IoTDataPlaneClient({})
 
   const topic = `radio/player/${playerId}/command`
   const message = {

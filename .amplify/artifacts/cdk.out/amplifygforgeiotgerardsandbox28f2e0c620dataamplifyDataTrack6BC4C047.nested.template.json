@@ -2075,14 +2075,6 @@
      ]
     }
    }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "TrackTable",
-     "TableArn"
-    ]
-   }
   }
  }
 }
