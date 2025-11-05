@@ -33,6 +33,7 @@ export default function Players() {
   const [player1TrackId, setPlayer1TrackId] = useState<string | null>(null)
   const [player2TrackId, setPlayer2TrackId] = useState<string | null>(null)
   const [playedTrackIds, setPlayedTrackIds] = useState<Set<string>>(new Set())
+  const [isCrossFadeActive, setIsCrossFadeActive] = useState(false)
   
   // ============================================
   // 📅 SCHEDULE & PLAYLIST LOADING
@@ -169,6 +170,49 @@ export default function Players() {
     // When a track is actually loaded via IoT command, it will be highlighted purple
   }
   
+  // ============================================
+  // 🎛️ CROSS-FADE CONTROLLER
+  // ============================================
+  const handleStartCrossFade = async () => {
+    if (!activePlaylist) {
+      console.error('❌ No active playlist to start cross-fade')
+      return
+    }
+
+    console.log('▶️ Starting cross-fade for playlist:', activePlaylist.id)
+    setIsCrossFadeActive(true)
+
+    try {
+      // Publish START_CROSSFADE command to IoT topic
+      await iot.publish('radio/crossfade/control', {
+        command: 'START_CROSSFADE',
+        playlistId: activePlaylist.id,
+        timestamp: new Date().toISOString()
+      })
+
+      console.log('✅ Cross-fade started!')
+    } catch (error) {
+      console.error('❌ Error starting cross-fade:', error)
+      setIsCrossFadeActive(false)
+    }
+  }
+
+  const handleStopCrossFade = async () => {
+    console.log('⏹️ Stopping cross-fade')
+    setIsCrossFadeActive(false)
+
+    try {
+      await iot.publish('radio/crossfade/control', {
+        command: 'STOP_CROSSFADE',
+        timestamp: new Date().toISOString()
+      })
+
+      console.log('✅ Cross-fade stopped!')
+    } catch (error) {
+      console.error('❌ Error stopping cross-fade:', error)
+    }
+  }
+  
   return (
     <Layout title="Players" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -186,6 +230,50 @@ export default function Players() {
             playerName="🎵 Player 2"
           />
         </div>
+        
+        {/* Cross-Fade Controller */}
+        {activePlaylist && (
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl shadow-lg p-6 border border-indigo-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-2xl">🎛️</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg">Cross-Fade Controller</h3>
+                  <p className="text-sm text-gray-600">
+                    {isCrossFadeActive ? (
+                      <span className="text-green-600 font-medium">▶️ Active - Playing tracks alternately</span>
+                    ) : (
+                      <span className="text-gray-500">⏸️ Ready to start cross-fade playback</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3">
+                {!isCrossFadeActive ? (
+                  <button
+                    onClick={handleStartCrossFade}
+                    disabled={isLoadingSchedule}
+                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2"
+                  >
+                    <span className="text-xl">▶️</span>
+                    <span>Start Cross-Fade</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleStopCrossFade}
+                    className="px-6 py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-red-600 hover:to-rose-700 transition-all duration-200 flex items-center gap-2"
+                  >
+                    <span className="text-xl">⏹️</span>
+                    <span>Stop Cross-Fade</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Playlist Viewer - Full Width */}
         <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl shadow-lg overflow-hidden border border-purple-200">

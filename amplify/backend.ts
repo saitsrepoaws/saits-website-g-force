@@ -9,6 +9,7 @@ import { playerLoadHandler } from './functions/player-load-handler/resource'
 import { playerIotPublisher } from './functions/player-iot-publisher/resource'
 import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 import { radioScheduler } from './functions/radio-scheduler/resource'
+import { crossfadeController } from './functions/crossfade-controller/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -47,6 +48,7 @@ export const backend = defineBackend({
   playerIotPublisher,
   playerSimpleHandler,
   radioScheduler,
+  crossfadeController,
   // audioAnalyzer - replaced with container Lambda below
 })
 
@@ -118,6 +120,29 @@ radioSchedulerLambda.addToRolePolicy(
     effect: Effect.ALLOW,
     actions: ['iot:Publish'],
     resources: ['arn:aws:iot:*:*:topic/radio/station/*'],
+  })
+)
+
+// =============================================================================
+// Cross-Fade Controller Configuration
+// =============================================================================
+
+const crossfadeControllerLambda = backend.crossfadeController.resources.lambda
+
+// Grant cross-fade controller Lambda permissions
+playlistTable.grantReadData(crossfadeControllerLambda)
+trackTable.grantReadData(crossfadeControllerLambda)
+
+// Add environment variables for cross-fade controller
+backend.crossfadeController.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
+backend.crossfadeController.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+
+// Grant IoT publish permission to cross-fade controller
+crossfadeControllerLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/player/*'],
   })
 )
 
@@ -440,6 +465,35 @@ new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
 new CfnOutput(stateMachineStack, 'IoTRuleArn', {
   value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${iotRule.ruleName}`,
   description: 'ARN of the IoT Rule for player commands',
+})
+
+// =============================================================================
+// Cross-Fade Controller IoT Rule
+// =============================================================================
+
+// Grant IoT permission to invoke cross-fade controller
+crossfadeControllerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
+
+const crossfadeIotRule = new iot.CfnTopicRule(stateMachineStack, 'CrossFadeControlRule', {
+  ruleName: 'RadioCrossFadeControlRule',
+  topicRulePayload: {
+    sql: "SELECT * FROM 'radio/crossfade/control'",
+    description: 'Trigger cross-fade controller for START/STOP commands',
+    actions: [
+      {
+        lambda: {
+          functionArn: crossfadeControllerLambda.functionArn,
+        },
+      },
+    ],
+    awsIotSqlVersion: '2016-03-23',
+  },
+})
+
+// Cross-Fade Rule output
+new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
+  value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${crossfadeIotRule.ruleName}`,
+  description: 'ARN of the IoT Rule for cross-fade control',
   exportName: 'PlayerCommandIoTRuleArn',
 })
 
