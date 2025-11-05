@@ -1,0 +1,501 @@
+import { useState, useEffect } from 'react'
+import { useIoT } from '../contexts/IoTContext'
+import { getAudioUrl, getCoverArtUrl, getWaveformUrl } from '../utils/mediaUrl'
+
+interface PlayerCardProps {
+  playerId: string
+  playerName: string
+}
+
+/**
+ * PlayerCard Component
+ * 
+ * Reusable player card that can be used for multiple players
+ * Each card manages its own state and IoT subscription
+ */
+export default function PlayerCard({ playerId, playerName }: PlayerCardProps) {
+  const iot = useIoT()
+  
+  // ============================================
+  // 📊 LOCAL STATE
+  // ============================================
+  const [autoLoad, setAutoLoad] = useState(false)
+  const [isSubscribed, setIsSubscribed] = useState(false)
+  
+  // Track info for UI display
+  const [trackInfo, setTrackInfo] = useState<any>(null)
+  const [coverArtUrl, setCoverArtUrl] = useState<string | null>(null)
+  const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  
+  // Player status for UI
+  const [playerStatus, setPlayerStatus] = useState<'idle' | 'loading' | 'loaded' | 'playing' | 'paused' | 'stopped'>('idle')
+  
+  // Progress tracking
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  
+  // ============================================
+  // 📡 IOT SUBSCRIPTION
+  // ============================================
+  useEffect(() => {
+    if (iot.connectionState !== 'Connected') {
+      console.log(`⏸️ [${playerId}] IoT not connected, skipping subscription`)
+      return
+    }
+
+    const commandTopic = `radio/player/${playerId}/command`
+    
+    console.log(`📡 [${playerId}] Subscribing to ${commandTopic}`)
+
+    let unsubscribe: (() => void) | undefined
+    let isMounted = true
+
+    iot.subscribe(commandTopic, (message: any) => {
+      console.log(`📥 [${playerId}] INCOMING MESSAGE:`, message)
+      handleIncomingCommand(message)
+    }).then((unsub) => {
+      if (!isMounted) {
+        console.log(`⚠️ [${playerId}] Component unmounted before subscribe completed`)
+        unsub()
+        return
+      }
+      
+      unsubscribe = unsub
+      setIsSubscribed(true)
+      console.log(`✅ [${playerId}] SUBSCRIBED SUCCESSFULLY`)
+    }).catch((error) => {
+      console.error(`❌ [${playerId}] Failed to subscribe:`, error)
+      if (isMounted) {
+        setIsSubscribed(false)
+      }
+    })
+
+    return () => {
+      console.log(`🧹 [${playerId}] Cleaning up subscription...`)
+      isMounted = false
+      if (unsubscribe) {
+        unsubscribe()
+      }
+      setIsSubscribed(false)
+    }
+  }, [iot.connectionState, playerId])
+  
+  // ============================================
+  // 🎮 COMMAND HANDLERS
+  // ============================================
+  const handleIncomingCommand = async (message: any) => {
+    const { command } = message
+
+    console.log(`🎯 [${playerId}] Processing command: ${command}`)
+
+    switch (command) {
+      case 'PLAY':
+        handlePlayCommand(message)
+        break
+      case 'PAUSE':
+        handlePauseCommand(message)
+        break
+      case 'STOP':
+        handleStopCommand(message)
+        break
+      case 'LOAD':
+        await handleLoadCommand(message)
+        break
+      case 'UNLOAD':
+        handleUnloadCommand(message)
+        break
+      default:
+        console.warn(`⚠️ [${playerId}] Unknown command: ${command}`)
+    }
+  }
+
+  const handlePlayCommand = (message: any) => {
+    console.log(`▶️ [${playerId}] PLAY COMMAND RECEIVED`)
+    
+    setPlayerStatus('playing')
+    
+    const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
+    if (audioElement) {
+      audioElement.play()
+        .then(() => console.log(`✅ [${playerId}] Audio playback started!`))
+        .catch((error) => console.error(`❌ [${playerId}] Failed to start audio:`, error))
+    }
+  }
+
+  const handlePauseCommand = (message: any) => {
+    console.log(`⏸️ [${playerId}] PAUSE COMMAND RECEIVED`)
+    setPlayerStatus('paused')
+    
+    const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
+    if (audioElement) {
+      audioElement.pause()
+    }
+  }
+
+  const handleStopCommand = (message: any) => {
+    console.log(`⏹️ [${playerId}] STOP COMMAND RECEIVED`)
+    
+    const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
+    if (audioElement) {
+      audioElement.pause()
+      audioElement.currentTime = 0
+    }
+    
+    setPlayerStatus('stopped')
+  }
+
+  const handleLoadCommand = async (message: any) => {
+    console.log(`💿 [${playerId}] LOAD COMMAND RECEIVED`)
+    
+    if (!message.params || !message.params.track) {
+      console.error(`❌ [${playerId}] No track data in LOAD command`)
+      return
+    }
+
+    const { track } = message.params
+    
+    console.log(`✅ [${playerId}] Track:`, track.title, 'by', track.artist)
+    
+    setPlayerStatus('loading')
+    
+    try {
+      const [audioUrlResolved, coverUrl, waveUrl] = await Promise.all([
+        getAudioUrl(track.fileUrl),
+        getCoverArtUrl(track.coverArtUrl),
+        getWaveformUrl(track.waveformUrl)
+      ])
+      
+      setCoverArtUrl(coverUrl)
+      setWaveformUrl(waveUrl)
+      setAudioUrl(audioUrlResolved)
+      
+      setTrackInfo({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        album: track.album,
+        duration: track.duration,
+        bpm: track.bpm,
+        key: track.key,
+        genre: track.genre,
+        year: track.year,
+        label: track.label,
+        energy: track.energy
+      })
+      
+      setPlayerStatus('loaded')
+      console.log(`✅ [${playerId}] Track loaded successfully`)
+    } catch (error) {
+      console.error(`❌ [${playerId}] Failed to load track:`, error)
+      setPlayerStatus('idle')
+    }
+  }
+
+  const handleUnloadCommand = (message: any) => {
+    console.log(`🗑️ [${playerId}] UNLOAD COMMAND RECEIVED`)
+    
+    const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
+    if (audioElement) {
+      audioElement.pause()
+      audioElement.currentTime = 0
+    }
+    
+    setCoverArtUrl(null)
+    setWaveformUrl(null)
+    setAudioUrl(null)
+    setTrackInfo(null)
+    setPlayerStatus('idle')
+    
+    console.log(`✅ [${playerId}] Track cleared successfully`)
+  }
+  
+  // ============================================
+  // 🎚️ UI HANDLERS
+  // ============================================
+  const handleStopButton = async () => {
+    const commandTopic = `radio/player/${playerId}/command-request`
+    const stopCommand = {
+      command: 'STOP',
+      playerId: playerId,
+      timestamp: new Date().toISOString()
+    }
+
+    try {
+      await iot.publish(commandTopic, stopCommand)
+      console.log(`✅ [${playerId}] STOP command published`)
+    } catch (error) {
+      console.error(`❌ [${playerId}] Failed to publish STOP:`, error)
+    }
+  }
+
+  const handlePlayButton = async () => {
+    const commandTopic = `radio/player/${playerId}/command-request`
+    const playCommand = {
+      command: 'PLAY',
+      playerId: playerId,
+      timestamp: new Date().toISOString()
+    }
+
+    try {
+      await iot.publish(commandTopic, playCommand)
+      console.log(`✅ [${playerId}] PLAY command published`)
+    } catch (error) {
+      console.error(`❌ [${playerId}] Failed to publish PLAY:`, error)
+    }
+  }
+
+  const handleAutoLoadToggle = async () => {
+    const newValue = !autoLoad
+    setAutoLoad(newValue)
+    
+    console.log(`🎚️ [${playerId}] AUTO LOAD:`, newValue ? 'ON' : 'OFF')
+
+    if (newValue) {
+      const commandTopic = `radio/player/${playerId}/command-request`
+      const loadCommand = {
+        command: 'LOAD',
+        playerId: playerId,
+        timestamp: new Date().toISOString()
+      }
+      
+      try {
+        await iot.publish(commandTopic, loadCommand)
+        console.log(`✅ [${playerId}] LOAD command published`)
+      } catch (error) {
+        console.error(`❌ [${playerId}] Failed to publish LOAD:`, error)
+      }
+    } else {
+      const commandTopic = `radio/player/${playerId}/command`
+      const unloadCommand = {
+        command: 'UNLOAD',
+        playerId: playerId,
+        timestamp: new Date().toISOString()
+      }
+      
+      try {
+        await iot.publish(commandTopic, unloadCommand)
+        console.log(`✅ [${playerId}] UNLOAD command published`)
+      } catch (error) {
+        console.error(`❌ [${playerId}] Failed to publish UNLOAD:`, error)
+      }
+    }
+  }
+  
+  // ============================================
+  // 🎨 RENDER
+  // ============================================
+  return (
+    <>
+      {/* Hidden Audio Element */}
+      {audioUrl && (
+        <audio
+          id={`player-audio-${playerId}`}
+          src={audioUrl}
+          onPlay={() => {
+            console.log(`🎵 [${playerId}] Audio started playing`)
+            setPlayerStatus('playing')
+          }}
+          onPause={() => {
+            console.log(`⏸️ [${playerId}] Audio paused`)
+            setPlayerStatus('paused')
+          }}
+          onEnded={() => {
+            console.log(`🏁 [${playerId}] Audio ended`)
+            setPlayerStatus('stopped')
+            setCurrentTime(0)
+          }}
+          onTimeUpdate={(e) => {
+            const audio = e.currentTarget
+            setCurrentTime(audio.currentTime)
+            setDuration(audio.duration)
+          }}
+          onLoadedMetadata={(e) => {
+            const audio = e.currentTarget
+            setDuration(audio.duration)
+          }}
+          onError={(e) => console.error(`❌ [${playerId}] Audio error:`, e)}
+        />
+      )}
+      
+      {/* Player Card */}
+      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-6 space-y-4">
+        
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white mb-1">{playerName}</h2>
+          <p className="text-blue-200 text-xs">ID: {playerId}</p>
+        </div>
+
+        {/* Connection Status */}
+        <div className="flex items-center justify-center gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${iot.connectionState === 'Connected' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+            <span className="text-white font-medium">
+              {iot.connectionState === 'Connected' ? 'IoT' : 'Offline'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+            <span className="text-white font-medium">
+              {isSubscribed ? 'Sub' : 'No Sub'}
+            </span>
+          </div>
+        </div>
+
+        {/* Cover Art Display */}
+        {coverArtUrl && (
+          <div className="bg-black/30 rounded-xl p-3 border border-white/10">
+            <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-gradient-to-br from-purple-900/20 to-blue-900/20">
+              <img 
+                src={coverArtUrl} 
+                alt={trackInfo?.title ? `${trackInfo.title} cover art` : 'Cover art'}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23374151" width="400" height="400"/%3E%3Ctext fill="%239CA3AF" font-family="sans-serif" font-size="24" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3ENo Cover%3C/text%3E%3C/svg%3E'
+                }}
+              />
+            </div>
+            
+            {/* Waveform Display */}
+            {waveformUrl && (
+              <div className="mt-3">
+                <div className="bg-black/50 rounded-lg p-2 border border-white/5">
+                  <img 
+                    src={waveformUrl} 
+                    alt="Waveform"
+                    className="w-full h-12 object-contain"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="mt-2">
+                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                    <span className="font-mono">
+                      {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
+                    </span>
+                    <span className="font-mono">
+                      {Math.floor(duration / 60)}:{String(Math.floor(duration % 60)).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <div className="relative h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/10">
+                    <div 
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-linear"
+                      style={{ 
+                        width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` 
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Control Buttons */}
+        <div className="space-y-2">
+          {/* Auto Load Toggle */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleAutoLoadToggle()
+            }}
+            className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+              autoLoad
+                ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/50'
+                : 'bg-white/10 hover:bg-white/20 text-gray-300 border-2 border-white/20'
+            }`}
+          >
+            <span className="text-xl">{autoLoad ? '✅' : '⭕'}</span>
+            <span>Auto Load</span>
+            <span className="ml-auto text-xs opacity-75">
+              {autoLoad ? 'ON' : 'OFF'}
+            </span>
+          </button>
+
+          {/* Play Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handlePlayButton()
+            }}
+            disabled={!(trackInfo) || playerStatus === 'playing'}
+            className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+              trackInfo && playerStatus !== 'playing'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/50 cursor-pointer'
+                : 'bg-gray-600/50 text-gray-400 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <span className="text-xl">
+              {playerStatus === 'playing' ? '⏸️' : '▶️'}
+            </span>
+            <span>
+              {playerStatus === 'playing' ? 'Playing' : 'Play'}
+            </span>
+          </button>
+
+          {/* Stop Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleStopButton()
+            }}
+            disabled={playerStatus !== 'playing'}
+            className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
+              playerStatus === 'playing'
+                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/50 cursor-pointer'
+                : 'bg-gray-600/50 text-gray-400 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <span className="text-xl">⏹️</span>
+            <span>Stop</span>
+          </button>
+        </div>
+
+        {/* Status Grid */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/5 rounded-lg p-2">
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Status</div>
+              <div className={`text-xs font-semibold capitalize ${
+                playerStatus === 'loading' ? 'text-yellow-400' :
+                playerStatus === 'playing' ? 'text-green-400' :
+                playerStatus === 'paused' ? 'text-orange-400' :
+                playerStatus === 'stopped' ? 'text-red-400' :
+                'text-gray-400'
+              }`}>
+                {playerStatus || 'idle'}
+              </div>
+            </div>
+            <div className="bg-white/5 rounded-lg p-2">
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Mode</div>
+              <div className="text-white text-xs font-semibold">{autoLoad ? 'Auto' : 'Manual'}</div>
+            </div>
+            <div className="bg-white/5 rounded-lg p-2 col-span-2">
+              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Track</div>
+              {trackInfo ? (
+                <div className="text-white text-xs">
+                  <div className="font-semibold truncate" title={trackInfo.title}>
+                    {trackInfo.title}
+                  </div>
+                  <div className="text-xs text-gray-400 truncate" title={trackInfo.artist}>
+                    {trackInfo.artist}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-500 text-xs">No track loaded</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </>
+  )
+}
