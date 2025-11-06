@@ -929,7 +929,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "aa3bf066e82a6ee6ac60bdc92e21f54ba0f19ecab20440cd1aa0502dad26decb.zip"
+     "S3Key": "ca915022bc5f823d63daa6d4e56543e39d8d5ba91cbe7ef524bb9a07baed8c2e.zip"
     },
     "Environment": {
      "Variables": {
@@ -979,7 +979,8 @@
          ]
         }
        ]
-      }
+      },
+      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
      }
     },
     "EphemeralStorage": {
@@ -1018,7 +1019,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/Resource",
-    "aws:asset:path": "asset.aa3bf066e82a6ee6ac60bdc92e21f54ba0f19ecab20440cd1aa0502dad26decb",
+    "aws:asset:path": "asset.ca915022bc5f823d63daa6d4e56543e39d8d5ba91cbe7ef524bb9a07baed8c2e",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

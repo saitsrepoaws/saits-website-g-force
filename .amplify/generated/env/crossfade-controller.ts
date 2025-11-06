@@ -84,4 +84,5 @@ type LambdaProvidedEnvVars = {
 type AmplifyBackendEnvVars = {
   PLAYLIST_TABLE_NAME: string;
   TRACK_TABLE_NAME: string;
+  IOT_ENDPOINT: string;
 };

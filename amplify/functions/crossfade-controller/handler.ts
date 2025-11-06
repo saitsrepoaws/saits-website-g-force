@@ -109,14 +109,21 @@ async function startCrossFade(playlistId: string) {
     console.log('🎵 Loading first track in Player 1:', firstTrack.title)
 
     await sendLoadCommand('player-001', firstTrack)
+    
+    // Small delay to ensure track is loaded before playing
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // Start playing Player 1
+    console.log('▶️ Starting playback on Player 1')
+    await sendPlayCommand('player-001')
 
     // If there's a second track, preload it in Player 2
     if (tracks.length > 1) {
       const secondTrack = tracks[1]
       console.log('🎵 Preloading second track in Player 2:', secondTrack.title)
       
-      // Small delay to ensure Player 1 loads first
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Small delay to ensure Player 1 starts first
+      await new Promise(resolve => setTimeout(resolve, 500))
       
       await sendLoadCommand('player-002', secondTrack)
     }
@@ -126,8 +133,8 @@ async function startCrossFade(playlistId: string) {
       playlistId,
       tracksLoaded: Math.min(2, tracks.length),
       totalTracks: tracks.length,
-      currentIndex: 1, // Next track to load
-      activePlayer: 1 // Player 1 should play first
+      currentIndex: 1, // Next track to load (tracks[2])
+      activePlayer: 1 // Player 1 is playing
     }
   } catch (error) {
     console.error('❌ Error starting cross-fade:', error)
@@ -254,6 +261,27 @@ async function sendLoadCommand(playerId: string, track: Track) {
   )
 
   console.log(`✅ LOAD command sent to ${playerId}`)
+}
+
+async function sendPlayCommand(playerId: string) {
+  console.log(`📤 Sending PLAY command to ${playerId}`)
+
+  const topic = `radio/player/${playerId}/command`
+  const message = {
+    command: 'PLAY',
+    playerId,
+    timestamp: new Date().toISOString()
+  }
+
+  await iot.send(
+    new PublishCommand({
+      topic,
+      payload: Buffer.from(JSON.stringify(message)),
+      qos: 1
+    })
+  )
+
+  console.log(`✅ PLAY command sent to ${playerId}`)
 }
 
 async function sendStopCommand(playerId: string) {
