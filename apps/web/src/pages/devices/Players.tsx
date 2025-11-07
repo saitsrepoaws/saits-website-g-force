@@ -6,6 +6,7 @@ import { useTabTitle } from '../../hooks/useTabTitle'
 import { useIoT } from '../../contexts/IoTContext'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
 import { getPlaylist } from '../../services/playlists'
+import { getTrack } from '../../services/tracks'
 import type { ScheduleSlot } from '../../utils/scheduleCalculator'
 import type { Playlist } from '../../types/playlist'
 
@@ -237,7 +238,7 @@ export default function Players() {
   }
 
   const handleTrackEnded = async (playerId: string, trackId: string) => {
-    console.log(`🔄 Track ended on ${playerId}:`, trackId)
+    console.log(`🏁 Track ended on ${playerId}:`, trackId)
     
     if (!isCrossFadeActive || !crossFadeState) {
       console.log('⚠️ Cross-fade not active, ignoring track end')
@@ -246,45 +247,72 @@ export default function Players() {
 
     const { currentPlayer, nextTrackIndex, allTracks } = crossFadeState
     
-    // Check if there are more tracks
-    if (nextTrackIndex >= allTracks.length) {
-      console.log('🏁 Playlist finished!')
-      setIsCrossFadeActive(false)
-      setCrossFadeState(null)
-      return
-    }
-
-    // Switch to the other player
+    // Determine which player just finished and which should play next
+    const finishedPlayer = currentPlayer
     const nextPlayer = currentPlayer === 1 ? 2 : 1
     const nextPlayerId = `player-00${nextPlayer}`
-    const nextTrack = allTracks[nextTrackIndex]
+    const finishedPlayerId = `player-00${finishedPlayer}`
     
-    console.log(`🎵 Loading next track (${nextTrackIndex + 1}/${allTracks.length}) on Player ${nextPlayer}:`, nextTrack.title)
+    console.log(`🔄 Player ${finishedPlayer} finished → Starting Player ${nextPlayer}`)
 
     try {
-      // Load track on the other player
-      await iot.publish(`radio/player/${nextPlayerId}/command-request`, {
-        command: 'LOAD',
-        playerId: nextPlayerId,
-        timestamp: new Date().toISOString()
-      })
-      
-      // Wait a bit for load
-      await new Promise(resolve => setTimeout(resolve, 300))
-      
-      // Start playing
-      await iot.publish(`radio/player/${nextPlayerId}/command-request`, {
+      // 1. Start playing the OTHER player (which already has a track loaded)
+      console.log(`▶️ Starting playback on Player ${nextPlayer}`)
+      await iot.publish(`radio/player/${nextPlayerId}/command`, {
         command: 'PLAY',
         playerId: nextPlayerId,
         timestamp: new Date().toISOString()
       })
-
-      // Update state
-      setCrossFadeState({
-        currentPlayer: nextPlayer,
-        nextTrackIndex: nextTrackIndex + 1,
-        allTracks
-      })
+      
+      // 2. Load next track in the player that just finished (if available)
+      if (nextTrackIndex < allTracks.length) {
+        const nextTrack = allTracks[nextTrackIndex]
+        console.log(`📥 Preloading track ${nextTrackIndex + 1}/${allTracks.length} in Player ${finishedPlayer}: ${nextTrack.trackTitle || 'Unknown'}`)
+        
+        // Small delay to let the other player start
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
+        // Get full track data from DynamoDB
+        const { data: trackData, errors } = await getTrack(nextTrack.trackId)
+        
+        if (errors || !trackData) {
+          console.error('❌ Failed to load track data for:', nextTrack.trackId, errors)
+          return
+        }
+        
+        // Load track directly with full data (bypass state machine)
+        await iot.publish(`radio/player/${finishedPlayerId}/command`, {
+          command: 'LOAD',
+          playerId: finishedPlayerId,
+          timestamp: new Date().toISOString(),
+          params: {
+            track: {
+              id: trackData.id,
+              title: trackData.title,
+              artist: trackData.artist,
+              fileUrl: trackData.fileUrl,
+              coverArtUrl: trackData.coverArtUrl,
+              waveformUrl: trackData.waveformUrl,
+              duration: trackData.trackDuration
+            }
+          }
+        })
+        
+        // Update state
+        setCrossFadeState({
+          currentPlayer: nextPlayer, // Now the other player is playing
+          nextTrackIndex: nextTrackIndex + 1, // Next track to load
+          allTracks
+        })
+      } else {
+        // No more tracks to load, but let the last track play
+        console.log('📋 No more tracks to preload, last track playing on Player', nextPlayer)
+        setCrossFadeState({
+          currentPlayer: nextPlayer,
+          nextTrackIndex: nextTrackIndex,
+          allTracks
+        })
+      }
 
       console.log(`✅ Switched to Player ${nextPlayer}`)
     } catch (error) {
