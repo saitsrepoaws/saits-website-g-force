@@ -51,6 +51,31 @@ const schema = a.schema({
     ])
     .authorization((allow) => [allow.authenticated()]),
 
+  // UserPreferences model - user settings and preferences
+  UserPreferences: a
+    .model({
+      userId: a.string().required(), // Cognito userId (from getCurrentUser)
+      
+      // Notification Settings
+      notificationsEnabled: a.boolean().default(true),
+      notifyOnTrackChange: a.boolean().default(true),
+      notifyOnPlaylistUpdate: a.boolean().default(true),
+      notifyOnLogin: a.boolean().default(false),
+      
+      // UI Preferences
+      theme: a.string().default('light'), // "light" | "dark"
+      defaultView: a.string(), // "players" | "playlists" | "libery"
+      
+      // Timestamps
+      createdAt: a.datetime(),
+      updatedAt: a.datetime(),
+    })
+    .identifier(['userId'])
+    .authorization((allow) => [
+      allow.owner(),
+      allow.authenticated().to(['read'])
+    ]),
+
   // PlayerState model - persistent player state for recovery
   // Hybrid approach: IoT for real-time, DynamoDB for snapshots
   PlayerState: a

@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { useIoT } from '../contexts/IoTContext'
 import { getCurrentUser } from 'aws-amplify/auth'
+import { getUserPreferences } from '../services/userPreferences'
 
 export interface NotificationMessage {
   type: 'track_change' | 'playlist_update' | 'schedule_alert' | 'system' | 'user_login' | 'user_logout'
@@ -29,6 +30,7 @@ export function useNotifications() {
   const iot = useIoT()
   const [permission, setPermission] = useState<NotificationPermission>('default')
   const [userId, setUserId] = useState<string | null>(null)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
 
   // Get user ID and send login notification
   useEffect(() => {
@@ -37,8 +39,14 @@ export function useNotifications() {
         const user = await getCurrentUser()
         setUserId(user.userId)
         
+        // Load user preferences
+        const prefs = await getUserPreferences(user.userId)
+        if (prefs) {
+          setNotificationsEnabled(prefs.notificationsEnabled)
+        }
+        
         // Send login notification to IoT (will be picked up by other tabs/devices)
-        if (iot.connectionState === 'Connected') {
+        if (iot.connectionState === 'Connected' && prefs?.notifyOnLogin) {
           await iot.publish(`user/${user.userId}/notifications/user_login`, {
             type: 'user_login',
             title: 'Welcome Back!',
@@ -68,8 +76,14 @@ export function useNotifications() {
     return false
   }
 
-  // Show browser notification
+  // Show browser notification (respects user preferences)
   const showNotification = (message: NotificationMessage) => {
+    // Check if notifications are enabled in preferences
+    if (!notificationsEnabled) {
+      console.log('🔕 Notifications disabled in user preferences')
+      return
+    }
+    
     if (permission !== 'granted') {
       console.warn('Notification permission not granted')
       return
