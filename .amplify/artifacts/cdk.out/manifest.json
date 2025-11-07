@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ba184c1e1a96300f86c406a154c71e1d165ae873d8948f29db715ab8472e8def.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a1c2f2c4a6740ab24e64cf7941ff0bdd8f4dc80c2f8fbfdb5e189d42be81c9fe.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -3125,6 +3125,12 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": [
           {
             "type": "aws:cdk:logicalId",
@@ -3227,6 +3233,24 @@
             "data": "crossfadecontrollerlambdaInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE1037AE21"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "streamplaylistupdaterlambdaServiceRoleFFBA28E3"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "streamplaylistupdaterlambdaServiceRoleDefaultPolicyB8B2212A"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "streamplaylistupdaterlambda53C93EC5"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -3243,6 +3267,168 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "RadioSchedulerRuleArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamPlaylistBucket5DE5E8D3"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamPlaylistSchedulerRuleD4455083"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC167": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamPlaylistSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC1673E42A909"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPC6AFF271F"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet1SubnetB84F8F5B"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet1RouteTableC1A9EB54"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet1RouteTableAssociation4B376B22"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet1DefaultRoute924D0152"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet2Subnet1639858E"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet2RouteTable8637D996"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet2RouteTableAssociation77E97464"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCPublicSubnet2DefaultRoute88362319"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCIGW4F1D4290"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamVPCVPCGW05B9AFAC"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamSG/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamSGC03004BE"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerRole6A0ED596"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerRoleDefaultPolicy19BCE421"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerInstanceProfileC0407D9A"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerA433EFF8ebe149ffa8a4336a"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/LaunchTemplate": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerLaunchTemplate2D6E0EA8"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/SsmParameterValue:--aws--service--canonical--ubuntu--server--22.04--stable--current--amd64--hvm--ebs-gp2--ami-id:C96584B6-F00A-464E-AD19-53AFF4B05118.Parameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SsmParameterValueawsservicecanonicalubuntuserver2204stablecurrentamd64hvmebsgp2amiidC96584B6F00A464EAD1953AFF4B05118Parameter"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerEIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerEIP"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerPublicIP": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerPublicIP"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamURL"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/IcecastAdminURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IcecastAdminURL"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/PlaylistBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PlaylistBucketName"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerInstanceId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamServerInstanceId"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default": [
@@ -3287,6 +3473,12 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Ref"
           }
         ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref"
+          }
+        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": [
           {
             "type": "aws:cdk:logicalId",
@@ -3309,6 +3501,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": [

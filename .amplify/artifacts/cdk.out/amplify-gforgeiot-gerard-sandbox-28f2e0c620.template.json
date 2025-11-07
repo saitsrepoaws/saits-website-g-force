@@ -211,6 +211,13 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -475,7 +482,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/81a0ccda879785b036b0f956979f6249ef57bc4f6cabc5d8d834351107d93314.json"
+       "/b576d883de9f4815d1aef99d15682184b187cd7146a3b89e8cae4798a683ce88.json"
       ]
      ]
     }
@@ -515,6 +522,12 @@
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
+      "Fn::GetAtt": [
+       "storage0EC3F24A",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
+      ]
      }
     },
     "Tags": [
@@ -543,7 +556,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/8f5ce0e8df4021559a155d2be5a7540643044a09531c0098fda6065d9b623540.json"
+       "/f89e9d1045f41940d66a5ceb237cda02efaff9be28d93ccae5e221feacb43835.json"
       ]
      ]
     }

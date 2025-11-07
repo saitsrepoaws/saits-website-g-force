@@ -1759,6 +1759,14 @@
     "Ref": "waveformgeneratorlambdaD07307E8"
    }
   },
+  "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "gforgeIotStorageBucketEED00516",
+     "Arn"
+    ]
+   }
+  },
   "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
    "Value": {
     "Ref": "gforgeIotStorageBucketEED00516"
