@@ -19,7 +19,7 @@ interface FileUploadItem {
   label: string
   duration: number
   progress: UploadProgress | null
-  status: 'pending' | 'uploading' | 'success' | 'error'
+  status: 'pending' | 'uploading' | 'success' | 'error' | 'skipped'
   error?: string
 }
 
@@ -182,6 +182,24 @@ function Libery() {
     for (let i = 0; i < uploadQueue.length; i++) {
       const item = uploadQueue[i]
       if (item.status !== 'pending') continue
+
+      // ✅ DUPLICATE CHECK: Check if track already exists
+      const isDuplicate = tracks.some(track => {
+        const existingArtist = (track.artist || '').toLowerCase().trim()
+        const existingTitle = (track.title || '').toLowerCase().trim()
+        const newArtist = (item.artist || '').toLowerCase().trim()
+        const newTitle = (item.title || '').toLowerCase().trim()
+        
+        return existingArtist === newArtist && existingTitle === newTitle
+      })
+
+      if (isDuplicate) {
+        console.log(`⏭️ Skipping duplicate: ${item.artist} - ${item.title}`)
+        setUploadQueue(prev => prev.map((q, idx) => 
+          idx === i ? { ...q, status: 'skipped' as const } : q
+        ))
+        continue
+      }
 
       // Update status to uploading
       setUploadQueue(prev => prev.map((q, idx) => 
@@ -642,6 +660,7 @@ This action cannot be undone!`
                     key={index}
                     className={`border rounded-lg p-4 ${
                       item.status === 'success' ? 'bg-green-50 border-green-200' :
+                      item.status === 'skipped' ? 'bg-yellow-50 border-yellow-200' :
                       item.status === 'error' ? 'bg-red-50 border-red-200' :
                       item.status === 'uploading' ? 'bg-blue-50 border-blue-200' :
                       'bg-gray-50 border-gray-200'
@@ -652,6 +671,7 @@ This action cannot be undone!`
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">
                           {item.status === 'success' && '✅'}
+                          {item.status === 'skipped' && '⏭️'}
                           {item.status === 'error' && '❌'}
                           {item.status === 'uploading' && '⏳'}
                           {item.status === 'pending' && '⏸️'}
@@ -723,9 +743,14 @@ This action cannot be undone!`
                       </div>
                     )}
 
-                    {/* Error Message */}
+                    {/* Status Messages */}
                     {item.error && (
                       <div className="text-xs text-red-600 mt-1">{item.error}</div>
+                    )}
+                    {item.status === 'skipped' && (
+                      <div className="text-xs text-yellow-700 mt-1">
+                        ⏭️ Skipped: Track already exists in library
+                      </div>
                     )}
                   </div>
                 ))}
