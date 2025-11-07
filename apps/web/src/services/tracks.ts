@@ -20,64 +20,83 @@ function getClient() {
 }
 
 /**
- * List all tracks
+ * List all tracks (with pagination to get all tracks)
  */
 export async function listTracks() {
   try {
     console.log('🔍 Attempting to list tracks...')
     
-    // @ts-ignore - Track model exists at runtime
-    const result = await getClient().models.Track.list({
-      selectionSet: [
-        'id',
-        'artist',
-        'title',
-        'version',
-        'label',
-        'genre',
-        'year',
-        'duration',
-        'fileUrl',
-        'fileSize',
-        'format',
-        'addedAt',
-        'bpm',
-        'key',
-        'energy',
-        'danceability',
-        'valence',
-        'coverArtUrl',
-        'waveformUrl',
-        'trimStart',
-        'trimEnd',
-        // Skip createdAt/updatedAt - they have datetime format issues from Lambda
-      ],
-    })
+    let allTracks: any[] = []
+    let nextToken: string | null | undefined = undefined
+    let pageCount = 0
     
-    console.log('📦 Raw result from GraphQL:', result)
-    
-    const { data, errors } = result
-    
-    if (errors) {
-      console.error('❌ GraphQL Errors listing tracks:', errors)
-      errors.forEach((err: any, i: number) => {
-        console.error(`  Error ${i + 1}:`, {
-          message: err.message,
-          path: err.path,
-          errorType: err.errorType,
-          errorInfo: err.errorInfo,
-          locations: err.locations,
-          fullError: err,
-        })
+    // Fetch all pages
+    do {
+      pageCount++
+      console.log(`📄 Fetching page ${pageCount}${nextToken ? ` (token: ${nextToken.substring(0, 20)}...)` : ''}`)
+      
+      // @ts-ignore - Track model exists at runtime
+      const result = await getClient().models.Track.list({
+        limit: 1000, // Max limit per page
+        nextToken: nextToken,
+        selectionSet: [
+          'id',
+          'artist',
+          'title',
+          'version',
+          'label',
+          'genre',
+          'year',
+          'duration',
+          'fileUrl',
+          'fileSize',
+          'format',
+          'addedAt',
+          'bpm',
+          'key',
+          'energy',
+          'danceability',
+          'valence',
+          'coverArtUrl',
+          'waveformUrl',
+          'trimStart',
+          'trimEnd',
+          // Skip createdAt/updatedAt - they have datetime format issues from Lambda
+        ],
       })
-      // Still return data if available (partial success), but filter nulls
+      
+      const { data, errors } = result
+      const newNextToken: string | null | undefined = (result as any).nextToken
+      
+      if (errors) {
+        console.error('❌ GraphQL Errors listing tracks (page ${pageCount}):', errors)
+        errors.forEach((err: any, i: number) => {
+          console.error(`  Error ${i + 1}:`, {
+            message: err.message,
+            path: err.path,
+            errorType: err.errorType,
+            errorInfo: err.errorInfo,
+            locations: err.locations,
+            fullError: err,
+          })
+        })
+      }
+      
+      // Filter out null tracks and add to allTracks
       const validTracks = (data || []).filter((track: any) => track !== null && track.id)
-      console.log(`⚠️ Filtered ${data?.length || 0} items → ${validTracks.length} valid tracks`)
-      return { data: validTracks, errors }
-    }
+      allTracks = allTracks.concat(validTracks)
+      
+      console.log(`📊 Page ${pageCount}: ${validTracks.length} valid tracks (total so far: ${allTracks.length})`)
+      
+      // Update nextToken for next iteration
+      nextToken = newNextToken
+      
+    } while (nextToken)
+    
+    console.log(`✅ Fetched all tracks: ${allTracks.length} total tracks across ${pageCount} page(s)`)
     
     // Filter out null tracks (corrupted data)
-    const validTracks = (data || []).filter((track: any) => track !== null && track.id)
+    const validTracks = allTracks.filter((track: any) => track !== null && track.id)
     console.log(`✅ Successfully loaded ${validTracks.length} tracks`)
     return { data: validTracks, errors: null }
   } catch (error) {
