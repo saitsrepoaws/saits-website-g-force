@@ -46,6 +46,10 @@ function Libery() {
   const [genreFilter, setGenreFilter] = useState<string>('all')
   const [labelFilter, setLabelFilter] = useState<string>('all')
   
+  // Genre grouping state
+  const [expandedGenres, setExpandedGenres] = useState<Record<string, boolean>>({})
+  const [genreDisplayCounts, setGenreDisplayCounts] = useState<Record<string, number>>({})
+  
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfo, setShowTrackInfo] = useState(false)
@@ -617,6 +621,51 @@ This action cannot be undone!`
   // Get unique genres and labels for filter dropdowns
   const uniqueGenres = Array.from(new Set(tracks.map(t => (t as any).genre).filter(Boolean)))
   const uniqueLabels = Array.from(new Set(tracks.map(t => t.label).filter(Boolean)))
+  
+  // Group filtered tracks by genre
+  const tracksByGenre = filteredTracks.reduce((acc, track) => {
+    const genre = (track as any).genre || 'Unknown'
+    if (!acc[genre]) {
+      acc[genre] = []
+    }
+    acc[genre].push(track)
+    return acc
+  }, {} as Record<string, Track[]>)
+  
+  // Sort genres by track count (descending)
+  const sortedGenres = Object.keys(tracksByGenre).sort((a, b) => {
+    return tracksByGenre[b].length - tracksByGenre[a].length
+  })
+  
+  // Toggle genre expansion
+  const toggleGenre = (genre: string) => {
+    setExpandedGenres(prev => ({
+      ...prev,
+      [genre]: !prev[genre]
+    }))
+  }
+  
+  // Show more/less tracks for a genre
+  const showMoreTracks = (genre: string) => {
+    setGenreDisplayCounts(prev => ({
+      ...prev,
+      [genre]: (prev[genre] || 50) + 50
+    }))
+  }
+  
+  const showLessTracks = (genre: string) => {
+    setGenreDisplayCounts(prev => ({
+      ...prev,
+      [genre]: 50
+    }))
+  }
+  
+  // Get visible tracks for a genre
+  const getVisibleTracks = (genre: string) => {
+    const genreTracks = tracksByGenre[genre] || []
+    const displayCount = genreDisplayCounts[genre] || 50
+    return genreTracks.slice(0, displayCount)
+  }
 
   return (
     <Layout title="Track Library" showBackButton backTo="/devices">
@@ -847,7 +896,7 @@ This action cannot be undone!`
               </div>
             )}
 
-            {/* Track List */}
+            {/* Track List - Grouped by Genre */}
             {isLoadingTracks ? (
               <div className="text-center py-8 text-gray-500">Loading tracks...</div>
             ) : filteredTracks.length === 0 ? (
@@ -858,79 +907,107 @@ This action cannot be undone!`
                  'No tracks yet. Add your first track!'}
               </div>
             ) : (
-              <div className="space-y-2">
-                {/* Header Row */}
-                <div className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 px-3 py-2 bg-gray-100 rounded text-xs font-semibold text-gray-700">
-                  <div></div>
-                  <div>Artist</div>
-                  <div>Title</div>
-                  <div className="text-center">🥁 BPM</div>
-                  <div className="text-center">🎹 Key</div>
-                  <div>Genre</div>
-                  <div>Year</div>
-                  <div>Version</div>
-                  <div>Label</div>
-                  <div></div>
-                </div>
-
-                {/* Track Rows */}
-                {filteredTracks.map((track) => (
-                  <div key={track.id}>
-                    <div
-                      className="grid grid-cols-[auto_2fr_2fr_80px_100px_1.5fr_60px_80px_1.5fr_auto] gap-2 items-center p-3 border border-gray-200 rounded hover:bg-gray-50"
-                    >
-                    {/* Cover Art */}
-                    <div>
-                      {coverArtUrls[track.id] ? (
-                        <img
-                          src={coverArtUrls[track.id]}
-                          alt={track.title}
-                          className="w-12 h-12 object-cover rounded shadow-sm"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
-                          <span className="text-gray-400 text-xs">🎵</span>
+              <div className="space-y-4">
+                {/* Genre Groups */}
+                {sortedGenres.map((genre) => {
+                  const genreTracks = tracksByGenre[genre]
+                  const isExpanded = expandedGenres[genre] !== false // Default to expanded
+                  const visibleTracks = getVisibleTracks(genre)
+                  const hasMore = genreTracks.length > visibleTracks.length
+                  const displayCount = genreDisplayCounts[genre] || 50
+                  
+                  return (
+                    <div key={genre} className="border border-gray-300 rounded-lg overflow-hidden">
+                      {/* Genre Header - Clickable */}
+                      <button
+                        onClick={() => toggleGenre(genre)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{isExpanded ? '▼' : '▶'}</span>
+                          <div className="text-left">
+                            <h3 className="font-bold text-gray-900 text-lg">{genre}</h3>
+                            <p className="text-sm text-gray-600">
+                              {genreTracks.length} {genreTracks.length === 1 ? 'track' : 'tracks'}
+                            </p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="text-sm font-medium text-gray-900 truncate">
-                      {track.artist || '-'}
-                    </div>
-                    <div className="text-sm text-gray-900 truncate">
-                      {track.title}
-                    </div>
-                    {/* BPM */}
-                    <div className="text-center">
-                      {track.bpm && track.bpm > 0 ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                          {track.bpm}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">-</span>
-                      )}
-                    </div>
-                    {/* Key */}
-                    <div className="text-center">
-                      {(track as any).key ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
-                          {(track as any).key}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">-</span>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-600 truncate">
-                      {(track as any).genre || '-'}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {(track as any).year || '-'}
-                    </div>
-                    <div className="text-xs text-gray-600 truncate">
-                      {track.version || '-'}
-                    </div>
-                    <div className="text-xs text-gray-600 truncate">
-                      {track.label || '-'}
-                    </div>
+                        <div className="text-sm text-gray-500">
+                          Click to {isExpanded ? 'collapse' : 'expand'}
+                        </div>
+                      </button>
+                      
+                      {/* Tracks in Genre */}
+                      {isExpanded && (
+                        <div className="bg-white">
+                          {/* Header Row */}
+                          <div className="grid grid-cols-[auto_2fr_2fr_80px_100px_60px_80px_1.5fr_auto] gap-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-700 sticky top-0">
+                            <div></div>
+                            <div>Artist</div>
+                            <div>Title</div>
+                            <div className="text-center">🥁 BPM</div>
+                            <div className="text-center">🎹 Key</div>
+                            <div>Year</div>
+                            <div>Version</div>
+                            <div>Label</div>
+                            <div></div>
+                          </div>
+
+                          {/* Track Rows */}
+                          {visibleTracks.map((track: Track) => (
+                            <div key={track.id}>
+                              <div
+                                className="grid grid-cols-[auto_2fr_2fr_80px_100px_60px_80px_1.5fr_auto] gap-2 items-center p-3 border-b border-gray-100 hover:bg-gray-50"
+                              >
+                              {/* Cover Art */}
+                              <div>
+                                {coverArtUrls[track.id] ? (
+                                  <img
+                                    src={coverArtUrls[track.id]}
+                                    alt={track.title}
+                                    className="w-12 h-12 object-cover rounded shadow-sm"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                    <span className="text-gray-400 text-xs">🎵</span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="text-sm font-medium text-gray-900 truncate">
+                                {track.artist || '-'}
+                              </div>
+                              <div className="text-sm text-gray-900 truncate">
+                                {track.title}
+                              </div>
+                              {/* BPM */}
+                              <div className="text-center">
+                                {track.bpm && track.bpm > 0 ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                                    {track.bpm}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">-</span>
+                                )}
+                              </div>
+                              {/* Key */}
+                              <div className="text-center">
+                                {(track as any).key ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800">
+                                    {(track as any).key}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs text-gray-400">-</span>
+                                )}
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {(track as any).year || '-'}
+                              </div>
+                              <div className="text-xs text-gray-600 truncate">
+                                {track.version || '-'}
+                              </div>
+                              <div className="text-xs text-gray-600 truncate">
+                                {track.label || '-'}
+                              </div>
                     <div className="text-right flex gap-1 justify-end">
                       {/* Play Button */}
                       <button
@@ -1090,14 +1167,43 @@ This action cannot be undone!`
                           )}
                         </div>
                       </div>
+                              </div>
+                            )}
+                          </div>
+                          ))}
+                          
+                          {/* Show More/Less Buttons */}
+                          {genreTracks.length > 50 && (
+                            <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-center gap-3">
+                              {hasMore ? (
+                                <button
+                                  onClick={() => showMoreTracks(genre)}
+                                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                                >
+                                  Show More (+50 tracks)
+                                </button>
+                              ) : displayCount > 50 && (
+                                <button
+                                  onClick={() => showLessTracks(genre)}
+                                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
+                                >
+                                  Show Less (first 50)
+                                </button>
+                              )}
+                              <span className="px-4 py-2 text-sm text-gray-600">
+                                Showing {visibleTracks.length} of {genreTracks.length} tracks
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
-      </div>
+        </div>
 
       {/* Track Info Modal */}
       {showTrackInfo && selectedTrack && (
