@@ -110,6 +110,58 @@ export default function Players() {
   }, [])
   
   // ============================================
+  // 🔄 STREAM STATUS FETCH FUNCTION
+  // ============================================
+  const fetchStreamStatus = async () => {
+    console.log('🔄 Fetching stream status from Icecast...')
+    
+    try {
+      const response = await fetch('http://46.137.184.91:8000/status-json.xsl')
+      const data = await response.json()
+      const source = data.icestats?.source
+      
+      if (source) {
+        // Parse current track from metadata
+        let currentTrack = null
+        const metadata = source.title || source.yp_currently_playing || ''
+        
+        if (metadata && metadata !== 'Unknown') {
+          const match = metadata.match(/^(.+?)\s*-\s*(.+)$/)
+          if (match) {
+            currentTrack = {
+              artist: match[1].trim(),
+              title: match[2].trim()
+            }
+          }
+        }
+        
+        // Set status (preserve playlist data if already present from IoT)
+        setStreamStatus(prev => ({
+          isLive: true,
+          currentTrack,
+          listeners: source.listeners || 0,
+          playlist: prev?.playlist || {
+            current: null,
+            queue: [],
+            total: 0
+          }
+        }))
+        
+        console.log('✅ Stream status refreshed:', currentTrack?.artist, '-', currentTrack?.title)
+      }
+    } catch (error) {
+      console.warn('⚠️ Could not fetch stream status:', error)
+    }
+  }
+  
+  // ============================================
+  // 🔄 INITIAL STREAM STATUS FETCH
+  // ============================================
+  useEffect(() => {
+    fetchStreamStatus()
+  }, [])
+  
+  // ============================================
   // 📡 IOT SUBSCRIPTION FOR STREAM STATUS
   // ============================================
   useEffect(() => {
@@ -117,10 +169,10 @@ export default function Players() {
       return
     }
 
-    console.log('📡 Subscribing to stream status...')
+    console.log('📡 Subscribing to stream status updates...')
     
     const unsubscribePromise = iot.subscribe('radio/stream/status', (message: any) => {
-      console.log('📥 Stream status update:', message)
+      console.log('📥 Stream status update via IoT:', message)
       setStreamStatus(message)
     })
     
@@ -452,15 +504,24 @@ export default function Players() {
                   </p>
                 </div>
               </div>
-              <a
-                href="http://46.137.184.91:8000/stream.mp3"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
-              >
-                <span>🎧</span>
-                <span>Listen</span>
-              </a>
+              <div className="flex gap-2">
+                <button
+                  onClick={fetchStreamStatus}
+                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
+                  title="Refresh stream status"
+                >
+                  <span>🔄</span>
+                </button>
+                <a
+                  href="http://46.137.184.91:8000/stream.mp3"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
+                >
+                  <span>🎧</span>
+                  <span>Listen</span>
+                </a>
+              </div>
             </div>
             
             {/* Queue Preview */}
