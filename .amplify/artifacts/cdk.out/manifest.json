@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/81a015e113967e8f29c849118708f295b93a0eb8d6243ddd875f59eb775605c8.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/58b313ffb70b2b983ad24f304818b50eb0b63acce4b3f137f08193750aa4b385.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -3420,7 +3420,7 @@
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "StreamServerA433EFF8ebe149ffa8a4336a"
+            "data": "StreamServerA433EFF8bd053fa7f35c770a"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/LaunchTemplate": [

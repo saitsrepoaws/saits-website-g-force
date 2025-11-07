@@ -47,7 +47,7 @@ const schema = a.schema({
       updatedAt: a.datetime(),
     })
     .secondaryIndexes((index) => [
-      index('dayOfWeek').sortKeys(['startTime']).queryField('byDay')
+      index('dayOfWeek').sortKeys(['startTime'])
     ])
     .authorization((allow) => [allow.authenticated()]),
 

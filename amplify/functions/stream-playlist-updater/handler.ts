@@ -37,7 +37,7 @@ async function getCurrentScheduleSlot() {
   try {
     const result = await dynamodb.send(new QueryCommand({
       TableName: SCHEDULE_TABLE,
-      IndexName: 'byDay',
+      IndexName: 'schedulesByDayOfWeekAndStartTime',
       KeyConditionExpression: 'dayOfWeek = :day',
       ExpressionAttributeValues: {
         ':day': dayOfWeek

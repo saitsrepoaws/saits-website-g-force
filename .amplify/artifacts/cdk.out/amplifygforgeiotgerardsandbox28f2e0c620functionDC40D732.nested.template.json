@@ -1972,7 +1972,7 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile"
    }
   },
-  "StreamServerA433EFF8ebe149ffa8a4336a": {
+  "StreamServerA433EFF8bd053fa7f35c770a": {
    "Type": "AWS::EC2::Instance",
    "Properties": {
     "AvailabilityZone": {
@@ -2038,7 +2038,7 @@
       "Fn::Join": [
        "",
        [
-        "#!/bin/bash\n#!/bin/bash\nset -e\nexec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n\necho \"🎙️ G-Forge Radio Stream Server Setup Starting...\"\n\n# Update system\napt-get update\nDEBIAN_FRONTEND=noninteractive apt-get upgrade -y\n\n# Install dependencies\napt-get install -y \\\n  icecast2 \\\n  liquidsoap \\\n  awscli \\\n  nginx \\\n  curl \\\n  ffmpeg\n\n# Configure Icecast\ncat > /etc/icecast2/icecast.xml << \"ICECAST_EOF\"\n<icecast>\n  <location>Europe/Amsterdam</location>\n  <admin>admin@g-forge.com</admin>\n  <limits>\n    <clients>100</clients>\n    <sources>5</sources>\n    <queue-size>524288</queue-size>\n  </limits>\n  <authentication>\n    <source-password>gforge2024radio</source-password>\n    <admin-password>gforge2024admin</admin-password>\n  </authentication>\n  <hostname>radio.g-forge.com</hostname>\n  <listen-socket>\n    <port>8000</port>\n  </listen-socket>\n  <paths>\n    <basedir>/usr/share/icecast2</basedir>\n    <logdir>/var/log/icecast2</logdir>\n  </paths>\n</icecast>\nICECAST_EOF\n\n# Enable Icecast\nsed -i \"s/ENABLE=false/ENABLE=true/\" /etc/default/icecast2\n\n# Create radio directory\nmkdir -p /opt/radio\nmkdir -p /var/log/liquidsoap\n\n# Create Liquidsoap configuration\ncat > /opt/radio/radio.liq << \"LIQUIDSOAP_EOF\"\n# G-Forge Radio - Liquidsoap Configuration\nset(\"log.file.path\", \"/var/log/liquidsoap/radio.log\")\nset(\"log.level\", 3)\n\ns3_bucket = \"",
+        "#!/bin/bash\n#!/bin/bash\nset -e\nexec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n\necho \"🎙️ G-Forge Radio Stream Server Setup Starting...\"\n\n# Update system\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get upgrade -y\n\n# Pre-configure icecast2 to avoid interactive prompts\necho \"icecast2 icecast2/icecast-setup boolean false\" | debconf-set-selections\n\n# Install dependencies\napt-get install -y \\\n  icecast2 \\\n  liquidsoap \\\n  awscli \\\n  nginx \\\n  curl \\\n  ffmpeg\n\n# Configure Icecast\ncat > /etc/icecast2/icecast.xml << \"ICECAST_EOF\"\n<icecast>\n  <location>Europe/Amsterdam</location>\n  <admin>admin@g-forge.com</admin>\n  <limits>\n    <clients>100</clients>\n    <sources>5</sources>\n    <queue-size>524288</queue-size>\n  </limits>\n  <authentication>\n    <source-password>gforge2024radio</source-password>\n    <admin-password>gforge2024admin</admin-password>\n  </authentication>\n  <hostname>radio.g-forge.com</hostname>\n  <listen-socket>\n    <port>8000</port>\n  </listen-socket>\n  <paths>\n    <basedir>/usr/share/icecast2</basedir>\n    <logdir>/var/log/icecast2</logdir>\n    <webroot>/usr/share/icecast2/web</webroot>\n    <adminroot>/usr/share/icecast2/admin</adminroot>\n    <alias source=\"/\" dest=\"/status.xsl\"/>\n  </paths>\n</icecast>\nICECAST_EOF\n\n# Enable Icecast\nsed -i \"s/ENABLE=false/ENABLE=true/\" /etc/default/icecast2\n\n# Create radio directory\nmkdir -p /opt/radio\nmkdir -p /var/log/liquidsoap\n\n# Create Liquidsoap configuration\ncat > /opt/radio/radio.liq << \"LIQUIDSOAP_EOF\"\n# G-Forge Radio - Liquidsoap Configuration\nset(\"log.file.path\", \"/var/log/liquidsoap/radio.log\")\nset(\"log.level\", 3)\n\ns3_bucket = \"",
         {
          "Ref": "StreamPlaylistBucket5DE5E8D3"
         },
@@ -2078,7 +2078,7 @@
    "Type": "AWS::EC2::EIP",
    "Properties": {
     "InstanceId": {
-     "Ref": "StreamServerA433EFF8ebe149ffa8a4336a"
+     "Ref": "StreamServerA433EFF8bd053fa7f35c770a"
     },
     "Tags": [
      {
@@ -2182,7 +2182,7 @@
   "StreamServerInstanceId": {
    "Description": "EC2 instance ID for stream server",
    "Value": {
-    "Ref": "StreamServerA433EFF8ebe149ffa8a4336a"
+    "Ref": "StreamServerA433EFF8bd053fa7f35c770a"
    },
    "Export": {
     "Name": "StreamServerInstanceId"
