@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a1c2f2c4a6740ab24e64cf7941ff0bdd8f4dc80c2f8fbfdb5e189d42be81c9fe.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/81a015e113967e8f29c849118708f295b93a0eb8d6243ddd875f59eb775605c8.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -1397,6 +1397,46 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Subscription.onDeleteSchedule"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerybyDayauth0Function/QuerybyDayauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerybyDayauth0FunctionQuerybyDayauth0FunctionAppSyncFunctionC0433ADC"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerybyDayauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerybyDaypostAuth0Function/QuerybyDaypostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerybyDaypostAuth0FunctionQuerybyDaypostAuth0FunctionAppSyncFunction67858E4C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerybyDaypostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QueryByDayDataResolverFn/QueryByDayDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryByDayDataResolverFnQueryByDayDataResolverFnAppSyncFunctionF955D13F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryByDayDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/queryByDayResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerybyDayResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.byDay"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/CDKMetadata/Default": [
