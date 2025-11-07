@@ -553,6 +553,18 @@ playlistTable.grantReadData(streamPlaylistLambda)
 trackTable.grantReadData(streamPlaylistLambda)
 playlistBucket.grantWrite(streamPlaylistLambda)
 
+// Grant explicit permission to query GSI on Schedule table
+streamPlaylistLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['dynamodb:Query'],
+    resources: [
+      scheduleTable.tableArn,
+      `${scheduleTable.tableArn}/index/*`
+    ]
+  })
+)
+
 // Add environment variables
 backend.streamPlaylistUpdater.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)

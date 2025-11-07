@@ -86,4 +86,5 @@ type AmplifyBackendEnvVars = {
   PLAYLIST_TABLE: string;
   TRACK_TABLE: string;
   PLAYLIST_BUCKET: string;
+  STORAGE_BUCKET: string;
 };

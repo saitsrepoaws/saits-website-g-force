@@ -194,7 +194,7 @@
             "dayOfWeek": {
               "name": "dayOfWeek",
               "isArray": false,
-              "type": "String",
+              "type": "Int",
               "isRequired": false,
               "attributes": []
             },

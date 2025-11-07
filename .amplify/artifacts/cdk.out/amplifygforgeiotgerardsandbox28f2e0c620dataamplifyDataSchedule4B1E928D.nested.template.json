@@ -374,7 +374,7 @@
      },
      {
       "attributeName": "dayOfWeek",
-      "attributeType": "S"
+      "attributeType": "N"
      },
      {
       "attributeName": "startTime",
@@ -2143,7 +2143,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "QueryListScheduleByDayOfWeekAndStartTimeDataResolverFn",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/7520864eab2fcccf2eed97fc066dcecfe1fca3f16a4bf7a354f8be122ae56541.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/5ab1537dcb1cc9e8a07907963d8a681f7a6832c421bdf3191e0c7640f0031d17.vtl"
     },
     "ResponseMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"

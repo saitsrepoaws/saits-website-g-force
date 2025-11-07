@@ -1220,7 +1220,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "8af111e1b8d1501e3211a887d41e1c27352b2de72085c2702ebed13fa68a882f.zip"
+     "S3Key": "d1b86a438228f28e65d7d00ead04b9a2ef980ccabb292426479e414c98ef6c30.zip"
     },
     "Environment": {
      "Variables": {
@@ -1296,6 +1296,9 @@
       },
       "PLAYLIST_BUCKET": {
        "Ref": "StreamPlaylistBucket5DE5E8D3"
+      },
+      "STORAGE_BUCKET": {
+       "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
       }
      }
     },
@@ -1335,7 +1338,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/Resource",
-    "aws:asset:path": "asset.8af111e1b8d1501e3211a887d41e1c27352b2de72085c2702ebed13fa68a882f",
+    "aws:asset:path": "asset.d1b86a438228f28e65d7d00ead04b9a2ef980ccabb292426479e414c98ef6c30",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1972,7 +1975,7 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile"
    }
   },
-  "StreamServerA433EFF82fe06a2f5160d99c": {
+  "StreamServerA433EFF8f42f1780509ca506": {
    "Type": "AWS::EC2::Instance",
    "Properties": {
     "AvailabilityZone": {
@@ -2038,11 +2041,11 @@
       "Fn::Join": [
        "",
        [
-        "#!/bin/bash\n#!/bin/bash\nset -e\nexec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n\necho \"🎙️ G-Forge Radio Stream Server Setup Starting...\"\n\n# Update system\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get upgrade -y\n\n# Pre-configure icecast2 to avoid interactive prompts\necho \"icecast2 icecast2/icecast-setup boolean false\" | debconf-set-selections\n\n# Install dependencies\napt-get install -y \\\n  icecast2 \\\n  liquidsoap \\\n  awscli \\\n  nginx \\\n  curl \\\n  ffmpeg\n\n# Configure Icecast\ncat > /etc/icecast2/icecast.xml << \"ICECAST_EOF\"\n<icecast>\n  <location>Europe/Amsterdam</location>\n  <admin>admin@g-forge.com</admin>\n  <limits>\n    <clients>100</clients>\n    <sources>5</sources>\n    <queue-size>524288</queue-size>\n  </limits>\n  <authentication>\n    <source-password>gforge2024radio</source-password>\n    <admin-password>gforge2024admin</admin-password>\n  </authentication>\n  <hostname>radio.g-forge.com</hostname>\n  <listen-socket>\n    <port>8000</port>\n  </listen-socket>\n  <paths>\n    <basedir>/usr/share/icecast2</basedir>\n    <logdir>/var/log/icecast2</logdir>\n    <webroot>/usr/share/icecast2/web</webroot>\n    <adminroot>/usr/share/icecast2/admin</adminroot>\n    <alias source=\"/\" dest=\"/status.xsl\"/>\n  </paths>\n</icecast>\nICECAST_EOF\n\n# Enable Icecast\nsed -i \"s/ENABLE=false/ENABLE=true/\" /etc/default/icecast2\n\n# Create radio directory\nmkdir -p /opt/radio\nmkdir -p /var/log/liquidsoap\n\n# Create Liquidsoap configuration\ncat > /opt/radio/radio.liq << \"LIQUIDSOAP_EOF\"\n# G-Forge Radio - Liquidsoap Configuration\nset(\"log.file.path\", \"/var/log/liquidsoap/radio.log\")\nset(\"log.level\", 3)\n\ns3_bucket = \"",
+        "#!/bin/bash\n#!/bin/bash\nset -e\nexec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n\necho \"🎙️ G-Forge Radio Stream Server Setup Starting...\"\n\n# Update system\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get upgrade -y\n\n# Pre-configure icecast2 to avoid interactive prompts\necho \"icecast2 icecast2/icecast-setup boolean false\" | debconf-set-selections\n\n# Install dependencies\napt-get install -y \\\n  icecast2 \\\n  liquidsoap \\\n  awscli \\\n  nginx \\\n  curl \\\n  ffmpeg\n\n# Configure Icecast\ncat > /etc/icecast2/icecast.xml << \"ICECAST_EOF\"\n<icecast>\n  <location>Europe/Amsterdam</location>\n  <admin>admin@g-forge.com</admin>\n  <limits>\n    <clients>100</clients>\n    <sources>5</sources>\n    <queue-size>524288</queue-size>\n  </limits>\n  <authentication>\n    <source-password>gforge2024radio</source-password>\n    <admin-password>gforge2024admin</admin-password>\n  </authentication>\n  <hostname>radio.g-forge.com</hostname>\n  <listen-socket>\n    <port>8000</port>\n  </listen-socket>\n  <paths>\n    <basedir>/usr/share/icecast2</basedir>\n    <logdir>/var/log/icecast2</logdir>\n    <webroot>/usr/share/icecast2/web</webroot>\n    <adminroot>/usr/share/icecast2/admin</adminroot>\n    <alias source=\"/\" dest=\"/status.xsl\"/>\n  </paths>\n</icecast>\nICECAST_EOF\n\n# Enable Icecast\nsed -i \"s/ENABLE=false/ENABLE=true/\" /etc/default/icecast2\n\n# Create radio directory\nmkdir -p /opt/radio\nmkdir -p /var/log/liquidsoap\n\n# Create Liquidsoap configuration\ncat > /opt/radio/radio.liq << \"LIQUIDSOAP_EOF\"\n# G-Forge Radio - Liquidsoap Configuration\nset(\"init.allow_root\",true)\nset(\"log.file.path\", \"/var/log/liquidsoap/radio.log\")\nset(\"log.level\", 4)\n\ns3_bucket = \"",
         {
          "Ref": "StreamPlaylistBucket5DE5E8D3"
         },
-        "\"\nplaylist_file = \"/tmp/current-playlist.m3u\"\n\ndef fetch_playlist() =\n  log(\"📥 Fetching playlist from S3...\")\n  ret = get_process_output(\"aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1\")\n  log(\"S3 result: #{ret}\")\n  playlist_file\nend\n\nignore(fetch_playlist())\nadd_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)\n\n# Create playlist source\nradio = playlist(playlist_file, mode=\"normal\", reload_mode=\"watch\", reload=300)\n\n# Add silence as fallback to make source infallible\nradio = fallback(track_sensitive=false, [radio, blank()])\n\n# Crossfade for smooth transitions (Liquidsoap 2.x syntax)\nradio = crossfade(duration=3., radio)\nradio = normalize(radio)\n\noutput.icecast(\n  %mp3(bitrate=192, samplerate=44100),\n  host=\"localhost\",\n  port=8000,\n  password=\"gforge2024radio\",\n  mount=\"/stream.mp3\",\n  name=\"G-Forge Radio\",\n  description=\"Techno & Electronic Music 24/7\",\n  genre=\"Techno\",\n  public=true,\n  radio\n)\nLIQUIDSOAP_EOF\n\n# Create systemd service\ncat > /etc/systemd/system/liquidsoap-radio.service << \"SERVICE_EOF\"\n[Unit]\nDescription=Liquidsoap Radio Stream\nAfter=network.target icecast2.service\nRequires=icecast2.service\n\n[Service]\nType=simple\nUser=root\nExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\nSERVICE_EOF\n\n# Create empty playlist\ntouch /tmp/current-playlist.m3u\n\n# Start services\nsystemctl daemon-reload\nsystemctl enable icecast2\nsystemctl start icecast2\nsystemctl enable liquidsoap-radio\nsystemctl start liquidsoap-radio\n\n# Configure nginx reverse proxy\ncat > /etc/nginx/sites-available/radio << \"NGINX_EOF\"\nserver {\n  listen 80;\n  server_name _;\n  location / {\n    proxy_pass http://localhost:8000;\n    proxy_set_header Host $host;\n  }\n}\nNGINX_EOF\n\nln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nsystemctl restart nginx\n\n# Health check script\ncat > /opt/radio/healthcheck.sh << \"HEALTH_EOF\"\n#!/bin/bash\ncurl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1\nif [ $? -ne 0 ]; then\n  systemctl restart icecast2\n  systemctl restart liquidsoap-radio\nfi\nHEALTH_EOF\nchmod +x /opt/radio/healthcheck.sh\n\n# Add healthcheck cron\necho \"*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1\" | crontab -\n\necho \"✅ Radio stream server setup complete!\""
+        "\"\nplaylist_file = \"/tmp/current-playlist.m3u\"\n\ndef fetch_playlist() =\n  log(\"📥 Fetching playlist from S3...\")\n  ret = get_process_output(\"aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1\")\n  log(\"S3 result: #{ret}\")\n  playlist_file\nend\n\nignore(fetch_playlist())\nadd_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)\n\n# Create playlist source\nradio = playlist(playlist_file, mode=\"normal\", reload_mode=\"watch\", reload=300)\n\n# Fallback to silence when playlist is empty\nradio = fallback(track_sensitive=false, [radio, blank()])\nradio = normalize(radio)\n\noutput.icecast(\n  %mp3(bitrate=192),\n  host=\"localhost\",\n  port=8000,\n  password=\"gforge2024radio\",\n  mount=\"stream.mp3\",\n  name=\"G-Forge Radio\",\n  description=\"Techno & Electronic Music 24/7\",\n  radio\n)\nLIQUIDSOAP_EOF\n\n# Create systemd service\ncat > /etc/systemd/system/liquidsoap-radio.service << \"SERVICE_EOF\"\n[Unit]\nDescription=Liquidsoap Radio Stream\nAfter=network.target icecast2.service\nRequires=icecast2.service\n\n[Service]\nType=simple\nUser=root\nExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\nSERVICE_EOF\n\n# Create empty playlist\ntouch /tmp/current-playlist.m3u\n\n# Start services\nsystemctl daemon-reload\nsystemctl enable icecast2\nsystemctl start icecast2\nsystemctl enable liquidsoap-radio\nsystemctl start liquidsoap-radio\n\n# Configure nginx reverse proxy\ncat > /etc/nginx/sites-available/radio << \"NGINX_EOF\"\nserver {\n  listen 80;\n  server_name _;\n  location / {\n    proxy_pass http://localhost:8000;\n    proxy_set_header Host $host;\n  }\n}\nNGINX_EOF\n\nln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nsystemctl restart nginx\n\n# Health check script\ncat > /opt/radio/healthcheck.sh << \"HEALTH_EOF\"\n#!/bin/bash\ncurl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1\nif [ $? -ne 0 ]; then\n  systemctl restart icecast2\n  systemctl restart liquidsoap-radio\nfi\nHEALTH_EOF\nchmod +x /opt/radio/healthcheck.sh\n\n# Add healthcheck cron\necho \"*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1\" | crontab -\n\necho \"✅ Radio stream server setup complete!\""
        ]
       ]
      }
@@ -2078,7 +2081,7 @@
    "Type": "AWS::EC2::EIP",
    "Properties": {
     "InstanceId": {
-     "Ref": "StreamServerA433EFF82fe06a2f5160d99c"
+     "Ref": "StreamServerA433EFF8f42f1780509ca506"
     },
     "Tags": [
      {
@@ -2182,7 +2185,7 @@
   "StreamServerInstanceId": {
    "Description": "EC2 instance ID for stream server",
    "Value": {
-    "Ref": "StreamServerA433EFF82fe06a2f5160d99c"
+    "Ref": "StreamServerA433EFF8f42f1780509ca506"
    },
    "Export": {
     "Name": "StreamServerInstanceId"
@@ -2266,6 +2269,9 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
