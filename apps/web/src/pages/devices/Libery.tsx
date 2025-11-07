@@ -50,6 +50,10 @@ function Libery() {
   const [expandedGenres, setExpandedGenres] = useState<Record<string, boolean>>({})
   const [genreDisplayCounts, setGenreDisplayCounts] = useState<Record<string, number>>({})
   
+  // Sorting state
+  const [sortField, setSortField] = useState<'artist' | 'title' | 'bpm' | 'key' | 'year' | 'version' | 'label' | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfo, setShowTrackInfo] = useState(false)
@@ -660,9 +664,46 @@ This action cannot be undone!`
     }))
   }
   
-  // Get visible tracks for a genre
+  // Handle column sort
+  const handleSort = (field: 'artist' | 'title' | 'bpm' | 'key' | 'year' | 'version' | 'label') => {
+    if (sortField === field) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // New field, default to ascending
+      setSortField(field)
+      setSortDirection('asc')
+    }
+  }
+  
+  // Get visible tracks for a genre (with sorting)
   const getVisibleTracks = (genre: string) => {
-    const genreTracks = tracksByGenre[genre] || []
+    let genreTracks = tracksByGenre[genre] || []
+    
+    // Apply sorting if a field is selected
+    if (sortField) {
+      genreTracks = [...genreTracks].sort((a, b) => {
+        let aVal: any = sortField === 'bpm' || sortField === 'year' 
+          ? ((a as any)[sortField] || 0)
+          : ((a as any)[sortField] || '').toString().toLowerCase()
+        let bVal: any = sortField === 'bpm' || sortField === 'year'
+          ? ((b as any)[sortField] || 0)
+          : ((b as any)[sortField] || '').toString().toLowerCase()
+        
+        // Handle numeric fields
+        if (sortField === 'bpm' || sortField === 'year') {
+          return sortDirection === 'asc' ? aVal - bVal : bVal - aVal
+        }
+        
+        // Handle string fields
+        if (sortDirection === 'asc') {
+          return aVal < bVal ? -1 : aVal > bVal ? 1 : 0
+        } else {
+          return aVal > bVal ? -1 : aVal < bVal ? 1 : 0
+        }
+      })
+    }
+    
     const displayCount = genreDisplayCounts[genre] || 50
     return genreTracks.slice(0, displayCount)
   }
@@ -940,16 +981,72 @@ This action cannot be undone!`
                       {/* Tracks in Genre */}
                       {isExpanded && (
                         <div className="bg-white">
-                          {/* Header Row */}
+                          {/* Header Row - Sortable */}
                           <div className="grid grid-cols-[auto_2fr_2fr_80px_100px_60px_80px_1.5fr_auto] gap-2 px-3 py-2 bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-700 sticky top-0">
                             <div></div>
-                            <div>Artist</div>
-                            <div>Title</div>
-                            <div className="text-center">🥁 BPM</div>
-                            <div className="text-center">🎹 Key</div>
-                            <div>Year</div>
-                            <div>Version</div>
-                            <div>Label</div>
+                            <button 
+                              onClick={() => handleSort('artist')}
+                              className="text-left hover:text-blue-600 flex items-center gap-1"
+                            >
+                              Artist
+                              {sortField === 'artist' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('title')}
+                              className="text-left hover:text-blue-600 flex items-center gap-1"
+                            >
+                              Title
+                              {sortField === 'title' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('bpm')}
+                              className="text-center hover:text-blue-600 flex items-center justify-center gap-1"
+                            >
+                              🥁 BPM
+                              {sortField === 'bpm' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('key')}
+                              className="text-center hover:text-blue-600 flex items-center justify-center gap-1"
+                            >
+                              🎹 Key
+                              {sortField === 'key' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('year')}
+                              className="text-left hover:text-blue-600 flex items-center gap-1"
+                            >
+                              Year
+                              {sortField === 'year' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('version')}
+                              className="text-left hover:text-blue-600 flex items-center gap-1"
+                            >
+                              Version
+                              {sortField === 'version' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
+                            <button 
+                              onClick={() => handleSort('label')}
+                              className="text-left hover:text-blue-600 flex items-center gap-1"
+                            >
+                              Label
+                              {sortField === 'label' && (
+                                <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                              )}
+                            </button>
                             <div></div>
                           </div>
 

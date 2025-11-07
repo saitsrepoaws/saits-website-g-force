@@ -10,13 +10,17 @@ import { useIoT } from '../contexts/IoTContext'
 import { getCurrentUser } from 'aws-amplify/auth'
 
 export interface NotificationMessage {
-  type: 'track_change' | 'playlist_update' | 'schedule_alert' | 'system'
+  type: 'track_change' | 'playlist_update' | 'schedule_alert' | 'system' | 'user_login' | 'user_logout'
   title: string
   body: string
   playerId?: string
   track?: {
     artist: string
     title: string
+  }
+  user?: {
+    username: string
+    email?: string
   }
   timestamp: string
 }
@@ -26,18 +30,33 @@ export function useNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>('default')
   const [userId, setUserId] = useState<string | null>(null)
 
-  // Get user ID
+  // Get user ID and send login notification
   useEffect(() => {
     const loadUser = async () => {
       try {
         const user = await getCurrentUser()
         setUserId(user.userId)
+        
+        // Send login notification to IoT (will be picked up by other tabs/devices)
+        if (iot.connectionState === 'Connected') {
+          await iot.publish(`user/${user.userId}/notifications/user_login`, {
+            type: 'user_login',
+            title: 'Welcome Back!',
+            body: `You logged in as ${user.username || 'User'}`,
+            user: {
+              username: user.username || 'User',
+              email: (user as any).email || undefined
+            },
+            timestamp: new Date().toISOString()
+          })
+          console.log('📬 Login notification sent via IoT')
+        }
       } catch (error) {
         console.warn('No authenticated user')
       }
     }
     loadUser()
-  }, [])
+  }, [iot.connectionState])
 
   // Request notification permission
   const requestPermission = async () => {
@@ -84,11 +103,13 @@ export function useNotifications() {
 
     // Subscribe to all notification types
     const topics = [
-      // User-specific topics (future)
+      // User-specific topics
       `user/${userId}/notifications/track_change`,
       `user/${userId}/notifications/playlist_update`,
       `user/${userId}/notifications/schedule_alert`,
       `user/${userId}/notifications/system`,
+      `user/${userId}/notifications/user_login`,
+      `user/${userId}/notifications/user_logout`,
       // Broadcast topics (all users)
       'notifications/track_change',
       'notifications/playlist_update',
@@ -107,6 +128,27 @@ export function useNotifications() {
       unsubscribePromises.forEach(promise => promise.then(unsub => unsub()))
     }
   }, [iot.connectionState, userId, permission])
+  
+  // Send logout notification on unmount (when user logs out)
+  useEffect(() => {
+    return () => {
+      if (userId && iot.connectionState === 'Connected') {
+        iot.publish(`user/${userId}/notifications/user_logout`, {
+          type: 'user_logout',
+          title: 'Goodbye!',
+          body: 'You have logged out',
+          user: {
+            username: 'User'
+          },
+          timestamp: new Date().toISOString()
+        }).then(() => {
+          console.log('📬 Logout notification sent via IoT')
+        }).catch((error) => {
+          console.warn('Failed to send logout notification:', error)
+        })
+      }
+    }
+  }, [userId, iot.connectionState])
 
   // Check if notifications are supported
   const isSupported = 'Notification' in window
