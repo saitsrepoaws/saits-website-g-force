@@ -113,13 +113,21 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
   const handlePlayCommand = (message: any) => {
     console.log(`▶️ [${playerId}] PLAY COMMAND RECEIVED`)
     
+    if (!audioUrl) {
+      console.error(`❌ [${playerId}] Cannot play - no track loaded!`)
+      return
+    }
+    
     setPlayerStatus('playing')
     
     const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
     if (audioElement) {
+      console.log(`🎵 [${playerId}] Starting audio playback for:`, trackInfo?.title || 'Unknown')
       audioElement.play()
         .then(() => console.log(`✅ [${playerId}] Audio playback started!`))
         .catch((error) => console.error(`❌ [${playerId}] Failed to start audio:`, error))
+    } else {
+      console.error(`❌ [${playerId}] Audio element not found!`)
     }
   }
 
