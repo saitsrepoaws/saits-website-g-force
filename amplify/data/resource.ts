@@ -35,7 +35,7 @@ const schema = a.schema({
   Schedule: a
     .model({
       name: a.string().required(), // "Morning Show", "Peak Time", etc.
-      dayOfWeek: a.string(), // "Monday", "Tuesday", etc. (changed from integer to string for GSI)
+      dayOfWeek: a.integer(), // 0=Sunday, 1=Monday, ..., 6=Saturday (null = every day)
       startTime: a.string().required(), // "09:00"
       endTime: a.string(), // "12:00" (null = until next slot)
       startDate: a.string(), // "2025-01-01" (null = starts immediately)

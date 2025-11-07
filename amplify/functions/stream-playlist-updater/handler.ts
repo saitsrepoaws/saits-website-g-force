@@ -13,6 +13,7 @@ const s3 = new S3Client({})
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 const PLAYLIST_BUCKET = process.env.PLAYLIST_BUCKET || ''
+const STORAGE_BUCKET = process.env.STORAGE_BUCKET || ''
 const SCHEDULE_TABLE = process.env.SCHEDULE_TABLE || ''
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE || ''
 const TRACK_TABLE = process.env.TRACK_TABLE || ''
@@ -29,12 +30,14 @@ interface Track {
  */
 async function getCurrentScheduleSlot() {
   const now = new Date()
-  const dayOfWeek = now.toLocaleDateString('en-US', { weekday: 'long' })
+  const dayOfWeek = now.getDay() // 0=Sunday, 1=Monday, ..., 6=Saturday
   const currentTime = now.toTimeString().slice(0, 5) // HH:MM
-
-  console.log(`📅 Current: ${dayOfWeek} ${currentTime}`)
+  
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  console.log(`📅 Current: ${dayNames[dayOfWeek]} ${currentTime} (dayOfWeek=${dayOfWeek})`)
 
   try {
+    // Query by integer dayOfWeek (matches DynamoDB schema)
     const result = await dynamodb.send(new QueryCommand({
       TableName: SCHEDULE_TABLE,
       IndexName: 'schedulesByDayOfWeekAndStartTime',
@@ -142,11 +145,13 @@ function generateM3UPlaylist(tracks: any[]): string {
     const title = `${track.artist || 'Unknown'} - ${track.title || 'Unknown'}`
     lines.push(`#EXTINF:${duration},${title}`)
     
-    // File URL - convert S3 path to presigned URL
-    // For now, use the S3 path directly (Liquidsoap will need S3 access)
-    const fileUrl = track.fileUrl.startsWith('http') 
+    // File URL - S3 path that Liquidsoap can access via AWS CLI
+    // EC2 has IAM role with S3 read access
+    const fileUrl = track.fileUrl.startsWith('s3://') 
       ? track.fileUrl 
-      : `https://your-bucket.s3.eu-west-1.amazonaws.com/${track.fileUrl}`
+      : (track.fileUrl.startsWith('http') 
+        ? track.fileUrl 
+        : `s3://${STORAGE_BUCKET}/${track.fileUrl}`)
     
     lines.push(fileUrl)
   }

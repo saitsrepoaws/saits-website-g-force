@@ -558,6 +558,7 @@ backend.streamPlaylistUpdater.addEnvironment('SCHEDULE_TABLE', scheduleTable.tab
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
+backend.streamPlaylistUpdater.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
 
 // EventBridge rule - Run every 5 minutes
 const streamSchedulerRule = new events.Rule(
