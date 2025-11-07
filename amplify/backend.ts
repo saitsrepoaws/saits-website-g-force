@@ -553,11 +553,12 @@ playlistTable.grantReadData(streamPlaylistLambda)
 trackTable.grantReadData(streamPlaylistLambda)
 playlistBucket.grantWrite(streamPlaylistLambda)
 
-// Grant explicit permission to query GSI on Schedule table
+// Grant explicit permission to scan and query Schedule table
+// Scan is needed because dayOfWeek can be null (= every day)
 streamPlaylistLambda.addToRolePolicy(
   new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,
-    actions: ['dynamodb:Query'],
+    actions: ['dynamodb:Query', 'dynamodb:Scan'],
     resources: [
       scheduleTable.tableArn,
       `${scheduleTable.tableArn}/index/*`

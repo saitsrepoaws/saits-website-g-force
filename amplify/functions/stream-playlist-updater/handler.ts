@@ -7,7 +7,7 @@
  */
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, GetCommand, QueryCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
 
 const s3 = new S3Client({})
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
@@ -37,27 +37,59 @@ async function getCurrentScheduleSlot() {
   console.log(`📅 Current: ${dayNames[dayOfWeek]} ${currentTime} (dayOfWeek=${dayOfWeek})`)
 
   try {
-    // Query by integer dayOfWeek (matches DynamoDB schema)
-    const result = await dynamodb.send(new QueryCommand({
+    // APPROACH: Scan table and filter by time + day
+    // This handles both:
+    // - Entries with dayOfWeek set (specific days)
+    // - Entries with dayOfWeek=null (every day)
+    const result = await dynamodb.send(new ScanCommand({
       TableName: SCHEDULE_TABLE,
-      IndexName: 'schedulesByDayOfWeekAndStartTime',
-      KeyConditionExpression: 'dayOfWeek = :day',
+      FilterExpression: 'isActive = :active',
       ExpressionAttributeValues: {
-        ':day': dayOfWeek
+        ':active': true
       }
     }))
 
     if (!result.Items || result.Items.length === 0) {
+      console.log('⚠️ No schedule entries found in table')
+      return null
+    }
+    
+    console.log(`📋 Found ${result.Items.length} total schedule entries`)
+    
+    // Filter entries that match current day OR are null (= every day)
+    const todaySlots = result.Items.filter((item: any) => {
+      // null/undefined dayOfWeek means "every day"
+      if (item.dayOfWeek === null || item.dayOfWeek === undefined) {
+        return true
+      }
+      // Match specific day
+      return item.dayOfWeek === dayOfWeek
+    })
+    
+    console.log(`📋 Found ${todaySlots.length} slots for ${dayNames[dayOfWeek]}`)
+    
+    if (todaySlots.length === 0) {
       console.log('⚠️ No schedule slots found for today')
       return null
     }
 
     // Find slot where currentTime is between startTime and endTime
-    const activeSlot = result.Items.find(slot => {
-      const start = slot.startTime
-      const end = slot.endTime
-      return currentTime >= start && currentTime < end
-    })
+    // Sort slots by startTime to find the current slot
+    todaySlots.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime))
+    
+    // Find the active slot: latest start time that's <= current time
+    let activeSlot = null
+    for (const slot of todaySlots) {
+      if (slot.startTime <= currentTime) {
+        // Check if there's an endTime and we're past it
+        if (slot.endTime && currentTime >= slot.endTime) {
+          continue // This slot has ended
+        }
+        activeSlot = slot
+      } else {
+        break // Slots are sorted, no need to check further
+      }
+    }
 
     if (activeSlot) {
       console.log(`✅ Active slot: ${activeSlot.startTime}-${activeSlot.endTime}, Playlist: ${activeSlot.playlistId}`)
