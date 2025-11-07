@@ -14,6 +14,8 @@ function Playlist() {
   const [showAutoGenerateModal, setShowAutoGenerateModal] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [availableGenres, setAvailableGenres] = useState<string[]>([])
+  const [genreTrackCounts, setGenreTrackCounts] = useState<Record<string, number>>({})
+  const [totalTracksCount, setTotalTracksCount] = useState(0)
   
   // Create playlist form
   const [newPlaylistName, setNewPlaylistName] = useState('')
@@ -56,17 +58,26 @@ function Playlist() {
     try {
       const { data } = await listTracks()
       if (data) {
+        // Total tracks count
+        setTotalTracksCount(data.length)
+        
+        // Count tracks per genre
+        const genreCounts: Record<string, number> = {}
+        data.forEach((track: any) => {
+          const genre = track.genre
+          if (genre) {
+            genreCounts[genre] = (genreCounts[genre] || 0) + 1
+          }
+        })
+        
         // Extract unique genres from tracks
-        const genres = Array.from(
-          new Set(
-            data
-              .map((track: any) => track.genre)
-              .filter((genre: any): genre is string => Boolean(genre))
-          )
-        ).sort() as string[]
+        const genres = Object.keys(genreCounts).sort()
         
         setAvailableGenres(genres)
-        console.log('🎵 Loaded genres from tracks:', genres)
+        setGenreTrackCounts(genreCounts)
+        
+        console.log('🎵 Total tracks:', data.length)
+        console.log('🎵 Genres with counts:', genreCounts)
       }
     } catch (error) {
       console.error('Failed to load genres:', error)
@@ -76,6 +87,8 @@ function Playlist() {
         'Progressive', 'Trance', 'Drum & Bass', 'Dubstep', 'Ambient', 
         'Electronica'
       ])
+      setTotalTracksCount(0)
+      setGenreTrackCounts({})
     }
   }
   
@@ -351,6 +364,13 @@ function Playlist() {
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold mb-4">Create New Playlist</h3>
               
+              {/* Track Library Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>📚 Your Library:</strong> {totalTracksCount} tracks across {availableGenres.length} genres
+                </p>
+              </div>
+              
               <div className="space-y-4">
                 {/* Basic Info */}
                 <div className="grid grid-cols-1 gap-4">
@@ -397,7 +417,9 @@ function Playlist() {
                       >
                         <option value="">Select genre...</option>
                         {availableGenres.map(genre => (
-                          <option key={genre} value={genre}>{genre}</option>
+                          <option key={genre} value={genre}>
+                            {genre} ({genreTrackCounts[genre] || 0} tracks)
+                          </option>
                         ))}
                         <option value="Mixed">Mixed</option>
                       </select>
@@ -565,6 +587,25 @@ function Playlist() {
               <p className="text-sm text-gray-600 mb-4">
                 Let AI create a playlist for you based on your criteria! Tracks will be automatically selected from your library.
               </p>
+              
+              {/* Track Library Info */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-green-800">
+                  <strong>📚 Your Library:</strong> {totalTracksCount} total tracks
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {availableGenres.slice(0, 6).map(genre => (
+                    <span key={genre} className="px-2 py-1 bg-white text-green-700 text-xs rounded-full">
+                      {genre}: {genreTrackCounts[genre]}
+                    </span>
+                  ))}
+                  {availableGenres.length > 6 && (
+                    <span className="px-2 py-1 bg-white text-green-700 text-xs rounded-full">
+                      +{availableGenres.length - 6} more
+                    </span>
+                  )}
+                </div>
+              </div>
               
               {/* Use same form as create modal */}
               <div className="space-y-4">
