@@ -608,14 +608,14 @@ playlistBucket.grantRead(streamStatusLambda)
 // Add environment variables
 backend.streamStatusPublisher.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 
-// EventBridge rule - Run every 10 seconds for real-time updates
+// EventBridge rule - Run every 1 minute for near real-time updates
 const streamStatusRule = new events.Rule(
   streamStatusLambda.stack,
   'StreamStatusPublisherRule',
   {
-    ruleName: 'StreamStatusEvery10Seconds',
-    description: 'Publishes stream status to IoT every 10 seconds',
-    schedule: events.Schedule.rate(Duration.seconds(10)),
+    ruleName: 'StreamStatusEveryMinute',
+    description: 'Publishes stream status to IoT every minute',
+    schedule: events.Schedule.rate(Duration.minutes(1)),
   }
 )
 
