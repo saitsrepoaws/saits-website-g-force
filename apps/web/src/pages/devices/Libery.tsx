@@ -304,12 +304,6 @@ function Libery() {
     setUploadQueue(prev => prev.filter(item => item.status === 'pending' || item.status === 'uploading'))
   }
 
-  const handleUpdateQueueItem = (index: number, field: keyof FileUploadItem, value: any) => {
-    setUploadQueue(prev => prev.map((item, idx) => 
-      idx === index ? { ...item, [field]: value } : item
-    ))
-  }
-
   const handleDeleteTrack = async (id: string) => {
     const track = tracks.find(t => t.id === id)
     if (!track) return
@@ -692,40 +686,6 @@ This action cannot be undone!`
                         </button>
                       )}
                     </div>
-
-                    {/* Editable Metadata (only for pending) */}
-                    {item.status === 'pending' && (
-                      <div className="grid grid-cols-4 gap-2 mb-2">
-                        <input
-                          type="text"
-                          placeholder="Artist"
-                          value={item.artist}
-                          onChange={(e) => handleUpdateQueueItem(index, 'artist', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-xs"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Title *"
-                          value={item.title}
-                          onChange={(e) => handleUpdateQueueItem(index, 'title', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-xs"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Version"
-                          value={item.version}
-                          onChange={(e) => handleUpdateQueueItem(index, 'version', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-xs"
-                        />
-                        <input
-                          type="text"
-                          placeholder="Label"
-                          value={item.label}
-                          onChange={(e) => handleUpdateQueueItem(index, 'label', e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-xs"
-                        />
-                      </div>
-                    )}
 
                     {/* Progress Bar */}
                     {item.progress && item.status === 'uploading' && (
