@@ -20,7 +20,6 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
   // ============================================
   // 📊 LOCAL STATE
   // ============================================
-  const [autoLoad, setAutoLoad] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
   
   // Track info for UI display
@@ -246,42 +245,6 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
   }
 
-  const handleAutoLoadToggle = async () => {
-    const newValue = !autoLoad
-    setAutoLoad(newValue)
-    
-    console.log(`🎚️ [${playerId}] AUTO LOAD:`, newValue ? 'ON' : 'OFF')
-
-    if (newValue) {
-      const commandTopic = `radio/player/${playerId}/command-request`
-      const loadCommand = {
-        command: 'LOAD',
-        playerId: playerId,
-        timestamp: new Date().toISOString()
-      }
-      
-      try {
-        await iot.publish(commandTopic, loadCommand)
-        console.log(`✅ [${playerId}] LOAD command published`)
-      } catch (error) {
-        console.error(`❌ [${playerId}] Failed to publish LOAD:`, error)
-      }
-    } else {
-      const commandTopic = `radio/player/${playerId}/command`
-      const unloadCommand = {
-        command: 'UNLOAD',
-        playerId: playerId,
-        timestamp: new Date().toISOString()
-      }
-      
-      try {
-        await iot.publish(commandTopic, unloadCommand)
-        console.log(`✅ [${playerId}] UNLOAD command published`)
-      } catch (error) {
-        console.error(`❌ [${playerId}] Failed to publish UNLOAD:`, error)
-      }
-    }
-  }
   
   // ============================================
   // 🎨 RENDER
@@ -407,25 +370,6 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
 
         {/* Control Buttons */}
         <div className="space-y-2">
-          {/* Auto Load Toggle */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              handleAutoLoadToggle()
-            }}
-            className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
-              autoLoad
-                ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/50'
-                : 'bg-white/10 hover:bg-white/20 text-gray-300 border-2 border-white/20'
-            }`}
-          >
-            <span className="text-xl">{autoLoad ? '✅' : '⭕'}</span>
-            <span>Auto Load</span>
-            <span className="ml-auto text-xs opacity-75">
-              {autoLoad ? 'ON' : 'OFF'}
-            </span>
-          </button>
-
           {/* Play Button */}
           <button
             onClick={(e) => {
@@ -467,7 +411,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
 
         {/* Status Grid */}
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2">
             <div className="bg-white/5 rounded-lg p-2">
               <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Status</div>
               <div className={`text-xs font-semibold capitalize ${
@@ -481,10 +425,6 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
               </div>
             </div>
             <div className="bg-white/5 rounded-lg p-2">
-              <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Mode</div>
-              <div className="text-white text-xs font-semibold">{autoLoad ? 'Auto' : 'Manual'}</div>
-            </div>
-            <div className="bg-white/5 rounded-lg p-2 col-span-2">
               <div className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Track</div>
               {trackInfo ? (
                 <div className="text-white text-xs">
