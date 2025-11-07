@@ -29,6 +29,20 @@ export default function Players() {
   const [isLoadingSchedule, setIsLoadingSchedule] = useState(true)
   
   // ============================================
+  // 🎙️ STREAM STATUS (from IoT)
+  // ============================================
+  const [streamStatus, setStreamStatus] = useState<{
+    isLive: boolean
+    currentTrack: { artist: string; title: string } | null
+    listeners: number
+    playlist: {
+      current: string | null
+      queue: string[]
+      total: number
+    }
+  } | null>(null)
+  
+  // ============================================
   // 🎵 PLAYER TRACKING (for playlist highlighting)
   // ============================================
   const [player1TrackId, setPlayer1TrackId] = useState<string | null>(null)
@@ -94,6 +108,26 @@ export default function Players() {
     const interval = setInterval(loadScheduleData, 60000)
     return () => clearInterval(interval)
   }, [])
+  
+  // ============================================
+  // 📡 IOT SUBSCRIPTION FOR STREAM STATUS
+  // ============================================
+  useEffect(() => {
+    if (iot.connectionState !== 'Connected') {
+      return
+    }
+
+    console.log('📡 Subscribing to stream status...')
+    
+    const unsubscribePromise = iot.subscribe('radio/stream/status', (message: any) => {
+      console.log('📥 Stream status update:', message)
+      setStreamStatus(message)
+    })
+    
+    return () => {
+      unsubscribePromise.then(unsub => unsub())
+    }
+  }, [iot.connectionState])
   
   // ============================================
   // 📡 IOT SUBSCRIPTION FOR BOTH PLAYERS
@@ -382,6 +416,67 @@ export default function Players() {
                 )}
               </div>
             </div>
+          </div>
+        )}
+        
+        {/* Live Stream Status */}
+        {streamStatus && (
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl shadow-lg p-4 border-2 border-red-300">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-3xl">🎙️</span>
+                  </div>
+                  {streamStatus.isLive && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-gray-800 text-xl">Live Stream</h3>
+                    {streamStatus.isLive && (
+                      <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded uppercase animate-pulse">LIVE</span>
+                    )}
+                  </div>
+                  {streamStatus.currentTrack ? (
+                    <p className="text-gray-700 font-medium">
+                      <span className="text-gray-500">Now Playing:</span> {streamStatus.currentTrack.artist} - {streamStatus.currentTrack.title}
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 text-sm">No track playing</p>
+                  )}
+                  <p className="text-sm text-gray-600">
+                    👥 {streamStatus.listeners} listener{streamStatus.listeners !== 1 ? 's' : ''} • 
+                    📋 {streamStatus.playlist.total} tracks in queue
+                  </p>
+                </div>
+              </div>
+              <a
+                href="http://46.137.184.91:8000/stream.mp3"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
+              >
+                <span>🎧</span>
+                <span>Listen</span>
+              </a>
+            </div>
+            
+            {/* Queue Preview */}
+            {streamStatus.playlist.queue.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-red-200">
+                <p className="text-xs font-semibold text-gray-600 mb-2">COMING UP:</p>
+                <div className="space-y-1">
+                  {streamStatus.playlist.queue.slice(0, 3).map((track, idx) => (
+                    <p key={idx} className="text-sm text-gray-700 flex items-center gap-2">
+                      <span className="text-gray-400">{idx + 1}.</span>
+                      {track}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
         

@@ -1,0 +1,9 @@
+{
+  "name": "stream-status-publisher",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-iot-data-plane": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0"
+  }
+}

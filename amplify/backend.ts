@@ -11,6 +11,7 @@ import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
+import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -51,7 +52,8 @@ export const backend = defineBackend({
   playerSimpleHandler,
   radioScheduler,
   crossfadeController,
-  streamPlaylistUpdater
+  streamPlaylistUpdater,
+  streamStatusPublisher
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -585,6 +587,39 @@ const streamSchedulerRule = new events.Rule(
 )
 
 streamSchedulerRule.addTarget(new targets.LambdaFunction(streamPlaylistLambda))
+
+// ============================================
+// 📡 STREAM STATUS PUBLISHER - IoT Real-time
+// ============================================
+const streamStatusLambda = backend.streamStatusPublisher.resources.lambda
+
+// Grant IoT publish permission
+streamStatusLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['*'] // Wildcard for IoT topic
+  })
+)
+
+// Grant S3 read for playlist
+playlistBucket.grantRead(streamStatusLambda)
+
+// Add environment variables
+backend.streamStatusPublisher.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
+
+// EventBridge rule - Run every 10 seconds for real-time updates
+const streamStatusRule = new events.Rule(
+  streamStatusLambda.stack,
+  'StreamStatusPublisherRule',
+  {
+    ruleName: 'StreamStatusEvery10Seconds',
+    description: 'Publishes stream status to IoT every 10 seconds',
+    schedule: events.Schedule.rate(Duration.seconds(10)),
+  }
+)
+
+streamStatusRule.addTarget(new targets.LambdaFunction(streamStatusLambda))
 
 // VPC for EC2 Stream Server
 const vpc = new ec2.Vpc(streamPlaylistLambda.stack, 'StreamVPC', {
