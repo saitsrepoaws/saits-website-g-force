@@ -36,6 +36,15 @@ export default function Players() {
   const [isCrossFadeActive, setIsCrossFadeActive] = useState(false)
   
   // ============================================
+  // 🔄 CROSS-FADE STATE
+  // ============================================
+  const [crossFadeState, setCrossFadeState] = useState<{
+    currentPlayer: 1 | 2
+    nextTrackIndex: number
+    allTracks: any[]
+  } | null>(null)
+  
+  // ============================================
   // 📅 SCHEDULE & PLAYLIST LOADING
   // ============================================
   useEffect(() => {
@@ -175,7 +184,7 @@ export default function Players() {
   // ============================================
   const handleStartCrossFade = async () => {
     if (!activePlaylist) {
-      console.error('❌ No active playlist to start cross-fade')
+      console.error('No active playlist')
       return
     }
 
@@ -190,6 +199,19 @@ export default function Players() {
         timestamp: new Date().toISOString()
       })
 
+      // Initialize cross-fade state
+      // Lambda will load first 2 tracks (Player 1 starts playing, Player 2 preloaded)
+      // We start from track index 2 (third track) as next
+      const tracks = typeof activePlaylist.tracks === 'string' 
+        ? JSON.parse(activePlaylist.tracks) 
+        : (activePlaylist.tracks || [])
+      
+      setCrossFadeState({
+        currentPlayer: 1, // Player 1 is playing
+        nextTrackIndex: 2, // Next track to load (0=P1, 1=P2, 2=next)
+        allTracks: tracks
+      })
+
       console.log('✅ Cross-fade started!')
     } catch (error) {
       console.error('❌ Error starting cross-fade:', error)
@@ -200,6 +222,7 @@ export default function Players() {
   const handleStopCrossFade = async () => {
     console.log('⏹️ Stopping cross-fade')
     setIsCrossFadeActive(false)
+    setCrossFadeState(null)
 
     try {
       await iot.publish('radio/crossfade/control', {
@@ -212,6 +235,62 @@ export default function Players() {
       console.error('❌ Error stopping cross-fade:', error)
     }
   }
+
+  const handleTrackEnded = async (playerId: string, trackId: string) => {
+    console.log(`🔄 Track ended on ${playerId}:`, trackId)
+    
+    if (!isCrossFadeActive || !crossFadeState) {
+      console.log('⚠️ Cross-fade not active, ignoring track end')
+      return
+    }
+
+    const { currentPlayer, nextTrackIndex, allTracks } = crossFadeState
+    
+    // Check if there are more tracks
+    if (nextTrackIndex >= allTracks.length) {
+      console.log('🏁 Playlist finished!')
+      setIsCrossFadeActive(false)
+      setCrossFadeState(null)
+      return
+    }
+
+    // Switch to the other player
+    const nextPlayer = currentPlayer === 1 ? 2 : 1
+    const nextPlayerId = `player-00${nextPlayer}`
+    const nextTrack = allTracks[nextTrackIndex]
+    
+    console.log(`🎵 Loading next track (${nextTrackIndex + 1}/${allTracks.length}) on Player ${nextPlayer}:`, nextTrack.title)
+
+    try {
+      // Load track on the other player
+      await iot.publish(`radio/player/${nextPlayerId}/command-request`, {
+        command: 'LOAD',
+        playerId: nextPlayerId,
+        timestamp: new Date().toISOString()
+      })
+      
+      // Wait a bit for load
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      // Start playing
+      await iot.publish(`radio/player/${nextPlayerId}/command-request`, {
+        command: 'PLAY',
+        playerId: nextPlayerId,
+        timestamp: new Date().toISOString()
+      })
+
+      // Update state
+      setCrossFadeState({
+        currentPlayer: nextPlayer,
+        nextTrackIndex: nextTrackIndex + 1,
+        allTracks
+      })
+
+      console.log(`✅ Switched to Player ${nextPlayer}`)
+    } catch (error) {
+      console.error('❌ Error switching players:', error)
+    }
+  }
   
   return (
     <Layout title="Players" showBackButton backTo="/devices">
@@ -222,12 +301,14 @@ export default function Players() {
           <PlayerCard 
             playerId="player-001" 
             playerName="🎵 Player 1"
+            onTrackEnded={handleTrackEnded}
           />
           
           {/* Player 2 */}
           <PlayerCard 
             playerId="player-002" 
-            playerName="🎵 Player 2"
+            playerName="🎧 Player 2"
+            onTrackEnded={handleTrackEnded}
           />
         </div>
         

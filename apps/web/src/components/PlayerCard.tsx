@@ -5,6 +5,7 @@ import { getAudioUrl, getCoverArtUrl, getWaveformUrl } from '../utils/mediaUrl'
 interface PlayerCardProps {
   playerId: string
   playerName: string
+  onTrackEnded?: (playerId: string, trackId: string) => void
 }
 
 /**
@@ -13,7 +14,7 @@ interface PlayerCardProps {
  * Reusable player card that can be used for multiple players
  * Each card manages its own state and IoT subscription
  */
-export default function PlayerCard({ playerId, playerName }: PlayerCardProps) {
+export default function PlayerCard({ playerId, playerName, onTrackEnded }: PlayerCardProps) {
   const iot = useIoT()
   
   // ============================================
@@ -304,6 +305,12 @@ export default function PlayerCard({ playerId, playerName }: PlayerCardProps) {
             console.log(`🏁 [${playerId}] Audio ended`)
             setPlayerStatus('stopped')
             setCurrentTime(0)
+            
+            // Notify parent component if callback provided
+            if (onTrackEnded && trackInfo?.id) {
+              console.log(`📢 [${playerId}] Notifying parent: track ${trackInfo.id} ended`)
+              onTrackEnded(playerId, trackInfo.id)
+            }
           }}
           onTimeUpdate={(e) => {
             const audio = e.currentTarget
