@@ -245,19 +245,20 @@ export default function Players() {
       return
     }
 
-    const { currentPlayer, nextTrackIndex, allTracks } = crossFadeState
+    const { nextTrackIndex, allTracks } = crossFadeState
     
-    // Determine which player just finished and which should play next
-    const finishedPlayer = currentPlayer
-    const nextPlayer = currentPlayer === 1 ? 2 : 1
-    const nextPlayerId = `player-00${nextPlayer}`
-    const finishedPlayerId = `player-00${finishedPlayer}`
+    // Determine which player just finished based on the actual playerId parameter
+    const finishedPlayerNum = playerId === 'player-001' ? 1 : 2
+    const nextPlayerNum = finishedPlayerNum === 1 ? 2 : 1
+    const nextPlayerId = `player-00${nextPlayerNum}`
+    const finishedPlayerId = playerId
     
-    console.log(`🔄 Player ${finishedPlayer} finished → Starting Player ${nextPlayer}`)
+    console.log(`🔄 Player ${finishedPlayerNum} finished → Starting Player ${nextPlayerNum}`)
+    console.log(`📊 State: nextTrackIndex=${nextTrackIndex}, totalTracks=${allTracks.length}`)
 
     try {
       // 1. Start playing the OTHER player (which already has a track loaded)
-      console.log(`▶️ Starting playback on Player ${nextPlayer}`)
+      console.log(`▶️ Starting playback on Player ${nextPlayerNum}`)
       await iot.publish(`radio/player/${nextPlayerId}/command`, {
         command: 'PLAY',
         playerId: nextPlayerId,
@@ -267,7 +268,7 @@ export default function Players() {
       // 2. Load next track in the player that just finished (if available)
       if (nextTrackIndex < allTracks.length) {
         const nextTrack = allTracks[nextTrackIndex]
-        console.log(`📥 Preloading track ${nextTrackIndex + 1}/${allTracks.length} in Player ${finishedPlayer}: ${nextTrack.trackTitle || 'Unknown'}`)
+        console.log(`📥 Preloading track ${nextTrackIndex + 1}/${allTracks.length} in Player ${finishedPlayerNum}: ${nextTrack.trackTitle || 'Unknown'}`)
         
         // Small delay to let the other player start
         await new Promise(resolve => setTimeout(resolve, 300))
@@ -300,21 +301,21 @@ export default function Players() {
         
         // Update state
         setCrossFadeState({
-          currentPlayer: nextPlayer, // Now the other player is playing
+          currentPlayer: nextPlayerNum, // Now the other player is playing
           nextTrackIndex: nextTrackIndex + 1, // Next track to load
           allTracks
         })
       } else {
         // No more tracks to load, but let the last track play
-        console.log('📋 No more tracks to preload, last track playing on Player', nextPlayer)
+        console.log('📋 No more tracks to preload, last track playing on Player', nextPlayerNum)
         setCrossFadeState({
-          currentPlayer: nextPlayer,
+          currentPlayer: nextPlayerNum,
           nextTrackIndex: nextTrackIndex,
           allTracks
         })
       }
 
-      console.log(`✅ Switched to Player ${nextPlayer}`)
+      console.log(`✅ Switched to Player ${nextPlayerNum}`)
     } catch (error) {
       console.error('❌ Error switching players:', error)
     }
