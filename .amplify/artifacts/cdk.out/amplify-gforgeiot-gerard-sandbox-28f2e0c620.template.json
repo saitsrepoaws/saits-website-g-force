@@ -489,7 +489,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/81a0ccda879785b036b0f956979f6249ef57bc4f6cabc5d8d834351107d93314.json"
+       "/a8288ed9a51d6a2fc86f4c5154e5631bfcb39dec89c9a245a5d9fb3422d90a0f.json"
       ]
      ]
     }
@@ -535,6 +535,12 @@
        "storage0EC3F24A",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
       ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
+      "Fn::GetAtt": [
+       "storage0EC3F24A",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
+      ]
      }
     },
     "Tags": [
@@ -563,7 +569,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/713fc1c473c435a406da490dddcc4a3eb59dc034b89ee6146ccf1411b1e122db.json"
+       "/c27536e42922733678fa5f0341921ef50bd561ce87e93581bcc1d5f8c2931835.json"
       ]
      ]
     }

@@ -1763,6 +1763,14 @@
    "Value": {
     "Ref": "gforgeIotStorageBucketEED00516"
    }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "gforgeIotStorageBucketEED00516",
+     "Arn"
+    ]
+   }
   }
  },
  "Conditions": {
