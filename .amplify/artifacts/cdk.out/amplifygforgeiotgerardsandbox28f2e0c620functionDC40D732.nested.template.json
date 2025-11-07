@@ -1455,6 +1455,31 @@
          ]
         }
        ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiot6E2D80CF"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -1482,13 +1507,36 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "e7876bbbba7496552ef8e97aa9a7ab9830623e38b1726fceb63b8b0ebf56213b.zip"
+     "S3Key": "1dd942857163f580defe44e985ac90f72adcff1dfdadd80305a715ba394954f7.zip"
     },
     "Environment": {
      "Variables": {
       "AMPLIFY_SSM_ENV_CONFIG": "{}",
       "PLAYLIST_BUCKET": {
        "Ref": "StreamPlaylistBucket5DE5E8D3"
+      },
+      "PLAYER_STATE_TABLE": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiot6E2D80CF"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
       }
      }
     },
@@ -1528,7 +1576,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-status-publisher-lambda/Resource",
-    "aws:asset:path": "asset.e7876bbbba7496552ef8e97aa9a7ab9830623e38b1726fceb63b8b0ebf56213b",
+    "aws:asset:path": "asset.1dd942857163f580defe44e985ac90f72adcff1dfdadd80305a715ba394954f7",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -2526,6 +2574,9 @@
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiot6E2D80CF": {
    "Type": "String"
   },
   "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {

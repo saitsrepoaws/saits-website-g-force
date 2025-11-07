@@ -628,7 +628,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/adc7ce05b3fe76c1fd0ab1dd2ce004298d2e7ea858a61812fd71afaee34b6017.json"
+       "/f0badd247921871cbb701a8300fe4b65d463f0d956745c16065274283cffaa69.json"
       ]
      ]
     }
@@ -2123,6 +2123,14 @@
     "Fn::GetAtt": [
      "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
      "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataPlayerStateNestedStackPlayerStateNestedStackResourceBD80A56B",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
     ]
    }
   }

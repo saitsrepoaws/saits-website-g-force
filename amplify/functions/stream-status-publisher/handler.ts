@@ -140,6 +140,37 @@ export const handler = async (event: any) => {
       qos: 0
     }))
     
+    // 8. Send notifications to subscribed users if track changed
+    if (trackChanged && currentTrack) {
+      try {
+        // Get all subscribed users from DynamoDB
+        // For now, broadcast to all authenticated users
+        // TODO: Add UserNotificationPreferences table to manage subscriptions
+        
+        const notification = {
+          type: 'track_change',
+          title: 'Track Changed',
+          body: `Now playing: ${currentTrack.artist} - ${currentTrack.title}`,
+          playerId: NONSTOP_PLAYER_ID,
+          track: currentTrack,
+          timestamp: new Date().toISOString()
+        }
+        
+        // Publish to broadcast notification topic (all users)
+        // Users subscribe to: user/{userId}/notifications/track_change
+        // For demo: use a broadcast topic that all can subscribe to
+        await iot.send(new PublishCommand({
+          topic: 'notifications/track_change',
+          payload: Buffer.from(JSON.stringify(notification)),
+          qos: 0
+        }))
+        
+        console.log('📬 Notification sent to users')
+      } catch (notifError) {
+        console.warn('⚠️ Could not send notification:', notifError)
+      }
+    }
+    
     console.log('✅ Published stream status to IoT')
     console.log(`   Current: ${currentTrack ? `${currentTrack.artist} - ${currentTrack.title}` : 'None'}`)
     console.log(`   Queue: ${playlist.total} tracks`)

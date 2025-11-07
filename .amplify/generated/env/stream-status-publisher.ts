@@ -83,4 +83,5 @@ type LambdaProvidedEnvVars = {
 /** Amplify backend environment variables available at runtime, this includes environment variables defined in `defineFunction` and by cross resource mechanisms */
 type AmplifyBackendEnvVars = {
   PLAYLIST_BUCKET: string;
+  PLAYER_STATE_TABLE: string;
 };

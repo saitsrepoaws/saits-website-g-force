@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react'
 import Layout from '../../components/Layout'
 import PlayerCard from '../../components/PlayerCard'
 import PlaylistViewer from '../../components/PlaylistViewer'
+import NotificationControl from '../../components/NotificationControl'
 import { useTabTitle } from '../../hooks/useTabTitle'
 import { useIoT } from '../../contexts/IoTContext'
+import { useNotifications } from '../../hooks/useNotifications'
 import { loadScheduleAndDeterminePlaylist } from '../../services/scheduleService'
 import { getPlaylist } from '../../services/playlists'
 import { getTrack } from '../../services/tracks'
@@ -20,6 +22,9 @@ export default function Players() {
   useTabTitle('Players', '🎵')
   
   const iot = useIoT()
+  
+  // Enable notifications for this page
+  useNotifications()
   
   // ============================================
   // 📊 SCHEDULE & PLAYLIST STATE
@@ -524,6 +529,11 @@ export default function Players() {
             </div>
           </div>
         )}
+        
+        {/* Notification Control */}
+        <div className="flex justify-end">
+          <NotificationControl />
+        </div>
         
         {/* Live Stream Status */}
         {streamStatus && (

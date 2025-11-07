@@ -2103,6 +2103,14 @@
      ]
     }
    }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PlayerStateTable",
+     "TableArn"
+    ]
+   }
   }
  }
 }
