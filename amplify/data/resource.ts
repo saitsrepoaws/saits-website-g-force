@@ -66,6 +66,11 @@ const schema = a.schema({
       theme: a.string().default('light'), // "light" | "dark"
       defaultView: a.string(), // "players" | "playlists" | "libery"
       
+      // Activity Tracking
+      lastLoginAt: a.datetime(), // Last login timestamp
+      lastLogoutAt: a.datetime(), // Last logout timestamp
+      loginCount: a.integer().default(0), // Total number of logins
+      
       // Timestamps
       createdAt: a.datetime(),
       updatedAt: a.datetime(),

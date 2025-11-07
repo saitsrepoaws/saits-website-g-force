@@ -14,6 +14,9 @@ export interface UserPreferences {
   notifyOnLogin: boolean
   theme?: string
   defaultView?: string
+  lastLoginAt?: string
+  lastLogoutAt?: string
+  loginCount?: number
   createdAt?: string
   updatedAt?: string
 }
@@ -84,6 +87,9 @@ export async function saveUserPreferences(preferences: Partial<UserPreferences> 
         notifyOnLogin: preferences.notifyOnLogin ?? false,
         theme: preferences.theme ?? 'light',
         defaultView: preferences.defaultView ?? undefined,
+        lastLoginAt: preferences.lastLoginAt ?? undefined,
+        lastLogoutAt: preferences.lastLogoutAt ?? undefined,
+        loginCount: preferences.loginCount ?? 0,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       })

@@ -8,7 +8,7 @@
 import { useEffect, useState } from 'react'
 import { useIoT } from '../contexts/IoTContext'
 import { getCurrentUser } from 'aws-amplify/auth'
-import { getUserPreferences } from '../services/userPreferences'
+import { getUserPreferences, saveUserPreferences } from '../services/userPreferences'
 
 export interface NotificationMessage {
   type: 'track_change' | 'playlist_update' | 'schedule_alert' | 'system' | 'user_login' | 'user_logout'
@@ -45,6 +45,18 @@ export function useNotifications() {
           setNotificationsEnabled(prefs.notificationsEnabled)
         }
         
+        // Update login timestamp and count
+        const loginTimestamp = new Date().toISOString()
+        const loginCount = (prefs?.loginCount || 0) + 1
+        
+        await saveUserPreferences({
+          userId: user.userId,
+          lastLoginAt: loginTimestamp,
+          loginCount: loginCount
+        })
+        
+        console.log(`🔐 Login tracked: #${loginCount} at ${loginTimestamp}`)
+        
         // Send login notification to IoT (will be picked up by other tabs/devices)
         if (iot.connectionState === 'Connected' && prefs?.notifyOnLogin) {
           await iot.publish(`user/${user.userId}/notifications/user_login`, {
@@ -55,7 +67,7 @@ export function useNotifications() {
               username: user.username || 'User',
               email: (user as any).email || undefined
             },
-            timestamp: new Date().toISOString()
+            timestamp: loginTimestamp
           })
           console.log('📬 Login notification sent via IoT')
         }
@@ -147,6 +159,19 @@ export function useNotifications() {
   useEffect(() => {
     return () => {
       if (userId && iot.connectionState === 'Connected') {
+        const logoutTimestamp = new Date().toISOString()
+        
+        // Update logout timestamp
+        saveUserPreferences({
+          userId,
+          lastLogoutAt: logoutTimestamp
+        }).then(() => {
+          console.log(`🔐 Logout tracked at ${logoutTimestamp}`)
+        }).catch((error) => {
+          console.warn('Failed to save logout timestamp:', error)
+        })
+        
+        // Send IoT notification
         iot.publish(`user/${userId}/notifications/user_logout`, {
           type: 'user_logout',
           title: 'Goodbye!',
@@ -154,7 +179,7 @@ export function useNotifications() {
           user: {
             username: 'User'
           },
-          timestamp: new Date().toISOString()
+          timestamp: logoutTimestamp
         }).then(() => {
           console.log('📬 Logout notification sent via IoT')
         }).catch((error) => {
