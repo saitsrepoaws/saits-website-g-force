@@ -641,12 +641,19 @@ This action cannot be undone!`
     return tracksByGenre[b].length - tracksByGenre[a].length
   })
   
-  // Toggle genre expansion
+  // Toggle genre expansion (accordion style - only one open at a time)
   const toggleGenre = (genre: string) => {
-    setExpandedGenres(prev => ({
-      ...prev,
-      [genre]: !prev[genre]
-    }))
+    setExpandedGenres(prev => {
+      const isCurrentlyExpanded = prev[genre]
+      
+      // If clicking on already expanded genre, close it
+      if (isCurrentlyExpanded) {
+        return {}
+      }
+      
+      // Otherwise, close all and open only this one
+      return { [genre]: true }
+    })
   }
   
   // Show more/less tracks for a genre
@@ -952,7 +959,7 @@ This action cannot be undone!`
                 {/* Genre Groups */}
                 {sortedGenres.map((genre) => {
                   const genreTracks = tracksByGenre[genre]
-                  const isExpanded = expandedGenres[genre] !== false // Default to expanded
+                  const isExpanded = expandedGenres[genre] === true // Default to collapsed
                   const visibleTracks = getVisibleTracks(genre)
                   const hasMore = genreTracks.length > visibleTracks.length
                   const displayCount = genreDisplayCounts[genre] || 50
