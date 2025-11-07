@@ -1220,7 +1220,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "e992ee0ff2d8e1c6fe7a21687e056d7744309248b0dfb8a83f7056c31a9fb5e3.zip"
+     "S3Key": "8af111e1b8d1501e3211a887d41e1c27352b2de72085c2702ebed13fa68a882f.zip"
     },
     "Environment": {
      "Variables": {
@@ -1335,7 +1335,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/Resource",
-    "aws:asset:path": "asset.e992ee0ff2d8e1c6fe7a21687e056d7744309248b0dfb8a83f7056c31a9fb5e3",
+    "aws:asset:path": "asset.8af111e1b8d1501e3211a887d41e1c27352b2de72085c2702ebed13fa68a882f",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -1972,7 +1972,7 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile"
    }
   },
-  "StreamServerA433EFF8bd053fa7f35c770a": {
+  "StreamServerA433EFF82fe06a2f5160d99c": {
    "Type": "AWS::EC2::Instance",
    "Properties": {
     "AvailabilityZone": {
@@ -2042,7 +2042,7 @@
         {
          "Ref": "StreamPlaylistBucket5DE5E8D3"
         },
-        "\"\nplaylist_file = \"/tmp/current-playlist.m3u\"\n\ndef fetch_playlist() =\n  log(\"📥 Fetching playlist from S3...\")\n  ret = get_process_output(\"aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1\")\n  log(\"S3 result: #{ret}\")\n  playlist_file\nend\n\nignore(fetch_playlist())\nadd_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)\n\nradio = playlist(playlist_file, mode=\"normal\", reload_mode=\"watch\", reload=300)\nradio = fallback(track_sensitive=false, [radio])\nradio = crossfade(start_next=3., fade_in=2., fade_out=2., radio)\nradio = normalize(radio)\n\noutput.icecast(\n  %mp3(bitrate=192, samplerate=44100),\n  host=\"localhost\",\n  port=8000,\n  password=\"gforge2024radio\",\n  mount=\"/stream.mp3\",\n  name=\"G-Forge Radio\",\n  description=\"Techno & Electronic Music 24/7\",\n  genre=\"Techno\",\n  public=true,\n  radio\n)\nLIQUIDSOAP_EOF\n\n# Create systemd service\ncat > /etc/systemd/system/liquidsoap-radio.service << \"SERVICE_EOF\"\n[Unit]\nDescription=Liquidsoap Radio Stream\nAfter=network.target icecast2.service\nRequires=icecast2.service\n\n[Service]\nType=simple\nUser=root\nExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\nSERVICE_EOF\n\n# Create empty playlist\ntouch /tmp/current-playlist.m3u\n\n# Start services\nsystemctl daemon-reload\nsystemctl enable icecast2\nsystemctl start icecast2\nsystemctl enable liquidsoap-radio\nsystemctl start liquidsoap-radio\n\n# Configure nginx reverse proxy\ncat > /etc/nginx/sites-available/radio << \"NGINX_EOF\"\nserver {\n  listen 80;\n  server_name _;\n  location / {\n    proxy_pass http://localhost:8000;\n    proxy_set_header Host $host;\n  }\n}\nNGINX_EOF\n\nln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nsystemctl restart nginx\n\n# Health check script\ncat > /opt/radio/healthcheck.sh << \"HEALTH_EOF\"\n#!/bin/bash\ncurl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1\nif [ $? -ne 0 ]; then\n  systemctl restart icecast2\n  systemctl restart liquidsoap-radio\nfi\nHEALTH_EOF\nchmod +x /opt/radio/healthcheck.sh\n\n# Add healthcheck cron\necho \"*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1\" | crontab -\n\necho \"✅ Radio stream server setup complete!\""
+        "\"\nplaylist_file = \"/tmp/current-playlist.m3u\"\n\ndef fetch_playlist() =\n  log(\"📥 Fetching playlist from S3...\")\n  ret = get_process_output(\"aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1\")\n  log(\"S3 result: #{ret}\")\n  playlist_file\nend\n\nignore(fetch_playlist())\nadd_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)\n\n# Create playlist source\nradio = playlist(playlist_file, mode=\"normal\", reload_mode=\"watch\", reload=300)\n\n# Add silence as fallback to make source infallible\nradio = fallback(track_sensitive=false, [radio, blank()])\n\n# Crossfade for smooth transitions (Liquidsoap 2.x syntax)\nradio = crossfade(duration=3., radio)\nradio = normalize(radio)\n\noutput.icecast(\n  %mp3(bitrate=192, samplerate=44100),\n  host=\"localhost\",\n  port=8000,\n  password=\"gforge2024radio\",\n  mount=\"/stream.mp3\",\n  name=\"G-Forge Radio\",\n  description=\"Techno & Electronic Music 24/7\",\n  genre=\"Techno\",\n  public=true,\n  radio\n)\nLIQUIDSOAP_EOF\n\n# Create systemd service\ncat > /etc/systemd/system/liquidsoap-radio.service << \"SERVICE_EOF\"\n[Unit]\nDescription=Liquidsoap Radio Stream\nAfter=network.target icecast2.service\nRequires=icecast2.service\n\n[Service]\nType=simple\nUser=root\nExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\nSERVICE_EOF\n\n# Create empty playlist\ntouch /tmp/current-playlist.m3u\n\n# Start services\nsystemctl daemon-reload\nsystemctl enable icecast2\nsystemctl start icecast2\nsystemctl enable liquidsoap-radio\nsystemctl start liquidsoap-radio\n\n# Configure nginx reverse proxy\ncat > /etc/nginx/sites-available/radio << \"NGINX_EOF\"\nserver {\n  listen 80;\n  server_name _;\n  location / {\n    proxy_pass http://localhost:8000;\n    proxy_set_header Host $host;\n  }\n}\nNGINX_EOF\n\nln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nsystemctl restart nginx\n\n# Health check script\ncat > /opt/radio/healthcheck.sh << \"HEALTH_EOF\"\n#!/bin/bash\ncurl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1\nif [ $? -ne 0 ]; then\n  systemctl restart icecast2\n  systemctl restart liquidsoap-radio\nfi\nHEALTH_EOF\nchmod +x /opt/radio/healthcheck.sh\n\n# Add healthcheck cron\necho \"*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1\" | crontab -\n\necho \"✅ Radio stream server setup complete!\""
        ]
       ]
      }
@@ -2078,7 +2078,7 @@
    "Type": "AWS::EC2::EIP",
    "Properties": {
     "InstanceId": {
-     "Ref": "StreamServerA433EFF8bd053fa7f35c770a"
+     "Ref": "StreamServerA433EFF82fe06a2f5160d99c"
     },
     "Tags": [
      {
@@ -2182,7 +2182,7 @@
   "StreamServerInstanceId": {
    "Description": "EC2 instance ID for stream server",
    "Value": {
-    "Ref": "StreamServerA433EFF8bd053fa7f35c770a"
+    "Ref": "StreamServerA433EFF82fe06a2f5160d99c"
    },
    "Export": {
     "Name": "StreamServerInstanceId"

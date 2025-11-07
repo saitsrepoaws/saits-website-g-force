@@ -273,7 +273,7 @@
               "type": "key",
               "properties": {
                 "name": "schedulesByDayOfWeekAndStartTime",
-                "queryField": "byDay",
+                "queryField": "listScheduleByDayOfWeekAndStartTime",
                 "fields": [
                   "dayOfWeek",
                   "startTime"

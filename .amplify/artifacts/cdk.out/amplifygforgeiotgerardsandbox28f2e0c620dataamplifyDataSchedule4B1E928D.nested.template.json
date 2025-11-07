@@ -2084,7 +2084,7 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/subscriptionOnDeleteScheduleResolver"
    }
   },
-  "QuerybyDayauth0FunctionQuerybyDayauth0FunctionAppSyncFunctionC0433ADC": {
+  "QuerylistScheduleByDayOfWeekAndStartTimeauth0FunctionQuerylistScheduleByDayOfWeekAndStartTimeauth0FunctionAppSyncFunctionB27A5D94": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -2094,7 +2094,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerybyDayauth0Function",
+    "Name": "QuerylistScheduleByDayOfWeekAndStartTimeauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/88d5b7081b0dc9c39fd0bffedf56f011b2a7cf1ce5cc227f47a1e94efee8067c.vtl"
     },
@@ -2103,10 +2103,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerybyDayauth0Function/QuerybyDayauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerylistScheduleByDayOfWeekAndStartTimeauth0Function/QuerylistScheduleByDayOfWeekAndStartTimeauth0Function.AppSyncFunction"
    }
   },
-  "QuerybyDaypostAuth0FunctionQuerybyDaypostAuth0FunctionAppSyncFunction67858E4C": {
+  "QuerylistScheduleByDayOfWeekAndStartTimepostAuth0FunctionQuerylistScheduleByDayOfWeekAndStartTimepostAuth0FunctionAppSyncFunction288467BA": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -2116,7 +2116,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerybyDaypostAuth0Function",
+    "Name": "QuerylistScheduleByDayOfWeekAndStartTimepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -2125,10 +2125,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerybyDaypostAuth0Function/QuerybyDaypostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QuerylistScheduleByDayOfWeekAndStartTimepostAuth0Function/QuerylistScheduleByDayOfWeekAndStartTimepostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryByDayDataResolverFnQueryByDayDataResolverFnAppSyncFunctionF955D13F": {
+  "QueryListScheduleByDayOfWeekAndStartTimeDataResolverFnQueryListScheduleByDayOfWeekAndStartTimeDataResolverFnAppSyncFunctionFD2E071B": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -2141,7 +2141,7 @@
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryByDayDataResolverFn",
+    "Name": "QueryListScheduleByDayOfWeekAndStartTimeDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/7520864eab2fcccf2eed97fc066dcecfe1fca3f16a4bf7a354f8be122ae56541.vtl"
     },
@@ -2155,34 +2155,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QueryByDayDataResolverFn/QueryByDayDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/QueryListScheduleByDayOfWeekAndStartTimeDataResolverFn/QueryListScheduleByDayOfWeekAndStartTimeDataResolverFn.AppSyncFunction"
    }
   },
-  "QuerybyDayResolver": {
+  "QuerylistScheduleByDayOfWeekAndStartTimeResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "byDay",
+    "FieldName": "listScheduleByDayOfWeekAndStartTime",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerybyDayauth0FunctionQuerybyDayauth0FunctionAppSyncFunctionC0433ADC",
+        "QuerylistScheduleByDayOfWeekAndStartTimeauth0FunctionQuerylistScheduleByDayOfWeekAndStartTimeauth0FunctionAppSyncFunctionB27A5D94",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerybyDaypostAuth0FunctionQuerybyDaypostAuth0FunctionAppSyncFunction67858E4C",
+        "QuerylistScheduleByDayOfWeekAndStartTimepostAuth0FunctionQuerylistScheduleByDayOfWeekAndStartTimepostAuth0FunctionAppSyncFunction288467BA",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryByDayDataResolverFnQueryByDayDataResolverFnAppSyncFunctionF955D13F",
+        "QueryListScheduleByDayOfWeekAndStartTimeDataResolverFnQueryListScheduleByDayOfWeekAndStartTimeDataResolverFnAppSyncFunctionFD2E071B",
         "FunctionId"
        ]
       }
@@ -2192,7 +2192,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"byDay\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listScheduleByDayOfWeekAndStartTime\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -2261,7 +2261,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/queryByDayResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/queryListScheduleByDayOfWeekAndStartTimeResolver"
    }
   },
   "CDKMetadata": {
