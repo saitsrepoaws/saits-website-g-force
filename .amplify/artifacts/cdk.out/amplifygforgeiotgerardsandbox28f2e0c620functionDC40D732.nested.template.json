@@ -1193,6 +1193,29 @@
          ]
         }
        ]
+      },
+      {
+       "Action": [
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
+           },
+           "/index/*"
+          ]
+         ]
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -1220,7 +1243,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "d1b86a438228f28e65d7d00ead04b9a2ef980ccabb292426479e414c98ef6c30.zip"
+     "S3Key": "bde9b983204080b06e20723bb2c6690dc371cc16bc43d5329a542f561f139bc9.zip"
     },
     "Environment": {
      "Variables": {
@@ -1338,7 +1361,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/Resource",
-    "aws:asset:path": "asset.d1b86a438228f28e65d7d00ead04b9a2ef980ccabb292426479e414c98ef6c30",
+    "aws:asset:path": "asset.bde9b983204080b06e20723bb2c6690dc371cc16bc43d5329a542f561f139bc9",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
