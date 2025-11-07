@@ -64,6 +64,7 @@ const playlistGeneratorLambda = backend.playlistGenerator.resources.lambda
 const trackTable = backend.data.resources.tables['Track']
 const playlistTable = backend.data.resources.tables['Playlist']
 const scheduleTable = backend.data.resources.tables['Schedule']
+const playerStateTable = backend.data.resources.tables['PlayerState']
 const radioSchedulerLambda = backend.radioScheduler.resources.lambda
 
 // Create Docker-based Lambda for audio analysis with FFmpeg
@@ -605,8 +606,12 @@ streamStatusLambda.addToRolePolicy(
 // Grant S3 read for playlist
 playlistBucket.grantRead(streamStatusLambda)
 
+// Grant DynamoDB access to PlayerState table
+playerStateTable.grantReadWriteData(streamStatusLambda)
+
 // Add environment variables
 backend.streamStatusPublisher.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
+backend.streamStatusPublisher.addEnvironment('PLAYER_STATE_TABLE', playerStateTable.tableName)
 
 // EventBridge rule - Run every 1 minute for near real-time updates
 const streamStatusRule = new events.Rule(

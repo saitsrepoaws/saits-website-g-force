@@ -7,13 +7,19 @@
 
 import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb'
 
 const iot = new IoTDataPlaneClient({})
 const s3 = new S3Client({})
+const dynamoClient = new DynamoDBClient({})
+const dynamodb = DynamoDBDocumentClient.from(dynamoClient)
 
 const ICECAST_URL = 'http://46.137.184.91:8000'
 const PLAYLIST_BUCKET = process.env.PLAYLIST_BUCKET || ''
+const PLAYER_STATE_TABLE = process.env.PLAYER_STATE_TABLE || ''
 const IOT_TOPIC = 'radio/stream/status'
+const NONSTOP_PLAYER_ID = 'nonstop'
 
 export const handler = async (event: any) => {
   console.log('🎙️ Publishing stream status to IoT...')
@@ -74,19 +80,62 @@ export const handler = async (event: any) => {
       }
     }
     
-    // 4. Build status message
+    // 4. Check PlayerState - heeft track gewijzigd?
+    let trackChanged = false
+    try {
+      const playerStateResult = await dynamodb.send(new GetCommand({
+        TableName: PLAYER_STATE_TABLE,
+        Key: { id: NONSTOP_PLAYER_ID }
+      }))
+      
+      const currentState = playerStateResult.Item
+      const newTrackTitle = currentTrack ? `${currentTrack.artist} - ${currentTrack.title}` : null
+      
+      if (!currentState || currentState.currentTrackTitle !== newTrackTitle) {
+        trackChanged = true
+        
+        // Update PlayerState in DynamoDB
+        await dynamodb.send(new PutCommand({
+          TableName: PLAYER_STATE_TABLE,
+          Item: {
+            id: NONSTOP_PLAYER_ID,
+            playerId: NONSTOP_PLAYER_ID,
+            currentTrackTitle: currentTrack?.title || null,
+            currentTrackArtist: currentTrack?.artist || null,
+            status: source ? 'playing' : 'idle',
+            lastActive: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        }))
+        
+        console.log('🔄 Track changed:', newTrackTitle)
+      }
+    } catch (dbError) {
+      console.warn('⚠️ Could not update PlayerState:', dbError)
+    }
+    
+    // 5. Build status message
     const status = {
       timestamp: new Date().toISOString(),
+      playerId: NONSTOP_PLAYER_ID,
       isLive: !!source,
       currentTrack,
       listeners: source?.listeners || 0,
       bitrate: source?.bitrate || 192,
-      playlist
+      playlist,
+      trackChanged
     }
     
-    // 5. Publish to IoT
+    // 6. Publish to IoT - broadcast topic
     await iot.send(new PublishCommand({
       topic: IOT_TOPIC,
+      payload: Buffer.from(JSON.stringify(status)),
+      qos: 0
+    }))
+    
+    // 7. Publish to nonstop player specific topic
+    await iot.send(new PublishCommand({
+      topic: `radio/player/${NONSTOP_PLAYER_ID}/status`,
       payload: Buffer.from(JSON.stringify(status)),
       qos: 0
     }))
@@ -94,6 +143,7 @@ export const handler = async (event: any) => {
     console.log('✅ Published stream status to IoT')
     console.log(`   Current: ${currentTrack ? `${currentTrack.artist} - ${currentTrack.title}` : 'None'}`)
     console.log(`   Queue: ${playlist.total} tracks`)
+    console.log(`   Track changed: ${trackChanged}`)
     
     return { statusCode: 200, body: JSON.stringify({ success: true }) }
     
