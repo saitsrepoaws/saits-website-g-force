@@ -182,20 +182,22 @@ export default function Players() {
   }, [iot.connectionState])
   
   // ============================================
-  // 📡 IOT SUBSCRIPTION FOR BOTH PLAYERS
+  // 📡 IOT REGISTRATION & SUBSCRIPTION - PLAYERS
   // ============================================
   useEffect(() => {
     if (iot.connectionState !== 'Connected') {
       return
     }
 
-    console.log('📡 Subscribing to both player commands...')
+    console.log('📡 Registering players and subscribing...')
 
     let unsubscribe1: (() => void) | undefined
     let unsubscribe2: (() => void) | undefined
+    let unsubscribeStatus1: (() => void) | undefined
+    let unsubscribeStatus2: (() => void) | undefined
     let isMounted = true
 
-    // Subscribe to Player 1
+    // Subscribe to Player 1 commands
     iot.subscribe('radio/player/player-001/command', (message: any) => {
       console.log('📥 [Player 1] Command:', message.command)
       
@@ -207,7 +209,6 @@ export default function Players() {
       
       if (message.command === 'UNLOAD') {
         console.log('🗑️ [Player 1] Track unloaded')
-        // Mark as played before clearing
         if (player1TrackId) {
           setPlayedTrackIds(prev => new Set(prev).add(player1TrackId))
         }
@@ -216,13 +217,39 @@ export default function Players() {
     }).then((unsub) => {
       if (isMounted) {
         unsubscribe1 = unsub
-        console.log('✅ Subscribed to Player 1')
+        console.log('✅ Subscribed to Player 1 commands')
+      } else {
+        unsub()
+      }
+    })
+    
+    // Subscribe to Player 1 status responses
+    iot.subscribe('radio/player/player-001/status', (message: any) => {
+      console.log('📥 [Player 1] Status:', message)
+      // Update player 1 state based on status
+      if (message.currentTrack?.id) {
+        setPlayer1TrackId(message.currentTrack.id)
+      }
+    }).then((unsub) => {
+      if (isMounted) {
+        unsubscribeStatus1 = unsub
+        console.log('✅ Subscribed to Player 1 status')
+        
+        // Send registration request
+        iot.publish('radio/player/player-001/register', {
+          playerId: 'player-001',
+          action: 'register',
+          requestStatus: true,
+          timestamp: new Date().toISOString()
+        }).then(() => {
+          console.log('✅ Player 1 registered')
+        })
       } else {
         unsub()
       }
     })
 
-    // Subscribe to Player 2
+    // Subscribe to Player 2 commands
     iot.subscribe('radio/player/player-002/command', (message: any) => {
       console.log('📥 [Player 2] Command:', message.command)
       
@@ -234,7 +261,6 @@ export default function Players() {
       
       if (message.command === 'UNLOAD') {
         console.log('🗑️ [Player 2] Track unloaded')
-        // Mark as played before clearing
         if (player2TrackId) {
           setPlayedTrackIds(prev => new Set(prev).add(player2TrackId))
         }
@@ -243,7 +269,33 @@ export default function Players() {
     }).then((unsub) => {
       if (isMounted) {
         unsubscribe2 = unsub
-        console.log('✅ Subscribed to Player 2')
+        console.log('✅ Subscribed to Player 2 commands')
+      } else {
+        unsub()
+      }
+    })
+    
+    // Subscribe to Player 2 status responses
+    iot.subscribe('radio/player/player-002/status', (message: any) => {
+      console.log('📥 [Player 2] Status:', message)
+      // Update player 2 state based on status
+      if (message.currentTrack?.id) {
+        setPlayer2TrackId(message.currentTrack.id)
+      }
+    }).then((unsub) => {
+      if (isMounted) {
+        unsubscribeStatus2 = unsub
+        console.log('✅ Subscribed to Player 2 status')
+        
+        // Send registration request
+        iot.publish('radio/player/player-002/register', {
+          playerId: 'player-002',
+          action: 'register',
+          requestStatus: true,
+          timestamp: new Date().toISOString()
+        }).then(() => {
+          console.log('✅ Player 2 registered')
+        })
       } else {
         unsub()
       }
@@ -253,6 +305,8 @@ export default function Players() {
       isMounted = false
       if (unsubscribe1) unsubscribe1()
       if (unsubscribe2) unsubscribe2()
+      if (unsubscribeStatus1) unsubscribeStatus1()
+      if (unsubscribeStatus2) unsubscribeStatus2()
     }
   }, [iot.connectionState, player1TrackId, player2TrackId])
   
