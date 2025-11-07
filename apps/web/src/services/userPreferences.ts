@@ -41,13 +41,19 @@ export async function getUserPreferences(userId: string): Promise<UserPreference
     const { data, errors } = await getClient().models.UserPreferences.get({ userId })
     
     if (errors) {
-      console.error('Error getting user preferences:', errors)
+      // Check if table doesn't exist yet (not deployed)
+      const errorMessage = JSON.stringify(errors)
+      if (errorMessage.includes('does not exist') || errorMessage.includes('not found')) {
+        console.warn('⚠️ UserPreferences table not deployed yet. Run: npx ampx sandbox')
+        return null
+      }
+      console.error('❌ Error getting user preferences:', errors)
       return null
     }
     
     return data as UserPreferences
   } catch (error) {
-    console.error('Failed to get user preferences:', error)
+    console.error('❌ Failed to get user preferences:', error)
     return null
   }
 }
@@ -70,11 +76,20 @@ export async function saveUserPreferences(preferences: Partial<UserPreferences> 
       const { data, errors } = await getClient().models.UserPreferences.update(updateData)
       
       if (errors) {
-        console.error('Error updating user preferences:', errors)
+        // Check if table doesn't exist
+        const errorMessage = JSON.stringify(errors)
+        if (errorMessage.includes('does not exist') || errorMessage.includes('not found')) {
+          console.warn('⚠️ UserPreferences table not deployed yet. Run: npx ampx sandbox')
+          console.warn('📝 Preferences will not be saved until table is deployed')
+          return { data: null, errors: ['TABLE_NOT_DEPLOYED'] }
+        }
+        console.error('❌ Error updating user preferences:', errors)
+        console.error('Update data:', updateData)
+        console.error('Existing data:', existing)
         return { data: null, errors }
       }
       
-      console.log('✅ User preferences updated')
+      console.log('✅ User preferences updated:', updateData)
       return { data, errors: null }
     } else {
       // Create new
@@ -95,7 +110,14 @@ export async function saveUserPreferences(preferences: Partial<UserPreferences> 
       })
       
       if (errors) {
-        console.error('Error creating user preferences:', errors)
+        // Check if table doesn't exist
+        const errorMessage = JSON.stringify(errors)
+        if (errorMessage.includes('does not exist') || errorMessage.includes('not found')) {
+          console.warn('⚠️ UserPreferences table not deployed yet. Run: npx ampx sandbox')
+          console.warn('📝 Preferences will not be saved until table is deployed')
+          return { data: null, errors: ['TABLE_NOT_DEPLOYED'] }
+        }
+        console.error('❌ Error creating user preferences:', errors)
         return { data: null, errors }
       }
       
@@ -103,7 +125,7 @@ export async function saveUserPreferences(preferences: Partial<UserPreferences> 
       return { data, errors: null }
     }
   } catch (error) {
-    console.error('Failed to save user preferences:', error)
+    console.error('❌ Failed to save user preferences:', error)
     return { data: null, errors: [error] }
   }
 }

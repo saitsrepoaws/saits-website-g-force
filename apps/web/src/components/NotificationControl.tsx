@@ -89,14 +89,21 @@ export default function NotificationControl() {
       const result = await toggleNotifications(userId, newState)
       
       if (result.errors) {
-        console.error('❌ Failed to save notification preference:', result.errors)
-        // Rollback on error
-        setPreferencesEnabled(!newState)
-        alert('Failed to save notification preference. Please try again.')
-        return
+        // Check if it's just that the table isn't deployed yet
+        if (result.errors[0] === 'TABLE_NOT_DEPLOYED') {
+          console.warn('⚠️ Preferences not saved (table not deployed). Functionality still works!')
+          // Don't rollback or show alert - just log it
+          // Local state still works for this session
+        } else {
+          console.error('❌ Failed to save notification preference:', result.errors)
+          // Rollback on real error
+          setPreferencesEnabled(!newState)
+          alert('Failed to save notification preference. Please try again.')
+          return
+        }
+      } else {
+        console.log('✅ Notification preference saved:', newState)
       }
-      
-      console.log('✅ Notification preference saved:', newState)
       
       // If enabling, also request browser permission
       if (newState && permission !== 'granted') {
