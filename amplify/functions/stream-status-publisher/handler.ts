@@ -5,7 +5,7 @@
  * Publishes stream status to IoT topic: radio/stream/status
  */
 
-import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iotdata'
+import { IoTDataPlaneClient, PublishCommand } from '@aws-sdk/client-iot-data-plane'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
 const iot = new IoTDataPlaneClient({})
