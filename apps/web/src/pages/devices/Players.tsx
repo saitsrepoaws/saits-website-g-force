@@ -617,11 +617,6 @@ export default function Players() {
                 <h3 className="font-bold text-white truncate leading-tight">
                   {isLoadingSchedule ? 'Loading...' : activePlaylist?.name || 'No Active Playlist'}
                 </h3>
-                {activeSlot && (
-                  <p className="text-xs text-white/80 truncate">
-                    {activeSlot.name} • {activeSlot.time}
-                  </p>
-                )}
               </div>
             </div>
           </div>
