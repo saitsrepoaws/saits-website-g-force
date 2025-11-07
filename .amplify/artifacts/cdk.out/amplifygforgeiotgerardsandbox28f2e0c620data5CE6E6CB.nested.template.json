@@ -51,79 +51,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/ServiceRole/Resource"
    }
   },
-  "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-         ]
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-         ]
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF",
-    "Roles": [
-     {
-      "Ref": "playlistgeneratorlambdaServiceRoleBA132824"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "playlistgeneratorlambda1BE43B64": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -138,59 +65,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "TRACK_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Fn::GetAtt": [
-                "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Fn::GetAtt": [
-                "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -222,7 +97,6 @@
     "Timeout": 60
    },
    "DependsOn": [
-    "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF",
     "playlistgeneratorlambdaServiceRoleBA132824"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -442,7 +316,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/2c9dc0d93ccb6ce4b89e5c42f41b5949e486d2c9053c62f37399f6cd756114aa.json"
+       "/5d8447bd5b76459d5e81aa4752494cc5b6dd9e415022aee41185c348493245bb.json"
       ]
      ]
     }
@@ -535,7 +409,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/874c03af580d9b327e234422c5fa8d61338a468fd84060764e35428f25808842.json"
+       "/38259205566d7eb10570bf22f9ffb3f80c075283fb1ab41e4004569ebd4c1920.json"
       ]
      ]
     }
@@ -721,7 +595,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/ad152ee7890b935f18418d7f43e91fb9def4b70701fd0779501868055efc9a81.json"
+       "/52e0ea4de3456420efc861ca0edf98de03ffbb17d3d52e897685c215c70dd185.json"
       ]
      ]
     }
@@ -2091,38 +1965,6 @@
     "Fn::GetAtt": [
      "amplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiB21775929",
      "DestinationBucketArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
     ]
    }
   }

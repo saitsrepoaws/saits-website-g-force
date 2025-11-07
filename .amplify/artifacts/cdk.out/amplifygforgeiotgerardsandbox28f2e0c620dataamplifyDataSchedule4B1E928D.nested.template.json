@@ -2325,14 +2325,6 @@
      ]
     }
    }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "ScheduleTable",
-     "TableArn"
-    ]
-   }
   }
  }
 }

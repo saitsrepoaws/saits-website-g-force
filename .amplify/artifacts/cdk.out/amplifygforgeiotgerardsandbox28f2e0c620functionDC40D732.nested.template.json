@@ -51,118 +51,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/ServiceRole/Resource"
    }
   },
-  "playerloadhandlerlambdaServiceRoleDefaultPolicy22C90EB2": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "appsync:GraphQL",
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
-           },
-           "/types/Query/*"
-          ]
-         ]
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
-           },
-           "/types/Mutation/*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "playerloadhandlerlambdaServiceRoleDefaultPolicy22C90EB2",
-    "Roles": [
-     {
-      "Ref": "playerloadhandlerlambdaServiceRoleABB7A998"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "playerloadhandlerlambdaB45DE213": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -177,78 +65,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "APPSYNC_ENDPOINT": "https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql",
-      "APPSYNC_API_KEY": "",
-      "SCHEDULE_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "TRACK_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -280,7 +97,6 @@
     "Timeout": 30
    },
    "DependsOn": [
-    "playerloadhandlerlambdaServiceRoleDefaultPolicy22C90EB2",
     "playerloadhandlerlambdaServiceRoleABB7A998"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -342,32 +158,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-iot-publisher-lambda/ServiceRole/Resource"
    }
   },
-  "playeriotpublisherlambdaServiceRoleDefaultPolicyD00B6C65": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "iot:Publish",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:*:*:topic/radio/player/*"
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "playeriotpublisherlambdaServiceRoleDefaultPolicyD00B6C65",
-    "Roles": [
-     {
-      "Ref": "playeriotpublisherlambdaServiceRoleAE84F947"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-iot-publisher-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "playeriotpublisherlambda59AC52A2": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -382,8 +172,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -415,7 +204,6 @@
     "Timeout": 10
    },
    "DependsOn": [
-    "playeriotpublisherlambdaServiceRoleDefaultPolicyD00B6C65",
     "playeriotpublisherlambdaServiceRoleAE84F947"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -584,95 +372,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/Resource"
    }
   },
-  "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": "iot:Publish",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:*:*:topic/radio/station/*"
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD",
-    "Roles": [
-     {
-      "Ref": "radioschedulerlambdaServiceRole43393D2F"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "radioschedulerlambda7B148CC5": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -687,77 +386,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "SCHEDULE_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "TRACK_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -789,7 +418,6 @@
     "Timeout": 30
    },
    "DependsOn": [
-    "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD",
     "radioschedulerlambdaServiceRole43393D2F"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -851,74 +479,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/ServiceRole/Resource"
    }
   },
-  "crossfadecontrollerlambdaServiceRoleDefaultPolicyC4FFA5C2": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": "iot:Publish",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:*:*:topic/radio/player/*"
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "crossfadecontrollerlambdaServiceRoleDefaultPolicyC4FFA5C2",
-    "Roles": [
-     {
-      "Ref": "crossfadecontrollerlambdaServiceRoleE31AAB6A"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "crossfadecontrollerlambda4630B68A": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -933,54 +493,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "PLAYLIST_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "TRACK_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "IOT_ENDPOINT": "acjtf0bi0eel2-ats.iot.eu-west-1.amazonaws.com"
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -1012,7 +525,6 @@
     "Timeout": 30
    },
    "DependsOn": [
-    "crossfadecontrollerlambdaServiceRoleDefaultPolicyC4FFA5C2",
     "crossfadecontrollerlambdaServiceRoleE31AAB6A"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -1022,24 +534,6 @@
     "aws:asset:path": "asset.9a0eeca9120ee73b66a3435dcc14875df67ceac4639f961ca506ef8a18b68f84",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
-   }
-  },
-  "crossfadecontrollerlambdaInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE1037AE21": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "crossfadecontrollerlambda4630B68A",
-      "Arn"
-     ]
-    },
-    "Principal": "iot.amazonaws.com"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
    }
   },
   "streamplaylistupdaterlambdaServiceRoleFFBA28E3": {
@@ -1092,147 +586,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/Resource"
    }
   },
-  "streamplaylistupdaterlambdaServiceRoleDefaultPolicyB8B2212A": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "s3:DeleteObject*",
-        "s3:PutObject",
-        "s3:PutObjectLegalHold",
-        "s3:PutObjectRetention",
-        "s3:PutObjectTagging",
-        "s3:PutObjectVersionTagging",
-        "s3:Abort*"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "StreamPlaylistBucket5DE5E8D3",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Fn::GetAtt": [
-             "StreamPlaylistBucket5DE5E8D3",
-             "Arn"
-            ]
-           },
-           "/*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:Query",
-        "dynamodb:Scan"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-           },
-           "/index/*"
-          ]
-         ]
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "streamplaylistupdaterlambdaServiceRoleDefaultPolicyB8B2212A",
-    "Roles": [
-     {
-      "Ref": "streamplaylistupdaterlambdaServiceRoleFFBA28E3"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "streamplaylistupdaterlambda53C93EC5": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -1247,82 +600,7 @@
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "SCHEDULE_TABLE": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_TABLE": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "TRACK_TABLE": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_BUCKET": {
-       "Ref": "StreamPlaylistBucket5DE5E8D3"
-      },
-      "STORAGE_BUCKET": {
-       "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
-      }
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -1354,7 +632,6 @@
     "Timeout": 60
    },
    "DependsOn": [
-    "streamplaylistupdaterlambdaServiceRoleDefaultPolicyB8B2212A",
     "streamplaylistupdaterlambdaServiceRoleFFBA28E3"
    ],
    "UpdateReplacePolicy": "Delete",
@@ -1366,503 +643,7 @@
     "aws:asset:property": "Code"
    }
   },
-  "RadioSchedulerRule661B6F57": {
-   "Type": "AWS::Events::Rule",
-   "Properties": {
-    "Description": "Triggers radio scheduler Lambda every minute to broadcast next track",
-    "Name": "RadioSchedulerEveryMinute",
-    "ScheduleExpression": "rate(1 minute)",
-    "State": "ENABLED",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "Targets": [
-     {
-      "Arn": {
-       "Fn::GetAtt": [
-        "radioschedulerlambda7B148CC5",
-        "Arn"
-       ]
-      },
-      "Id": "Target0"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/Resource"
-   }
-  },
-  "RadioSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26A64A6AE8": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "radioschedulerlambda7B148CC5",
-      "Arn"
-     ]
-    },
-    "Principal": "events.amazonaws.com",
-    "SourceArn": {
-     "Fn::GetAtt": [
-      "RadioSchedulerRule661B6F57",
-      "Arn"
-     ]
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26"
-   }
-  },
-  "StreamPlaylistBucket5DE5E8D3": {
-   "Type": "AWS::S3::Bucket",
-   "Properties": {
-    "BucketName": {
-     "Fn::Join": [
-      "",
-      [
-       "radio-playlists-",
-       {
-        "Ref": "AWS::AccountId"
-       }
-      ]
-     ]
-    },
-    "LifecycleConfiguration": {
-     "Rules": [
-      {
-       "ExpirationInDays": 7,
-       "Id": "CleanupOldPlaylists",
-       "Status": "Enabled"
-      }
-     ]
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistBucket/Resource"
-   }
-  },
-  "StreamPlaylistSchedulerRuleD4455083": {
-   "Type": "AWS::Events::Rule",
-   "Properties": {
-    "Description": "Updates stream playlist every 5 minutes based on schedule",
-    "Name": "StreamPlaylistEvery5Minutes",
-    "ScheduleExpression": "rate(5 minutes)",
-    "State": "ENABLED",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "Targets": [
-     {
-      "Arn": {
-       "Fn::GetAtt": [
-        "streamplaylistupdaterlambda53C93EC5",
-        "Arn"
-       ]
-      },
-      "Id": "Target0"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/Resource"
-   }
-  },
-  "StreamPlaylistSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC1673E42A909": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "streamplaylistupdaterlambda53C93EC5",
-      "Arn"
-     ]
-    },
-    "Principal": "events.amazonaws.com",
-    "SourceArn": {
-     "Fn::GetAtt": [
-      "StreamPlaylistSchedulerRuleD4455083",
-      "Arn"
-     ]
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC167"
-   }
-  },
-  "StreamVPC6AFF271F": {
-   "Type": "AWS::EC2::VPC",
-   "Properties": {
-    "CidrBlock": "10.0.0.0/16",
-    "EnableDnsHostnames": true,
-    "EnableDnsSupport": true,
-    "InstanceTenancy": "default",
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/Resource"
-   }
-  },
-  "StreamVPCPublicSubnet1SubnetB84F8F5B": {
-   "Type": "AWS::EC2::Subnet",
-   "Properties": {
-    "AvailabilityZone": {
-     "Fn::Select": [
-      0,
-      {
-       "Fn::GetAZs": ""
-      }
-     ]
-    },
-    "CidrBlock": "10.0.0.0/24",
-    "MapPublicIpOnLaunch": true,
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "aws-cdk:subnet-name",
-      "Value": "Public"
-     },
-     {
-      "Key": "aws-cdk:subnet-type",
-      "Value": "Public"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1"
-     }
-    ],
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/Subnet"
-   }
-  },
-  "StreamVPCPublicSubnet1RouteTableC1A9EB54": {
-   "Type": "AWS::EC2::RouteTable",
-   "Properties": {
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1"
-     }
-    ],
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTable"
-   }
-  },
-  "StreamVPCPublicSubnet1RouteTableAssociation4B376B22": {
-   "Type": "AWS::EC2::SubnetRouteTableAssociation",
-   "Properties": {
-    "RouteTableId": {
-     "Ref": "StreamVPCPublicSubnet1RouteTableC1A9EB54"
-    },
-    "SubnetId": {
-     "Ref": "StreamVPCPublicSubnet1SubnetB84F8F5B"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTableAssociation"
-   }
-  },
-  "StreamVPCPublicSubnet1DefaultRoute924D0152": {
-   "Type": "AWS::EC2::Route",
-   "Properties": {
-    "DestinationCidrBlock": "0.0.0.0/0",
-    "GatewayId": {
-     "Ref": "StreamVPCIGW4F1D4290"
-    },
-    "RouteTableId": {
-     "Ref": "StreamVPCPublicSubnet1RouteTableC1A9EB54"
-    }
-   },
-   "DependsOn": [
-    "StreamVPCVPCGW05B9AFAC"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/DefaultRoute"
-   }
-  },
-  "StreamVPCPublicSubnet2Subnet1639858E": {
-   "Type": "AWS::EC2::Subnet",
-   "Properties": {
-    "AvailabilityZone": {
-     "Fn::Select": [
-      1,
-      {
-       "Fn::GetAZs": ""
-      }
-     ]
-    },
-    "CidrBlock": "10.0.1.0/24",
-    "MapPublicIpOnLaunch": true,
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "aws-cdk:subnet-name",
-      "Value": "Public"
-     },
-     {
-      "Key": "aws-cdk:subnet-type",
-      "Value": "Public"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2"
-     }
-    ],
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/Subnet"
-   }
-  },
-  "StreamVPCPublicSubnet2RouteTable8637D996": {
-   "Type": "AWS::EC2::RouteTable",
-   "Properties": {
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2"
-     }
-    ],
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTable"
-   }
-  },
-  "StreamVPCPublicSubnet2RouteTableAssociation77E97464": {
-   "Type": "AWS::EC2::SubnetRouteTableAssociation",
-   "Properties": {
-    "RouteTableId": {
-     "Ref": "StreamVPCPublicSubnet2RouteTable8637D996"
-    },
-    "SubnetId": {
-     "Ref": "StreamVPCPublicSubnet2Subnet1639858E"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTableAssociation"
-   }
-  },
-  "StreamVPCPublicSubnet2DefaultRoute88362319": {
-   "Type": "AWS::EC2::Route",
-   "Properties": {
-    "DestinationCidrBlock": "0.0.0.0/0",
-    "GatewayId": {
-     "Ref": "StreamVPCIGW4F1D4290"
-    },
-    "RouteTableId": {
-     "Ref": "StreamVPCPublicSubnet2RouteTable8637D996"
-    }
-   },
-   "DependsOn": [
-    "StreamVPCVPCGW05B9AFAC"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/DefaultRoute"
-   }
-  },
-  "StreamVPCIGW4F1D4290": {
-   "Type": "AWS::EC2::InternetGateway",
-   "Properties": {
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/IGW"
-   }
-  },
-  "StreamVPCVPCGW05B9AFAC": {
-   "Type": "AWS::EC2::VPCGatewayAttachment",
-   "Properties": {
-    "InternetGatewayId": {
-     "Ref": "StreamVPCIGW4F1D4290"
-    },
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/VPCGW"
-   }
-  },
-  "StreamSGC03004BE": {
-   "Type": "AWS::EC2::SecurityGroup",
-   "Properties": {
-    "GroupDescription": "Security group for Icecast stream server",
-    "SecurityGroupEgress": [
-     {
-      "CidrIp": "0.0.0.0/0",
-      "Description": "Allow all outbound traffic by default",
-      "IpProtocol": "-1"
-     }
-    ],
-    "SecurityGroupIngress": [
-     {
-      "CidrIp": "0.0.0.0/0",
-      "Description": "Allow Icecast streaming",
-      "FromPort": 8000,
-      "IpProtocol": "tcp",
-      "ToPort": 8000
-     },
-     {
-      "CidrIp": "0.0.0.0/0",
-      "Description": "Allow SSH access",
-      "FromPort": 22,
-      "IpProtocol": "tcp",
-      "ToPort": 22
-     },
-     {
-      "CidrIp": "0.0.0.0/0",
-      "Description": "Allow HTTP access",
-      "FromPort": 80,
-      "IpProtocol": "tcp",
-      "ToPort": 80
-     }
-    ],
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     }
-    ],
-    "VpcId": {
-     "Ref": "StreamVPC6AFF271F"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamSG/Resource"
-   }
-  },
-  "StreamServerRole6A0ED596": {
+  "streamstatuspublisherlambdaServiceRole326D3684": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -1871,7 +652,7 @@
        "Action": "sts:AssumeRole",
        "Effect": "Allow",
        "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
        }
       }
      ],
@@ -1886,7 +667,7 @@
         {
          "Ref": "AWS::Partition"
         },
-        ":iam::aws:policy/AmazonSSMManagedInstanceCore"
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
        ]
       ]
      }
@@ -1905,400 +686,18 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/Resource"
-   }
-  },
-  "StreamServerRoleDefaultPolicy19BCE421": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "s3:GetObject*",
-        "s3:GetBucket*",
-        "s3:List*"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "StreamPlaylistBucket5DE5E8D3",
-          "Arn"
-         ]
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Fn::GetAtt": [
-             "StreamPlaylistBucket5DE5E8D3",
-             "Arn"
-            ]
-           },
-           "/*"
-          ]
-         ]
-        }
-       ]
-      },
-      {
-       "Action": [
-        "s3:GetObject*",
-        "s3:GetBucket*",
-        "s3:List*"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
-        },
-        {
-         "Fn::Join": [
-          "",
-          [
-           {
-            "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
-           },
-           "/*"
-          ]
-         ]
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "StreamServerRoleDefaultPolicy19BCE421",
-    "Roles": [
-     {
-      "Ref": "StreamServerRole6A0ED596"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/DefaultPolicy/Resource"
-   }
-  },
-  "StreamServerInstanceProfileC0407D9A": {
-   "Type": "AWS::IAM::InstanceProfile",
-   "Properties": {
-    "Roles": [
-     {
-      "Ref": "StreamServerRole6A0ED596"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile"
-   }
-  },
-  "StreamServerA433EFF8f42f1780509ca506": {
-   "Type": "AWS::EC2::Instance",
-   "Properties": {
-    "AvailabilityZone": {
-     "Fn::Select": [
-      0,
-      {
-       "Fn::GetAZs": ""
-      }
-     ]
-    },
-    "BlockDeviceMappings": [
-     {
-      "DeviceName": "/dev/sda1",
-      "Ebs": {
-       "VolumeSize": 20,
-       "VolumeType": "gp3"
-      }
-     }
-    ],
-    "IamInstanceProfile": {
-     "Ref": "StreamServerInstanceProfileC0407D9A"
-    },
-    "ImageId": {
-     "Ref": "SsmParameterValueawsservicecanonicalubuntuserver2204stablecurrentamd64hvmebsgp2amiidC96584B6F00A464EAD1953AFF4B05118Parameter"
-    },
-    "InstanceType": "t3.small",
-    "LaunchTemplate": {
-     "LaunchTemplateName": "StreamServerLaunchTemplate",
-     "Version": {
-      "Fn::GetAtt": [
-       "StreamServerLaunchTemplate2D6E0EA8",
-       "LatestVersionNumber"
-      ]
-     }
-    },
-    "SecurityGroupIds": [
-     {
-      "Fn::GetAtt": [
-       "StreamSGC03004BE",
-       "GroupId"
-      ]
-     }
-    ],
-    "SubnetId": {
-     "Ref": "StreamVPCPublicSubnet1SubnetB84F8F5B"
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer"
-     }
-    ],
-    "UserData": {
-     "Fn::Base64": {
-      "Fn::Join": [
-       "",
-       [
-        "#!/bin/bash\n#!/bin/bash\nset -e\nexec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1\n\necho \"🎙️ G-Forge Radio Stream Server Setup Starting...\"\n\n# Update system\nexport DEBIAN_FRONTEND=noninteractive\napt-get update\napt-get upgrade -y\n\n# Pre-configure icecast2 to avoid interactive prompts\necho \"icecast2 icecast2/icecast-setup boolean false\" | debconf-set-selections\n\n# Install dependencies\napt-get install -y \\\n  icecast2 \\\n  liquidsoap \\\n  awscli \\\n  nginx \\\n  curl \\\n  ffmpeg\n\n# Configure Icecast\ncat > /etc/icecast2/icecast.xml << \"ICECAST_EOF\"\n<icecast>\n  <location>Europe/Amsterdam</location>\n  <admin>admin@g-forge.com</admin>\n  <limits>\n    <clients>100</clients>\n    <sources>5</sources>\n    <queue-size>524288</queue-size>\n  </limits>\n  <authentication>\n    <source-password>gforge2024radio</source-password>\n    <admin-password>gforge2024admin</admin-password>\n  </authentication>\n  <hostname>radio.g-forge.com</hostname>\n  <listen-socket>\n    <port>8000</port>\n  </listen-socket>\n  <paths>\n    <basedir>/usr/share/icecast2</basedir>\n    <logdir>/var/log/icecast2</logdir>\n    <webroot>/usr/share/icecast2/web</webroot>\n    <adminroot>/usr/share/icecast2/admin</adminroot>\n    <alias source=\"/\" dest=\"/status.xsl\"/>\n  </paths>\n</icecast>\nICECAST_EOF\n\n# Enable Icecast\nsed -i \"s/ENABLE=false/ENABLE=true/\" /etc/default/icecast2\n\n# Create radio directory\nmkdir -p /opt/radio\nmkdir -p /var/log/liquidsoap\n\n# Create Liquidsoap configuration\ncat > /opt/radio/radio.liq << \"LIQUIDSOAP_EOF\"\n# G-Forge Radio - Liquidsoap Configuration\nset(\"init.allow_root\",true)\nset(\"log.file.path\", \"/var/log/liquidsoap/radio.log\")\nset(\"log.level\", 4)\n\ns3_bucket = \"",
-        {
-         "Ref": "StreamPlaylistBucket5DE5E8D3"
-        },
-        "\"\nplaylist_file = \"/tmp/current-playlist.m3u\"\n\ndef fetch_playlist() =\n  log(\"📥 Fetching playlist from S3...\")\n  ret = get_process_output(\"aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1\")\n  log(\"S3 result: #{ret}\")\n  playlist_file\nend\n\nignore(fetch_playlist())\nadd_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)\n\n# Create playlist source\nradio = playlist(playlist_file, mode=\"normal\", reload_mode=\"watch\", reload=300)\n\n# Fallback to silence when playlist is empty\nradio = fallback(track_sensitive=false, [radio, blank()])\nradio = normalize(radio)\n\noutput.icecast(\n  %mp3(bitrate=192),\n  host=\"localhost\",\n  port=8000,\n  password=\"gforge2024radio\",\n  mount=\"stream.mp3\",\n  name=\"G-Forge Radio\",\n  description=\"Techno & Electronic Music 24/7\",\n  radio\n)\nLIQUIDSOAP_EOF\n\n# Create systemd service\ncat > /etc/systemd/system/liquidsoap-radio.service << \"SERVICE_EOF\"\n[Unit]\nDescription=Liquidsoap Radio Stream\nAfter=network.target icecast2.service\nRequires=icecast2.service\n\n[Service]\nType=simple\nUser=root\nExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq\nRestart=always\nRestartSec=10\n\n[Install]\nWantedBy=multi-user.target\nSERVICE_EOF\n\n# Create empty playlist\ntouch /tmp/current-playlist.m3u\n\n# Start services\nsystemctl daemon-reload\nsystemctl enable icecast2\nsystemctl start icecast2\nsystemctl enable liquidsoap-radio\nsystemctl start liquidsoap-radio\n\n# Configure nginx reverse proxy\ncat > /etc/nginx/sites-available/radio << \"NGINX_EOF\"\nserver {\n  listen 80;\n  server_name _;\n  location / {\n    proxy_pass http://localhost:8000;\n    proxy_set_header Host $host;\n  }\n}\nNGINX_EOF\n\nln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/\nrm -f /etc/nginx/sites-enabled/default\nsystemctl restart nginx\n\n# Health check script\ncat > /opt/radio/healthcheck.sh << \"HEALTH_EOF\"\n#!/bin/bash\ncurl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1\nif [ $? -ne 0 ]; then\n  systemctl restart icecast2\n  systemctl restart liquidsoap-radio\nfi\nHEALTH_EOF\nchmod +x /opt/radio/healthcheck.sh\n\n# Add healthcheck cron\necho \"*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1\" | crontab -\n\necho \"✅ Radio stream server setup complete!\""
-       ]
-      ]
-     }
-    }
-   },
-   "DependsOn": [
-    "StreamServerRoleDefaultPolicy19BCE421",
-    "StreamServerRole6A0ED596"
-   ],
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/Resource"
-   }
-  },
-  "StreamServerLaunchTemplate2D6E0EA8": {
-   "Type": "AWS::EC2::LaunchTemplate",
-   "Properties": {
-    "LaunchTemplateData": {
-     "MetadataOptions": {
-      "HttpTokens": "required"
-     }
-    },
-    "LaunchTemplateName": "StreamServerLaunchTemplate"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/LaunchTemplate"
-   }
-  },
-  "StreamServerEIP": {
-   "Type": "AWS::EC2::EIP",
-   "Properties": {
-    "InstanceId": {
-     "Ref": "StreamServerA433EFF8f42f1780509ca506"
-    },
-    "Tags": [
-     {
-      "Key": "amplify:deployment-type",
-      "Value": "sandbox"
-     },
-     {
-      "Key": "created-by",
-      "Value": "amplify"
-     },
-     {
-      "Key": "Name",
-      "Value": "G-Forge-Radio-Stream-EIP"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerEIP"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-status-publisher-lambda/ServiceRole/Resource"
    }
   },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WR0W7CMAxFv4X3kLHyBYA2hDSxqkW8IjcYCLROFTsgVPXfpzQwtqd7cy3r2E6ms2yiJyO48djsL+PaVrpbIwvuSwFzUXDjXVdDU+1hR26PZ9brQT4DGbGOlIVGd4WrUS0ONGjuamvu8flyK2IBMph7d7A19oqnO2BGYT2Loniqu3kwF5Q5MKpkY2dyvUpD6G5xoF92RKBvLLN11Cu8IgnrrgiPaUIkocl0t21NTLb5QuWhqq0pQ0UJ8HKFC4IbqFJ3yl/ZjNkZC0/wUEirCXpCWYLgDe4PzOM1EwFzapBElWiCt3JfehfaAfAveF7o77Wi/4JA5rTBpq0hAT9Wed+rAtkFb1AN9ysFjpaOsfwdpA3DPjl4aFDQ9yr+nT7z2zXLdPauJ6MzWzv2gcQ2qIukP0f+yu8OAgAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/zXNOw6DMBBF0bXQDxNiVhCQUlLAAtBgD8h8bImxoUDsPQKU6lTvPoVKZZgltEuqzZTOtsOjYglsmkB6AtqlPWZaOkOt84ZHwermG50O1juwtOBR+5mh7N3lCZK3JMJB8HMBkmMR9cShIGF4alj27t84oWbxcdUM96AJNFg3nHA94iivTSlUb8ySUaxN1+iCXRjrxx+nwuA9xAAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
-  }
- },
- "Outputs": {
-  "RadioSchedulerRuleArn": {
-   "Description": "EventBridge rule that triggers radio scheduler every minute",
-   "Value": {
-    "Fn::GetAtt": [
-     "RadioSchedulerRule661B6F57",
-     "Arn"
-    ]
-   },
-   "Export": {
-    "Name": "RadioSchedulerRuleArn"
-   }
-  },
-  "StreamServerPublicIP": {
-   "Description": "Elastic IP of stream server (fixed)",
-   "Value": {
-    "Ref": "StreamServerEIP"
-   },
-   "Export": {
-    "Name": "StreamServerPublicIP"
-   }
-  },
-  "StreamURL": {
-   "Description": "Radio stream URL",
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "http://",
-      {
-       "Ref": "StreamServerEIP"
-      },
-      ":8000/stream.mp3"
-     ]
-    ]
-   },
-   "Export": {
-    "Name": "StreamURL"
-   }
-  },
-  "IcecastAdminURL": {
-   "Description": "Icecast admin interface",
-   "Value": {
-    "Fn::Join": [
-     "",
-     [
-      "http://",
-      {
-       "Ref": "StreamServerEIP"
-      },
-      ":8000/admin/"
-     ]
-    ]
-   },
-   "Export": {
-    "Name": "IcecastAdminURL"
-   }
-  },
-  "PlaylistBucketName": {
-   "Description": "S3 bucket for playlists",
-   "Value": {
-    "Ref": "StreamPlaylistBucket5DE5E8D3"
-   },
-   "Export": {
-    "Name": "PlaylistBucketName"
-   }
-  },
-  "StreamServerInstanceId": {
-   "Description": "EC2 instance ID for stream server",
-   "Value": {
-    "Ref": "StreamServerA433EFF8f42f1780509ca506"
-   },
-   "Export": {
-    "Name": "StreamServerInstanceId"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Ref": {
-   "Value": {
-    "Ref": "playerloadhandlerlambdaB45DE213"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCRef": {
-   "Value": {
-    "Ref": "playeriotpublisherlambda59AC52A2"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref": {
-   "Value": {
-    "Ref": "playersimplehandlerlambdaC2FF27C5"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref": {
-   "Value": {
-    "Ref": "radioschedulerlambda7B148CC5"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Ref": {
-   "Value": {
-    "Ref": "crossfadecontrollerlambda4630B68A"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref": {
-   "Value": {
-    "Ref": "streamplaylistupdaterlambda53C93EC5"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playerloadhandlerlambdaB45DE213",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playeriotpublisherlambda59AC52A2",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "playersimplehandlerlambdaC2FF27C5",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "crossfadecontrollerlambda4630B68A",
-     "Arn"
-    ]
-   }
-  }
- },
- "Parameters": {
-  "SsmParameterValueawsservicecanonicalubuntuserver2204stablecurrentamd64hvmebsgp2amiidC96584B6F00A464EAD1953AFF4B05118Parameter": {
-   "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
-   "Default": "/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
-   "Type": "String"
-  },
-  "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
-   "Type": "String"
   }
  },
  "Conditions": {
@@ -2565,6 +964,38 @@
      ]
     }
    ]
+  }
+ },
+ "Outputs": {
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Ref": {
+   "Value": {
+    "Ref": "playerloadhandlerlambdaB45DE213"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCRef": {
+   "Value": {
+    "Ref": "playeriotpublisherlambda59AC52A2"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Ref": {
+   "Value": {
+    "Ref": "playersimplehandlerlambdaC2FF27C5"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaA78FEC94Ref": {
+   "Value": {
+    "Ref": "radioschedulerlambda7B148CC5"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Ref": {
+   "Value": {
+    "Ref": "crossfadecontrollerlambda4630B68A"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref": {
+   "Value": {
+    "Ref": "streamplaylistupdaterlambda53C93EC5"
+   }
   }
  }
 }
