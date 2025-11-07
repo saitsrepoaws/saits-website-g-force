@@ -10,6 +10,7 @@ import { playerIotPublisher } from './functions/player-iot-publisher/resource'
 import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
+import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -29,6 +30,7 @@ import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks'
 import * as iot from 'aws-cdk-lib/aws-iot'
 import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
+import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join} from 'path'
@@ -49,7 +51,7 @@ export const backend = defineBackend({
   playerSimpleHandler,
   radioScheduler,
   crossfadeController,
-  // audioAnalyzer - replaced with container Lambda below
+  streamPlaylistUpdater
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -520,3 +522,330 @@ new CfnOutput(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRule
 })
 
 console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minute)')
+
+// =============================================================================
+// 🎙️ STREAM SERVER - EC2 Icecast + Liquidsoap + S3 Playlist
+// =============================================================================
+
+// Get Lambda for stream playlist updater
+const streamPlaylistLambda = backend.streamPlaylistUpdater.resources.lambda
+
+// Create S3 bucket for playlists (Liquidsoap will download from here)
+const playlistBucket = new s3.Bucket(
+  streamPlaylistLambda.stack,
+  'StreamPlaylistBucket',
+  {
+    bucketName: `radio-playlists-${streamPlaylistLambda.stack.account}`,
+    publicReadAccess: false,
+    versioned: false,
+    lifecycleRules: [
+      {
+        expiration: Duration.days(7),
+        id: 'CleanupOldPlaylists'
+      }
+    ]
+  }
+)
+
+// Grant Lambda permissions
+scheduleTable.grantReadData(streamPlaylistLambda)
+playlistTable.grantReadData(streamPlaylistLambda)
+trackTable.grantReadData(streamPlaylistLambda)
+playlistBucket.grantWrite(streamPlaylistLambda)
+
+// Add environment variables
+backend.streamPlaylistUpdater.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
+backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
+backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
+
+// EventBridge rule - Run every 5 minutes
+const streamSchedulerRule = new events.Rule(
+  streamPlaylistLambda.stack,
+  'StreamPlaylistSchedulerRule',
+  {
+    ruleName: 'StreamPlaylistEvery5Minutes',
+    description: 'Updates stream playlist every 5 minutes based on schedule',
+    schedule: events.Schedule.rate(Duration.minutes(5)),
+  }
+)
+
+streamSchedulerRule.addTarget(new targets.LambdaFunction(streamPlaylistLambda))
+
+// VPC for EC2 Stream Server
+const vpc = new ec2.Vpc(streamPlaylistLambda.stack, 'StreamVPC', {
+  maxAzs: 2,
+  natGateways: 0, // Use public subnet only for cost
+  subnetConfiguration: [
+    {
+      name: 'Public',
+      subnetType: ec2.SubnetType.PUBLIC,
+      cidrMask: 24
+    }
+  ]
+})
+
+// Security Group for Stream Server
+const streamSG = new ec2.SecurityGroup(streamPlaylistLambda.stack, 'StreamSG', {
+  vpc,
+  description: 'Security group for Icecast stream server',
+  allowAllOutbound: true
+})
+
+// Allow Icecast port 8000
+streamSG.addIngressRule(
+  ec2.Peer.anyIpv4(),
+  ec2.Port.tcp(8000),
+  'Allow Icecast streaming'
+)
+
+// Allow SSH
+streamSG.addIngressRule(
+  ec2.Peer.anyIpv4(),
+  ec2.Port.tcp(22),
+  'Allow SSH access'
+)
+
+// Allow HTTP
+streamSG.addIngressRule(
+  ec2.Peer.anyIpv4(),
+  ec2.Port.tcp(80),
+  'Allow HTTP access'
+)
+
+// IAM Role for EC2
+const ec2Role = new iam.Role(streamPlaylistLambda.stack, 'StreamServerRole', {
+  assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+  managedPolicies: [
+    iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
+  ]
+})
+
+// Grant S3 read access to EC2
+playlistBucket.grantRead(ec2Role)
+storageBucket.grantRead(ec2Role) // For reading audio files
+
+// User data script for EC2
+const userData = ec2.UserData.forLinux()
+userData.addCommands(
+  '#!/bin/bash',
+  'set -e',
+  'exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1',
+  '',
+  'echo "🎙️ G-Forge Radio Stream Server Setup Starting..."',
+  '',
+  '# Update system',
+  'apt-get update',
+  'DEBIAN_FRONTEND=noninteractive apt-get upgrade -y',
+  '',
+  '# Install dependencies',
+  'apt-get install -y \\',
+  '  icecast2 \\',
+  '  liquidsoap \\',
+  '  awscli \\',
+  '  nginx \\',
+  '  curl \\',
+  '  ffmpeg',
+  '',
+  '# Configure Icecast',
+  'cat > /etc/icecast2/icecast.xml << "ICECAST_EOF"',
+  '<icecast>',
+  '  <location>Europe/Amsterdam</location>',
+  '  <admin>admin@g-forge.com</admin>',
+  '  <limits>',
+  '    <clients>100</clients>',
+  '    <sources>5</sources>',
+  '    <queue-size>524288</queue-size>',
+  '  </limits>',
+  '  <authentication>',
+  '    <source-password>gforge2024radio</source-password>',
+  '    <admin-password>gforge2024admin</admin-password>',
+  '  </authentication>',
+  '  <hostname>radio.g-forge.com</hostname>',
+  '  <listen-socket>',
+  '    <port>8000</port>',
+  '  </listen-socket>',
+  '  <paths>',
+  '    <basedir>/usr/share/icecast2</basedir>',
+  '    <logdir>/var/log/icecast2</logdir>',
+  '  </paths>',
+  '</icecast>',
+  'ICECAST_EOF',
+  '',
+  '# Enable Icecast',
+  'sed -i "s/ENABLE=false/ENABLE=true/" /etc/default/icecast2',
+  '',
+  '# Create radio directory',
+  'mkdir -p /opt/radio',
+  'mkdir -p /var/log/liquidsoap',
+  '',
+  '# Create Liquidsoap configuration',
+  `cat > /opt/radio/radio.liq << "LIQUIDSOAP_EOF"`,
+  '# G-Forge Radio - Liquidsoap Configuration',
+  'set("log.file.path", "/var/log/liquidsoap/radio.log")',
+  'set("log.level", 3)',
+  '',
+  's3_bucket = "' + playlistBucket.bucketName + '"',
+  'playlist_file = "/tmp/current-playlist.m3u"',
+  '',
+  'def fetch_playlist() =',
+  '  log("📥 Fetching playlist from S3...")',
+  '  ret = get_process_output("aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1")',
+  '  log("S3 result: #{ret}")',
+  '  playlist_file',
+  'end',
+  '',
+  'ignore(fetch_playlist())',
+  'add_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)',
+  '',
+  'radio = playlist(playlist_file, mode="normal", reload_mode="watch", reload=300)',
+  'radio = fallback(track_sensitive=false, [radio])',
+  'radio = crossfade(start_next=3., fade_in=2., fade_out=2., radio)',
+  'radio = normalize(radio)',
+  '',
+  'output.icecast(',
+  '  %mp3(bitrate=192, samplerate=44100),',
+  '  host="localhost",',
+  '  port=8000,',
+  '  password="gforge2024radio",',
+  '  mount="/stream.mp3",',
+  '  name="G-Forge Radio",',
+  '  description="Techno & Electronic Music 24/7",',
+  '  genre="Techno",',
+  '  public=true,',
+  '  radio',
+  ')',
+  'LIQUIDSOAP_EOF',
+  '',
+  '# Create systemd service',
+  'cat > /etc/systemd/system/liquidsoap-radio.service << "SERVICE_EOF"',
+  '[Unit]',
+  'Description=Liquidsoap Radio Stream',
+  'After=network.target icecast2.service',
+  'Requires=icecast2.service',
+  '',
+  '[Service]',
+  'Type=simple',
+  'User=root',
+  'ExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq',
+  'Restart=always',
+  'RestartSec=10',
+  '',
+  '[Install]',
+  'WantedBy=multi-user.target',
+  'SERVICE_EOF',
+  '',
+  '# Create empty playlist',
+  'touch /tmp/current-playlist.m3u',
+  '',
+  '# Start services',
+  'systemctl daemon-reload',
+  'systemctl enable icecast2',
+  'systemctl start icecast2',
+  'systemctl enable liquidsoap-radio',
+  'systemctl start liquidsoap-radio',
+  '',
+  '# Configure nginx reverse proxy',
+  'cat > /etc/nginx/sites-available/radio << "NGINX_EOF"',
+  'server {',
+  '  listen 80;',
+  '  server_name _;',
+  '  location / {',
+  '    proxy_pass http://localhost:8000;',
+  '    proxy_set_header Host $host;',
+  '  }',
+  '}',
+  'NGINX_EOF',
+  '',
+  'ln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/',
+  'rm -f /etc/nginx/sites-enabled/default',
+  'systemctl restart nginx',
+  '',
+  '# Health check script',
+  'cat > /opt/radio/healthcheck.sh << "HEALTH_EOF"',
+  '#!/bin/bash',
+  'curl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1',
+  'if [ $? -ne 0 ]; then',
+  '  systemctl restart icecast2',
+  '  systemctl restart liquidsoap-radio',
+  'fi',
+  'HEALTH_EOF',
+  'chmod +x /opt/radio/healthcheck.sh',
+  '',
+  '# Add healthcheck cron',
+  'echo "*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1" | crontab -',
+  '',
+  'echo "✅ Radio stream server setup complete!"'
+)
+
+// EC2 Instance
+const streamInstance = new ec2.Instance(streamPlaylistLambda.stack, 'StreamServer', {
+  vpc,
+  vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
+  instanceType: ec2.InstanceType.of(
+    ec2.InstanceClass.T3,
+    ec2.InstanceSize.SMALL
+  ),
+  machineImage: ec2.MachineImage.fromSsmParameter(
+    '/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id',
+    { os: ec2.OperatingSystemType.LINUX }
+  ),
+  securityGroup: streamSG,
+  role: ec2Role,
+  userData,
+  userDataCausesReplacement: true,
+  requireImdsv2: true,
+  blockDevices: [
+    {
+      deviceName: '/dev/sda1',
+      volume: ec2.BlockDeviceVolume.ebs(20, {
+        volumeType: ec2.EbsDeviceVolumeType.GP3
+      })
+    }
+  ]
+})
+
+// Elastic IP for fixed stream URL
+const eip = new ec2.CfnEIP(streamPlaylistLambda.stack, 'StreamServerEIP', {
+  instanceId: streamInstance.instanceId,
+  tags: [
+    {
+      key: 'Name',
+      value: 'G-Forge-Radio-Stream-EIP'
+    }
+  ]
+})
+
+// Outputs
+new CfnOutput(streamPlaylistLambda.stack, 'StreamServerPublicIP', {
+  value: eip.ref,
+  description: 'Elastic IP of stream server (fixed)',
+  exportName: 'StreamServerPublicIP',
+})
+
+new CfnOutput(streamPlaylistLambda.stack, 'StreamURL', {
+  value: `http://${eip.ref}:8000/stream.mp3`,
+  description: 'Radio stream URL',
+  exportName: 'StreamURL',
+})
+
+new CfnOutput(streamPlaylistLambda.stack, 'IcecastAdminURL', {
+  value: `http://${eip.ref}:8000/admin/`,
+  description: 'Icecast admin interface',
+  exportName: 'IcecastAdminURL',
+})
+
+new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
+  value: playlistBucket.bucketName,
+  description: 'S3 bucket for playlists',
+  exportName: 'PlaylistBucketName',
+})
+
+new CfnOutput(streamPlaylistLambda.stack, 'StreamServerInstanceId', {
+  value: streamInstance.instanceId,
+  description: 'EC2 instance ID for stream server',
+  exportName: 'StreamServerInstanceId',
+})
+
+console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
+console.log('📋 Stream Playlist Updater Lambda deployed with EventBridge (rate: 5 minutes)')
