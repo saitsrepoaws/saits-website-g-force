@@ -34,9 +34,15 @@ export function useNotifications() {
 
   // Get user ID and send login notification
   useEffect(() => {
+    let isCleanedUp = false
+    
     const loadUser = async () => {
       try {
         const user = await getCurrentUser()
+        
+        // Prevent duplicate execution in React Strict Mode
+        if (isCleanedUp) return
+        
         setUserId(user.userId)
         
         // Load user preferences
@@ -75,7 +81,12 @@ export function useNotifications() {
         console.warn('No authenticated user')
       }
     }
+    
     loadUser()
+    
+    return () => {
+      isCleanedUp = true
+    }
   }, [iot.connectionState])
 
   // Request notification permission
@@ -106,8 +117,6 @@ export function useNotifications() {
     
     const notification = new Notification(message.title, {
       body: message.body,
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
       tag: message.type,
       requireInteraction: false,
       silent: false

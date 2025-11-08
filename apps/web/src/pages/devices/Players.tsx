@@ -47,7 +47,10 @@ export default function Players() {
     console.log('🔄 Fetching stream status from Icecast...')
     
     try {
-      const response = await fetch('http://46.137.184.91:8000/status-json.xsl')
+      const response = await fetch('http://46.137.184.91:8000/status-json.xsl', {
+        mode: 'cors',
+        cache: 'no-cache'
+      })
       const data = await response.json()
       const source = data.icestats?.source
       
@@ -81,7 +84,10 @@ export default function Players() {
         console.log('✅ Stream status refreshed:', currentTrack?.artist, '-', currentTrack?.title)
       }
     } catch (error) {
-      console.warn('⚠️ Could not fetch stream status:', error)
+      // CORS error is expected if Icecast doesn't send CORS headers
+      // This is not critical - IoT notifications provide track info
+      console.log('ℹ️ Stream status unavailable (CORS/network issue - this is OK)')
+      console.log('💡 Track info will be available via IoT notifications')
     }
   }
   
