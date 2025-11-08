@@ -1,0 +1,97 @@
+type Playlist @model @auth(rules: [{allow: private}])
+{
+  name: String!
+  description: String
+  coverImageUrl: String
+  genre: String
+  mood: String
+  bpmMin: Int
+  bpmMax: Int
+  key: String
+  tags: String
+  tracks: String @default(value: "[]")
+  trackCount: Int @default(value: "0")
+  totalDuration: Int @default(value: "0")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type Schedule @model @auth(rules: [{allow: private}])
+{
+  name: String!
+  dayOfWeek: Int @index(sortKeyFields: ["startTime"], queryField: "listScheduleByDayOfWeekAndStartTime")
+  startTime: String!
+  endTime: String
+  startDate: String
+  endDate: String
+  playlistId: String!
+  isActive: Boolean @default(value: "true")
+  priority: Int @default(value: "0")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type UserPreferences @model @auth(rules: [{allow: owner, ownerField: "owner"},
+  {allow: private, operations: [read]}])
+{
+  userId: String! @primaryKey
+  notificationsEnabled: Boolean @default(value: "true")
+  notifyOnTrackChange: Boolean @default(value: "true")
+  notifyOnPlaylistUpdate: Boolean @default(value: "true")
+  notifyOnLogin: Boolean @default(value: "false")
+  theme: String @default(value: "light")
+  defaultView: String
+  lastLoginAt: AWSDateTime
+  lastLogoutAt: AWSDateTime
+  loginCount: Int @default(value: "0")
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type PlayerState @model @auth(rules: [{allow: private}])
+{
+  playerId: String!
+  currentTrackId: String
+  currentTrackTitle: String
+  currentTrackArtist: String
+  currentPlaylistId: String
+  status: String @default(value: "idle")
+  lastPosition: Float @default(value: "0")
+  duration: Float @default(value: "0")
+  volume: Float @default(value: "0.7")
+  autoPlayEnabled: Boolean @default(value: "false")
+  currentScheduleSlotId: String
+  currentScheduleSlotName: String
+  lastActive: AWSDateTime
+  lastUpdated: AWSDateTime
+  deviceInfo: String
+}
+
+type Track @model @auth(rules: [{allow: private}])
+{
+  artist: String
+  title: String!
+  version: String
+  label: String
+  genre: String
+  year: Int
+  duration: Int
+  fileUrl: String
+  fileSize: Int
+  format: String
+  addedAt: AWSDateTime
+  bpm: Int
+  key: String
+  energy: Float
+  danceability: Float
+  valence: Float
+  coverArtUrl: String
+  waveformUrl: String
+  peaks: String
+  trimStart: Float
+  trimEnd: Float
+}
+
+type Query {
+  generatePlaylist(name: String!, description: String, genre: String, mood: String, bpmMin: Int, bpmMax: Int, keys: [String], tags: String, maxTracks: Int, maxDuration: Int): AWSJSON @function(name: "FnGeneratePlaylist") @auth(rules: [{allow: private}])
+}

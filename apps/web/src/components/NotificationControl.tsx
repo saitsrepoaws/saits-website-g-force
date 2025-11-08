@@ -67,11 +67,23 @@ export default function NotificationControl() {
   }
 
   const handleEnable = async () => {
+    console.log('🔔 Requesting browser notification permission...')
     const granted = await requestPermission()
+    
     if (granted) {
-      console.log('✅ Notifications enabled!')
+      console.log('✅ Browser notification permission granted!')
+      
+      // Save to preferences
+      if (userId) {
+        setPreferencesEnabled(true)
+        const result = await toggleNotifications(userId, true)
+        
+        if (result.errors && result.errors[0] !== 'TABLE_NOT_DEPLOYED') {
+          console.warn('⚠️ Failed to save preference, but notifications will work')
+        }
+      }
     } else {
-      console.warn('⚠️ Notification permission denied')
+      console.warn('⚠️ Browser notification permission denied')
     }
   }
 
@@ -176,10 +188,11 @@ export default function NotificationControl() {
   return (
     <button
       onClick={handleEnable}
-      className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+      className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 animate-pulse"
     >
       <span>🔔</span>
-      <span>Enable Browser Notifications</span>
+      <span>Click to Enable Notifications</span>
+      <span className="px-2 py-0.5 bg-blue-600 rounded text-xs">Permission needed</span>
     </button>
   )
 }

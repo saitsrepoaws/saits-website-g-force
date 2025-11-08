@@ -97,10 +97,13 @@ export function useNotifications() {
     }
     
     if (permission !== 'granted') {
-      console.warn('Notification permission not granted')
+      console.log('📬 IoT notification received:', message.title)
+      console.log('⚠️ Browser permission not granted - Click the notification button to enable')
       return
     }
 
+    console.log('🔔 Showing browser notification:', message.title)
+    
     const notification = new Notification(message.title, {
       body: message.body,
       icon: '/favicon.ico',
