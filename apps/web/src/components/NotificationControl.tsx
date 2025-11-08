@@ -14,6 +14,16 @@ export default function NotificationControl() {
   const [isLoading, setIsLoading] = useState(true)
   const [preferencesEnabled, setPreferencesEnabled] = useState(true)
   
+  // Debug: Log permission state on mount and when it changes
+  useEffect(() => {
+    console.log('📊 NotificationControl State:', {
+      isSupported,
+      permission,
+      userId: userId ? userId.substring(0, 8) + '...' : 'null',
+      preferencesEnabled
+    })
+  }, [isSupported, permission, userId, preferencesEnabled])
+  
   // Load user preferences
   useEffect(() => {
     const loadPreferences = async () => {
@@ -67,8 +77,29 @@ export default function NotificationControl() {
   }
 
   const handleEnable = async () => {
-    console.log('🔔 Requesting browser notification permission...')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    console.log('🔔 REQUESTING BROWSER NOTIFICATION PERMISSION')
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    
+    // Check current permission state
+    console.log('Current permission state:', Notification.permission)
+    console.log('Browser supports notifications:', 'Notification' in window)
+    
+    if (Notification.permission === 'denied') {
+      console.error('❌ NOTIFICATIONS ARE BLOCKED!')
+      console.error('📋 How to fix:')
+      console.error('   1. Click the 🔒 or ⓘ icon in address bar')
+      console.error('   2. Find "Notifications"')
+      console.error('   3. Change from "Block" to "Ask" or "Allow"')
+      console.error('   4. Refresh the page')
+      alert('❌ Notifications are blocked!\n\nTo enable:\n1. Click the lock icon (🔒) in address bar\n2. Find "Notifications"\n3. Change to "Allow"\n4. Refresh page')
+      return
+    }
+    
+    console.log('Calling Notification.requestPermission()...')
     const granted = await requestPermission()
+    
+    console.log('Permission result:', granted ? 'GRANTED ✅' : 'DENIED ❌')
     
     if (granted) {
       console.log('✅ Browser notification permission granted!')
@@ -84,7 +115,9 @@ export default function NotificationControl() {
       }
     } else {
       console.warn('⚠️ Browser notification permission denied')
+      console.warn('User clicked "Block" or dismissed the popup')
     }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
   }
 
   const handleToggle = async () => {
