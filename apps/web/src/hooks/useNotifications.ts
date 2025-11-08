@@ -125,10 +125,16 @@ export function useNotifications() {
   // Subscribe to user notifications
   useEffect(() => {
     if (iot.connectionState !== 'Connected' || !userId) {
+      console.log('⏳ Waiting for IoT connection and userId...')
       return
     }
 
-    console.log('📬 Subscribing to user notifications...')
+    console.log('📬 Subscribing to notification topics...')
+    console.log('📋 Settings:', {
+      notificationsEnabled,
+      browserPermission: permission,
+      userId: userId.substring(0, 8) + '...'
+    })
 
     // Subscribe to all notification types
     const topics = [
@@ -145,6 +151,8 @@ export function useNotifications() {
       'notifications/system'
     ]
 
+    console.log(`📡 Subscribing to ${topics.length} topics...`)
+
     const unsubscribePromises = topics.map(topic =>
       iot.subscribe(topic, (data: unknown) => {
         const message = data as NotificationMessage
@@ -153,10 +161,13 @@ export function useNotifications() {
       })
     )
 
+    console.log('✅ Subscribed to all notification topics')
+
     return () => {
+      console.log('🔌 Unsubscribing from notification topics...')
       unsubscribePromises.forEach(promise => promise.then(unsub => unsub()))
     }
-  }, [iot.connectionState, userId, permission])
+  }, [iot.connectionState, userId, permission, notificationsEnabled])
   
   // Send logout notification on unmount (when user logs out)
   useEffect(() => {
