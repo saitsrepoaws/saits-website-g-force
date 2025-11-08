@@ -35,12 +35,6 @@ export default function Players() {
   } | null>(null)
   
   // ============================================
-  // 🎵 PLAYER TRACKING
-  // ============================================
-  const [player1TrackId, setPlayer1TrackId] = useState<string | null>(null)
-  const [player2TrackId, setPlayer2TrackId] = useState<string | null>(null)
-  
-  // ============================================
   // 🔄 STREAM STATUS FETCH FUNCTION
   // ============================================
   const fetchStreamStatus = async () => {
@@ -119,127 +113,13 @@ export default function Players() {
   }, [iot.connectionState])
   
   // ============================================
-  // 📡 IOT REGISTRATION & SUBSCRIPTION - PLAYERS
+  // 📡 IOT - PLAYERS NOW HANDLE THEIR OWN SUBSCRIPTIONS
   // ============================================
-  useEffect(() => {
-    if (iot.connectionState !== 'Connected') {
-      return
-    }
-
-    console.log('📡 Registering players and subscribing...')
-
-    let unsubscribe1: (() => void) | undefined
-    let unsubscribe2: (() => void) | undefined
-    let unsubscribeStatus1: (() => void) | undefined
-    let unsubscribeStatus2: (() => void) | undefined
-    let isMounted = true
-
-    // Subscribe to Player 1 commands
-    iot.subscribe('radio/player/player-001/command', (message: any) => {
-      console.log('📥 [Player 1] Command:', message.command)
-      
-      if (message.command === 'LOAD' && message.params?.track?.id) {
-        const trackId = message.params.track.id
-        console.log('🎵 [Player 1] Track loaded:', trackId)
-        setPlayer1TrackId(trackId)
-      }
-      
-      if (message.command === 'UNLOAD') {
-        console.log('🗑️ [Player 1] Track unloaded')
-        setPlayer1TrackId(null)
-      }
-    }).then((unsub) => {
-      if (isMounted) {
-        unsubscribe1 = unsub
-        console.log('✅ Subscribed to Player 1 commands')
-      } else {
-        unsub()
-      }
-    })
-    
-    // Subscribe to Player 1 status responses
-    iot.subscribe('radio/player/player-001/status', (message: any) => {
-      console.log('📥 [Player 1] Status:', message)
-      // Update player 1 state based on status
-      if (message.currentTrack?.id) {
-        setPlayer1TrackId(message.currentTrack.id)
-      }
-    }).then((unsub) => {
-      if (isMounted) {
-        unsubscribeStatus1 = unsub
-        console.log('✅ Subscribed to Player 1 status')
-        
-        // Send registration request
-        iot.publish('radio/player/player-001/register', {
-          playerId: 'player-001',
-          action: 'register',
-          requestStatus: true,
-          timestamp: new Date().toISOString()
-        }).then(() => {
-          console.log('✅ Player 1 registered')
-        })
-      } else {
-        unsub()
-      }
-    })
-
-    // Subscribe to Player 2 commands
-    iot.subscribe('radio/player/player-002/command', (message: any) => {
-      console.log('📥 [Player 2] Command:', message.command)
-      
-      if (message.command === 'LOAD' && message.params?.track?.id) {
-        const trackId = message.params.track.id
-        console.log('🎵 [Player 2] Track loaded:', trackId)
-        setPlayer2TrackId(trackId)
-      }
-      
-      if (message.command === 'UNLOAD') {
-        console.log('🗑️ [Player 2] Track unloaded')
-        setPlayer2TrackId(null)
-      }
-    }).then((unsub) => {
-      if (isMounted) {
-        unsubscribe2 = unsub
-        console.log('✅ Subscribed to Player 2 commands')
-      } else {
-        unsub()
-      }
-    })
-    
-    // Subscribe to Player 2 status responses
-    iot.subscribe('radio/player/player-002/status', (message: any) => {
-      console.log('📥 [Player 2] Status:', message)
-      // Update player 2 state based on status
-      if (message.currentTrack?.id) {
-        setPlayer2TrackId(message.currentTrack.id)
-      }
-    }).then((unsub) => {
-      if (isMounted) {
-        unsubscribeStatus2 = unsub
-        console.log('✅ Subscribed to Player 2 status')
-        
-        // Send registration request
-        iot.publish('radio/player/player-002/register', {
-          playerId: 'player-002',
-          action: 'register',
-          requestStatus: true,
-          timestamp: new Date().toISOString()
-        }).then(() => {
-          console.log('✅ Player 2 registered')
-        })
-      } else {
-        unsub()
-      }
-    })
-
-    return () => {
-      isMounted = false
-      if (unsubscribe1) unsubscribe1()
-      if (unsubscribe2) unsubscribe2()
-      if (unsubscribeStatus1) unsubscribeStatus1()
-      if (unsubscribeStatus2) unsubscribeStatus2()
-    }
-  }, [iot.connectionState, player1TrackId, player2TrackId])
+  // PlayerCard components now handle their own:
+  // - Command subscriptions
+  // - Status subscriptions
+  // - Registration requests
+  // This avoids duplicate subscriptions and keeps logic encapsulated
   
   const handleTrackEnded = async (playerId: string, trackId: string) => {
     console.log(`🏁 Track ended on ${playerId}:`, trackId)
