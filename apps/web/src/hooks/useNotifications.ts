@@ -215,6 +215,38 @@ export function useNotifications() {
   // Check if notifications are supported
   const isSupported = 'Notification' in window
 
+  // Initialize and monitor permission state
+  useEffect(() => {
+    if (!isSupported) return
+    
+    // Set initial permission
+    const initialPermission = Notification.permission
+    setPermission(initialPermission)
+    console.log('📊 Initial notification permission:', initialPermission)
+    
+    // Check permission periodically (user might change in browser settings)
+    const checkPermission = () => {
+      const current = Notification.permission
+      setPermission(prev => {
+        if (current !== prev) {
+          console.log('📊 Permission changed:', prev, '→', current)
+        }
+        return current
+      })
+    }
+    
+    // Check every 2 seconds
+    const interval = setInterval(checkPermission, 2000)
+    
+    // Also check when window gains focus
+    window.addEventListener('focus', checkPermission)
+    
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('focus', checkPermission)
+    }
+  }, [isSupported])
+
   return {
     isSupported,
     permission,
