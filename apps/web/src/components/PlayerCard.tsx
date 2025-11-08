@@ -45,38 +45,60 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
 
     const commandTopic = `radio/player/${playerId}/command`
+    const statusTopic = `radio/player/${playerId}/status`
     
-    console.log(`📡 [${playerId}] Subscribing to ${commandTopic}`)
+    console.log(`📡 [${playerId}] Subscribing to command and status topics...`)
 
-    let unsubscribe: (() => void) | undefined
+    let unsubscribeCommand: (() => void) | undefined
+    let unsubscribeStatus: (() => void) | undefined
     let isMounted = true
 
+    // Subscribe to commands
     iot.subscribe(commandTopic, (message: any) => {
-      console.log(`📥 [${playerId}] INCOMING MESSAGE:`, message)
+      console.log(`📥 [${playerId}] COMMAND:`, message)
       handleIncomingCommand(message)
     }).then((unsub) => {
       if (!isMounted) {
-        console.log(`⚠️ [${playerId}] Component unmounted before subscribe completed`)
         unsub()
         return
       }
-      
-      unsubscribe = unsub
-      setIsSubscribed(true)
-      console.log(`✅ [${playerId}] SUBSCRIBED SUCCESSFULLY`)
+      unsubscribeCommand = unsub
+      console.log(`✅ [${playerId}] Subscribed to commands`)
     }).catch((error) => {
-      console.error(`❌ [${playerId}] Failed to subscribe:`, error)
-      if (isMounted) {
-        setIsSubscribed(false)
+      console.error(`❌ [${playerId}] Failed to subscribe to commands:`, error)
+    })
+
+    // Subscribe to status updates
+    iot.subscribe(statusTopic, (message: any) => {
+      console.log(`📊 [${playerId}] STATUS UPDATE:`, message)
+      handleStatusUpdate(message)
+    }).then((unsub) => {
+      if (!isMounted) {
+        unsub()
+        return
       }
+      unsubscribeStatus = unsub
+      setIsSubscribed(true)
+      console.log(`✅ [${playerId}] Subscribed to status`)
+      
+      // Request current status
+      iot.publish(`radio/player/${playerId}/register`, {
+        playerId,
+        action: 'register',
+        requestStatus: true,
+        timestamp: new Date().toISOString()
+      }).then(() => {
+        console.log(`📤 [${playerId}] Sent registration & status request`)
+      })
+    }).catch((error) => {
+      console.error(`❌ [${playerId}] Failed to subscribe to status:`, error)
     })
 
     return () => {
-      console.log(`🧹 [${playerId}] Cleaning up subscription...`)
+      console.log(`🧹 [${playerId}] Cleaning up subscriptions...`)
       isMounted = false
-      if (unsubscribe) {
-        unsubscribe()
-      }
+      if (unsubscribeCommand) unsubscribeCommand()
+      if (unsubscribeStatus) unsubscribeStatus()
       setIsSubscribed(false)
     }
   }, [iot.connectionState, playerId])
@@ -110,7 +132,71 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
   }
 
-  const handlePlayCommand = (message: any) => {
+  // Handle status updates from backend
+  const handleStatusUpdate = async (message: any) => {
+    console.log(`📊 [${playerId}] Processing status update...`)
+    
+    // Update player status
+    if (message.status) {
+      const statusMap: Record<string, typeof playerStatus> = {
+        'idle': 'idle',
+        'loading': 'loading',
+        'loaded': 'loaded',
+        'playing': 'playing',
+        'paused': 'paused',
+        'stopped': 'stopped'
+      }
+      const mappedStatus = statusMap[message.status] || 'idle'
+      setPlayerStatus(mappedStatus)
+      console.log(`🎚️ [${playerId}] Status: ${message.status}`)
+    }
+    
+    // Update current track info
+    if (message.currentTrack) {
+      const track = message.currentTrack
+      console.log(`🎵 [${playerId}] Current track:`, track.artist, '-', track.title)
+      
+      try {
+        const [audioUrlResolved, coverUrl, waveUrl] = await Promise.all([
+          getAudioUrl(track.fileUrl || ''),
+          getCoverArtUrl(track.coverArtUrl || ''),
+          getWaveformUrl(track.waveformUrl || '')
+        ])
+        
+        setCoverArtUrl(coverUrl)
+        setWaveformUrl(waveUrl)
+        setAudioUrl(audioUrlResolved)
+        
+        setTrackInfo({
+          id: track.id,
+          title: track.title,
+          artist: track.artist,
+          album: track.album,
+          duration: track.duration,
+          bpm: track.bpm,
+          key: track.key,
+          genre: track.genre,
+          year: track.year,
+          label: track.label,
+          energy: track.energy
+        })
+        
+        console.log(`✅ [${playerId}] Track info updated from status`)
+      } catch (error) {
+        console.error(`❌ [${playerId}] Failed to process track URLs:`, error)
+      }
+    }
+    
+    // Update playback position
+    if (message.position !== undefined) {
+      setCurrentTime(message.position)
+    }
+    if (message.duration !== undefined) {
+      setDuration(message.duration)
+    }
+  }
+
+  const handlePlayCommand = (_message: any) => {
     console.log(`▶️ [${playerId}] PLAY COMMAND RECEIVED`)
     
     if (!audioUrl) {
@@ -131,7 +217,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
   }
 
-  const handlePauseCommand = (message: any) => {
+  const handlePauseCommand = (_message: any) => {
     console.log(`⏸️ [${playerId}] PAUSE COMMAND RECEIVED`)
     setPlayerStatus('paused')
     
@@ -141,7 +227,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
   }
 
-  const handleStopCommand = (message: any) => {
+  const handleStopCommand = (_message: any) => {
     console.log(`⏹️ [${playerId}] STOP COMMAND RECEIVED`)
     
     const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
@@ -200,7 +286,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
     }
   }
 
-  const handleUnloadCommand = (message: any) => {
+  const handleUnloadCommand = (_message: any) => {
     console.log(`🗑️ [${playerId}] UNLOAD COMMAND RECEIVED`)
     
     const audioElement = document.getElementById(`player-audio-${playerId}`) as HTMLAudioElement
