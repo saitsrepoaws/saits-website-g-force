@@ -114,21 +114,44 @@ export function useNotifications() {
     }
 
     console.log('🔔 Showing browser notification:', message.title)
+    console.log('📝 Notification body:', message.body)
     
-    const notification = new Notification(message.title, {
-      body: message.body,
-      tag: message.type,
-      requireInteraction: false,
-      silent: false
-    })
+    try {
+      const notification = new Notification(message.title, {
+        body: message.body,
+        tag: message.type,
+        requireInteraction: false,
+        silent: false
+      })
 
-    notification.onclick = () => {
-      window.focus()
-      notification.close()
+      console.log('✅ Notification object created successfully')
+
+      notification.onclick = () => {
+        console.log('👆 Notification clicked!')
+        window.focus()
+        notification.close()
+      }
+
+      notification.onshow = () => {
+        console.log('👀 Notification is now visible!')
+      }
+
+      notification.onerror = (error) => {
+        console.error('❌ Notification error:', error)
+      }
+
+      notification.onclose = () => {
+        console.log('🚪 Notification closed')
+      }
+
+      // Auto close after 10 seconds
+      setTimeout(() => {
+        console.log('⏰ Auto-closing notification after 10s')
+        notification.close()
+      }, 10000)
+    } catch (error) {
+      console.error('❌ Failed to create notification:', error)
     }
-
-    // Auto close after 5 seconds
-    setTimeout(() => notification.close(), 5000)
   }
 
   // Subscribe to user notifications
