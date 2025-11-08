@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { useIoT } from '../contexts/IoTContext'
 import { getCurrentUser } from 'aws-amplify/auth'
 import { getUserPreferences, saveUserPreferences } from '../services/userPreferences'
+import { getCoverArtUrl } from '../utils/mediaUrl'
 
 export interface NotificationMessage {
   type: 'track_change' | 'playlist_update' | 'schedule_alert' | 'system' | 'user_login' | 'user_logout'
@@ -18,6 +19,7 @@ export interface NotificationMessage {
   track?: {
     artist: string
     title: string
+    coverArtUrl?: string
   }
   user?: {
     username: string
@@ -100,10 +102,12 @@ export function useNotifications() {
   }
 
   // Show browser notification (respects user preferences)
-  const showNotification = (message: NotificationMessage) => {
-    // Check if notifications are enabled in preferences
+  const showNotification = async (message: NotificationMessage) => {
+    console.log('🎯 Checking notification conditions...')
+    console.log('Settings:', { notificationsEnabled, permission })
+    
     if (!notificationsEnabled) {
-      console.log('🔕 Notifications disabled in user preferences')
+      console.log('🔕 Notifications disabled by user preference')
       return
     }
     
@@ -117,9 +121,19 @@ export function useNotifications() {
     console.log('📝 Notification body:', message.body)
     
     try {
+      // Get cover art URL if track info is available
+      let icon: string | undefined = undefined
+      
+      if (message.track?.coverArtUrl) {
+        console.log('🎨 Loading cover art for notification...')
+        icon = await getCoverArtUrl(message.track.coverArtUrl)
+        console.log('✅ Cover art URL:', icon)
+      }
+      
       const notification = new Notification(message.title, {
         body: message.body,
         tag: message.type,
+        icon: icon, // Cover art as notification icon
         requireInteraction: false,
         silent: false
       })
