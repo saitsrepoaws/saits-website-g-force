@@ -16,7 +16,7 @@ import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resou
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
-import { listenerTracker } from './functions/listener-tracker/resource'
+// import { listenerTracker } from './functions/listener-tracker/resource' // DISABLED: esbuild bundling issue
 import { getCoverUrl } from './functions/get-cover-url/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
@@ -66,7 +66,7 @@ export const backend = defineBackend({
   streamStatusPublisher,
   streamMonitor,
   trackCompletionHandler,
-  listenerTracker,
+  // listenerTracker, // DISABLED: esbuild bundling issue
   getCoverUrl
 })
 
@@ -874,6 +874,8 @@ console.log('✅ Track completion handler configured with IoT trigger')
 // ============================================
 // 👥 LISTENER TRACKER - Detailed Analytics
 // ============================================
+// DISABLED: esbuild bundling issue - will fix later
+/*
 const listenerTrackerLambda = backend.listenerTracker.resources.lambda
 const listenerSessionTable = backend.data.resources.tables['ListenerSession']
 const listenerProfileTable = backend.data.resources.tables['ListenerProfile']
@@ -898,6 +900,7 @@ const listenerTrackerRule = new events.Rule(
 )
 
 listenerTrackerRule.addTarget(new targets.LambdaFunction(listenerTrackerLambda))
+*/
 
 console.log('✅ Listener tracker configured')
 

@@ -2103,6 +2103,14 @@
      ]
     }
    }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "StreamQueueTrackTable",
+     "TableArn"
+    ]
+   }
   }
  }
 }
