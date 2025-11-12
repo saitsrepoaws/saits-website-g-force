@@ -11,7 +11,7 @@ import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
-import { streamTrackPusher } from './functions/stream-track-pusher/resource'
+// import { streamTrackPusher } from './functions/stream-track-pusher/resource' // DISABLED: Incomplete Lambda
 import { streamHealthMonitor } from './functions/stream-health-monitor/resource'
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
@@ -61,7 +61,7 @@ export const backend = defineBackend({
   radioScheduler,
   crossfadeController,
   streamPlaylistUpdater,
-  streamTrackPusher,
+  // streamTrackPusher, // DISABLED: Incomplete Lambda
   streamHealthMonitor,
   streamStatusPublisher,
   streamMonitor,
@@ -636,9 +636,12 @@ streamSchedulerRule.addTarget(new targets.LambdaFunction(streamPlaylistLambda))
 // ============================================
 // 🎵 TRACK PUSHER - Smart 2-Track Buffer
 // ============================================
+// DISABLED: Lambda incomplete, needs fixing
 // Runs every 2-3 minutes to maintain buffer
-const trackPusherLambda = backend.streamTrackPusher.resources.lambda
+// const trackPusherLambda = backend.streamTrackPusher.resources.lambda
 
+// DISABLED: Lambda incomplete
+/*
 // Grant permissions
 scheduleTable.grantReadData(trackPusherLambda)
 playlistTable.grantReadData(trackPusherLambda)
@@ -687,6 +690,7 @@ const trackPusherRule = new events.Rule(
 )
 
 trackPusherRule.addTarget(new targets.LambdaFunction(trackPusherLambda))
+*/
 
 // ============================================
 // 🛡️ STREAM HEALTH MONITOR - Bulletproof!
@@ -694,6 +698,7 @@ trackPusherRule.addTarget(new targets.LambdaFunction(trackPusherLambda))
 const healthMonitorLambda = backend.streamHealthMonitor.resources.lambda
 const streamHealthLogTable = backend.data.resources.tables['StreamHealthLog']
 
+// ... (rest of the code remains the same)
 // Create SNS topic for alerts
 const alertTopic = new sns.Topic(
   healthMonitorLambda.stack,
