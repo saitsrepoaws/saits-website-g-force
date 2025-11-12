@@ -349,7 +349,7 @@
   }
  },
  "Resources": {
-  "TrackTable": {
+  "ListenerSessionTable": {
    "Type": "Custom::AmplifyDynamoDBTable",
    "Properties": {
     "ServiceToken": {
@@ -359,7 +359,7 @@
      "Fn::Join": [
       "",
       [
-       "Track-",
+       "ListenerSession-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -371,12 +371,54 @@
      {
       "attributeName": "id",
       "attributeType": "S"
+     },
+     {
+      "attributeName": "ipHash",
+      "attributeType": "S"
+     },
+     {
+      "attributeName": "connectTime",
+      "attributeType": "S"
      }
     ],
     "keySchema": [
      {
       "attributeName": "id",
       "keyType": "HASH"
+     }
+    ],
+    "globalSecondaryIndexes": [
+     {
+      "indexName": "listenerSessionsByIpHashAndConnectTime",
+      "keySchema": [
+       {
+        "attributeName": "ipHash",
+        "keyType": "HASH"
+       },
+       {
+        "attributeName": "connectTime",
+        "keyType": "RANGE"
+       }
+      ],
+      "projection": {
+       "projectionType": "ALL"
+      },
+      "provisionedThroughput": {
+       "Fn::If": [
+        "ShouldUsePayPerRequestBilling",
+        {
+         "Ref": "AWS::NoValue"
+        },
+        {
+         "ReadCapacityUnits": {
+          "Ref": "DynamoDBModelTableReadIOPS"
+         },
+         "WriteCapacityUnits": {
+          "Ref": "DynamoDBModelTableWriteIOPS"
+         }
+        }
+       ]
+      }
      }
     ],
     "provisionedThroughput": {
@@ -428,10 +470,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackTable/Default/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionTable/Default/Default"
    }
   },
-  "TrackIAMRoleE0B504B7": {
+  "ListenerSessionIAMRoleF8F1110E": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -475,7 +517,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "ListenerSession-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -494,7 +536,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "ListenerSession-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -517,7 +559,7 @@
      "Fn::Join": [
       "",
       [
-       "TrackIAMRoled55532-",
+       "ListenerSessionIAMRoee409f-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -543,10 +585,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackIAMRole/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionIAMRole/Resource"
    }
   },
-  "TrackDataSource": {
+  "ListenerSessionDataSource": {
    "Type": "AWS::AppSync::DataSource",
    "Properties": {
     "ApiId": {
@@ -570,7 +612,7 @@
              ":",
              {
               "Fn::GetAtt": [
-               "TrackTable",
+               "ListenerSessionTable",
                "TableArn"
               ]
              }
@@ -583,25 +625,25 @@
       ]
      }
     },
-    "Name": "TrackTable",
+    "Name": "ListenerSessionTable",
     "ServiceRoleArn": {
      "Fn::GetAtt": [
-      "TrackIAMRoleE0B504B7",
+      "ListenerSessionIAMRoleF8F1110E",
       "Arn"
      ]
     },
     "Type": "AMAZON_DYNAMODB"
    },
    "DependsOn": [
-    "TrackIAMRoleE0B504B7"
+    "ListenerSessionIAMRoleF8F1110E"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackDataSource/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionDataSource/Resource"
    }
   },
-  "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA": {
+  "QuerygetListenerSessionauth0FunctionQuerygetListenerSessionauth0FunctionAppSyncFunction18861667": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -611,19 +653,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackauth0Function",
+    "Name": "QuerygetListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackauth0Function/QuerygetTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerygetListenerSessionauth0Function/QuerygetListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935": {
+  "QuerygetListenerSessionpostAuth0FunctionQuerygetListenerSessionpostAuth0FunctionAppSyncFunction4FA82032": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -633,7 +675,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackpostAuth0Function",
+    "Name": "QuerygetListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -642,10 +684,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackpostAuth0Function/QuerygetTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerygetListenerSessionpostAuth0Function/QuerygetListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037": {
+  "QueryGetListenerSessionDataResolverFnQueryGetListenerSessionDataResolverFnAppSyncFunctionE4DCE76F": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -653,12 +695,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryGetTrackDataResolverFn",
+    "Name": "QueryGetListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/08f4d557693d96c1a4efba0f9dc91330e4b19772fd5477c156468843e3d9cb5e.vtl"
     },
@@ -667,39 +709,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryGetTrackDataResolverFn/QueryGetTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryGetListenerSessionDataResolverFn/QueryGetListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "GetTrackResolver": {
+  "GetListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "getTrack",
+    "FieldName": "getListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA",
+        "QuerygetListenerSessionauth0FunctionQuerygetListenerSessionauth0FunctionAppSyncFunction18861667",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935",
+        "QuerygetListenerSessionpostAuth0FunctionQuerygetListenerSessionpostAuth0FunctionAppSyncFunction4FA82032",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037",
+        "QueryGetListenerSessionDataResolverFnQueryGetListenerSessionDataResolverFnAppSyncFunctionE4DCE76F",
         "FunctionId"
        ]
       }
@@ -709,7 +751,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -728,7 +770,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerSessionTable",
                  "TableArn"
                 ]
                }
@@ -778,10 +820,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryGetTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryGetListenerSessionResolver"
    }
   },
-  "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED": {
+  "QuerylistListenerSessionsauth0FunctionQuerylistListenerSessionsauth0FunctionAppSyncFunction29100EED": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -791,19 +833,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTracksauth0Function",
+    "Name": "QuerylistListenerSessionsauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTracksauth0Function/QuerylistTracksauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionsauth0Function/QuerylistListenerSessionsauth0Function.AppSyncFunction"
    }
   },
-  "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F": {
+  "QuerylistListenerSessionspostAuth0FunctionQuerylistListenerSessionspostAuth0FunctionAppSyncFunction50E0BFB8": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -813,7 +855,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTrackspostAuth0Function",
+    "Name": "QuerylistListenerSessionspostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -822,10 +864,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTrackspostAuth0Function/QuerylistTrackspostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionspostAuth0Function/QuerylistListenerSessionspostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98": {
+  "QueryListListenerSessionsDataResolverFnQueryListListenerSessionsDataResolverFnAppSyncFunction58AD6F28": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -833,12 +875,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryListTracksDataResolverFn",
+    "Name": "QueryListListenerSessionsDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9fcbe070ecd3023c5bf5b966fa9584757db9762eef123bad0820bd87591b2174.vtl"
     },
@@ -847,39 +889,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryListTracksDataResolverFn/QueryListTracksDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryListListenerSessionsDataResolverFn/QueryListListenerSessionsDataResolverFn.AppSyncFunction"
    }
   },
-  "ListTrackResolver": {
+  "ListListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "listTracks",
+    "FieldName": "listListenerSessions",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED",
+        "QuerylistListenerSessionsauth0FunctionQuerylistListenerSessionsauth0FunctionAppSyncFunction29100EED",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F",
+        "QuerylistListenerSessionspostAuth0FunctionQuerylistListenerSessionspostAuth0FunctionAppSyncFunction50E0BFB8",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98",
+        "QueryListListenerSessionsDataResolverFnQueryListListenerSessionsDataResolverFnAppSyncFunction58AD6F28",
         "FunctionId"
        ]
       }
@@ -889,7 +931,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listTracks\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listListenerSessions\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -908,7 +950,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerSessionTable",
                  "TableArn"
                 ]
                }
@@ -958,10 +1000,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryListTracksResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryListListenerSessionsResolver"
    }
   },
-  "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4": {
+  "MutationcreateListenerSessioninit0FunctionMutationcreateListenerSessioninit0FunctionAppSyncFunction90C9C32C": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -971,7 +1013,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit0Function",
+    "Name": "MutationcreateListenerSessioninit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a183ddccbd956316c38ef97177b8f088ef0826f62023323f5ae6053d348ccffc.vtl"
     },
@@ -980,10 +1022,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit0Function/MutationcreateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessioninit0Function/MutationcreateListenerSessioninit0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB": {
+  "MutationcreateListenerSessionauth0FunctionMutationcreateListenerSessionauth0FunctionAppSyncFunction08635449": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -993,29 +1035,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit1Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a131eee6555e63e2cc9e16323fc3c65b9f041d74fdf6a0289b142925ee215a81.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit1Function/MutationcreateTrackinit1Function.AppSyncFunction"
-   }
-  },
-  "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackauth0Function",
+    "Name": "MutationcreateListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/163f1e92c10dcaf85e4690f19146fc5a18d1291ad6a6ad84db40c0c36d101fe9.vtl"
     },
@@ -1024,10 +1044,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackauth0Function/MutationcreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessionauth0Function/MutationcreateListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD": {
+  "MutationcreateListenerSessionpostAuth0FunctionMutationcreateListenerSessionpostAuth0FunctionAppSyncFunction6D5BD73F": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1037,7 +1057,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackpostAuth0Function",
+    "Name": "MutationcreateListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1046,10 +1066,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackpostAuth0Function/MutationcreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessionpostAuth0Function/MutationcreateListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C": {
+  "MutationCreateListenerSessionDataResolverFnMutationCreateListenerSessionDataResolverFnAppSyncFunctionC5245DD6": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1057,65 +1077,59 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationCreateTrackDataResolverFn",
+    "Name": "MutationCreateListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b38b6b2e84fa381544dd7e87d5737e0d60105785eb071d78af3eefa5baae3314.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/0a49ef932fc9c57af6adee9be2822ebe9019a295065590da33d12847bd559676.vtl"
     },
     "ResponseMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationCreateTrackDataResolverFn/MutationCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationCreateListenerSessionDataResolverFn/MutationCreateListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "CreateTrackResolver": {
+  "CreateListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "createTrack",
+    "FieldName": "createListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4",
+        "MutationcreateListenerSessioninit0FunctionMutationcreateListenerSessioninit0FunctionAppSyncFunction90C9C32C",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB",
+        "MutationcreateListenerSessionauth0FunctionMutationcreateListenerSessionauth0FunctionAppSyncFunction08635449",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18",
+        "MutationcreateListenerSessionpostAuth0FunctionMutationcreateListenerSessionpostAuth0FunctionAppSyncFunction6D5BD73F",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C",
+        "MutationCreateListenerSessionDataResolverFnMutationCreateListenerSessionDataResolverFnAppSyncFunctionC5245DD6",
         "FunctionId"
        ]
       }
@@ -1125,7 +1139,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1144,7 +1158,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerSessionTable",
                  "TableArn"
                 ]
                }
@@ -1194,10 +1208,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationCreateListenerSessionResolver"
    }
   },
-  "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737": {
+  "MutationupdateListenerSessioninit0FunctionMutationupdateListenerSessioninit0FunctionAppSyncFunction97F2F6D9": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1207,7 +1221,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackinit0Function",
+    "Name": "MutationupdateListenerSessioninit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/06db846fd14e6fc371f22b12b5545ba8e2dbfeda85d8c8d586c71c282166657b.vtl"
     },
@@ -1216,10 +1230,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackinit0Function/MutationupdateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessioninit0Function/MutationupdateListenerSessioninit0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9": {
+  "MutationupdateListenerSessionauth0FunctionMutationupdateListenerSessionauth0FunctionAppSyncFunction2ACFD7D6": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1227,12 +1241,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackauth0Function",
+    "Name": "MutationupdateListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1241,15 +1255,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackauth0Function/MutationupdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessionauth0Function/MutationupdateListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B": {
+  "MutationupdateListenerSessionpostAuth0FunctionMutationupdateListenerSessionpostAuth0FunctionAppSyncFunction6F1F8FB4": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1259,7 +1273,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackpostAuth0Function",
+    "Name": "MutationupdateListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1268,10 +1282,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackpostAuth0Function/MutationupdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessionpostAuth0Function/MutationupdateListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05": {
+  "MutationUpdateListenerSessionDataResolverFnMutationUpdateListenerSessionDataResolverFnAppSyncFunctionEE060533": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1279,12 +1293,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationUpdateTrackDataResolverFn",
+    "Name": "MutationUpdateListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/474bf0776ec2164a13191d1a0a9e057154931e4918fea5086f49850d02a5371b.vtl"
     },
@@ -1293,45 +1307,45 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationUpdateTrackDataResolverFn/MutationUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationUpdateListenerSessionDataResolverFn/MutationUpdateListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "UpdateTrackResolver": {
+  "UpdateListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "updateTrack",
+    "FieldName": "updateListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737",
+        "MutationupdateListenerSessioninit0FunctionMutationupdateListenerSessioninit0FunctionAppSyncFunction97F2F6D9",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9",
+        "MutationupdateListenerSessionauth0FunctionMutationupdateListenerSessionauth0FunctionAppSyncFunction2ACFD7D6",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B",
+        "MutationupdateListenerSessionpostAuth0FunctionMutationupdateListenerSessionpostAuth0FunctionAppSyncFunction6F1F8FB4",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05",
+        "MutationUpdateListenerSessionDataResolverFnMutationUpdateListenerSessionDataResolverFnAppSyncFunctionEE060533",
         "FunctionId"
        ]
       }
@@ -1341,7 +1355,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1360,7 +1374,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerSessionTable",
                  "TableArn"
                 ]
                }
@@ -1410,10 +1424,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationUpdateListenerSessionResolver"
    }
   },
-  "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9": {
+  "MutationdeleteListenerSessionauth0FunctionMutationdeleteListenerSessionauth0FunctionAppSyncFunction565940D8": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1421,12 +1435,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackauth0Function",
+    "Name": "MutationdeleteListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1435,15 +1449,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackauth0Function/MutationdeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationdeleteListenerSessionauth0Function/MutationdeleteListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7": {
+  "MutationdeleteListenerSessionpostAuth0FunctionMutationdeleteListenerSessionpostAuth0FunctionAppSyncFunctionC4703665": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1453,7 +1467,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackpostAuth0Function",
+    "Name": "MutationdeleteListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1462,10 +1476,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackpostAuth0Function/MutationdeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationdeleteListenerSessionpostAuth0Function/MutationdeleteListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD": {
+  "MutationDeleteListenerSessionDataResolverFnMutationDeleteListenerSessionDataResolverFnAppSyncFunctionCBA1F8CA": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1473,12 +1487,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerSessionDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationDeleteTrackDataResolverFn",
+    "Name": "MutationDeleteListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4f7907d1209a2c9953a0c053df402c634e359546d70c7cc5c2e8e21ea734880f.vtl"
     },
@@ -1487,39 +1501,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerSessionDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationDeleteTrackDataResolverFn/MutationDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationDeleteListenerSessionDataResolverFn/MutationDeleteListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "DeleteTrackResolver": {
+  "DeleteListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "deleteTrack",
+    "FieldName": "deleteListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9",
+        "MutationdeleteListenerSessionauth0FunctionMutationdeleteListenerSessionauth0FunctionAppSyncFunction565940D8",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7",
+        "MutationdeleteListenerSessionpostAuth0FunctionMutationdeleteListenerSessionpostAuth0FunctionAppSyncFunctionC4703665",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD",
+        "MutationDeleteListenerSessionDataResolverFnMutationDeleteListenerSessionDataResolverFnAppSyncFunctionCBA1F8CA",
         "FunctionId"
        ]
       }
@@ -1529,7 +1543,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1548,7 +1562,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerSessionTable",
                  "TableArn"
                 ]
                }
@@ -1598,10 +1612,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationDeleteListenerSessionResolver"
    }
   },
-  "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF": {
+  "SubscriptiononCreateListenerSessionauth0FunctionSubscriptiononCreateListenerSessionauth0FunctionAppSyncFunction503E93F0": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1611,19 +1625,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackauth0Function",
+    "Name": "SubscriptiononCreateListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackauth0Function/SubscriptiononCreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononCreateListenerSessionauth0Function/SubscriptiononCreateListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006": {
+  "SubscriptiononCreateListenerSessionpostAuth0FunctionSubscriptiononCreateListenerSessionpostAuth0FunctionAppSyncFunction1C4C5419": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1633,7 +1647,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackpostAuth0Function",
+    "Name": "SubscriptiononCreateListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1642,10 +1656,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackpostAuth0Function/SubscriptiononCreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononCreateListenerSessionpostAuth0Function/SubscriptiononCreateListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF": {
+  "SubscriptionOnCreateListenerSessionDataResolverFnSubscriptionOnCreateListenerSessionDataResolverFnAppSyncFunctionAA70E0FB": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1655,7 +1669,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnCreateTrackDataResolverFn",
+    "Name": "SubscriptionOnCreateListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1666,34 +1680,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnCreateTrackDataResolverFn/SubscriptionOnCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnCreateListenerSessionDataResolverFn/SubscriptionOnCreateListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackResolver": {
+  "SubscriptiononCreateListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onCreateTrack",
+    "FieldName": "onCreateListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF",
+        "SubscriptiononCreateListenerSessionauth0FunctionSubscriptiononCreateListenerSessionauth0FunctionAppSyncFunction503E93F0",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006",
+        "SubscriptiononCreateListenerSessionpostAuth0FunctionSubscriptiononCreateListenerSessionpostAuth0FunctionAppSyncFunction1C4C5419",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF",
+        "SubscriptionOnCreateListenerSessionDataResolverFnSubscriptionOnCreateListenerSessionDataResolverFnAppSyncFunctionAA70E0FB",
         "FunctionId"
        ]
       }
@@ -1703,7 +1717,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1745,10 +1759,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnCreateListenerSessionResolver"
    }
   },
-  "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503": {
+  "SubscriptiononUpdateListenerSessionauth0FunctionSubscriptiononUpdateListenerSessionauth0FunctionAppSyncFunctionD0E1CB7F": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1758,19 +1772,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackauth0Function",
+    "Name": "SubscriptiononUpdateListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackauth0Function/SubscriptiononUpdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononUpdateListenerSessionauth0Function/SubscriptiononUpdateListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232": {
+  "SubscriptiononUpdateListenerSessionpostAuth0FunctionSubscriptiononUpdateListenerSessionpostAuth0FunctionAppSyncFunction9218BAD8": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1780,7 +1794,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackpostAuth0Function",
+    "Name": "SubscriptiononUpdateListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1789,10 +1803,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackpostAuth0Function/SubscriptiononUpdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononUpdateListenerSessionpostAuth0Function/SubscriptiononUpdateListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959": {
+  "SubscriptionOnUpdateListenerSessionDataResolverFnSubscriptionOnUpdateListenerSessionDataResolverFnAppSyncFunctionC1C8CA52": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1802,7 +1816,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnUpdateTrackDataResolverFn",
+    "Name": "SubscriptionOnUpdateListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1813,34 +1827,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnUpdateTrackDataResolverFn/SubscriptionOnUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnUpdateListenerSessionDataResolverFn/SubscriptionOnUpdateListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackResolver": {
+  "SubscriptiononUpdateListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onUpdateTrack",
+    "FieldName": "onUpdateListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503",
+        "SubscriptiononUpdateListenerSessionauth0FunctionSubscriptiononUpdateListenerSessionauth0FunctionAppSyncFunctionD0E1CB7F",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232",
+        "SubscriptiononUpdateListenerSessionpostAuth0FunctionSubscriptiononUpdateListenerSessionpostAuth0FunctionAppSyncFunction9218BAD8",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959",
+        "SubscriptionOnUpdateListenerSessionDataResolverFnSubscriptionOnUpdateListenerSessionDataResolverFnAppSyncFunctionC1C8CA52",
         "FunctionId"
        ]
       }
@@ -1850,7 +1864,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1892,10 +1906,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnUpdateListenerSessionResolver"
    }
   },
-  "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C": {
+  "SubscriptiononDeleteListenerSessionauth0FunctionSubscriptiononDeleteListenerSessionauth0FunctionAppSyncFunctionE7C7EA0A": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1905,19 +1919,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackauth0Function",
+    "Name": "SubscriptiononDeleteListenerSessionauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackauth0Function/SubscriptiononDeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononDeleteListenerSessionauth0Function/SubscriptiononDeleteListenerSessionauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45": {
+  "SubscriptiononDeleteListenerSessionpostAuth0FunctionSubscriptiononDeleteListenerSessionpostAuth0FunctionAppSyncFunction7A453369": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1927,7 +1941,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackpostAuth0Function",
+    "Name": "SubscriptiononDeleteListenerSessionpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1936,10 +1950,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackpostAuth0Function/SubscriptiononDeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononDeleteListenerSessionpostAuth0Function/SubscriptiononDeleteListenerSessionpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C": {
+  "SubscriptionOnDeleteListenerSessionDataResolverFnSubscriptionOnDeleteListenerSessionDataResolverFnAppSyncFunction9C98B8BB": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1949,7 +1963,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnDeleteTrackDataResolverFn",
+    "Name": "SubscriptionOnDeleteListenerSessionDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1960,34 +1974,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnDeleteTrackDataResolverFn/SubscriptionOnDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnDeleteListenerSessionDataResolverFn/SubscriptionOnDeleteListenerSessionDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackResolver": {
+  "SubscriptiononDeleteListenerSessionResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onDeleteTrack",
+    "FieldName": "onDeleteListenerSession",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C",
+        "SubscriptiononDeleteListenerSessionauth0FunctionSubscriptiononDeleteListenerSessionauth0FunctionAppSyncFunctionE7C7EA0A",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45",
+        "SubscriptiononDeleteListenerSessionpostAuth0FunctionSubscriptiononDeleteListenerSessionpostAuth0FunctionAppSyncFunction7A453369",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C",
+        "SubscriptionOnDeleteListenerSessionDataResolverFnSubscriptionOnDeleteListenerSessionDataResolverFnAppSyncFunction9C98B8BB",
         "FunctionId"
        ]
       }
@@ -1997,7 +2011,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteListenerSession\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -2039,7 +2053,187 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnDeleteListenerSessionResolver"
+   }
+  },
+  "QuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionQuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionAppSyncFunction05E71AC5": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerylistListenerSessionByIpHashAndConnectTimeauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionByIpHashAndConnectTimeauth0Function/QuerylistListenerSessionByIpHashAndConnectTimeauth0Function.AppSyncFunction"
+   }
+  },
+  "QuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionQuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionAppSyncFunction23717F81": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function/QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function.AppSyncFunction"
+   }
+  },
+  "QueryListListenerSessionByIpHashAndConnectTimeDataResolverFnQueryListListenerSessionByIpHashAndConnectTimeDataResolverFnAppSyncFunctionC6BEB75D": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "ListenerSessionDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9f6023add6dee02f8581e23a18e1fca2e8ae296e58dc6f5b6d5c1b756b185240.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/098c998f215c333f57348ca8912f66057ae6b574fe34013033dc54362ee2372c.vtl"
+    }
+   },
+   "DependsOn": [
+    "ListenerSessionDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn/QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn.AppSyncFunction"
+   }
+  },
+  "QuerylistListenerSessionByIpHashAndConnectTimeResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+    },
+    "FieldName": "listListenerSessionByIpHashAndConnectTime",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionQuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionAppSyncFunction05E71AC5",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionQuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionAppSyncFunction23717F81",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QueryListListenerSessionByIpHashAndConnectTimeDataResolverFnQueryListListenerSessionByIpHashAndConnectTimeDataResolverFnAppSyncFunctionC6BEB75D",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listListenerSessionByIpHashAndConnectTime\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "ListenerSessionTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Query"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryListListenerSessionByIpHashAndConnectTimeResolver"
    }
   },
   "CDKMetadata": {
@@ -2048,17 +2242,17 @@
     "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WO0W6DMAxFv6XvwWPpF6ygPW4T7L0yiUEpIUGx06pC/PsEnTrt6frIR/bVoHUJ5QFvXBg7Ft51sHwQC9lW0Iyq6sMXJpxIKG1QxWCduBhUQxxzMqSqzBKnP+zDc8Ybnxd7DzhF28E3dp5OyKQcTrA00T/s6GlVOM98DwaWetfrrkbB9nnyP73nYLYSVQy9G3LCvdHvZ3+ltCo+npGZhOFtC8VHOGUzkmwF1s39zDJnUfu6FRxcGFYVoiW48MtVa9CvUB4u7FyRchA3ETSP/AG67XqaNgEAAA=="
    },
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/CDKMetadata/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
   }
  },
  "Outputs": {
-  "GetAttTrackTableStreamArn": {
+  "GetAttListenerSessionTableStreamArn": {
    "Description": "Your DynamoDB table StreamArn.",
    "Value": {
     "Fn::GetAtt": [
-     "TrackTable",
+     "ListenerSessionTable",
      "TableStreamArn"
     ]
    },
@@ -2070,19 +2264,19 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:StreamArn"
+       "GetAtt:ListenerSessionTable:StreamArn"
       ]
      ]
     }
    }
   },
-  "GetAttTrackTableName": {
+  "GetAttListenerSessionTableName": {
    "Description": "Your DynamoDB table name.",
    "Value": {
     "Fn::Join": [
      "",
      [
-      "Track-",
+      "ListenerSession-",
       {
        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
       },
@@ -2098,7 +2292,7 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:Name"
+       "GetAtt:ListenerSessionTable:Name"
       ]
      ]
     }

@@ -349,7 +349,7 @@
   }
  },
  "Resources": {
-  "TrackTable": {
+  "StreamHealthLogTable": {
    "Type": "Custom::AmplifyDynamoDBTable",
    "Properties": {
     "ServiceToken": {
@@ -359,7 +359,7 @@
      "Fn::Join": [
       "",
       [
-       "Track-",
+       "StreamHealthLog-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -428,10 +428,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackTable/Default/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogTable/Default/Default"
    }
   },
-  "TrackIAMRoleE0B504B7": {
+  "StreamHealthLogIAMRole5E7849AA": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -475,7 +475,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "StreamHealthLog-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -494,7 +494,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "StreamHealthLog-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -517,7 +517,7 @@
      "Fn::Join": [
       "",
       [
-       "TrackIAMRoled55532-",
+       "StreamHealthLogIAMRoa4ab69-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -543,10 +543,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackIAMRole/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogIAMRole/Resource"
    }
   },
-  "TrackDataSource": {
+  "StreamHealthLogDataSource": {
    "Type": "AWS::AppSync::DataSource",
    "Properties": {
     "ApiId": {
@@ -570,7 +570,7 @@
              ":",
              {
               "Fn::GetAtt": [
-               "TrackTable",
+               "StreamHealthLogTable",
                "TableArn"
               ]
              }
@@ -583,25 +583,25 @@
       ]
      }
     },
-    "Name": "TrackTable",
+    "Name": "StreamHealthLogTable",
     "ServiceRoleArn": {
      "Fn::GetAtt": [
-      "TrackIAMRoleE0B504B7",
+      "StreamHealthLogIAMRole5E7849AA",
       "Arn"
      ]
     },
     "Type": "AMAZON_DYNAMODB"
    },
    "DependsOn": [
-    "TrackIAMRoleE0B504B7"
+    "StreamHealthLogIAMRole5E7849AA"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackDataSource/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogDataSource/Resource"
    }
   },
-  "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA": {
+  "QuerygetStreamHealthLogauth0FunctionQuerygetStreamHealthLogauth0FunctionAppSyncFunction9332C993": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -611,19 +611,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackauth0Function",
+    "Name": "QuerygetStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackauth0Function/QuerygetTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerygetStreamHealthLogauth0Function/QuerygetStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935": {
+  "QuerygetStreamHealthLogpostAuth0FunctionQuerygetStreamHealthLogpostAuth0FunctionAppSyncFunction87BC93DB": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -633,7 +633,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackpostAuth0Function",
+    "Name": "QuerygetStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -642,10 +642,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackpostAuth0Function/QuerygetTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerygetStreamHealthLogpostAuth0Function/QuerygetStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037": {
+  "QueryGetStreamHealthLogDataResolverFnQueryGetStreamHealthLogDataResolverFnAppSyncFunction6E407844": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -653,12 +653,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryGetTrackDataResolverFn",
+    "Name": "QueryGetStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/08f4d557693d96c1a4efba0f9dc91330e4b19772fd5477c156468843e3d9cb5e.vtl"
     },
@@ -667,39 +667,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryGetTrackDataResolverFn/QueryGetTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QueryGetStreamHealthLogDataResolverFn/QueryGetStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "GetTrackResolver": {
+  "GetStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "getTrack",
+    "FieldName": "getStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA",
+        "QuerygetStreamHealthLogauth0FunctionQuerygetStreamHealthLogauth0FunctionAppSyncFunction9332C993",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935",
+        "QuerygetStreamHealthLogpostAuth0FunctionQuerygetStreamHealthLogpostAuth0FunctionAppSyncFunction87BC93DB",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037",
+        "QueryGetStreamHealthLogDataResolverFnQueryGetStreamHealthLogDataResolverFnAppSyncFunction6E407844",
         "FunctionId"
        ]
       }
@@ -709,7 +709,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -728,7 +728,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "StreamHealthLogTable",
                  "TableArn"
                 ]
                }
@@ -778,10 +778,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryGetTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/queryGetStreamHealthLogResolver"
    }
   },
-  "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED": {
+  "QuerylistStreamHealthLogsauth0FunctionQuerylistStreamHealthLogsauth0FunctionAppSyncFunctionC0D19588": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -791,19 +791,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTracksauth0Function",
+    "Name": "QuerylistStreamHealthLogsauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTracksauth0Function/QuerylistTracksauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerylistStreamHealthLogsauth0Function/QuerylistStreamHealthLogsauth0Function.AppSyncFunction"
    }
   },
-  "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F": {
+  "QuerylistStreamHealthLogspostAuth0FunctionQuerylistStreamHealthLogspostAuth0FunctionAppSyncFunctionB8D0D329": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -813,7 +813,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTrackspostAuth0Function",
+    "Name": "QuerylistStreamHealthLogspostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -822,10 +822,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTrackspostAuth0Function/QuerylistTrackspostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerylistStreamHealthLogspostAuth0Function/QuerylistStreamHealthLogspostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98": {
+  "QueryListStreamHealthLogsDataResolverFnQueryListStreamHealthLogsDataResolverFnAppSyncFunctionB945AD44": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -833,12 +833,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryListTracksDataResolverFn",
+    "Name": "QueryListStreamHealthLogsDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9fcbe070ecd3023c5bf5b966fa9584757db9762eef123bad0820bd87591b2174.vtl"
     },
@@ -847,39 +847,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryListTracksDataResolverFn/QueryListTracksDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QueryListStreamHealthLogsDataResolverFn/QueryListStreamHealthLogsDataResolverFn.AppSyncFunction"
    }
   },
-  "ListTrackResolver": {
+  "ListStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "listTracks",
+    "FieldName": "listStreamHealthLogs",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED",
+        "QuerylistStreamHealthLogsauth0FunctionQuerylistStreamHealthLogsauth0FunctionAppSyncFunctionC0D19588",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F",
+        "QuerylistStreamHealthLogspostAuth0FunctionQuerylistStreamHealthLogspostAuth0FunctionAppSyncFunctionB8D0D329",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98",
+        "QueryListStreamHealthLogsDataResolverFnQueryListStreamHealthLogsDataResolverFnAppSyncFunctionB945AD44",
         "FunctionId"
        ]
       }
@@ -889,7 +889,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listTracks\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listStreamHealthLogs\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -908,7 +908,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "StreamHealthLogTable",
                  "TableArn"
                 ]
                }
@@ -958,10 +958,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryListTracksResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/queryListStreamHealthLogsResolver"
    }
   },
-  "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4": {
+  "MutationcreateStreamHealthLoginit0FunctionMutationcreateStreamHealthLoginit0FunctionAppSyncFunctionE7E7DE91": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -971,7 +971,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit0Function",
+    "Name": "MutationcreateStreamHealthLoginit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a183ddccbd956316c38ef97177b8f088ef0826f62023323f5ae6053d348ccffc.vtl"
     },
@@ -980,10 +980,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit0Function/MutationcreateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLoginit0Function/MutationcreateStreamHealthLoginit0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB": {
+  "MutationcreateStreamHealthLogauth0FunctionMutationcreateStreamHealthLogauth0FunctionAppSyncFunction348EBEC5": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -993,29 +993,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit1Function",
-    "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a131eee6555e63e2cc9e16323fc3c65b9f041d74fdf6a0289b142925ee215a81.vtl"
-    },
-    "ResponseMappingTemplate": "$util.toJson({})"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit1Function/MutationcreateTrackinit1Function.AppSyncFunction"
-   }
-  },
-  "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18": {
-   "Type": "AWS::AppSync::FunctionConfiguration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
-    },
-    "DataSourceName": {
-     "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
-    },
-    "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackauth0Function",
+    "Name": "MutationcreateStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/163f1e92c10dcaf85e4690f19146fc5a18d1291ad6a6ad84db40c0c36d101fe9.vtl"
     },
@@ -1024,10 +1002,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackauth0Function/MutationcreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLogauth0Function/MutationcreateStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD": {
+  "MutationcreateStreamHealthLogpostAuth0FunctionMutationcreateStreamHealthLogpostAuth0FunctionAppSyncFunctionDCF21A66": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1037,7 +1015,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackpostAuth0Function",
+    "Name": "MutationcreateStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1046,10 +1024,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackpostAuth0Function/MutationcreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLogpostAuth0Function/MutationcreateStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C": {
+  "MutationCreateStreamHealthLogDataResolverFnMutationCreateStreamHealthLogDataResolverFnAppSyncFunction26D95A6C": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1057,65 +1035,59 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationCreateTrackDataResolverFn",
+    "Name": "MutationCreateStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b38b6b2e84fa381544dd7e87d5737e0d60105785eb071d78af3eefa5baae3314.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/940fb83ff1fafde65770c8e2e36004bfdfd6fe92801536ffcc05deb13ae5578e.vtl"
     },
     "ResponseMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationCreateTrackDataResolverFn/MutationCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationCreateStreamHealthLogDataResolverFn/MutationCreateStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "CreateTrackResolver": {
+  "CreateStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "createTrack",
+    "FieldName": "createStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4",
+        "MutationcreateStreamHealthLoginit0FunctionMutationcreateStreamHealthLoginit0FunctionAppSyncFunctionE7E7DE91",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB",
+        "MutationcreateStreamHealthLogauth0FunctionMutationcreateStreamHealthLogauth0FunctionAppSyncFunction348EBEC5",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18",
+        "MutationcreateStreamHealthLogpostAuth0FunctionMutationcreateStreamHealthLogpostAuth0FunctionAppSyncFunctionDCF21A66",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD",
-        "FunctionId"
-       ]
-      },
-      {
-       "Fn::GetAtt": [
-        "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C",
+        "MutationCreateStreamHealthLogDataResolverFnMutationCreateStreamHealthLogDataResolverFnAppSyncFunction26D95A6C",
         "FunctionId"
        ]
       }
@@ -1125,7 +1097,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1144,7 +1116,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "StreamHealthLogTable",
                  "TableArn"
                 ]
                }
@@ -1194,10 +1166,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationCreateStreamHealthLogResolver"
    }
   },
-  "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737": {
+  "MutationupdateStreamHealthLoginit0FunctionMutationupdateStreamHealthLoginit0FunctionAppSyncFunctionB56742B3": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1207,7 +1179,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackinit0Function",
+    "Name": "MutationupdateStreamHealthLoginit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/06db846fd14e6fc371f22b12b5545ba8e2dbfeda85d8c8d586c71c282166657b.vtl"
     },
@@ -1216,10 +1188,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackinit0Function/MutationupdateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLoginit0Function/MutationupdateStreamHealthLoginit0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9": {
+  "MutationupdateStreamHealthLogauth0FunctionMutationupdateStreamHealthLogauth0FunctionAppSyncFunction5EBEFAF0": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1227,12 +1199,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackauth0Function",
+    "Name": "MutationupdateStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1241,15 +1213,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackauth0Function/MutationupdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLogauth0Function/MutationupdateStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B": {
+  "MutationupdateStreamHealthLogpostAuth0FunctionMutationupdateStreamHealthLogpostAuth0FunctionAppSyncFunctionDFFD9BFB": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1259,7 +1231,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackpostAuth0Function",
+    "Name": "MutationupdateStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1268,10 +1240,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackpostAuth0Function/MutationupdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLogpostAuth0Function/MutationupdateStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05": {
+  "MutationUpdateStreamHealthLogDataResolverFnMutationUpdateStreamHealthLogDataResolverFnAppSyncFunctionD6D3C829": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1279,12 +1251,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationUpdateTrackDataResolverFn",
+    "Name": "MutationUpdateStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/474bf0776ec2164a13191d1a0a9e057154931e4918fea5086f49850d02a5371b.vtl"
     },
@@ -1293,45 +1265,45 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationUpdateTrackDataResolverFn/MutationUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationUpdateStreamHealthLogDataResolverFn/MutationUpdateStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "UpdateTrackResolver": {
+  "UpdateStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "updateTrack",
+    "FieldName": "updateStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737",
+        "MutationupdateStreamHealthLoginit0FunctionMutationupdateStreamHealthLoginit0FunctionAppSyncFunctionB56742B3",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9",
+        "MutationupdateStreamHealthLogauth0FunctionMutationupdateStreamHealthLogauth0FunctionAppSyncFunction5EBEFAF0",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B",
+        "MutationupdateStreamHealthLogpostAuth0FunctionMutationupdateStreamHealthLogpostAuth0FunctionAppSyncFunctionDFFD9BFB",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05",
+        "MutationUpdateStreamHealthLogDataResolverFnMutationUpdateStreamHealthLogDataResolverFnAppSyncFunctionD6D3C829",
         "FunctionId"
        ]
       }
@@ -1341,7 +1313,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1360,7 +1332,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "StreamHealthLogTable",
                  "TableArn"
                 ]
                }
@@ -1410,10 +1382,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationUpdateStreamHealthLogResolver"
    }
   },
-  "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9": {
+  "MutationdeleteStreamHealthLogauth0FunctionMutationdeleteStreamHealthLogauth0FunctionAppSyncFunction831B0856": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1421,12 +1393,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackauth0Function",
+    "Name": "MutationdeleteStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1435,15 +1407,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackauth0Function/MutationdeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationdeleteStreamHealthLogauth0Function/MutationdeleteStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7": {
+  "MutationdeleteStreamHealthLogpostAuth0FunctionMutationdeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionACF47BDC": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1453,7 +1425,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackpostAuth0Function",
+    "Name": "MutationdeleteStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1462,10 +1434,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackpostAuth0Function/MutationdeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationdeleteStreamHealthLogpostAuth0Function/MutationdeleteStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD": {
+  "MutationDeleteStreamHealthLogDataResolverFnMutationDeleteStreamHealthLogDataResolverFnAppSyncFunction6CA45246": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1473,12 +1445,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "StreamHealthLogDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationDeleteTrackDataResolverFn",
+    "Name": "MutationDeleteStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4f7907d1209a2c9953a0c053df402c634e359546d70c7cc5c2e8e21ea734880f.vtl"
     },
@@ -1487,39 +1459,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "StreamHealthLogDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationDeleteTrackDataResolverFn/MutationDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationDeleteStreamHealthLogDataResolverFn/MutationDeleteStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "DeleteTrackResolver": {
+  "DeleteStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "deleteTrack",
+    "FieldName": "deleteStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9",
+        "MutationdeleteStreamHealthLogauth0FunctionMutationdeleteStreamHealthLogauth0FunctionAppSyncFunction831B0856",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7",
+        "MutationdeleteStreamHealthLogpostAuth0FunctionMutationdeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionACF47BDC",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD",
+        "MutationDeleteStreamHealthLogDataResolverFnMutationDeleteStreamHealthLogDataResolverFnAppSyncFunction6CA45246",
         "FunctionId"
        ]
       }
@@ -1529,7 +1501,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1548,7 +1520,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "StreamHealthLogTable",
                  "TableArn"
                 ]
                }
@@ -1598,10 +1570,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationDeleteStreamHealthLogResolver"
    }
   },
-  "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF": {
+  "SubscriptiononCreateStreamHealthLogauth0FunctionSubscriptiononCreateStreamHealthLogauth0FunctionAppSyncFunctionFF2D9F10": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1611,19 +1583,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackauth0Function",
+    "Name": "SubscriptiononCreateStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackauth0Function/SubscriptiononCreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononCreateStreamHealthLogauth0Function/SubscriptiononCreateStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006": {
+  "SubscriptiononCreateStreamHealthLogpostAuth0FunctionSubscriptiononCreateStreamHealthLogpostAuth0FunctionAppSyncFunctionF3DF9847": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1633,7 +1605,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackpostAuth0Function",
+    "Name": "SubscriptiononCreateStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1642,10 +1614,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackpostAuth0Function/SubscriptiononCreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononCreateStreamHealthLogpostAuth0Function/SubscriptiononCreateStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF": {
+  "SubscriptionOnCreateStreamHealthLogDataResolverFnSubscriptionOnCreateStreamHealthLogDataResolverFnAppSyncFunctionF5C48620": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1655,7 +1627,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnCreateTrackDataResolverFn",
+    "Name": "SubscriptionOnCreateStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1666,34 +1638,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnCreateTrackDataResolverFn/SubscriptionOnCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnCreateStreamHealthLogDataResolverFn/SubscriptionOnCreateStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackResolver": {
+  "SubscriptiononCreateStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onCreateTrack",
+    "FieldName": "onCreateStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF",
+        "SubscriptiononCreateStreamHealthLogauth0FunctionSubscriptiononCreateStreamHealthLogauth0FunctionAppSyncFunctionFF2D9F10",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006",
+        "SubscriptiononCreateStreamHealthLogpostAuth0FunctionSubscriptiononCreateStreamHealthLogpostAuth0FunctionAppSyncFunctionF3DF9847",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF",
+        "SubscriptionOnCreateStreamHealthLogDataResolverFnSubscriptionOnCreateStreamHealthLogDataResolverFnAppSyncFunctionF5C48620",
         "FunctionId"
        ]
       }
@@ -1703,7 +1675,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1745,10 +1717,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnCreateStreamHealthLogResolver"
    }
   },
-  "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503": {
+  "SubscriptiononUpdateStreamHealthLogauth0FunctionSubscriptiononUpdateStreamHealthLogauth0FunctionAppSyncFunctionB8B33869": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1758,19 +1730,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackauth0Function",
+    "Name": "SubscriptiononUpdateStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackauth0Function/SubscriptiononUpdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononUpdateStreamHealthLogauth0Function/SubscriptiononUpdateStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232": {
+  "SubscriptiononUpdateStreamHealthLogpostAuth0FunctionSubscriptiononUpdateStreamHealthLogpostAuth0FunctionAppSyncFunction99F21A0E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1780,7 +1752,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackpostAuth0Function",
+    "Name": "SubscriptiononUpdateStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1789,10 +1761,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackpostAuth0Function/SubscriptiononUpdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononUpdateStreamHealthLogpostAuth0Function/SubscriptiononUpdateStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959": {
+  "SubscriptionOnUpdateStreamHealthLogDataResolverFnSubscriptionOnUpdateStreamHealthLogDataResolverFnAppSyncFunction00E6F35C": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1802,7 +1774,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnUpdateTrackDataResolverFn",
+    "Name": "SubscriptionOnUpdateStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1813,34 +1785,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnUpdateTrackDataResolverFn/SubscriptionOnUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnUpdateStreamHealthLogDataResolverFn/SubscriptionOnUpdateStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackResolver": {
+  "SubscriptiononUpdateStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onUpdateTrack",
+    "FieldName": "onUpdateStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503",
+        "SubscriptiononUpdateStreamHealthLogauth0FunctionSubscriptiononUpdateStreamHealthLogauth0FunctionAppSyncFunctionB8B33869",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232",
+        "SubscriptiononUpdateStreamHealthLogpostAuth0FunctionSubscriptiononUpdateStreamHealthLogpostAuth0FunctionAppSyncFunction99F21A0E",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959",
+        "SubscriptionOnUpdateStreamHealthLogDataResolverFnSubscriptionOnUpdateStreamHealthLogDataResolverFnAppSyncFunction00E6F35C",
         "FunctionId"
        ]
       }
@@ -1850,7 +1822,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1892,10 +1864,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnUpdateStreamHealthLogResolver"
    }
   },
-  "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C": {
+  "SubscriptiononDeleteStreamHealthLogauth0FunctionSubscriptiononDeleteStreamHealthLogauth0FunctionAppSyncFunctionEEA2EE21": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1905,19 +1877,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackauth0Function",
+    "Name": "SubscriptiononDeleteStreamHealthLogauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackauth0Function/SubscriptiononDeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononDeleteStreamHealthLogauth0Function/SubscriptiononDeleteStreamHealthLogauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45": {
+  "SubscriptiononDeleteStreamHealthLogpostAuth0FunctionSubscriptiononDeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionAA2FEE42": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1927,7 +1899,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackpostAuth0Function",
+    "Name": "SubscriptiononDeleteStreamHealthLogpostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1936,10 +1908,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackpostAuth0Function/SubscriptiononDeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononDeleteStreamHealthLogpostAuth0Function/SubscriptiononDeleteStreamHealthLogpostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C": {
+  "SubscriptionOnDeleteStreamHealthLogDataResolverFnSubscriptionOnDeleteStreamHealthLogDataResolverFnAppSyncFunction9292A1CB": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1949,7 +1921,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnDeleteTrackDataResolverFn",
+    "Name": "SubscriptionOnDeleteStreamHealthLogDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1960,34 +1932,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnDeleteTrackDataResolverFn/SubscriptionOnDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnDeleteStreamHealthLogDataResolverFn/SubscriptionOnDeleteStreamHealthLogDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackResolver": {
+  "SubscriptiononDeleteStreamHealthLogResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onDeleteTrack",
+    "FieldName": "onDeleteStreamHealthLog",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C",
+        "SubscriptiononDeleteStreamHealthLogauth0FunctionSubscriptiononDeleteStreamHealthLogauth0FunctionAppSyncFunctionEEA2EE21",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45",
+        "SubscriptiononDeleteStreamHealthLogpostAuth0FunctionSubscriptiononDeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionAA2FEE42",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C",
+        "SubscriptionOnDeleteStreamHealthLogDataResolverFnSubscriptionOnDeleteStreamHealthLogDataResolverFnAppSyncFunction9292A1CB",
         "FunctionId"
        ]
       }
@@ -1997,7 +1969,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteStreamHealthLog\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -2039,7 +2011,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnDeleteStreamHealthLogResolver"
    }
   },
   "CDKMetadata": {
@@ -2048,17 +2020,17 @@
     "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WO0W6DMAxFv6XvwWPpF6ygPW4T7L0yiUEpIUGx06pC/PsEnTrt6frIR/bVoHUJ5QFvXBg7Ft51sHwQC9lW0Iyq6sMXJpxIKG1QxWCduBhUQxxzMqSqzBKnP+zDc8Ybnxd7DzhF28E3dp5OyKQcTrA00T/s6GlVOM98DwaWetfrrkbB9nnyP73nYLYSVQy9G3LCvdHvZ3+ltCo+npGZhOFtC8VHOGUzkmwF1s39zDJnUfu6FRxcGFYVoiW48MtVa9CvUB4u7FyRchA3ETSP/AG67XqaNgEAAA=="
    },
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/CDKMetadata/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
   }
  },
  "Outputs": {
-  "GetAttTrackTableStreamArn": {
+  "GetAttStreamHealthLogTableStreamArn": {
    "Description": "Your DynamoDB table StreamArn.",
    "Value": {
     "Fn::GetAtt": [
-     "TrackTable",
+     "StreamHealthLogTable",
      "TableStreamArn"
     ]
    },
@@ -2070,19 +2042,19 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:StreamArn"
+       "GetAtt:StreamHealthLogTable:StreamArn"
       ]
      ]
     }
    }
   },
-  "GetAttTrackTableName": {
+  "GetAttStreamHealthLogTableName": {
    "Description": "Your DynamoDB table name.",
    "Value": {
     "Fn::Join": [
      "",
      [
-      "Track-",
+      "StreamHealthLog-",
       {
        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
       },
@@ -2098,7 +2070,7 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:Name"
+       "GetAtt:StreamHealthLogTable:Name"
       ]
      ]
     }

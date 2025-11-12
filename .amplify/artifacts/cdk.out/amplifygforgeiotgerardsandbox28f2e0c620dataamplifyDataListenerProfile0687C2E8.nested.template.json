@@ -349,7 +349,7 @@
   }
  },
  "Resources": {
-  "TrackTable": {
+  "ListenerProfileTable": {
    "Type": "Custom::AmplifyDynamoDBTable",
    "Properties": {
     "ServiceToken": {
@@ -359,7 +359,7 @@
      "Fn::Join": [
       "",
       [
-       "Track-",
+       "ListenerProfile-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -428,10 +428,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackTable/Default/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileTable/Default/Default"
    }
   },
-  "TrackIAMRoleE0B504B7": {
+  "ListenerProfileIAMRoleFB47F728": {
    "Type": "AWS::IAM::Role",
    "Properties": {
     "AssumeRolePolicyDocument": {
@@ -475,7 +475,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "ListenerProfile-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -494,7 +494,7 @@
               "Fn::Join": [
                "",
                [
-                "Track-",
+                "ListenerProfile-",
                 {
                  "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
                 },
@@ -517,7 +517,7 @@
      "Fn::Join": [
       "",
       [
-       "TrackIAMRoled55532-",
+       "ListenerProfileIAMRo9d2abb-",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -543,10 +543,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackIAMRole/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileIAMRole/Resource"
    }
   },
-  "TrackDataSource": {
+  "ListenerProfileDataSource": {
    "Type": "AWS::AppSync::DataSource",
    "Properties": {
     "ApiId": {
@@ -570,7 +570,7 @@
              ":",
              {
               "Fn::GetAtt": [
-               "TrackTable",
+               "ListenerProfileTable",
                "TableArn"
               ]
              }
@@ -583,25 +583,25 @@
       ]
      }
     },
-    "Name": "TrackTable",
+    "Name": "ListenerProfileTable",
     "ServiceRoleArn": {
      "Fn::GetAtt": [
-      "TrackIAMRoleE0B504B7",
+      "ListenerProfileIAMRoleFB47F728",
       "Arn"
      ]
     },
     "Type": "AMAZON_DYNAMODB"
    },
    "DependsOn": [
-    "TrackIAMRoleE0B504B7"
+    "ListenerProfileIAMRoleFB47F728"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/TrackDataSource/Resource"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileDataSource/Resource"
    }
   },
-  "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA": {
+  "QuerygetListenerProfileauth0FunctionQuerygetListenerProfileauth0FunctionAppSyncFunction1EDA503B": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -611,19 +611,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackauth0Function",
+    "Name": "QuerygetListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackauth0Function/QuerygetTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerygetListenerProfileauth0Function/QuerygetListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935": {
+  "QuerygetListenerProfilepostAuth0FunctionQuerygetListenerProfilepostAuth0FunctionAppSyncFunction5DA354C5": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -633,7 +633,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerygetTrackpostAuth0Function",
+    "Name": "QuerygetListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -642,10 +642,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerygetTrackpostAuth0Function/QuerygetTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerygetListenerProfilepostAuth0Function/QuerygetListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037": {
+  "QueryGetListenerProfileDataResolverFnQueryGetListenerProfileDataResolverFnAppSyncFunction6DF73707": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -653,12 +653,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryGetTrackDataResolverFn",
+    "Name": "QueryGetListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/08f4d557693d96c1a4efba0f9dc91330e4b19772fd5477c156468843e3d9cb5e.vtl"
     },
@@ -667,39 +667,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryGetTrackDataResolverFn/QueryGetTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QueryGetListenerProfileDataResolverFn/QueryGetListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "GetTrackResolver": {
+  "GetListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "getTrack",
+    "FieldName": "getListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerygetTrackauth0FunctionQuerygetTrackauth0FunctionAppSyncFunction94DB14CA",
+        "QuerygetListenerProfileauth0FunctionQuerygetListenerProfileauth0FunctionAppSyncFunction1EDA503B",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerygetTrackpostAuth0FunctionQuerygetTrackpostAuth0FunctionAppSyncFunctionC8317935",
+        "QuerygetListenerProfilepostAuth0FunctionQuerygetListenerProfilepostAuth0FunctionAppSyncFunction5DA354C5",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryGetTrackDataResolverFnQueryGetTrackDataResolverFnAppSyncFunction10A5C037",
+        "QueryGetListenerProfileDataResolverFnQueryGetListenerProfileDataResolverFnAppSyncFunction6DF73707",
         "FunctionId"
        ]
       }
@@ -709,7 +709,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -728,7 +728,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerProfileTable",
                  "TableArn"
                 ]
                }
@@ -778,10 +778,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryGetTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/queryGetListenerProfileResolver"
    }
   },
-  "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED": {
+  "QuerylistListenerProfilesauth0FunctionQuerylistListenerProfilesauth0FunctionAppSyncFunctionC2952E9E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -791,19 +791,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTracksauth0Function",
+    "Name": "QuerylistListenerProfilesauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c198324ea51bbec9cebb98ea3502cd4efb8cea55edece7e137710efb94ab930b.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTracksauth0Function/QuerylistTracksauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerylistListenerProfilesauth0Function/QuerylistListenerProfilesauth0Function.AppSyncFunction"
    }
   },
-  "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F": {
+  "QuerylistListenerProfilespostAuth0FunctionQuerylistListenerProfilespostAuth0FunctionAppSyncFunction6FC6DAFE": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -813,7 +813,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QuerylistTrackspostAuth0Function",
+    "Name": "QuerylistListenerProfilespostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -822,10 +822,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTrackspostAuth0Function/QuerylistTrackspostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerylistListenerProfilespostAuth0Function/QuerylistListenerProfilespostAuth0Function.AppSyncFunction"
    }
   },
-  "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98": {
+  "QueryListListenerProfilesDataResolverFnQueryListListenerProfilesDataResolverFnAppSyncFunction344C14E3": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -833,12 +833,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "QueryListTracksDataResolverFn",
+    "Name": "QueryListListenerProfilesDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9fcbe070ecd3023c5bf5b966fa9584757db9762eef123bad0820bd87591b2174.vtl"
     },
@@ -847,39 +847,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryListTracksDataResolverFn/QueryListTracksDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QueryListListenerProfilesDataResolverFn/QueryListListenerProfilesDataResolverFn.AppSyncFunction"
    }
   },
-  "ListTrackResolver": {
+  "ListListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "listTracks",
+    "FieldName": "listListenerProfiles",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "QuerylistTracksauth0FunctionQuerylistTracksauth0FunctionAppSyncFunctionAF2C6FED",
+        "QuerylistListenerProfilesauth0FunctionQuerylistListenerProfilesauth0FunctionAppSyncFunctionC2952E9E",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QuerylistTrackspostAuth0FunctionQuerylistTrackspostAuth0FunctionAppSyncFunctionDEB2A09F",
+        "QuerylistListenerProfilespostAuth0FunctionQuerylistListenerProfilespostAuth0FunctionAppSyncFunction6FC6DAFE",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "QueryListTracksDataResolverFnQueryListTracksDataResolverFnAppSyncFunctionB5CA4E98",
+        "QueryListListenerProfilesDataResolverFnQueryListListenerProfilesDataResolverFnAppSyncFunction344C14E3",
         "FunctionId"
        ]
       }
@@ -889,7 +889,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listTracks\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listListenerProfiles\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -908,7 +908,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerProfileTable",
                  "TableArn"
                 ]
                }
@@ -958,10 +958,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryListTracksResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/queryListListenerProfilesResolver"
    }
   },
-  "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4": {
+  "MutationcreateListenerProfileinit0FunctionMutationcreateListenerProfileinit0FunctionAppSyncFunctionD36330B9": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -971,7 +971,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit0Function",
+    "Name": "MutationcreateListenerProfileinit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a183ddccbd956316c38ef97177b8f088ef0826f62023323f5ae6053d348ccffc.vtl"
     },
@@ -980,10 +980,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit0Function/MutationcreateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileinit0Function/MutationcreateListenerProfileinit0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB": {
+  "MutationcreateListenerProfileinit1FunctionMutationcreateListenerProfileinit1FunctionAppSyncFunction9AC8250E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -993,19 +993,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackinit1Function",
+    "Name": "MutationcreateListenerProfileinit1Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a131eee6555e63e2cc9e16323fc3c65b9f041d74fdf6a0289b142925ee215a81.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/92b9bf8f01565c585fff5bef92fd1313f0d43db33a0343e9619984a7ab53af52.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackinit1Function/MutationcreateTrackinit1Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileinit1Function/MutationcreateListenerProfileinit1Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18": {
+  "MutationcreateListenerProfileauth0FunctionMutationcreateListenerProfileauth0FunctionAppSyncFunction8D36E278": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1015,7 +1015,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackauth0Function",
+    "Name": "MutationcreateListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/163f1e92c10dcaf85e4690f19146fc5a18d1291ad6a6ad84db40c0c36d101fe9.vtl"
     },
@@ -1024,10 +1024,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackauth0Function/MutationcreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileauth0Function/MutationcreateListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD": {
+  "MutationcreateListenerProfilepostAuth0FunctionMutationcreateListenerProfilepostAuth0FunctionAppSyncFunctionBE4D77A1": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1037,7 +1037,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationcreateTrackpostAuth0Function",
+    "Name": "MutationcreateListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1046,10 +1046,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationcreateTrackpostAuth0Function/MutationcreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfilepostAuth0Function/MutationcreateListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C": {
+  "MutationCreateListenerProfileDataResolverFnMutationCreateListenerProfileDataResolverFnAppSyncFunction8E35DB17": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1057,65 +1057,65 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationCreateTrackDataResolverFn",
+    "Name": "MutationCreateListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/b38b6b2e84fa381544dd7e87d5737e0d60105785eb071d78af3eefa5baae3314.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f573ddcc0677dbdbc5ec89b5b0a81c0d2d794332200d6ac12f40e6135795393b.vtl"
     },
     "ResponseMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationCreateTrackDataResolverFn/MutationCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationCreateListenerProfileDataResolverFn/MutationCreateListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "CreateTrackResolver": {
+  "CreateListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "createTrack",
+    "FieldName": "createListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit0FunctionMutationcreateTrackinit0FunctionAppSyncFunction49C51DB4",
+        "MutationcreateListenerProfileinit0FunctionMutationcreateListenerProfileinit0FunctionAppSyncFunctionD36330B9",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackinit1FunctionMutationcreateTrackinit1FunctionAppSyncFunctionEF41C6BB",
+        "MutationcreateListenerProfileinit1FunctionMutationcreateListenerProfileinit1FunctionAppSyncFunction9AC8250E",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackauth0FunctionMutationcreateTrackauth0FunctionAppSyncFunctionD55D1C18",
+        "MutationcreateListenerProfileauth0FunctionMutationcreateListenerProfileauth0FunctionAppSyncFunction8D36E278",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationcreateTrackpostAuth0FunctionMutationcreateTrackpostAuth0FunctionAppSyncFunctionB19122FD",
+        "MutationcreateListenerProfilepostAuth0FunctionMutationcreateListenerProfilepostAuth0FunctionAppSyncFunctionBE4D77A1",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationCreateTrackDataResolverFnMutationCreateTrackDataResolverFnAppSyncFunctionC716B79C",
+        "MutationCreateListenerProfileDataResolverFnMutationCreateListenerProfileDataResolverFnAppSyncFunction8E35DB17",
         "FunctionId"
        ]
       }
@@ -1125,7 +1125,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1144,7 +1144,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerProfileTable",
                  "TableArn"
                 ]
                }
@@ -1194,10 +1194,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationCreateListenerProfileResolver"
    }
   },
-  "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737": {
+  "MutationupdateListenerProfileinit0FunctionMutationupdateListenerProfileinit0FunctionAppSyncFunction64EA127B": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1207,7 +1207,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackinit0Function",
+    "Name": "MutationupdateListenerProfileinit0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/06db846fd14e6fc371f22b12b5545ba8e2dbfeda85d8c8d586c71c282166657b.vtl"
     },
@@ -1216,10 +1216,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackinit0Function/MutationupdateTrackinit0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfileinit0Function/MutationupdateListenerProfileinit0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9": {
+  "MutationupdateListenerProfileauth0FunctionMutationupdateListenerProfileauth0FunctionAppSyncFunction42DB864F": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1227,12 +1227,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackauth0Function",
+    "Name": "MutationupdateListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1241,15 +1241,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackauth0Function/MutationupdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfileauth0Function/MutationupdateListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B": {
+  "MutationupdateListenerProfilepostAuth0FunctionMutationupdateListenerProfilepostAuth0FunctionAppSyncFunction13F40A8A": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1259,7 +1259,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationupdateTrackpostAuth0Function",
+    "Name": "MutationupdateListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1268,10 +1268,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationupdateTrackpostAuth0Function/MutationupdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfilepostAuth0Function/MutationupdateListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05": {
+  "MutationUpdateListenerProfileDataResolverFnMutationUpdateListenerProfileDataResolverFnAppSyncFunction4F78A79E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1279,12 +1279,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationUpdateTrackDataResolverFn",
+    "Name": "MutationUpdateListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/474bf0776ec2164a13191d1a0a9e057154931e4918fea5086f49850d02a5371b.vtl"
     },
@@ -1293,45 +1293,45 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationUpdateTrackDataResolverFn/MutationUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationUpdateListenerProfileDataResolverFn/MutationUpdateListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "UpdateTrackResolver": {
+  "UpdateListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "updateTrack",
+    "FieldName": "updateListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackinit0FunctionMutationupdateTrackinit0FunctionAppSyncFunctionB54D1737",
+        "MutationupdateListenerProfileinit0FunctionMutationupdateListenerProfileinit0FunctionAppSyncFunction64EA127B",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackauth0FunctionMutationupdateTrackauth0FunctionAppSyncFunction944935C9",
+        "MutationupdateListenerProfileauth0FunctionMutationupdateListenerProfileauth0FunctionAppSyncFunction42DB864F",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationupdateTrackpostAuth0FunctionMutationupdateTrackpostAuth0FunctionAppSyncFunctionD3822A4B",
+        "MutationupdateListenerProfilepostAuth0FunctionMutationupdateListenerProfilepostAuth0FunctionAppSyncFunction13F40A8A",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationUpdateTrackDataResolverFnMutationUpdateTrackDataResolverFnAppSyncFunction2AFBEC05",
+        "MutationUpdateListenerProfileDataResolverFnMutationUpdateListenerProfileDataResolverFnAppSyncFunction4F78A79E",
         "FunctionId"
        ]
       }
@@ -1341,7 +1341,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1360,7 +1360,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerProfileTable",
                  "TableArn"
                 ]
                }
@@ -1410,10 +1410,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationUpdateListenerProfileResolver"
    }
   },
-  "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9": {
+  "MutationdeleteListenerProfileauth0FunctionMutationdeleteListenerProfileauth0FunctionAppSyncFunction319596DA": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1421,12 +1421,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackauth0Function",
+    "Name": "MutationdeleteListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
     },
@@ -1435,15 +1435,15 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackauth0Function/MutationdeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationdeleteListenerProfileauth0Function/MutationdeleteListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7": {
+  "MutationdeleteListenerProfilepostAuth0FunctionMutationdeleteListenerProfilepostAuth0FunctionAppSyncFunctionFD008BE5": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1453,7 +1453,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationdeleteTrackpostAuth0Function",
+    "Name": "MutationdeleteListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1462,10 +1462,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationdeleteTrackpostAuth0Function/MutationdeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationdeleteListenerProfilepostAuth0Function/MutationdeleteListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD": {
+  "MutationDeleteListenerProfileDataResolverFnMutationDeleteListenerProfileDataResolverFnAppSyncFunction09416DC8": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1473,12 +1473,12 @@
     },
     "DataSourceName": {
      "Fn::GetAtt": [
-      "TrackDataSource",
+      "ListenerProfileDataSource",
       "Name"
      ]
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "MutationDeleteTrackDataResolverFn",
+    "Name": "MutationDeleteListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4f7907d1209a2c9953a0c053df402c634e359546d70c7cc5c2e8e21ea734880f.vtl"
     },
@@ -1487,39 +1487,39 @@
     }
    },
    "DependsOn": [
-    "TrackDataSource"
+    "ListenerProfileDataSource"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/MutationDeleteTrackDataResolverFn/MutationDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationDeleteListenerProfileDataResolverFn/MutationDeleteListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "DeleteTrackResolver": {
+  "DeleteListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "deleteTrack",
+    "FieldName": "deleteListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackauth0FunctionMutationdeleteTrackauth0FunctionAppSyncFunctionA6320FF9",
+        "MutationdeleteListenerProfileauth0FunctionMutationdeleteListenerProfileauth0FunctionAppSyncFunction319596DA",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationdeleteTrackpostAuth0FunctionMutationdeleteTrackpostAuth0FunctionAppSyncFunction519E4EA7",
+        "MutationdeleteListenerProfilepostAuth0FunctionMutationdeleteListenerProfilepostAuth0FunctionAppSyncFunctionFD008BE5",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "MutationDeleteTrackDataResolverFnMutationDeleteTrackDataResolverFnAppSyncFunction0E695DAD",
+        "MutationDeleteListenerProfileDataResolverFnMutationDeleteListenerProfileDataResolverFnAppSyncFunction09416DC8",
         "FunctionId"
        ]
       }
@@ -1529,7 +1529,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1548,7 +1548,7 @@
                ":",
                {
                 "Fn::GetAtt": [
-                 "TrackTable",
+                 "ListenerProfileTable",
                  "TableArn"
                 ]
                }
@@ -1598,10 +1598,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/mutationDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationDeleteListenerProfileResolver"
    }
   },
-  "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF": {
+  "SubscriptiononCreateListenerProfileauth0FunctionSubscriptiononCreateListenerProfileauth0FunctionAppSyncFunctionB1C00F00": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1611,19 +1611,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackauth0Function",
+    "Name": "SubscriptiononCreateListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackauth0Function/SubscriptiononCreateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononCreateListenerProfileauth0Function/SubscriptiononCreateListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006": {
+  "SubscriptiononCreateListenerProfilepostAuth0FunctionSubscriptiononCreateListenerProfilepostAuth0FunctionAppSyncFunction82933CC8": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1633,7 +1633,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononCreateTrackpostAuth0Function",
+    "Name": "SubscriptiononCreateListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1642,10 +1642,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononCreateTrackpostAuth0Function/SubscriptiononCreateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononCreateListenerProfilepostAuth0Function/SubscriptiononCreateListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF": {
+  "SubscriptionOnCreateListenerProfileDataResolverFnSubscriptionOnCreateListenerProfileDataResolverFnAppSyncFunction6DE29080": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1655,7 +1655,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnCreateTrackDataResolverFn",
+    "Name": "SubscriptionOnCreateListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1666,34 +1666,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnCreateTrackDataResolverFn/SubscriptionOnCreateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnCreateListenerProfileDataResolverFn/SubscriptionOnCreateListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononCreateTrackResolver": {
+  "SubscriptiononCreateListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onCreateTrack",
+    "FieldName": "onCreateListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackauth0FunctionSubscriptiononCreateTrackauth0FunctionAppSyncFunction014505BF",
+        "SubscriptiononCreateListenerProfileauth0FunctionSubscriptiononCreateListenerProfileauth0FunctionAppSyncFunctionB1C00F00",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononCreateTrackpostAuth0FunctionSubscriptiononCreateTrackpostAuth0FunctionAppSyncFunction98A25006",
+        "SubscriptiononCreateListenerProfilepostAuth0FunctionSubscriptiononCreateListenerProfilepostAuth0FunctionAppSyncFunction82933CC8",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnCreateTrackDataResolverFnSubscriptionOnCreateTrackDataResolverFnAppSyncFunction3ED73CAF",
+        "SubscriptionOnCreateListenerProfileDataResolverFnSubscriptionOnCreateListenerProfileDataResolverFnAppSyncFunction6DE29080",
         "FunctionId"
        ]
       }
@@ -1703,7 +1703,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1745,10 +1745,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnCreateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnCreateListenerProfileResolver"
    }
   },
-  "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503": {
+  "SubscriptiononUpdateListenerProfileauth0FunctionSubscriptiononUpdateListenerProfileauth0FunctionAppSyncFunction0E45B3D9": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1758,19 +1758,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackauth0Function",
+    "Name": "SubscriptiononUpdateListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackauth0Function/SubscriptiononUpdateTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononUpdateListenerProfileauth0Function/SubscriptiononUpdateListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232": {
+  "SubscriptiononUpdateListenerProfilepostAuth0FunctionSubscriptiononUpdateListenerProfilepostAuth0FunctionAppSyncFunction79F9712E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1780,7 +1780,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononUpdateTrackpostAuth0Function",
+    "Name": "SubscriptiononUpdateListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1789,10 +1789,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononUpdateTrackpostAuth0Function/SubscriptiononUpdateTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononUpdateListenerProfilepostAuth0Function/SubscriptiononUpdateListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959": {
+  "SubscriptionOnUpdateListenerProfileDataResolverFnSubscriptionOnUpdateListenerProfileDataResolverFnAppSyncFunctionF8DD5AE2": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1802,7 +1802,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnUpdateTrackDataResolverFn",
+    "Name": "SubscriptionOnUpdateListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1813,34 +1813,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnUpdateTrackDataResolverFn/SubscriptionOnUpdateTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnUpdateListenerProfileDataResolverFn/SubscriptionOnUpdateListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononUpdateTrackResolver": {
+  "SubscriptiononUpdateListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onUpdateTrack",
+    "FieldName": "onUpdateListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackauth0FunctionSubscriptiononUpdateTrackauth0FunctionAppSyncFunctionC430F503",
+        "SubscriptiononUpdateListenerProfileauth0FunctionSubscriptiononUpdateListenerProfileauth0FunctionAppSyncFunction0E45B3D9",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononUpdateTrackpostAuth0FunctionSubscriptiononUpdateTrackpostAuth0FunctionAppSyncFunction7C37D232",
+        "SubscriptiononUpdateListenerProfilepostAuth0FunctionSubscriptiononUpdateListenerProfilepostAuth0FunctionAppSyncFunction79F9712E",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnUpdateTrackDataResolverFnSubscriptionOnUpdateTrackDataResolverFnAppSyncFunction130AF959",
+        "SubscriptionOnUpdateListenerProfileDataResolverFnSubscriptionOnUpdateListenerProfileDataResolverFnAppSyncFunctionF8DD5AE2",
         "FunctionId"
        ]
       }
@@ -1850,7 +1850,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -1892,10 +1892,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnUpdateTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnUpdateListenerProfileResolver"
    }
   },
-  "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C": {
+  "SubscriptiononDeleteListenerProfileauth0FunctionSubscriptiononDeleteListenerProfileauth0FunctionAppSyncFunction31C17B9E": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1905,19 +1905,19 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackauth0Function",
+    "Name": "SubscriptiononDeleteListenerProfileauth0Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1d1fc1ddf435f301f89c9d0239d1040afb5fa61ba26cd289c29b8349f558e43d.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackauth0Function/SubscriptiononDeleteTrackauth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononDeleteListenerProfileauth0Function/SubscriptiononDeleteListenerProfileauth0Function.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45": {
+  "SubscriptiononDeleteListenerProfilepostAuth0FunctionSubscriptiononDeleteListenerProfilepostAuth0FunctionAppSyncFunction0366A7E6": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1927,7 +1927,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptiononDeleteTrackpostAuth0Function",
+    "Name": "SubscriptiononDeleteListenerProfilepostAuth0Function",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
     },
@@ -1936,10 +1936,10 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptiononDeleteTrackpostAuth0Function/SubscriptiononDeleteTrackpostAuth0Function.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononDeleteListenerProfilepostAuth0Function/SubscriptiononDeleteListenerProfilepostAuth0Function.AppSyncFunction"
    }
   },
-  "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C": {
+  "SubscriptionOnDeleteListenerProfileDataResolverFnSubscriptionOnDeleteListenerProfileDataResolverFnAppSyncFunctionD6988CC1": {
    "Type": "AWS::AppSync::FunctionConfiguration",
    "Properties": {
     "ApiId": {
@@ -1949,7 +1949,7 @@
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
     },
     "FunctionVersion": "2018-05-29",
-    "Name": "SubscriptionOnDeleteTrackDataResolverFn",
+    "Name": "SubscriptionOnDeleteListenerProfileDataResolverFn",
     "RequestMappingTemplateS3Location": {
      "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
     },
@@ -1960,34 +1960,34 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/SubscriptionOnDeleteTrackDataResolverFn/SubscriptionOnDeleteTrackDataResolverFn.AppSyncFunction"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnDeleteListenerProfileDataResolverFn/SubscriptionOnDeleteListenerProfileDataResolverFn.AppSyncFunction"
    }
   },
-  "SubscriptiononDeleteTrackResolver": {
+  "SubscriptiononDeleteListenerProfileResolver": {
    "Type": "AWS::AppSync::Resolver",
    "Properties": {
     "ApiId": {
      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
     },
-    "FieldName": "onDeleteTrack",
+    "FieldName": "onDeleteListenerProfile",
     "Kind": "PIPELINE",
     "PipelineConfig": {
      "Functions": [
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackauth0FunctionSubscriptiononDeleteTrackauth0FunctionAppSyncFunction389A616C",
+        "SubscriptiononDeleteListenerProfileauth0FunctionSubscriptiononDeleteListenerProfileauth0FunctionAppSyncFunction31C17B9E",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptiononDeleteTrackpostAuth0FunctionSubscriptiononDeleteTrackpostAuth0FunctionAppSyncFunction68C93F45",
+        "SubscriptiononDeleteListenerProfilepostAuth0FunctionSubscriptiononDeleteListenerProfilepostAuth0FunctionAppSyncFunction0366A7E6",
         "FunctionId"
        ]
       },
       {
        "Fn::GetAtt": [
-        "SubscriptionOnDeleteTrackDataResolverFnSubscriptionOnDeleteTrackDataResolverFnAppSyncFunctionB77B786C",
+        "SubscriptionOnDeleteListenerProfileDataResolverFnSubscriptionOnDeleteListenerProfileDataResolverFnAppSyncFunctionD6988CC1",
         "FunctionId"
        ]
       }
@@ -1997,7 +1997,7 @@
      "Fn::Join": [
       "",
       [
-       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteTrack\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteListenerProfile\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
@@ -2039,7 +2039,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/subscriptionOnDeleteTrackResolver"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnDeleteListenerProfileResolver"
    }
   },
   "CDKMetadata": {
@@ -2048,17 +2048,17 @@
     "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WO0W6DMAxFv6XvwWPpF6ygPW4T7L0yiUEpIUGx06pC/PsEnTrt6frIR/bVoHUJ5QFvXBg7Ft51sHwQC9lW0Iyq6sMXJpxIKG1QxWCduBhUQxxzMqSqzBKnP+zDc8Ybnxd7DzhF28E3dp5OyKQcTrA00T/s6GlVOM98DwaWetfrrkbB9nnyP73nYLYSVQy9G3LCvdHvZ3+ltCo+npGZhOFtC8VHOGUzkmwF1s39zDJnUfu6FRxcGFYVoiW48MtVa9CvUB4u7FyRchA3ETSP/AG67XqaNgEAAA=="
    },
    "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/CDKMetadata/Default"
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
   }
  },
  "Outputs": {
-  "GetAttTrackTableStreamArn": {
+  "GetAttListenerProfileTableStreamArn": {
    "Description": "Your DynamoDB table StreamArn.",
    "Value": {
     "Fn::GetAtt": [
-     "TrackTable",
+     "ListenerProfileTable",
      "TableStreamArn"
     ]
    },
@@ -2070,19 +2070,19 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:StreamArn"
+       "GetAtt:ListenerProfileTable:StreamArn"
       ]
      ]
     }
    }
   },
-  "GetAttTrackTableName": {
+  "GetAttListenerProfileTableName": {
    "Description": "Your DynamoDB table name.",
    "Value": {
     "Fn::Join": [
      "",
      [
-      "Track-",
+      "ListenerProfile-",
       {
        "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
       },
@@ -2098,7 +2098,7 @@
        {
         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
        },
-       "GetAtt:TrackTable:Name"
+       "GetAtt:ListenerProfileTable:Name"
       ]
      ]
     }

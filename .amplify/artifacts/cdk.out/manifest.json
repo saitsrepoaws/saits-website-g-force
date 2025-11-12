@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/46447db8f918b5a7817884b7de85918418083a454e7d8565c148c78c3064ef74.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/79ddd3a5d7eff497a671b6e2f8d441b9c08feefa208e210b2fcfb1af022bc55c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -99,24 +99,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyAuthIdentityPoolRoleAttachment045F17C8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IoTCognitoPolicyName": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IoTCognitoPolicyName"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IotPubSubPolicy43AD4595"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicyUnauth/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IotPubSubPolicyUnauth333DCE7E"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default": [
@@ -291,12 +273,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "playlistgeneratorlambdaServiceRoleBA132824"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/Resource": [
@@ -893,12 +869,6 @@
             "data": "CDKMetadataAvailable"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Playlist/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Playlist/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
           {
             "type": "aws:cdk:logicalId",
@@ -1491,12 +1461,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Schedule.NestedStack/Schedule.NestedStackResource": [
@@ -2605,12 +2569,6 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/PlayerState/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/PlayerState.NestedStack/PlayerState.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -3179,12 +3137,6 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamSettings/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamSettings.NestedStack/StreamSettings.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -3701,12 +3653,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamQueueTrack/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamQueueTrack.NestedStack/StreamQueueTrack.NestedStackResource": [
@@ -4267,16 +4213,1584 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/TrackPlayHistory/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/TrackPlayHistory.NestedStack/TrackPlayHistory.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResource3F17592B"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/DynamoDBModelTableReadIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableReadIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/DynamoDBModelTableWriteIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableWriteIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/DynamoDBBillingMode": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBBillingMode"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/DynamoDBEnablePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnablePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/DynamoDBEnableServerSideEncryption": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnableServerSideEncryption"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/HasEnvironmentParameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HasEnvironmentParameter"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/ShouldUsePayPerRequestBilling": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePayPerRequestBilling"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/ShouldUsePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogTable/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamHealthLogTable"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/CustomTableStreamHealthLogTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/GetAttStreamHealthLogTableStreamArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttStreamHealthLogTableStreamArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/GetAttStreamHealthLogTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttStreamHealthLogTableName"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogIAMRole": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLogIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogIAMRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamHealthLogIAMRole5E7849AA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLogIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogDataSource": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLogTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/StreamHealthLogDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "StreamHealthLogDataSource"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "StreamHealthLogTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerygetStreamHealthLogauth0Function/QuerygetStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetStreamHealthLogauth0FunctionQuerygetStreamHealthLogauth0FunctionAppSyncFunction9332C993"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerygetStreamHealthLogpostAuth0Function/QuerygetStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetStreamHealthLogpostAuth0FunctionQuerygetStreamHealthLogpostAuth0FunctionAppSyncFunction87BC93DB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QueryGetStreamHealthLogDataResolverFn/QueryGetStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryGetStreamHealthLogDataResolverFnQueryGetStreamHealthLogDataResolverFnAppSyncFunction6E407844"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryGetStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/queryGetStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.getStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerylistStreamHealthLogsauth0Function/QuerylistStreamHealthLogsauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistStreamHealthLogsauth0FunctionQuerylistStreamHealthLogsauth0FunctionAppSyncFunctionC0D19588"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistStreamHealthLogsauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QuerylistStreamHealthLogspostAuth0Function/QuerylistStreamHealthLogspostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistStreamHealthLogspostAuth0FunctionQuerylistStreamHealthLogspostAuth0FunctionAppSyncFunctionB8D0D329"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistStreamHealthLogspostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/QueryListStreamHealthLogsDataResolverFn/QueryListStreamHealthLogsDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListStreamHealthLogsDataResolverFnQueryListStreamHealthLogsDataResolverFnAppSyncFunctionB945AD44"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListStreamHealthLogsDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/queryListStreamHealthLogsResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listStreamHealthLogs"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLoginit0Function/MutationcreateStreamHealthLoginit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateStreamHealthLoginit0FunctionMutationcreateStreamHealthLoginit0FunctionAppSyncFunctionE7E7DE91"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateStreamHealthLoginit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLogauth0Function/MutationcreateStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateStreamHealthLogauth0FunctionMutationcreateStreamHealthLogauth0FunctionAppSyncFunction348EBEC5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationcreateStreamHealthLogpostAuth0Function/MutationcreateStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateStreamHealthLogpostAuth0FunctionMutationcreateStreamHealthLogpostAuth0FunctionAppSyncFunctionDCF21A66"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationCreateStreamHealthLogDataResolverFn/MutationCreateStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationCreateStreamHealthLogDataResolverFnMutationCreateStreamHealthLogDataResolverFnAppSyncFunction26D95A6C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationCreateStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationCreateStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.createStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLoginit0Function/MutationupdateStreamHealthLoginit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateStreamHealthLoginit0FunctionMutationupdateStreamHealthLoginit0FunctionAppSyncFunctionB56742B3"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateStreamHealthLoginit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLogauth0Function/MutationupdateStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateStreamHealthLogauth0FunctionMutationupdateStreamHealthLogauth0FunctionAppSyncFunction5EBEFAF0"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationupdateStreamHealthLogpostAuth0Function/MutationupdateStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateStreamHealthLogpostAuth0FunctionMutationupdateStreamHealthLogpostAuth0FunctionAppSyncFunctionDFFD9BFB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationUpdateStreamHealthLogDataResolverFn/MutationUpdateStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationUpdateStreamHealthLogDataResolverFnMutationUpdateStreamHealthLogDataResolverFnAppSyncFunctionD6D3C829"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationUpdateStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationUpdateStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.updateStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationdeleteStreamHealthLogauth0Function/MutationdeleteStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteStreamHealthLogauth0FunctionMutationdeleteStreamHealthLogauth0FunctionAppSyncFunction831B0856"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationdeleteStreamHealthLogpostAuth0Function/MutationdeleteStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteStreamHealthLogpostAuth0FunctionMutationdeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionACF47BDC"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/MutationDeleteStreamHealthLogDataResolverFn/MutationDeleteStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationDeleteStreamHealthLogDataResolverFnMutationDeleteStreamHealthLogDataResolverFnAppSyncFunction6CA45246"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationDeleteStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/mutationDeleteStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeleteStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.deleteStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononCreateStreamHealthLogauth0Function/SubscriptiononCreateStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateStreamHealthLogauth0FunctionSubscriptiononCreateStreamHealthLogauth0FunctionAppSyncFunctionFF2D9F10"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononCreateStreamHealthLogpostAuth0Function/SubscriptiononCreateStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateStreamHealthLogpostAuth0FunctionSubscriptiononCreateStreamHealthLogpostAuth0FunctionAppSyncFunctionF3DF9847"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnCreateStreamHealthLogDataResolverFn/SubscriptionOnCreateStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnCreateStreamHealthLogDataResolverFnSubscriptionOnCreateStreamHealthLogDataResolverFnAppSyncFunctionF5C48620"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnCreateStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnCreateStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onCreateStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononUpdateStreamHealthLogauth0Function/SubscriptiononUpdateStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateStreamHealthLogauth0FunctionSubscriptiononUpdateStreamHealthLogauth0FunctionAppSyncFunctionB8B33869"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononUpdateStreamHealthLogpostAuth0Function/SubscriptiononUpdateStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateStreamHealthLogpostAuth0FunctionSubscriptiononUpdateStreamHealthLogpostAuth0FunctionAppSyncFunction99F21A0E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnUpdateStreamHealthLogDataResolverFn/SubscriptionOnUpdateStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnUpdateStreamHealthLogDataResolverFnSubscriptionOnUpdateStreamHealthLogDataResolverFnAppSyncFunction00E6F35C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnUpdateStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnUpdateStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onUpdateStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononDeleteStreamHealthLogauth0Function/SubscriptiononDeleteStreamHealthLogauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteStreamHealthLogauth0FunctionSubscriptiononDeleteStreamHealthLogauth0FunctionAppSyncFunctionEEA2EE21"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteStreamHealthLogauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptiononDeleteStreamHealthLogpostAuth0Function/SubscriptiononDeleteStreamHealthLogpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteStreamHealthLogpostAuth0FunctionSubscriptiononDeleteStreamHealthLogpostAuth0FunctionAppSyncFunctionAA2FEE42"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteStreamHealthLogpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/SubscriptionOnDeleteStreamHealthLogDataResolverFn/SubscriptionOnDeleteStreamHealthLogDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnDeleteStreamHealthLogDataResolverFnSubscriptionOnDeleteStreamHealthLogDataResolverFnAppSyncFunction9292A1CB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnDeleteStreamHealthLogDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/subscriptionOnDeleteStreamHealthLogResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteStreamHealthLogResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onDeleteStreamHealthLog"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog.NestedStack/StreamHealthLog.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataStreamHealthLogNestedStackStreamHealthLogNestedStackResource1C56152A"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/DynamoDBModelTableReadIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableReadIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/DynamoDBModelTableWriteIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableWriteIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/DynamoDBBillingMode": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBBillingMode"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/DynamoDBEnablePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnablePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/DynamoDBEnableServerSideEncryption": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnableServerSideEncryption"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/HasEnvironmentParameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HasEnvironmentParameter"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ShouldUsePayPerRequestBilling": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePayPerRequestBilling"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ShouldUsePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionTable/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerSessionTable"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/CustomTableListenerSessionTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/GetAttListenerSessionTableStreamArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttListenerSessionTableStreamArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/GetAttListenerSessionTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttListenerSessionTableName"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionIAMRole": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSessionIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionIAMRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerSessionIAMRoleF8F1110E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSessionIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionDataSource": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSessionTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/ListenerSessionDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerSessionDataSource"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerSessionTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerygetListenerSessionauth0Function/QuerygetListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetListenerSessionauth0FunctionQuerygetListenerSessionauth0FunctionAppSyncFunction18861667"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerygetListenerSessionpostAuth0Function/QuerygetListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetListenerSessionpostAuth0FunctionQuerygetListenerSessionpostAuth0FunctionAppSyncFunction4FA82032"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryGetListenerSessionDataResolverFn/QueryGetListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryGetListenerSessionDataResolverFnQueryGetListenerSessionDataResolverFnAppSyncFunctionE4DCE76F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryGetListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryGetListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.getListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionsauth0Function/QuerylistListenerSessionsauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerSessionsauth0FunctionQuerylistListenerSessionsauth0FunctionAppSyncFunction29100EED"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerSessionsauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionspostAuth0Function/QuerylistListenerSessionspostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerSessionspostAuth0FunctionQuerylistListenerSessionspostAuth0FunctionAppSyncFunction50E0BFB8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerSessionspostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryListListenerSessionsDataResolverFn/QueryListListenerSessionsDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListListenerSessionsDataResolverFnQueryListListenerSessionsDataResolverFnAppSyncFunction58AD6F28"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListListenerSessionsDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryListListenerSessionsResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listListenerSessions"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessioninit0Function/MutationcreateListenerSessioninit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerSessioninit0FunctionMutationcreateListenerSessioninit0FunctionAppSyncFunction90C9C32C"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerSessioninit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessionauth0Function/MutationcreateListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerSessionauth0FunctionMutationcreateListenerSessionauth0FunctionAppSyncFunction08635449"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationcreateListenerSessionpostAuth0Function/MutationcreateListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerSessionpostAuth0FunctionMutationcreateListenerSessionpostAuth0FunctionAppSyncFunction6D5BD73F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationCreateListenerSessionDataResolverFn/MutationCreateListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationCreateListenerSessionDataResolverFnMutationCreateListenerSessionDataResolverFnAppSyncFunctionC5245DD6"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationCreateListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationCreateListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.createListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessioninit0Function/MutationupdateListenerSessioninit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerSessioninit0FunctionMutationupdateListenerSessioninit0FunctionAppSyncFunction97F2F6D9"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerSessioninit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessionauth0Function/MutationupdateListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerSessionauth0FunctionMutationupdateListenerSessionauth0FunctionAppSyncFunction2ACFD7D6"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationupdateListenerSessionpostAuth0Function/MutationupdateListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerSessionpostAuth0FunctionMutationupdateListenerSessionpostAuth0FunctionAppSyncFunction6F1F8FB4"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationUpdateListenerSessionDataResolverFn/MutationUpdateListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationUpdateListenerSessionDataResolverFnMutationUpdateListenerSessionDataResolverFnAppSyncFunctionEE060533"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationUpdateListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationUpdateListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.updateListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationdeleteListenerSessionauth0Function/MutationdeleteListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteListenerSessionauth0FunctionMutationdeleteListenerSessionauth0FunctionAppSyncFunction565940D8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationdeleteListenerSessionpostAuth0Function/MutationdeleteListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteListenerSessionpostAuth0FunctionMutationdeleteListenerSessionpostAuth0FunctionAppSyncFunctionC4703665"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/MutationDeleteListenerSessionDataResolverFn/MutationDeleteListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationDeleteListenerSessionDataResolverFnMutationDeleteListenerSessionDataResolverFnAppSyncFunctionCBA1F8CA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationDeleteListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/mutationDeleteListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeleteListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.deleteListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononCreateListenerSessionauth0Function/SubscriptiononCreateListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerSessionauth0FunctionSubscriptiononCreateListenerSessionauth0FunctionAppSyncFunction503E93F0"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononCreateListenerSessionpostAuth0Function/SubscriptiononCreateListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerSessionpostAuth0FunctionSubscriptiononCreateListenerSessionpostAuth0FunctionAppSyncFunction1C4C5419"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnCreateListenerSessionDataResolverFn/SubscriptionOnCreateListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnCreateListenerSessionDataResolverFnSubscriptionOnCreateListenerSessionDataResolverFnAppSyncFunctionAA70E0FB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnCreateListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnCreateListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onCreateListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononUpdateListenerSessionauth0Function/SubscriptiononUpdateListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerSessionauth0FunctionSubscriptiononUpdateListenerSessionauth0FunctionAppSyncFunctionD0E1CB7F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononUpdateListenerSessionpostAuth0Function/SubscriptiononUpdateListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerSessionpostAuth0FunctionSubscriptiononUpdateListenerSessionpostAuth0FunctionAppSyncFunction9218BAD8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnUpdateListenerSessionDataResolverFn/SubscriptionOnUpdateListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnUpdateListenerSessionDataResolverFnSubscriptionOnUpdateListenerSessionDataResolverFnAppSyncFunctionC1C8CA52"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnUpdateListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnUpdateListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onUpdateListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononDeleteListenerSessionauth0Function/SubscriptiononDeleteListenerSessionauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerSessionauth0FunctionSubscriptiononDeleteListenerSessionauth0FunctionAppSyncFunctionE7C7EA0A"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteListenerSessionauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptiononDeleteListenerSessionpostAuth0Function/SubscriptiononDeleteListenerSessionpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerSessionpostAuth0FunctionSubscriptiononDeleteListenerSessionpostAuth0FunctionAppSyncFunction7A453369"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteListenerSessionpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/SubscriptionOnDeleteListenerSessionDataResolverFn/SubscriptionOnDeleteListenerSessionDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnDeleteListenerSessionDataResolverFnSubscriptionOnDeleteListenerSessionDataResolverFnAppSyncFunction9C98B8BB"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnDeleteListenerSessionDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/subscriptionOnDeleteListenerSessionResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerSessionResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onDeleteListenerSession"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionByIpHashAndConnectTimeauth0Function/QuerylistListenerSessionByIpHashAndConnectTimeauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionQuerylistListenerSessionByIpHashAndConnectTimeauth0FunctionAppSyncFunction05E71AC5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerSessionByIpHashAndConnectTimeauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function/QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionQuerylistListenerSessionByIpHashAndConnectTimepostAuth0FunctionAppSyncFunction23717F81"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerSessionByIpHashAndConnectTimepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn/QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListListenerSessionByIpHashAndConnectTimeDataResolverFnQueryListListenerSessionByIpHashAndConnectTimeDataResolverFnAppSyncFunctionC6BEB75D"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListListenerSessionByIpHashAndConnectTimeDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/queryListListenerSessionByIpHashAndConnectTimeResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerSessionByIpHashAndConnectTimeResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listListenerSessionByIpHashAndConnectTime"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession.NestedStack/ListenerSession.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataListenerSessionNestedStackListenerSessionNestedStackResourceF0CB2B51"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/DynamoDBModelTableReadIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableReadIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/DynamoDBModelTableWriteIOPS": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBModelTableWriteIOPS"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/DynamoDBBillingMode": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBBillingMode"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/DynamoDBEnablePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnablePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/DynamoDBEnableServerSideEncryption": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoDBEnableServerSideEncryption"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/HasEnvironmentParameter": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HasEnvironmentParameter"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ShouldUsePayPerRequestBilling": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePayPerRequestBilling"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ShouldUsePointInTimeRecovery": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ShouldUsePointInTimeRecovery"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileTable/Default/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerProfileTable"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/CustomTableListenerProfileTable": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/GetAttListenerProfileTableStreamArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttListenerProfileTableStreamArn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/GetAttListenerProfileTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetAttListenerProfileTableName"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileIAMRole": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfileIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileIAMRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerProfileIAMRoleFB47F728"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfileIAMRole"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileDataSource": [
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfileTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/ListenerProfileDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListenerProfileDataSource"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "ListenerProfileTable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerygetListenerProfileauth0Function/QuerygetListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetListenerProfileauth0FunctionQuerygetListenerProfileauth0FunctionAppSyncFunction1EDA503B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerygetListenerProfilepostAuth0Function/QuerygetListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerygetListenerProfilepostAuth0FunctionQuerygetListenerProfilepostAuth0FunctionAppSyncFunction5DA354C5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerygetListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QueryGetListenerProfileDataResolverFn/QueryGetListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryGetListenerProfileDataResolverFnQueryGetListenerProfileDataResolverFnAppSyncFunction6DF73707"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryGetListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/queryGetListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.getListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerylistListenerProfilesauth0Function/QuerylistListenerProfilesauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerProfilesauth0FunctionQuerylistListenerProfilesauth0FunctionAppSyncFunctionC2952E9E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerProfilesauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QuerylistListenerProfilespostAuth0Function/QuerylistListenerProfilespostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistListenerProfilespostAuth0FunctionQuerylistListenerProfilespostAuth0FunctionAppSyncFunction6FC6DAFE"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistListenerProfilespostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/QueryListListenerProfilesDataResolverFn/QueryListListenerProfilesDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListListenerProfilesDataResolverFnQueryListListenerProfilesDataResolverFnAppSyncFunction344C14E3"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListListenerProfilesDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/queryListListenerProfilesResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ListListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listListenerProfiles"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileinit0Function/MutationcreateListenerProfileinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerProfileinit0FunctionMutationcreateListenerProfileinit0FunctionAppSyncFunctionD36330B9"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerProfileinit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileinit1Function/MutationcreateListenerProfileinit1Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerProfileinit1FunctionMutationcreateListenerProfileinit1FunctionAppSyncFunction9AC8250E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerProfileinit1Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfileauth0Function/MutationcreateListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerProfileauth0FunctionMutationcreateListenerProfileauth0FunctionAppSyncFunction8D36E278"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationcreateListenerProfilepostAuth0Function/MutationcreateListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationcreateListenerProfilepostAuth0FunctionMutationcreateListenerProfilepostAuth0FunctionAppSyncFunctionBE4D77A1"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationcreateListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationCreateListenerProfileDataResolverFn/MutationCreateListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationCreateListenerProfileDataResolverFnMutationCreateListenerProfileDataResolverFnAppSyncFunction8E35DB17"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationCreateListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationCreateListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CreateListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.createListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfileinit0Function/MutationupdateListenerProfileinit0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerProfileinit0FunctionMutationupdateListenerProfileinit0FunctionAppSyncFunction64EA127B"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerProfileinit0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfileauth0Function/MutationupdateListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerProfileauth0FunctionMutationupdateListenerProfileauth0FunctionAppSyncFunction42DB864F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationupdateListenerProfilepostAuth0Function/MutationupdateListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationupdateListenerProfilepostAuth0FunctionMutationupdateListenerProfilepostAuth0FunctionAppSyncFunction13F40A8A"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationupdateListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationUpdateListenerProfileDataResolverFn/MutationUpdateListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationUpdateListenerProfileDataResolverFnMutationUpdateListenerProfileDataResolverFnAppSyncFunction4F78A79E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationUpdateListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationUpdateListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.updateListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationdeleteListenerProfileauth0Function/MutationdeleteListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteListenerProfileauth0FunctionMutationdeleteListenerProfileauth0FunctionAppSyncFunction319596DA"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationdeleteListenerProfilepostAuth0Function/MutationdeleteListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationdeleteListenerProfilepostAuth0FunctionMutationdeleteListenerProfilepostAuth0FunctionAppSyncFunctionFD008BE5"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationdeleteListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/MutationDeleteListenerProfileDataResolverFn/MutationDeleteListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MutationDeleteListenerProfileDataResolverFnMutationDeleteListenerProfileDataResolverFnAppSyncFunction09416DC8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "MutationDeleteListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/mutationDeleteListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DeleteListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Mutation.deleteListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononCreateListenerProfileauth0Function/SubscriptiononCreateListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerProfileauth0FunctionSubscriptiononCreateListenerProfileauth0FunctionAppSyncFunctionB1C00F00"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononCreateListenerProfilepostAuth0Function/SubscriptiononCreateListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerProfilepostAuth0FunctionSubscriptiononCreateListenerProfilepostAuth0FunctionAppSyncFunction82933CC8"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononCreateListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnCreateListenerProfileDataResolverFn/SubscriptionOnCreateListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnCreateListenerProfileDataResolverFnSubscriptionOnCreateListenerProfileDataResolverFnAppSyncFunction6DE29080"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnCreateListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnCreateListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononCreateListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onCreateListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononUpdateListenerProfileauth0Function/SubscriptiononUpdateListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerProfileauth0FunctionSubscriptiononUpdateListenerProfileauth0FunctionAppSyncFunction0E45B3D9"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononUpdateListenerProfilepostAuth0Function/SubscriptiononUpdateListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerProfilepostAuth0FunctionSubscriptiononUpdateListenerProfilepostAuth0FunctionAppSyncFunction79F9712E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononUpdateListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnUpdateListenerProfileDataResolverFn/SubscriptionOnUpdateListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnUpdateListenerProfileDataResolverFnSubscriptionOnUpdateListenerProfileDataResolverFnAppSyncFunctionF8DD5AE2"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnUpdateListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnUpdateListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononUpdateListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onUpdateListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononDeleteListenerProfileauth0Function/SubscriptiononDeleteListenerProfileauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerProfileauth0FunctionSubscriptiononDeleteListenerProfileauth0FunctionAppSyncFunction31C17B9E"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteListenerProfileauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptiononDeleteListenerProfilepostAuth0Function/SubscriptiononDeleteListenerProfilepostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerProfilepostAuth0FunctionSubscriptiononDeleteListenerProfilepostAuth0FunctionAppSyncFunction0366A7E6"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptiononDeleteListenerProfilepostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/SubscriptionOnDeleteListenerProfileDataResolverFn/SubscriptionOnDeleteListenerProfileDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptionOnDeleteListenerProfileDataResolverFnSubscriptionOnDeleteListenerProfileDataResolverFnAppSyncFunctionD6988CC1"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "SubscriptionOnDeleteListenerProfileDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/subscriptionOnDeleteListenerProfileResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SubscriptiononDeleteListenerProfileResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Subscription.onDeleteListenerProfile"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile/reference-to-amplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputs.amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile.NestedStack/ListenerProfile.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "amplifyDataListenerProfileNestedStackListenerProfileNestedStackResourceB34E25D3"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/DynamoDBModelTableReadIOPS": [
@@ -4755,12 +6269,6 @@
             "data": "CDKMetadataAvailable"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn": [
           {
             "type": "aws:cdk:logicalId",
@@ -5161,54 +6669,6 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIDefaultApiKeyBDC11378ApiKey"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data.NestedStack/data.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
@@ -5281,18 +6741,6 @@
             "data": "gforgeIotStorageBucketAutoDeleteObjectsCustomResourceB68015C2"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/gforgeIotStorage/Bucket/Notifications/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "gforgeIotStorageBucketNotificationsBBBD6BA0"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/gforgeIotStorage/Bucket/AllowBucketNotificationsToamplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambda47FFBE22": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "gforgeIotStorageBucketAllowBucketNotificationsToamplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambda47FFBE222FBA0F43"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/LatestNodeRuntimeMap": [
           {
             "type": "aws:cdk:logicalId",
@@ -5341,12 +6789,6 @@
             "data": "audiometadatalambdaServiceRole451DEF97"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "audiometadatalambdaServiceRoleDefaultPolicyDC4857CF"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/audio-metadata-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -5359,76 +6801,10 @@
             "data": "waveformgeneratorlambdaServiceRole0C8A4833"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/waveform-generator-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "waveformgeneratorlambdaServiceRoleDefaultPolicy3E782CEB"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/waveform-generator-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "waveformgeneratorlambdaD07307E8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AudioAnalyzerDockerLambdaServiceRole96C96C6C"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AudioAnalyzerDockerLambdaServiceRoleDefaultPolicy96C37984"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioAnalyzerDockerLambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AudioAnalyzerDockerLambda15411CA8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/AudioCachePolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AudioCachePolicy1975B062"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StorageDistributionE9D21ABB"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CloudFrontDomain": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CloudFrontDomain"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CloudFrontDistributionId": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CloudFrontDistributionId"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default": [
@@ -5467,22 +6843,10 @@
             "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": [
           {
             "type": "aws:cdk:logicalId",
             "data": "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage.NestedStack/storage.NestedStackResource": [
@@ -5497,12 +6861,6 @@
             "data": "playerloadhandlerlambdaServiceRoleABB7A998"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "playerloadhandlerlambdaServiceRoleDefaultPolicy22C90EB2"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-load-handler-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -5513,12 +6871,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "playeriotpublisherlambdaServiceRoleAE84F947"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-iot-publisher-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "playeriotpublisherlambdaServiceRoleDefaultPolicyD00B6C65"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/player-iot-publisher-lambda/Resource": [
@@ -5545,12 +6897,6 @@
             "data": "radioschedulerlambdaServiceRole43393D2F"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "radioschedulerlambdaServiceRoleDefaultPolicy0858D2AD"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/radio-scheduler-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -5563,22 +6909,10 @@
             "data": "crossfadecontrollerlambdaServiceRoleE31AAB6A"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "crossfadecontrollerlambdaServiceRoleDefaultPolicyC4FFA5C2"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "crossfadecontrollerlambda4630B68A"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/crossfade-controller-lambda/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE=": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "crossfadecontrollerlambdaInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE1037AE21"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/Resource": [
@@ -5587,334 +6921,16 @@
             "data": "streamplaylistupdaterlambdaServiceRoleFFBA28E3"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streamplaylistupdaterlambdaServiceRoleDefaultPolicyB8B2212A"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-playlist-updater-lambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "streamplaylistupdaterlambda53C93EC5"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-status-publisher-lambda/ServiceRole/Resource": [
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-health-monitor-lambda/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "streamstatuspublisherlambdaServiceRole326D3684"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-status-publisher-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streamstatuspublisherlambdaServiceRoleDefaultPolicyDB96DE8C"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-status-publisher-lambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streamstatuspublisherlambdaA559F4BA"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-monitor-lambda/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streammonitorlambdaServiceRoleCB28BD7C"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-monitor-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streammonitorlambdaServiceRoleDefaultPolicyBA763171"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/stream-monitor-lambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "streammonitorlambdaE421A3CC"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/track-completion-handler-lambda/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "trackcompletionhandlerlambdaServiceRoleEBE86B33"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/track-completion-handler-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "trackcompletionhandlerlambdaServiceRoleDefaultPolicyC7F950ED"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/track-completion-handler-lambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "trackcompletionhandlerlambdaE7C25C81"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/track-completion-handler-lambda/AllowIoTInvoke": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "trackcompletionhandlerlambdaAllowIoTInvoke833B3182"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdaServiceRole58DD0CBB"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdaServiceRoleDefaultPolicy15F9C187"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdaB30C4545"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/FunctionUrl/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdaFunctionUrlF932798B"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/invoke-function-url": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdainvokefunctionurl2D54B24A"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/get-cover-url-lambda/invoke-function": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "getcoverurllambdainvokefunctionD911CB0E"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "RadioSchedulerRule661B6F57"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "RadioSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionradioschedulerlambdaCBDA9F26A64A6AE8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/RadioSchedulerRuleArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "RadioSchedulerRuleArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/TrackStreamQueue/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "TrackStreamQueue2F224FBC"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistBucket/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamPlaylistBucket5DE5E8D3"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamPlaylistSchedulerRuleD4455083"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamPlaylistSchedulerRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC167": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamPlaylistSchedulerRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda9BBAC1673E42A909"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamStatusPublisherRule/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamStatusPublisherRule829B66F8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamStatusPublisherRule/AllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamstatuspublisherlambda5DD4FA78": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamStatusPublisherRuleAllowEventRuleamplifygforgeiotgerardsandbox28f2e0c620functionstreamstatuspublisherlambda5DD4FA78CC12B7C4"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamMonitorLambdaName": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamMonitorLambdaName"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/TrackCompletionRule": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "TrackCompletionRule"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPC6AFF271F"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/Subnet": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet1SubnetB84F8F5B"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTable": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet1RouteTableC1A9EB54"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/RouteTableAssociation": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet1RouteTableAssociation4B376B22"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet1/DefaultRoute": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet1DefaultRoute924D0152"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/Subnet": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet2Subnet1639858E"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTable": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet2RouteTable8637D996"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/RouteTableAssociation": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet2RouteTableAssociation77E97464"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/PublicSubnet2/DefaultRoute": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCPublicSubnet2DefaultRoute88362319"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/IGW": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCIGW4F1D4290"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamVPC/VPCGW": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamVPCVPCGW05B9AFAC"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamSG/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamSGC03004BE"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerRole6A0ED596"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerRoleDefaultPolicy19BCE421"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/InstanceProfile": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerInstanceProfileC0407D9A"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerA433EFF888010c3b976f22a9"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServer/LaunchTemplate": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerLaunchTemplate2D6E0EA8"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/SsmParameterValue:--aws--service--canonical--ubuntu--server--22.04--stable--current--amd64--hvm--ebs-gp2--ami-id:C96584B6-F00A-464E-AD19-53AFF4B05118.Parameter": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "SsmParameterValueawsservicecanonicalubuntuserver2204stablecurrentamd64hvmebsgp2amiidC96584B6F00A464EAD1953AFF4B05118Parameter"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerEIP": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerEIP"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerPublicIP": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerPublicIP"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamURL": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamURL"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/IcecastAdminURL": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IcecastAdminURL"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/PlaylistBucketName": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlaylistBucketName"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/TrackQueueUrl": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "TrackQueueUrl"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/StreamServerInstanceId": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerInstanceId"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CoverUrlFunctionUrl": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CoverUrlFunctionUrl"
+            "data": "streamhealthmonitorlambdaServiceRole51C1782F"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/CDKMetadata/Default": [
@@ -5965,232 +6981,10 @@
             "data": "amplifygforgeiotgerardsandbox28f2e0c620functionstreamplaylistupdaterlambda5E3A56A8Ref"
           }
         ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionstreamstatuspublisherlambda9D3869D5Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionstreamstatuspublisherlambda9D3869D5Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionstreammonitorlambda2FEFF530Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionstreammonitorlambda2FEFF530Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functiontrackcompletionhandlerlambda650BAF5BRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functiontrackcompletionhandlerlambda650BAF5BRef"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functiongetcoverurllambdaEF0154EFRef": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functiongetcoverurllambdaEF0154EFRef"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerard9B874801"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerard61EB6D0D"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3OutputsamplifygfoE07CACAA"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841OutputsamplifABC070FF"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiot6E2D80CF"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifC4C9A1D1"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/reference-to-amplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputs.amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function/amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn"
-          }
-        ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/function.NestedStack/function.NestedStackResource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "function1351588B"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/ServiceRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StateMachineTriggerServiceRole7DACBDBA"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/ServiceRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StateMachineTrigger27A3F693"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE=": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Role/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerStateMachineRoleD8681A5A"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Role/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerStateMachineRoleDefaultPolicy5946B8E0"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachine/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerStateMachineDF3FE3FD"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerCommandRule": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerCommandRule"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/PlayerStateMachineArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "PlayerStateMachineArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/IoTRuleArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IoTRuleArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CrossFadeControlRule": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CrossFadeControlRule"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CrossFadeIoTRuleArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CrossFadeIoTRuleArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadata"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/CDKMetadata/Condition": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadataAvailable"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/reference-to-amplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayerloadhandlerlambdaDA281093Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/reference-to-amplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayeriotpublisherlambdaBDDE2BBCArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/reference-to-amplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functionplayersimplehandlerlambda4ABAF472Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/reference-to-amplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputs.amplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "referencetoamplifygforgeiotgerardsandbox28f2e0c620functionNestedStackfunctionNestedStackResource97EBAB10Outputsamplifygforgeiotgerardsandbox28f2e0c620functioncrossfadecontrollerlambda115A9402Arn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine.NestedStack/custom-player-state-machine.NestedStackResource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "customplayerstatemachine74B5C2ED"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storageRegion": [

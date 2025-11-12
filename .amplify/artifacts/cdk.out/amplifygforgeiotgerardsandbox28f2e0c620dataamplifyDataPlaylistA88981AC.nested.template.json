@@ -2103,14 +2103,6 @@
      ]
     }
    }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "PlaylistTable",
-     "TableArn"
-    ]
-   }
   }
  }
 }

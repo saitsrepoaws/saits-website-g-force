@@ -51,79 +51,6 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/ServiceRole/Resource"
    }
   },
-  "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-         ]
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      },
-      {
-       "Action": [
-        "dynamodb:BatchGetItem",
-        "dynamodb:GetRecords",
-        "dynamodb:GetShardIterator",
-        "dynamodb:Query",
-        "dynamodb:GetItem",
-        "dynamodb:Scan",
-        "dynamodb:ConditionCheckItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:PutItem",
-        "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:DescribeTable"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        {
-         "Fn::GetAtt": [
-          "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-         ]
-        },
-        {
-         "Ref": "AWS::NoValue"
-        }
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF",
-    "Roles": [
-     {
-      "Ref": "playlistgeneratorlambdaServiceRoleBA132824"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/ServiceRole/DefaultPolicy/Resource"
-   }
-  },
   "playlistgeneratorlambda1BE43B64": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -134,63 +61,11 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "41ccfef6f5c930c9c25d646a379ff403a934207bdcfeaba089e03c00f2c41f6d.zip"
+     "S3Key": "3ea8e7b000476813c39d52568ab098a67e7dd8a4673b45e03e4a6942dbbadb7a.zip"
     },
     "Environment": {
      "Variables": {
-      "AMPLIFY_SSM_ENV_CONFIG": "{}",
-      "TRACK_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Fn::GetAtt": [
-                "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      },
-      "PLAYLIST_TABLE_NAME": {
-       "Fn::Select": [
-        1,
-        {
-         "Fn::Split": [
-          "/",
-          {
-           "Fn::Select": [
-            5,
-            {
-             "Fn::Split": [
-              ":",
-              {
-               "Fn::GetAtt": [
-                "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-               ]
-              }
-             ]
-            }
-           ]
-          }
-         ]
-        }
-       ]
-      }
+      "AMPLIFY_SSM_ENV_CONFIG": "{}"
      }
     },
     "EphemeralStorage": {
@@ -222,14 +97,13 @@
     "Timeout": 60
    },
    "DependsOn": [
-    "playlistgeneratorlambdaServiceRoleDefaultPolicy71C1B4BF",
     "playlistgeneratorlambdaServiceRoleBA132824"
    ],
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/Resource",
-    "aws:asset:path": "asset.41ccfef6f5c930c9c25d646a379ff403a934207bdcfeaba089e03c00f2c41f6d",
+    "aws:asset:path": "asset.3ea8e7b000476813c39d52568ab098a67e7dd8a4673b45e03e4a6942dbbadb7a",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -287,7 +161,7 @@
      ]
     },
     "DefinitionS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/0465b2fefd7c17733c5121612c486066a4db6866b449d42cda9231cbb0c2a680.graphql"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f1d2f8c240514680c96ee95348affc20a100ff17d7c02814e3580526ee619273.graphql"
     }
    },
    "UpdateReplacePolicy": "Delete",
@@ -305,7 +179,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1794483131
+    "Expires": 1794525437
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -462,7 +336,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/f13e8774dee19cd8ec8f3d2ba5c538aedd4841675bc3184ce6399623f60e18d8.json"
+       "/9faf1422f5967c9f42d4e443a7395c0d272ab1050ae6e15266106d500e7f42d5.json"
       ]
      ]
     }
@@ -555,7 +429,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/d9f7bc060af206f85bf6bcc90b9f4eff0f26dda54107162f0ad91fbbb7c756c8.json"
+       "/103bda1cbf72dcb46f696059d157990248c3383c7cdcedcd7dce20254855f484.json"
       ]
      ]
     }
@@ -741,7 +615,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/5945db403a158b58edc5a6f4fcf5199f0429b31720e7f75563afe34cd11bfcb3.json"
+       "/1a2294b07ac35c070c889eceb67be1bbddc2eecbe847f51b000fd8b20d7eb081.json"
       ]
      ]
     }
@@ -834,7 +708,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/cf7ebc89119103fbbab1fee159d876d4c268bb65fd2a93d435b438a7a69c39b6.json"
+       "/29014c3de86f8a0b9550da45d0f54fa5dc4063a4fc0c7d0f47ac405d836f3c12.json"
       ]
      ]
     }
@@ -927,7 +801,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/4585697c9c004f50a110aa2eca7949f592cf727a5b2764bf53794e8d1f2bfe7c.json"
+       "/625b104e37c7ba3afa52469c94c9649e1593828db2e15510574be7549bb3767e.json"
       ]
      ]
     }
@@ -1020,7 +894,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/38072b1d78c3e766faa7bc4494e8970afc73c6e86301bfbb57e6eb278710a3ad.json"
+       "/c86a1891d2b2dc1c6d23769e7196cad39e6e58596917d62d29a25a318cf12678.json"
       ]
      ]
     }
@@ -1033,6 +907,285 @@
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/TrackPlayHistory.NestedStack/TrackPlayHistory.NestedStackResource",
     "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryAB33DB56.nested.template.json",
+    "aws:asset:property": "TemplateURL"
+   }
+  },
+  "amplifyDataStreamHealthLogNestedStackStreamHealthLogNestedStackResource1C56152A": {
+   "Type": "AWS::CloudFormation::Stack",
+   "Properties": {
+    "Parameters": {
+     "DynamoDBModelTableReadIOPS": {
+      "Ref": "DynamoDBModelTableReadIOPS"
+     },
+     "DynamoDBModelTableWriteIOPS": {
+      "Ref": "DynamoDBModelTableWriteIOPS"
+     },
+     "DynamoDBBillingMode": {
+      "Ref": "DynamoDBBillingMode"
+     },
+     "DynamoDBEnablePointInTimeRecovery": {
+      "Ref": "DynamoDBEnablePointInTimeRecovery"
+     },
+     "DynamoDBEnableServerSideEncryption": {
+      "Ref": "DynamoDBEnableServerSideEncryption"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA": {
+      "Fn::GetAtt": [
+       "amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPI42A6FA33",
+       "ApiId"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPINONEDS684BF699",
+       "Name"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+     }
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyData"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TemplateURL": {
+     "Fn::Join": [
+      "",
+      [
+       "https://s3.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".",
+       {
+        "Ref": "AWS::URLSuffix"
+       },
+       "/",
+       {
+        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+       },
+       "/45c9c0c2f6cf63cc5ce83ebc6c02c5cc8285159107e6cb5d2fbb306b52a57ba4.json"
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "amplifyDataGraphQLAPITransformerSchemaFF50A789"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/StreamHealthLog.NestedStack/StreamHealthLog.NestedStackResource",
+    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamHealthLogE8A22885.nested.template.json",
+    "aws:asset:property": "TemplateURL"
+   }
+  },
+  "amplifyDataListenerSessionNestedStackListenerSessionNestedStackResourceF0CB2B51": {
+   "Type": "AWS::CloudFormation::Stack",
+   "Properties": {
+    "Parameters": {
+     "DynamoDBModelTableReadIOPS": {
+      "Ref": "DynamoDBModelTableReadIOPS"
+     },
+     "DynamoDBModelTableWriteIOPS": {
+      "Ref": "DynamoDBModelTableWriteIOPS"
+     },
+     "DynamoDBBillingMode": {
+      "Ref": "DynamoDBBillingMode"
+     },
+     "DynamoDBEnablePointInTimeRecovery": {
+      "Ref": "DynamoDBEnablePointInTimeRecovery"
+     },
+     "DynamoDBEnableServerSideEncryption": {
+      "Ref": "DynamoDBEnableServerSideEncryption"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA": {
+      "Fn::GetAtt": [
+       "amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPI42A6FA33",
+       "ApiId"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPINONEDS684BF699",
+       "Name"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+     }
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyData"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TemplateURL": {
+     "Fn::Join": [
+      "",
+      [
+       "https://s3.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".",
+       {
+        "Ref": "AWS::URLSuffix"
+       },
+       "/",
+       {
+        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+       },
+       "/3d616c57e8b8f7663c3d21fd0b18049b05ccbeeacf589c5d93a1f8577a054f8d.json"
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "amplifyDataGraphQLAPITransformerSchemaFF50A789"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerSession.NestedStack/ListenerSession.NestedStackResource",
+    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataListenerSessionDC76FF35.nested.template.json",
+    "aws:asset:property": "TemplateURL"
+   }
+  },
+  "amplifyDataListenerProfileNestedStackListenerProfileNestedStackResourceB34E25D3": {
+   "Type": "AWS::CloudFormation::Stack",
+   "Properties": {
+    "Parameters": {
+     "DynamoDBModelTableReadIOPS": {
+      "Ref": "DynamoDBModelTableReadIOPS"
+     },
+     "DynamoDBModelTableWriteIOPS": {
+      "Ref": "DynamoDBModelTableWriteIOPS"
+     },
+     "DynamoDBBillingMode": {
+      "Ref": "DynamoDBBillingMode"
+     },
+     "DynamoDBEnablePointInTimeRecovery": {
+      "Ref": "DynamoDBEnablePointInTimeRecovery"
+     },
+     "DynamoDBEnableServerSideEncryption": {
+      "Ref": "DynamoDBEnableServerSideEncryption"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResourceF8875458Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomPA60315DA": {
+      "Fn::GetAtt": [
+       "amplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource86290833",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyTableManagerTableManagerCustomProviderframeworkonEventC1193D4AArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPI42A6FA33",
+       "ApiId"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPINONEDSFED67E51Name": {
+      "Fn::GetAtt": [
+       "amplifyDataGraphQLAPINONEDS684BF699",
+       "Name"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref"
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": {
+      "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620authNestedStackauthNestedStackResourceF788D233Outputsamplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref"
+     }
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyData"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TemplateURL": {
+     "Fn::Join": [
+      "",
+      [
+       "https://s3.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".",
+       {
+        "Ref": "AWS::URLSuffix"
+       },
+       "/",
+       {
+        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+       },
+       "/393f58e1a50632f8b9f6a6ee7106f8dd3d192b988ef284a7c321fdaa0dba10d9.json"
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "amplifyDataGraphQLAPITransformerSchemaFF50A789"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/ListenerProfile.NestedStack/ListenerProfile.NestedStackResource",
+    "aws:asset:path": "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataListenerProfile0687C2E8.nested.template.json",
     "aws:asset:property": "TemplateURL"
    }
   },
@@ -1113,7 +1266,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/441defd1d2d8e13c3161aa0f17bdbe20820f25ea5cf0c162985b98c02034023d.json"
+       "/cf8cd485862ce26b722920f75933012c4e3b7555bb6ec2c7fad31198e2779853.json"
       ]
      ]
     }
@@ -1380,7 +1533,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "c0f2afffad93935a2d187e4abe7399ad405c2b1be8f0c1e114363eb2e23eb138.zip"
+     "a3558798f0d2433b6f36e092059959a8526c5420d5827c963513074b448417b7.zip"
     ],
     "SourceMarkers": [
      {}
@@ -1893,7 +2046,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "13dec7a56f0cfedf8d43fea3312ca5fbd9458c3ac762b6348acfd3b5ec11ac36.zip"
+     "5ee4347c69bcdc24854056cd54ac28ce7480838fb0d2eb88d2365446d1686203.zip"
     ],
     "SourceMarkers": [
      {}
@@ -2491,70 +2644,6 @@
     "Fn::GetAtt": [
      "amplifyDataGraphQLAPIDefaultApiKey1C8ED374",
      "ApiKey"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResource5343AC44",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceD78BFED4",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataPlayerStateNestedStackPlayerStateNestedStackResourceBD80A56B",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResource3F17592B",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
     ]
    }
   }

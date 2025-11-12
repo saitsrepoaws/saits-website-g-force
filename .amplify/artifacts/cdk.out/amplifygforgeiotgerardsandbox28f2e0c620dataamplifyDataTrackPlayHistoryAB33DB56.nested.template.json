@@ -2325,14 +2325,6 @@
      ]
     }
    }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "TrackPlayHistoryTable",
-     "TableArn"
-    ]
-   }
   }
  }
 }

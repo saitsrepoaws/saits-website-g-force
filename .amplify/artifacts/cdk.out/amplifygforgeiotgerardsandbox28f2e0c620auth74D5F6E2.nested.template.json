@@ -176,32 +176,6 @@
      ],
      "Version": "2012-10-17"
     },
-    "ManagedPolicyArns": [
-     {
-      "Fn::Join": [
-       "",
-       [
-        "arn:",
-        {
-         "Ref": "AWS::Partition"
-        },
-        ":iam::aws:policy/AWSIoTDataAccess"
-       ]
-      ]
-     },
-     {
-      "Fn::Join": [
-       "",
-       [
-        "arn:",
-        {
-         "Ref": "AWS::Partition"
-        },
-        ":iam::aws:policy/AWSIoTConfigAccess"
-       ]
-      ]
-     }
-    ],
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -248,32 +222,6 @@
      ],
      "Version": "2012-10-17"
     },
-    "ManagedPolicyArns": [
-     {
-      "Fn::Join": [
-       "",
-       [
-        "arn:",
-        {
-         "Ref": "AWS::Partition"
-        },
-        ":iam::aws:policy/AWSIoTDataAccess"
-       ]
-      ]
-     },
-     {
-      "Fn::Join": [
-       "",
-       [
-        "arn:",
-        {
-         "Ref": "AWS::Partition"
-        },
-        ":iam::aws:policy/AWSIoTConfigAccess"
-       ]
-      ]
-     }
-    ],
     "Tags": [
      {
       "Key": "amplify:deployment-type",
@@ -351,173 +299,15 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/amplifyAuth/IdentityPoolRoleAttachment"
    }
   },
-  "IotPubSubPolicy43AD4595": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "iot:Connect",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:client/*"
-      },
-      {
-       "Action": "iot:Subscribe",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:topicfilter/*"
-      },
-      {
-       "Action": [
-        "iot:Publish",
-        "iot:Receive"
-       ],
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:topic/*"
-      },
-      {
-       "Action": [
-        "iot:AttachPolicy",
-        "iot:DetachPolicy",
-        "iot:ListAttachedPolicies"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        "arn:aws:iot:eu-west-1:*:policy/RadioPlayerCognitoPolicy",
-        "arn:aws:iot:eu-west-1:*:cert/*"
-       ]
-      },
-      {
-       "Action": [
-        "states:StartExecution",
-        "states:DescribeExecution"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        "arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine",
-        "arn:aws:states:eu-west-1:*:execution:RadioPlayerStateMachine:*"
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "IotPubSubPolicy43AD4595",
-    "Roles": [
-     {
-      "Ref": "amplifyAuthauthenticatedUserRoleD8DA3689"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicy/Resource"
-   }
-  },
-  "IotPubSubPolicyUnauth333DCE7E": {
-   "Type": "AWS::IAM::Policy",
-   "Properties": {
-    "PolicyDocument": {
-     "Statement": [
-      {
-       "Action": "iot:Connect",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:client/*"
-      },
-      {
-       "Action": "iot:Subscribe",
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:topicfilter/*"
-      },
-      {
-       "Action": [
-        "iot:Publish",
-        "iot:Receive"
-       ],
-       "Effect": "Allow",
-       "Resource": "arn:aws:iot:eu-west-1:*:topic/*"
-      },
-      {
-       "Action": [
-        "iot:AttachPolicy",
-        "iot:DetachPolicy",
-        "iot:ListAttachedPolicies"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        "arn:aws:iot:eu-west-1:*:policy/RadioPlayerCognitoPolicy",
-        "arn:aws:iot:eu-west-1:*:cert/*"
-       ]
-      },
-      {
-       "Action": [
-        "states:StartExecution",
-        "states:DescribeExecution"
-       ],
-       "Effect": "Allow",
-       "Resource": [
-        "arn:aws:states:eu-west-1:*:stateMachine:RadioPlayerStateMachine",
-        "arn:aws:states:eu-west-1:*:execution:RadioPlayerStateMachine:*"
-       ]
-      }
-     ],
-     "Version": "2012-10-17"
-    },
-    "PolicyName": "IotPubSubPolicyUnauth333DCE7E",
-    "Roles": [
-     {
-      "Ref": "amplifyAuthunauthenticatedUserRole2B524D9E"
-     }
-    ]
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicyUnauth/Resource"
-   }
-  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LTQ6CMBCFz8K+jNgbGFZulGBcm1pGHSitoYOENL27AYKyet/7kyBlBlmiBp/qqkkN3SGc0DNWF1a6EWrwt6Dd0xI7CFePXeGcEfnD/niF3BBa3lb/5FihZeJxPW996QwemJV+tWg5ClIthCmchrMWzpAeJ7tQjKJE7/pOz5tzz++eo7CuQqj97iMlyD1kSe2J0q63TC1CuegXM8s83PIAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LwQ6CMBBEv4V7WbF/YDh5MQbD2dR21YXSTegiMU3/3RCDcpqZNzMatK6gKswcS+v60tMN0gmjoLuIsb0yc7wmy49AwpDaiOOZ2av6Hn5+NbUnDLKt/uToMAjJez1vc8MeDyLGPgcMkhWZAdICl+GiOasGI0+jxawCO4Qu7l5ag95DVXSRqBynIDQgNF/9AL41c8DXAAAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
-  }
- },
- "Outputs": {
-  "IoTCognitoPolicyName": {
-   "Description": "IoT Policy name (existing) that gets attached to Cognito Identity",
-   "Value": "RadioPlayerCognitoPolicy",
-   "Export": {
-    "Name": "IoTCognitoPolicyName"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthUserPool5778D73ERef": {
-   "Value": {
-    "Ref": "amplifyAuthUserPool4BA7F805"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthUserPoolAppClient2DCB0BCBRef": {
-   "Value": {
-    "Ref": "amplifyAuthUserPoolAppClient2626C6F8"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": {
-   "Value": {
-    "Ref": "amplifyAuthIdentityPool3FDE84CC"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
-   "Value": {
-    "Ref": "amplifyAuthauthenticatedUserRoleD8DA3689"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
-   "Value": {
-    "Ref": "amplifyAuthunauthenticatedUserRole2B524D9E"
-   }
   }
  },
  "Conditions": {
@@ -784,6 +574,33 @@
      ]
     }
    ]
+  }
+ },
+ "Outputs": {
+  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthUserPool5778D73ERef": {
+   "Value": {
+    "Ref": "amplifyAuthUserPool4BA7F805"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthUserPoolAppClient2DCB0BCBRef": {
+   "Value": {
+    "Ref": "amplifyAuthUserPoolAppClient2626C6F8"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthIdentityPool912DCAE1Ref": {
+   "Value": {
+    "Ref": "amplifyAuthIdentityPool3FDE84CC"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthauthenticatedUserRole0E54FECARef": {
+   "Value": {
+    "Ref": "amplifyAuthauthenticatedUserRoleD8DA3689"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620authamplifyAuthunauthenticatedUserRole984D3815Ref": {
+   "Value": {
+    "Ref": "amplifyAuthunauthenticatedUserRole2B524D9E"
+   }
   }
  }
 }

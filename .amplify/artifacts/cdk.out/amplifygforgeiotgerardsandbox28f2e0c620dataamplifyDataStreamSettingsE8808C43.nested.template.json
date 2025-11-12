@@ -2243,14 +2243,6 @@
      ]
     }
    }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "StreamSettingsTable",
-     "TableArn"
-    ]
-   }
   }
  }
 }
