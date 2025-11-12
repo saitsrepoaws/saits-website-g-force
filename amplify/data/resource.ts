@@ -316,6 +316,10 @@ const schema = a.schema({
       tags: a.string(),
       maxTracks: a.integer(),
       maxDuration: a.integer(),
+      // Jingle options
+      includeJingles: a.boolean(), // Add jingles to playlist
+      jinglesEveryN: a.integer(), // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
+      jingleGenre: a.string(), // Genre filter for jingles (default: 'WildFM Jingels')
     })
     .returns(a.json())
     .authorization((allow) => [allow.authenticated()])

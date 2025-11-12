@@ -60,6 +60,10 @@ interface GeneratePlaylistInput {
   maxTracks?: number
   minDuration?: number
   maxDuration?: number
+  // Jingle options
+  includeJingles?: boolean // Add jingles to playlist
+  jinglesEveryN?: number // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
+  jingleGenre?: string // Genre filter for jingles (default: 'WildFM Jingels')
 }
 
 interface Track {
@@ -331,7 +335,15 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       console.log('✅ Energy flow playlist created with BPM smoothing')
     }
     
-    // 4. Select tracks (respect maxTracks and maxDuration)
+    // 4. Get jingles if requested
+    let jingles: Track[] = []
+    if (input.includeJingles) {
+      const jingleGenre = input.jingleGenre || 'WildFM Jingels'
+      jingles = allTracks.filter(t => t.genre === jingleGenre) as Track[]
+      console.log(`🎤 Found ${jingles.length} jingles (genre: ${jingleGenre})`)
+    }
+    
+    // 5. Select tracks (respect maxTracks and maxDuration)
     const maxTracks = input.maxTracks || 20
     const maxDuration = input.maxDuration || (59 * 60) // 59 minutes default
     
@@ -367,8 +379,48 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     console.log(`   Total duration (with silence): ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
     console.log(`   Actual mix duration (trimmed): ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
     
-    // 5. Create PlaylistTrackItems with auto-mix points
-    const playlistTracks: PlaylistTrackItem[] = selectedTracks.map((track, index) => {
+    // 5.5. Insert jingles if requested
+    let finalTracks: Track[] = selectedTracks
+    if (input.includeJingles && jingles.length > 0) {
+      const jinglesEveryN = input.jinglesEveryN || 2 // Default: every 2 tracks
+      console.log(`🎤 Inserting jingles every ${jinglesEveryN} tracks...`)
+      
+      finalTracks = []
+      let jingleIndex = 0
+      
+      for (let i = 0; i < selectedTracks.length; i++) {
+        finalTracks.push(selectedTracks[i])
+        
+        // Insert jingle after every N tracks (but not after the last track)
+        if ((i + 1) % jinglesEveryN === 0 && i < selectedTracks.length - 1) {
+          if (jingleIndex < jingles.length) {
+            finalTracks.push(jingles[jingleIndex])
+            jingleIndex++
+            
+            // Reset jingle index if we run out (loop through jingles)
+            if (jingleIndex >= jingles.length) {
+              jingleIndex = 0
+            }
+          }
+        }
+      }
+      
+      // Calculate new total duration with jingles
+      totalDuration = finalTracks.reduce((sum, t) => sum + (t.duration || 0), 0)
+      totalActualDuration = finalTracks.reduce((sum, t) => {
+        const duration = t.trimStart !== undefined && t.trimEnd !== undefined
+          ? (t.trimEnd - t.trimStart)
+          : (t.duration || 0)
+        return sum + duration
+      }, 0)
+      
+      console.log(`✅ Inserted ${finalTracks.length - selectedTracks.length} jingles`)
+      console.log(`   New total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+      console.log(`   New actual duration: ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
+    }
+    
+    // 6. Create PlaylistTrackItems with auto-mix points
+    const playlistTracks: PlaylistTrackItem[] = finalTracks.map((track, index) => {
       // Calculate actual duration using trim points
       const actualDuration = track.trimStart !== undefined && track.trimEnd !== undefined
         ? (track.trimEnd - track.trimStart)
@@ -411,7 +463,7 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     
     console.log('🎛️ Auto-mix points calculated for seamless transitions')
     
-    // 6. Create playlist in DynamoDB
+    // 7. Create playlist in DynamoDB
     const playlistTableName = process.env.PLAYLIST_TABLE_NAME
     if (!playlistTableName) {
       throw new Error('PLAYLIST_TABLE_NAME not configured')
@@ -420,10 +472,13 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     const playlistId = `playlist-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     const now = new Date().toISOString()
     
+    const jingleCount = finalTracks.length - selectedTracks.length
+    const descriptionSuffix = jingleCount > 0 ? ` + ${jingleCount} jingles` : ''
+    
     const playlist = {
       id: playlistId,
       name: input.name,
-      description: input.description || `Auto-generated harmonic mix with ${selectedTracks.length} tracks`,
+      description: input.description || `Auto-generated harmonic mix with ${selectedTracks.length} tracks${descriptionSuffix}`,
       genre: input.genre,
       mood: input.mood,
       bpmMin: input.bpmMin,
@@ -431,7 +486,7 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       key: input.keys && input.keys.length > 0 ? input.keys.join(', ') : undefined, // Store keys as comma-separated
       tags: input.tags,
       tracks: JSON.stringify(playlistTracks),
-      trackCount: selectedTracks.length,
+      trackCount: finalTracks.length,
       totalDuration,
       createdAt: now,
       updatedAt: now,
