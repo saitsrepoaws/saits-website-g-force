@@ -55,12 +55,72 @@ function SortableTrackRow({
     isDragging
   } = useSortable({ id: track.trackId })
 
+  // Check if this is a jingle
+  const isJingle = track.trackGenre?.toLowerCase().includes('jingle') || 
+                   track.trackGenre?.toLowerCase().includes('id') ||
+                   track.trackGenre === 'WildFM Jingels'
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   }
 
+  // Special styling for jingles
+  if (isJingle) {
+    return (
+      <div>
+        <div
+          ref={setNodeRef}
+          style={style}
+          className={`grid grid-cols-[auto,auto,1fr,auto,auto] gap-3 items-center p-3 border-2 rounded-lg ${
+            isDragging 
+              ? 'bg-purple-100 shadow-lg z-10 border-purple-400' 
+              : 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-300 hover:border-purple-400'
+          }`}
+        >
+          <div className="text-sm text-purple-600 font-bold cursor-grab active:cursor-grabbing" {...attributes} {...listeners}>
+            ⋮⋮ {index + 1}
+          </div>
+          
+          {/* Jingle Icon */}
+          <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full">
+            <span className="text-white text-xl">🎤</span>
+          </div>
+          
+          {/* Jingle Info */}
+          <div>
+            <div className="text-sm font-bold text-purple-900 flex items-center gap-2">
+              <span className="px-2 py-0.5 bg-purple-200 text-purple-700 text-xs font-bold rounded-full">JINGLE</span>
+              {track.trackTitle || 'Jingle'}
+            </div>
+            <div className="text-xs text-purple-600 mt-1">
+              {track.trackGenre} • {formatDuration(track.trackDuration || 0)}
+            </div>
+          </div>
+          
+          {/* Play Button (simplified for jingles) */}
+          <button
+            onClick={() => playingTrackId === track.trackId ? onStop() : onPlay(track.trackId)}
+            className="px-3 py-1.5 bg-purple-500 text-white rounded-md hover:bg-purple-600 text-sm font-medium transition-colors"
+          >
+            {playingTrackId === track.trackId && isPlaying ? '⏸ Pause' : '▶ Play'}
+          </button>
+          
+          {/* Remove */}
+          <button
+            onClick={() => onRemove(track.trackId)}
+            className="text-purple-400 hover:text-red-500 p-2"
+            title="Remove jingle"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Regular track styling
   return (
     <div>
       <div
