@@ -12,7 +12,7 @@ import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
 // import { streamTrackPusher } from './functions/stream-track-pusher/resource' // DISABLED: Incomplete Lambda
-import { streamHealthMonitor } from './functions/stream-health-monitor/resource'
+// import { streamHealthMonitor } from './functions/stream-health-monitor/resource' // DISABLED: esbuild bundling issue
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
@@ -62,7 +62,7 @@ export const backend = defineBackend({
   crossfadeController,
   streamPlaylistUpdater,
   // streamTrackPusher, // DISABLED: Incomplete Lambda
-  streamHealthMonitor,
+  // streamHealthMonitor, // DISABLED: esbuild bundling issue
   streamStatusPublisher,
   streamMonitor,
   trackCompletionHandler,
@@ -695,6 +695,8 @@ trackPusherRule.addTarget(new targets.LambdaFunction(trackPusherLambda))
 // ============================================
 // 🛡️ STREAM HEALTH MONITOR - Bulletproof!
 // ============================================
+// DISABLED: esbuild bundling issue - will fix later
+/*
 const healthMonitorLambda = backend.streamHealthMonitor.resources.lambda
 const streamHealthLogTable = backend.data.resources.tables['StreamHealthLog']
 
@@ -744,6 +746,7 @@ const healthMonitorRule = new events.Rule(
 )
 
 healthMonitorRule.addTarget(new targets.LambdaFunction(healthMonitorLambda))
+*/
 
 // ============================================
 // 📡 STREAM STATUS PUBLISHER - IoT Real-time
