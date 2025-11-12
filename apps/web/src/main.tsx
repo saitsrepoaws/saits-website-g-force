@@ -15,6 +15,7 @@ import Planner from './pages/devices/Planner'
 import AudioSettings from './pages/devices/AudioSettings'
 import NetworkSettings from './pages/devices/NetworkSettings'
 import StreamSettings from './pages/devices/StreamSettings'
+import RadioStats from './pages/RadioStats'
 import { configureAmplify } from './amplify-config'
 import Login from './pages/Login'
 import AuthGate from './routes/AuthGate'
@@ -115,6 +116,14 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <StreamSettings />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/radio-stats', 
+    element: (
+      <AuthGate>
+        <RadioStats />
       </AuthGate>
     )
   },

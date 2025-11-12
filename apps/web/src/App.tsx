@@ -16,6 +16,13 @@ function App() {
           />
           
           <NavigationCard
+            to="/radio-stats"
+            icon="📻"
+            title="Radio Statistics"
+            description="Live stream monitoring, listener count, and health status of Splash FM."
+          />
+          
+          <NavigationCard
             to="/analytics"
             icon="📊"
             title="Analytics"
