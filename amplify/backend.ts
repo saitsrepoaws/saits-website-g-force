@@ -16,6 +16,7 @@ import { streamHealthMonitor } from './functions/stream-health-monitor/resource'
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
+import { listenerTracker } from './functions/listener-tracker/resource'
 import { getCoverUrl } from './functions/get-cover-url/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
@@ -65,6 +66,7 @@ export const backend = defineBackend({
   streamStatusPublisher,
   streamMonitor,
   trackCompletionHandler,
+  listenerTracker,
   getCoverUrl
 })
 
@@ -860,6 +862,36 @@ trackCompletionLambda.addPermission('AllowIoTInvoke', {
 })
 
 console.log('✅ Track completion handler configured with IoT trigger')
+
+// ============================================
+// 👥 LISTENER TRACKER - Detailed Analytics
+// ============================================
+const listenerTrackerLambda = backend.listenerTracker.resources.lambda
+const listenerSessionTable = backend.data.resources.tables['ListenerSession']
+const listenerProfileTable = backend.data.resources.tables['ListenerProfile']
+
+// Grant table permissions
+listenerSessionTable.grantWriteData(listenerTrackerLambda)
+listenerProfileTable.grantReadWriteData(listenerTrackerLambda)
+
+// Add environment variables
+backend.listenerTracker.addEnvironment('SESSION_TABLE', listenerSessionTable.tableName)
+backend.listenerTracker.addEnvironment('PROFILE_TABLE', listenerProfileTable.tableName)
+
+// EventBridge rule - Run every 1 minute to track active listeners
+const listenerTrackerRule = new events.Rule(
+  listenerTrackerLambda.stack,
+  'ListenerTrackerRule',
+  {
+    ruleName: 'ListenerTrackerEveryMinute',
+    description: 'Tracks detailed listener analytics every minute',
+    schedule: events.Schedule.rate(Duration.minutes(1))
+  }
+)
+
+listenerTrackerRule.addTarget(new targets.LambdaFunction(listenerTrackerLambda))
+
+console.log('✅ Listener tracker configured')
 
 // VPC for EC2 Stream Server
 const vpc = new ec2.Vpc(streamPlaylistLambda.stack, 'StreamVPC', {

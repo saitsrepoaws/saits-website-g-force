@@ -219,6 +219,46 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
 
+  // Listener Session - detailed per-connection tracking
+  ListenerSession: a
+    .model({
+      sessionId: a.string().required(), // Unique session ID
+      ipHash: a.string().required(), // Hashed IP for privacy
+      userAgent: a.string(),
+      device: a.string(), // Desktop/Mobile/Car/Smart Speaker
+      os: a.string(), // Windows/Mac/iOS/Android/Linux
+      player: a.string(), // VLC/iTunes/Winamp/Browser/etc
+      country: a.string(),
+      city: a.string(),
+      connectTime: a.datetime().required(),
+      disconnectTime: a.datetime(),
+      duration: a.integer(), // seconds
+      tracksHeard: a.string(), // JSON array of track IDs
+      currentTrack: a.string(),
+    })
+    .secondaryIndexes((index) => [
+      index('ipHash').sortKeys(['connectTime']), // Query sessions by listener
+    ])
+    .authorization((allow) => [allow.authenticated()]),
+
+  // Listener Profile - aggregated listener stats
+  ListenerProfile: a
+    .model({
+      ipHash: a.string().required(), // Primary key
+      firstSeen: a.datetime().required(),
+      lastSeen: a.datetime().required(),
+      totalSessions: a.integer().default(0),
+      totalListenTime: a.integer().default(0), // seconds
+      favoriteHours: a.string(), // JSON array of hour preferences
+      returningListener: a.boolean().default(false),
+      country: a.string(),
+      city: a.string(),
+      lastDevice: a.string(),
+      lastOs: a.string(),
+      lastPlayer: a.string(),
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
   // Track model - audio tracks in the Libery system
   // Format: Artist - Title (Version) [Label]
   Track: a
