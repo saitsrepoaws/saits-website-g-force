@@ -21,6 +21,10 @@ interface FileUploadItem {
   progress: UploadProgress | null
   status: 'pending' | 'uploading' | 'success' | 'error' | 'skipped'
   error?: string
+  // Jingle & Tags fields
+  isJingle: boolean
+  jingleCategory: string
+  tags: string // Comma-separated: Hot Hits, Oldies, Party, etc.
 }
 
 function Libery() {
@@ -168,6 +172,11 @@ function Libery() {
         const metadata = await getAudioMetadata(file)
         const parsed = parseFilename(file.name)
         
+        // Auto-detect jingle based on filename
+        const isJingle = file.name.toLowerCase().includes('jingle') || 
+                        file.name.toLowerCase().includes('id') ||
+                        file.name.toLowerCase().includes('sweeper')
+        
         return {
           file,
           artist: parsed.artist || '',
@@ -177,6 +186,10 @@ function Libery() {
           duration: metadata.duration || 0,
           progress: null,
           status: 'pending' as const,
+          // Jingle & Tags defaults
+          isJingle,
+          jingleCategory: isJingle ? 'WildFM Jingels' : '',
+          tags: '', // User can add Hot Hits, Oldies, etc.
         }
       })
     )
@@ -234,6 +247,9 @@ function Libery() {
           fileSize: audioResult.size,
           format: audioResult.format,
           addedAt: new Date().toISOString(),
+          // Jingle & Tags
+          genre: item.isJingle ? item.jingleCategory : undefined,
+          tags: item.tags || undefined,
         })
 
         if (data) {
@@ -783,6 +799,76 @@ This action cannot be undone!`
                         </button>
                       )}
                     </div>
+
+                    {/* Jingle & Tags Fields (only for pending items) */}
+                    {item.status === 'pending' && (
+                      <div className="grid grid-cols-3 gap-3 mb-3 mt-3 p-3 bg-white rounded border border-gray-200">
+                        {/* Jingle Toggle */}
+                        <div className="col-span-3 flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            id={`jingle-${index}`}
+                            checked={item.isJingle}
+                            onChange={(e) => {
+                              const newQueue = [...uploadQueue]
+                              newQueue[index].isJingle = e.target.checked
+                              if (e.target.checked && !newQueue[index].jingleCategory) {
+                                newQueue[index].jingleCategory = 'WildFM Jingels'
+                              }
+                              setUploadQueue(newQueue)
+                            }}
+                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor={`jingle-${index}`} className="text-sm font-medium text-gray-700 cursor-pointer">
+                            🎤 This is a Jingle/Station ID
+                          </label>
+                        </div>
+
+                        {/* Jingle Category (only if isJingle) */}
+                        {item.isJingle && (
+                          <div className="col-span-3">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Jingle Category
+                            </label>
+                            <select
+                              value={item.jingleCategory}
+                              onChange={(e) => {
+                                const newQueue = [...uploadQueue]
+                                newQueue[index].jingleCategory = e.target.value
+                                setUploadQueue(newQueue)
+                              }}
+                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500"
+                            >
+                              <option value="WildFM Jingels">WildFM Jingels</option>
+                              <option value="Station IDs">Station IDs</option>
+                              <option value="Sweepers">Sweepers</option>
+                              <option value="Promos">Promos</option>
+                            </select>
+                          </div>
+                        )}
+
+                        {/* Tags Field */}
+                        <div className="col-span-3">
+                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                            Tags (Hot Hits, Oldies, Party, Peak Time, etc.)
+                          </label>
+                          <input
+                            type="text"
+                            value={item.tags}
+                            onChange={(e) => {
+                              const newQueue = [...uploadQueue]
+                              newQueue[index].tags = e.target.value
+                              setUploadQueue(newQueue)
+                            }}
+                            placeholder="Hot Hits, Oldies, Party (comma separated)"
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">
+                            💡 Use tags to categorize tracks for smart playlist generation
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Progress Bar */}
                     {item.progress && item.status === 'uploading' && (
