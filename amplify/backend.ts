@@ -12,13 +12,16 @@ import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
+import { streamMonitor } from './functions/stream-monitor/resource'
+import { trackCompletionHandler } from './functions/track-completion-handler/resource'
+import { getCoverUrl } from './functions/get-cover-url/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
-import { DockerImageFunction, DockerImageCode, Architecture, Runtime } from 'aws-cdk-lib/aws-lambda'
+import { DockerImageFunction, DockerImageCode, Architecture, Runtime, FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { Duration, CfnOutput } from 'aws-cdk-lib'
 import * as ecr from 'aws-cdk-lib/aws-ecr'
@@ -32,6 +35,7 @@ import * as iot from 'aws-cdk-lib/aws-iot'
 import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
+import * as sqs from 'aws-cdk-lib/aws-sqs'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join} from 'path'
@@ -53,7 +57,10 @@ export const backend = defineBackend({
   radioScheduler,
   crossfadeController,
   streamPlaylistUpdater,
-  streamStatusPublisher
+  streamStatusPublisher,
+  streamMonitor,
+  trackCompletionHandler,
+  getCoverUrl
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -65,6 +72,8 @@ const trackTable = backend.data.resources.tables['Track']
 const playlistTable = backend.data.resources.tables['Playlist']
 const scheduleTable = backend.data.resources.tables['Schedule']
 const playerStateTable = backend.data.resources.tables['PlayerState']
+const streamSettingsTable = backend.data.resources.tables['StreamSettings']
+const streamQueueTrackTable = backend.data.resources.tables['StreamQueueTrack']
 const radioSchedulerLambda = backend.radioScheduler.resources.lambda
 
 // Create Docker-based Lambda for audio analysis with FFmpeg
@@ -533,7 +542,22 @@ console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minu
 // Get Lambda for stream playlist updater
 const streamPlaylistLambda = backend.streamPlaylistUpdater.resources.lambda
 
-// Create S3 bucket for playlists (Liquidsoap will download from here)
+// Create FIFO SQS queue for track streaming (Lambda → Liquidsoap)
+// FIFO ensures strict ordering: News → Track 1 → Track 2 → ...
+const trackQueue = new sqs.Queue(
+  streamPlaylistLambda.stack,
+  'TrackStreamQueue',
+  {
+    queueName: 'radio-track-stream-queue.fifo', // FIFO queue MUST end with .fifo
+    fifo: true, // Enable FIFO mode
+    contentBasedDeduplication: true, // Auto-deduplication based on message body
+    visibilityTimeout: Duration.seconds(600), // 10 minutes per track (prevents in-flight buildup)
+    retentionPeriod: Duration.days(1), // Keep messages for 1 day
+    receiveMessageWaitTime: Duration.seconds(20), // Long polling
+  }
+)
+
+// Create S3 bucket for playlists (legacy - will be replaced by SQS)
 const playlistBucket = new s3.Bucket(
   streamPlaylistLambda.stack,
   'StreamPlaylistBucket',
@@ -554,7 +578,11 @@ const playlistBucket = new s3.Bucket(
 scheduleTable.grantReadData(streamPlaylistLambda)
 playlistTable.grantReadData(streamPlaylistLambda)
 trackTable.grantReadData(streamPlaylistLambda)
+streamSettingsTable.grantReadData(streamPlaylistLambda)
+streamQueueTrackTable.grantWriteData(streamPlaylistLambda) // Track queued songs for UI
 playlistBucket.grantWrite(streamPlaylistLambda)
+storageBucket.grantWrite(streamPlaylistLambda) // NEW: For uploading news MP3s
+trackQueue.grantSendMessages(streamPlaylistLambda) // NEW: SQS write access
 
 // Grant explicit permission to scan and query Schedule table
 // Scan is needed because dayOfWeek can be null (= every day)
@@ -569,21 +597,41 @@ streamPlaylistLambda.addToRolePolicy(
   })
 )
 
+// Grant SQS purge permission for hourly queue reset
+streamPlaylistLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['sqs:PurgeQueue', 'sqs:GetQueueAttributes'],
+    resources: [trackQueue.queueArn]
+  })
+)
+
 // Add environment variables
 backend.streamPlaylistUpdater.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName)
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
+backend.streamPlaylistUpdater.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
+backend.streamPlaylistUpdater.addEnvironment('TRACK_QUEUE_URL', trackQueue.queueUrl) // NEW: SQS queue URL
+backend.streamPlaylistUpdater.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrackTable.tableName) // Track queue history
 
-// EventBridge rule - Run every 5 minutes
+// EventBridge rule - Run HOURLY at :00 for radio station scheduling
+// Cron: minute hour day-of-month month day-of-week year
+// "0 * * * ? *" = Every hour at :00
 const streamSchedulerRule = new events.Rule(
   streamPlaylistLambda.stack,
   'StreamPlaylistSchedulerRule',
   {
-    ruleName: 'StreamPlaylistEvery5Minutes',
-    description: 'Updates stream playlist every 5 minutes based on schedule',
-    schedule: events.Schedule.rate(Duration.minutes(5)),
+    ruleName: 'StreamPlaylistHourly',
+    description: 'Updates stream playlist HOURLY - downloads news + queues full playlist per schedule',
+    schedule: events.Schedule.cron({
+      minute: '0',  // At :00
+      hour: '*',    // Every hour
+      day: '*',     // Every day
+      month: '*',   // Every month
+      year: '*'     // Every year
+    }),
   }
 )
 
@@ -608,23 +656,107 @@ playlistBucket.grantRead(streamStatusLambda)
 
 // Grant DynamoDB access to PlayerState table
 playerStateTable.grantReadWriteData(streamStatusLambda)
+streamSettingsTable.grantReadData(streamStatusLambda)
+trackTable.grantReadData(streamStatusLambda)
+
+// Grant Lambda invoke permission to trigger stream playlist updater
+streamStatusLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['lambda:InvokeFunction'],
+    resources: [streamPlaylistLambda.functionArn]
+  })
+)
 
 // Add environment variables
 backend.streamStatusPublisher.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 backend.streamStatusPublisher.addEnvironment('PLAYER_STATE_TABLE', playerStateTable.tableName)
+backend.streamStatusPublisher.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
+backend.streamStatusPublisher.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.streamStatusPublisher.addEnvironment('STREAM_PLAYLIST_UPDATER_FUNCTION', streamPlaylistLambda.functionName)
 
-// EventBridge rule - Run every 1 minute for near real-time updates
+// EventBridge rule - Run every 1 minute for dynamic playlist updates (checks track timing)
 const streamStatusRule = new events.Rule(
   streamStatusLambda.stack,
   'StreamStatusPublisherRule',
   {
     ruleName: 'StreamStatusEveryMinute',
-    description: 'Publishes stream status to IoT every minute',
+    description: 'Publishes stream status to IoT and checks for dynamic playlist updates every minute',
     schedule: events.Schedule.rate(Duration.minutes(1)),
   }
 )
 
 streamStatusRule.addTarget(new targets.LambdaFunction(streamStatusLambda))
+
+// ============================================
+// 📊 STREAM MONITOR - Queue & Stream Status
+// ============================================
+const streamMonitorLambda = backend.streamMonitor.resources.lambda
+
+// Grant SQS read access to get queue attributes and receive messages
+trackQueue.grant(streamMonitorLambda, 'sqs:GetQueueAttributes', 'sqs:ReceiveMessage')
+
+// Grant DynamoDB read access to StreamQueueTrack table for queue history
+streamQueueTrackTable.grantReadData(streamMonitorLambda)
+
+// Add environment variables
+backend.streamMonitor.addEnvironment('TRACK_QUEUE_URL', trackQueue.queueUrl)
+backend.streamMonitor.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrackTable.tableName)
+
+// NOTE: IAM permission for authenticated users to invoke stream-monitor Lambda
+// is managed manually via AWS CLI to avoid circular dependencies
+// See: aws iam put-role-policy --role-name <auth-role> --policy-name StreamMonitorLambdaInvoke
+
+// Output for Stream Monitor Lambda URL (optional: add Function URL if needed)
+new CfnOutput(streamMonitorLambda.stack, 'StreamMonitorLambdaName', {
+  value: streamMonitorLambda.functionName,
+  description: 'Stream Monitor Lambda function name',
+  exportName: 'StreamMonitorLambdaName',
+})
+
+// ============================================
+// 📊 TRACK COMPLETION HANDLER - Play Analytics
+// ============================================
+const trackCompletionLambda = backend.trackCompletionHandler.resources.lambda
+const trackPlayHistoryTable = backend.data.resources.tables['TrackPlayHistory']
+
+// Grant table permissions
+trackPlayHistoryTable.grantWriteData(trackCompletionLambda)
+trackTable.grantReadWriteData(trackCompletionLambda)
+if (backend.data.resources.tables['StreamQueueTrack']) {
+  backend.data.resources.tables['StreamQueueTrack'].grantReadWriteData(trackCompletionLambda)
+}
+
+// Add environment variables
+backend.trackCompletionHandler.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.trackCompletionHandler.addEnvironment('PLAY_HISTORY_TABLE', trackPlayHistoryTable.tableName)
+if (backend.data.resources.tables['StreamQueueTrack']) {
+  backend.trackCompletionHandler.addEnvironment('STREAM_QUEUE_TRACK_TABLE', backend.data.resources.tables['StreamQueueTrack'].tableName)
+}
+
+// IoT Rule to trigger on stream status updates (track changes)
+const trackCompletionRule = new iot.CfnTopicRule(trackCompletionLambda.stack, 'TrackCompletionRule', {
+  ruleName: 'TrackCompletionRule',
+  topicRulePayload: {
+    description: 'Triggers track completion handler when track finishes playing',
+    sql: "SELECT * FROM 'radio/stream/status' WHERE previousTrack.trackId <> ''",
+    actions: [{
+      lambda: {
+        functionArn: trackCompletionLambda.functionArn
+      }
+    }],
+    awsIotSqlVersion: '2016-03-23',
+    ruleDisabled: false
+  }
+})
+
+// Allow IoT to invoke Lambda
+trackCompletionLambda.addPermission('AllowIoTInvoke', {
+  principal: new ServicePrincipal('iot.amazonaws.com'),
+  sourceArn: trackCompletionRule.attrArn
+})
+
+console.log('✅ Track completion handler configured with IoT trigger')
 
 // VPC for EC2 Stream Server
 const vpc = new ec2.Vpc(streamPlaylistLambda.stack, 'StreamVPC', {
@@ -675,9 +807,12 @@ const ec2Role = new iam.Role(streamPlaylistLambda.stack, 'StreamServerRole', {
   ]
 })
 
-// Grant S3 read access to EC2
+// Grant S3 read access to EC2 (includes GetObject, ListBucket, GetBucketLocation)
 playlistBucket.grantRead(ec2Role)
 storageBucket.grantRead(ec2Role) // For reading audio files
+
+// Grant SQS read access to EC2 (for Liquidsoap to pull tracks)
+trackQueue.grantConsumeMessages(ec2Role)
 
 // User data script for EC2
 const userData = ec2.UserData.forLinux()
@@ -696,14 +831,28 @@ userData.addCommands(
   '# Pre-configure icecast2 to avoid interactive prompts',
   'echo "icecast2 icecast2/icecast-setup boolean false" | debconf-set-selections',
   '',
-  '# Install dependencies',
+  '# Install basic dependencies',
   'apt-get install -y \\',
   '  icecast2 \\',
   '  liquidsoap \\',
-  '  awscli \\',
   '  nginx \\',
   '  curl \\',
+  '  unzip \\',
   '  ffmpeg',
+  '',
+  '# Install AWS CLI v2 (Ubuntu 24.04 compatible)',
+  'echo "📦 Installing AWS CLI v2..."',
+  'cd /tmp',
+  'curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"',
+  'unzip -q awscliv2.zip',
+  'sudo ./aws/install',
+  'rm -rf aws awscliv2.zip',
+  '',
+  '# Install SSM Agent via snap',
+  'echo "📦 Installing SSM Agent..."',
+  'snap install amazon-ssm-agent --classic',
+  'systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service',
+  'systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service',
   '',
   '# Configure Icecast',
   'cat > /etc/icecast2/icecast.xml << "ICECAST_EOF"',
@@ -736,34 +885,93 @@ userData.addCommands(
   '# Enable Icecast',
   'sed -i "s/ENABLE=false/ENABLE=true/" /etc/default/icecast2',
   '',
-  '# Create radio directory',
-  'mkdir -p /opt/radio',
-  'mkdir -p /var/log/liquidsoap',
+  '# Configure Liquidsoap (SQS-based)',
+  'mkdir -p /opt/radio /var/log/liquidsoap',
   '',
-  '# Create Liquidsoap configuration',
-  `cat > /opt/radio/radio.liq << "LIQUIDSOAP_EOF"`,
-  '# G-Forge Radio - Liquidsoap Configuration',
-  'set("init.allow_root",true)',
+  '# Get SQS queue URL from CloudFormation export',
+  'echo "📥 Getting SQS queue URL..."',
+  'QUEUE_URL=$(/usr/local/bin/aws cloudformation list-exports --query "Exports[?Name==\'TrackQueueUrl\'].Value" --output text)',
+  'echo "$QUEUE_URL" > /opt/radio/queue-url.txt',
+  'echo "✅ Queue URL saved: $QUEUE_URL"',
+  '',
+  'cat > /opt/radio/radio.liq << \'LIQUIDSOAP_EOF\'',
+  '# G-Forge Radio - SQS Queue Based',
   'set("log.file.path", "/var/log/liquidsoap/radio.log")',
-  'set("log.level", 4)',
+  'set("log.level", 3)',
   '',
-  's3_bucket = "' + playlistBucket.bucketName + '"',
-  'playlist_file = "/tmp/current-playlist.m3u"',
+  'queue_url_file = "/opt/radio/queue-url.txt"',
+  'queue_url = ref("")',
   '',
-  'def fetch_playlist() =',
-  '  log("📥 Fetching playlist from S3...")',
-  '  ret = get_process_output("aws s3 cp s3://#{s3_bucket}/current-playlist.m3u #{playlist_file} 2>&1")',
-  '  log("S3 result: #{ret}")',
-  '  playlist_file',
+  '# Load queue URL',
+  'def load_queue_url() =',
+  '  if file.exists(queue_url_file) then',
+  '    lines = file.lines(queue_url_file)',
+  '    if list.length(lines) > 0 then',
+  '      queue_url := list.hd(default="", lines)',
+  '      log("Queue URL: #{!queue_url}")',
+  '    end',
+  '  end',
   'end',
   '',
-  'ignore(fetch_playlist())',
-  'add_timeout(300., fun () -> begin ignore(fetch_playlist()); -1. end)',
+  'load_queue_url()',
   '',
-  '# Create playlist source',
-  'radio = playlist(playlist_file, mode="normal", reload_mode="watch", reload=300)',
+  '# Parse track URL from SQS message',
+  'def parse_track_url(json_str) =',
+  '  if string.contains(substring="fileUrl", json_str) then',
+  '    start_pos = string.index(substring="\\"fileUrl\\":\\"", json_str)',
+  '    if start_pos >= 0 then',
+  '      url_start = start_pos + 11',
+  '      url_part = string.sub(json_str, start=url_start)',
+  '      url_end = string.index(substring="\\"", url_part)',
+  '      if url_end > 0 then',
+  '        string.sub(url_part, start=0, length=url_end)',
+  '      else',
+  '        ""',
+  '      end',
+  '    else',
+  '      ""',
+  '    end',
+  '  else',
+  '    ""',
+  '  end',
+  'end',
   '',
-  '# Fallback to silence when playlist is empty',
+  '# Get next track from SQS',
+  'def get_next_track() =',
+  '  log("Polling SQS...")',
+  '  cmd = "/usr/local/bin/aws sqs receive-message --queue-url \'#{!queue_url}\' --max-number-of-messages 1 --wait-time-seconds 20 --output json 2>&1"',
+  '  result = process.read(cmd)',
+  '  ',
+  '  track_url = parse_track_url(result)',
+  '  ',
+  '  if track_url != "" then',
+  '    log("Playing: #{track_url}")',
+  '    ',
+  '    # Extract receipt handle and delete message',
+  '    handle_start = string.index(substring="\\"ReceiptHandle\\":\\"", result)',
+  '    if handle_start >= 0 then',
+  '      handle_part = string.sub(result, start=handle_start + 17)',
+  '      handle_end = string.index(substring="\\"", handle_part)',
+  '      if handle_end > 0 then',
+  '        receipt = string.sub(handle_part, start=0, length=handle_end)',
+  '        del_cmd = "/usr/local/bin/aws sqs delete-message --queue-url \'#{!queue_url}\' --receipt-handle \'#{receipt}\'"',
+  '        ignore(process.read(del_cmd))',
+  '      end',
+  '    end',
+  '    ',
+  '    [request.create(track_url)]',
+  '  else',
+  '    []',
+  '  end',
+  'end',
+  '',
+  '# Dynamic request source',
+  'radio = request.dynamic(get_next_track)',
+  '',
+  '# Crossfade',
+  'radio = crossfade(start_next=3., fade_in=2., fade_out=2., radio)',
+  '',
+  '# Fallback to silence',
   'radio = fallback(track_sensitive=false, [radio, blank()])',
   'radio = normalize(radio)',
   '',
@@ -772,9 +980,8 @@ userData.addCommands(
   '  host="localhost",',
   '  port=8000,',
   '  password="gforge2024radio",',
-  '  mount="stream.mp3",',
-  '  name="G-Forge Radio",',
-  '  description="Techno & Electronic Music 24/7",',
+  '  mount="/stream.mp3",',
+  '  name="G-Forge Radio - SQS",',
   '  radio',
   ')',
   'LIQUIDSOAP_EOF',
@@ -797,9 +1004,6 @@ userData.addCommands(
   'WantedBy=multi-user.target',
   'SERVICE_EOF',
   '',
-  '# Create empty playlist',
-  'touch /tmp/current-playlist.m3u',
-  '',
   '# Start services',
   'systemctl daemon-reload',
   'systemctl enable icecast2',
@@ -807,13 +1011,41 @@ userData.addCommands(
   'systemctl enable liquidsoap-radio',
   'systemctl start liquidsoap-radio',
   '',
-  '# Configure nginx reverse proxy',
+  '# Download Splash FM player from S3',
+  'echo "📥 Downloading Splash FM player..."',
+  'mkdir -p /var/www/radio',
+  '/usr/local/bin/aws s3 cp s3://radio-playlists-035636364722/player-homepage-v2.html /var/www/radio/index.html',
+  '',
+  '# Configure nginx with Splash FM player',
   'cat > /etc/nginx/sites-available/radio << "NGINX_EOF"',
   'server {',
   '  listen 80;',
   '  server_name _;',
-  '  location / {',
-  '    proxy_pass http://localhost:8000;',
+  '',
+  '  # Serve Splash FM player on root',
+  '  location = / {',
+  '    root /var/www/radio;',
+  '    index index.html;',
+  '    try_files /index.html =404;',
+  '  }',
+  '',
+  '  # Proxy stream to Icecast',
+  '  location /stream.mp3 {',
+  '    proxy_pass http://localhost:8000/stream.mp3;',
+  '    proxy_set_header Host $host;',
+  '    proxy_buffering off;',
+  '    add_header Cache-Control "no-cache, no-store, must-revalidate";',
+  '  }',
+  '',
+  '  # Proxy admin interface to Icecast',
+  '  location /admin/ {',
+  '    proxy_pass http://localhost:8000/admin/;',
+  '    proxy_set_header Host $host;',
+  '  }',
+  '',
+  '  # Proxy status page to Icecast',
+  '  location /status-json.xsl {',
+  '    proxy_pass http://localhost:8000/status-json.xsl;',
   '    proxy_set_header Host $host;',
   '  }',
   '}',
@@ -903,11 +1135,47 @@ new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
   exportName: 'PlaylistBucketName',
 })
 
+new CfnOutput(streamPlaylistLambda.stack, 'TrackQueueUrl', {
+  value: trackQueue.queueUrl,
+  description: 'SQS queue URL for track streaming',
+  exportName: 'TrackQueueUrl',
+})
+
 new CfnOutput(streamPlaylistLambda.stack, 'StreamServerInstanceId', {
   value: streamInstance.instanceId,
   description: 'EC2 instance ID for stream server',
   exportName: 'StreamServerInstanceId',
 })
 
+// =============================================================================
+// Get Cover URL Lambda - Public endpoint for player page
+// =============================================================================
+
+const getCoverUrlLambda = backend.getCoverUrl.resources.lambda
+
+// Add environment variable
+backend.getCoverUrl.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
+
+// Grant S3 read permission
+storageBucket.grantRead(getCoverUrlLambda)
+
+// Add Function URL for public access (no auth required)
+const coverUrlFunctionUrl = getCoverUrlLambda.addFunctionUrl({
+  authType: FunctionUrlAuthType.NONE, // Public access
+  cors: {
+    allowedOrigins: ['*'],
+    allowedMethods: [HttpMethod.GET],
+    allowedHeaders: ['Content-Type'],
+    maxAge: Duration.hours(1)
+  }
+})
+
+// Output Function URL
+new CfnOutput(backend.getCoverUrl.resources.lambda.stack, 'CoverUrlFunctionUrl', {
+  value: coverUrlFunctionUrl.url,
+  description: 'Public URL for getting cover art signed URLs',
+  exportName: 'CoverUrlFunctionUrl',
+})
+
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
-console.log('📋 Stream Playlist Updater Lambda deployed with EventBridge (rate: 5 minutes)')
+console.log('📋 Stream Playlist Updater Lambda deployed with EventBridge (rate: 1 minute)')

@@ -1,28 +1,118 @@
 /**
- * Stream Playlist Updater Lambda
+ * Stream Playlist Updater Lambda - Radio Station Model
  * 
- * Runs every 5 minutes via EventBridge
- * Updates the M3U playlist in S3 based on current schedule
- * Liquidsoap automatically reloads the playlist
+ * Runs HOURLY (:00) via EventBridge
+ * Downloads news + Queues entire playlist to SQS
+ * 
+ * FLOW:
+ * 1. Download news MP3
+ * 2. Lookup schedule for current hour
+ * 3. Get full playlist
+ * 4. Queue: News → Track 1 → Track 2 → ... → Track N
+ * 5. Liquidsoap plays in order with minimal buffer
+ * 
+ * ARCHITECTUUR:
+ * Schedule → Playlist → Lambda → (News + Tracks) → SQS → Liquidsoap (EC2)
  */
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { SQSClient, SendMessageCommand, GetQueueAttributesCommand, PurgeQueueCommand } from '@aws-sdk/client-sqs'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import * as https from 'https'
 
-const s3 = new S3Client({})
+const sqs = new SQSClient({})
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+const s3 = new S3Client({})
 
-const PLAYLIST_BUCKET = process.env.PLAYLIST_BUCKET || ''
+const TRACK_QUEUE_URL = process.env.TRACK_QUEUE_URL || ''
 const STORAGE_BUCKET = process.env.STORAGE_BUCKET || ''
 const SCHEDULE_TABLE = process.env.SCHEDULE_TABLE || ''
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE || ''
 const TRACK_TABLE = process.env.TRACK_TABLE || ''
+const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''
+const STREAM_QUEUE_TRACK_TABLE = process.env.STREAM_QUEUE_TRACK_TABLE || ''
+
+// News URL
+const NEWS_URL = 'http://www.downloadlokaalmedia.nl/special/nieuwswildfm.mp3'
 
 interface Track {
   trackId: string
   trackTitle: string
+  trackArtist?: string
   trackDuration: number
   fileUrl: string
+  coverArtUrl?: string
+  waveformUrl?: string
+  genre?: string
+  bpm?: number
+  key?: string
+  energy?: number
+}
+
+interface SQSTrackMessage {
+  trackId: string
+  title: string
+  artist: string
+  fileUrl: string
+  duration: number
+  coverArtUrl?: string
+  waveformUrl?: string
+  genre?: string
+  bpm?: number
+  key?: string
+  energy?: number
+  scheduledAt: string
+  playlistId: string
+  playlistName: string
+}
+
+/**
+ * Download news MP3 and upload to S3
+ * Returns S3 URL for Liquidsoap
+ */
+async function downloadNews(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    console.log(`📰 Downloading news from ${NEWS_URL}`)
+    
+    https.get(NEWS_URL, (response) => {
+      if (response.statusCode !== 200) {
+        reject(new Error(`Failed to download news: ${response.statusCode}`))
+        return
+      }
+      
+      const chunks: Buffer[] = []
+      
+      response.on('data', (chunk) => {
+        chunks.push(chunk)
+      })
+      
+      response.on('end', async () => {
+        try {
+          const buffer = Buffer.concat(chunks)
+          const timestamp = Date.now()
+          const key = `public/news/nieuws-${timestamp}.mp3`
+          
+          // Upload to S3
+          await s3.send(new PutObjectCommand({
+            Bucket: STORAGE_BUCKET,
+            Key: key,
+            Body: buffer,
+            ContentType: 'audio/mpeg'
+          }))
+          
+          const s3Url = `s3://${STORAGE_BUCKET}/${key}`
+          console.log(`✅ News downloaded and uploaded to ${s3Url}`)
+          console.log(`   Size: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`)
+          
+          resolve(s3Url)
+        } catch (error) {
+          reject(error)
+        }
+      })
+      
+      response.on('error', reject)
+    }).on('error', reject)
+  })
 }
 
 /**
@@ -34,263 +124,278 @@ async function getCurrentScheduleSlot() {
   const currentTime = now.toTimeString().slice(0, 5) // HH:MM
   
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  console.log(`📅 Current: ${dayNames[dayOfWeek]} ${currentTime} (dayOfWeek=${dayOfWeek})`)
-
-  try {
-    // APPROACH: Scan table and filter by time + day
-    // This handles both:
-    // - Entries with dayOfWeek set (specific days)
-    // - Entries with dayOfWeek=null (every day)
-    const result = await dynamodb.send(new ScanCommand({
-      TableName: SCHEDULE_TABLE,
-      FilterExpression: 'isActive = :active',
-      ExpressionAttributeValues: {
-        ':active': true
-      }
-    }))
-
-    if (!result.Items || result.Items.length === 0) {
-      console.log('⚠️ No schedule entries found in table')
-      return null
-    }
+  const currentDayName = dayNames[dayOfWeek]
+  
+  console.log(`🗓️ Current time: ${currentDayName} (${dayOfWeek}) ${currentTime}`)
+  
+  // Scan Schedule table (we need scan because dayOfWeek can be null = every day)
+  const { Items = [] } = await dynamodb.send(new ScanCommand({
+    TableName: SCHEDULE_TABLE
+  }))
+  
+  console.log(`📋 Found ${Items.length} schedule entries`)
+  
+  // Find matching slot
+  for (const slot of Items) {
+    const slotDay = slot.dayOfWeek
+    const slotStart = slot.startTime
+    const slotEnd = slot.endTime
     
-    console.log(`📋 Found ${result.Items.length} total schedule entries`)
+    // Check if day matches (null/undefined = every day, otherwise compare as integers)
+    const dayMatches = (slotDay === null || slotDay === undefined) || slotDay === dayOfWeek
     
-    // Filter entries that match current day OR are null (= every day)
-    const todaySlots = result.Items.filter((item: any) => {
-      // null/undefined dayOfWeek means "every day"
-      if (item.dayOfWeek === null || item.dayOfWeek === undefined) {
-        return true
-      }
-      // Match specific day
-      return item.dayOfWeek === dayOfWeek
-    })
-    
-    console.log(`📋 Found ${todaySlots.length} slots for ${dayNames[dayOfWeek]}`)
-    
-    if (todaySlots.length === 0) {
-      console.log('⚠️ No schedule slots found for today')
-      return null
-    }
-
-    // Find slot where currentTime is between startTime and endTime
-    // Sort slots by startTime to find the current slot
-    todaySlots.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime))
-    
-    // Find the active slot: latest start time that's <= current time
-    let activeSlot = null
-    for (const slot of todaySlots) {
-      if (slot.startTime <= currentTime) {
-        // Check if there's an endTime and we're past it
-        if (slot.endTime && currentTime >= slot.endTime) {
-          continue // This slot has ended
-        }
-        activeSlot = slot
-      } else {
-        break // Slots are sorted, no need to check further
-      }
-    }
-
-    if (activeSlot) {
-      console.log(`✅ Active slot: ${activeSlot.startTime}-${activeSlot.endTime}, Playlist: ${activeSlot.playlistId}`)
+    // Check if time is within slot
+    // If endTime is null, slot runs until next hour
+    let timeMatches = false
+    if (slotEnd) {
+      timeMatches = currentTime >= slotStart && currentTime < slotEnd
     } else {
-      console.log('⚠️ No active slot for current time')
+      // No end time = slot is active for 1 hour
+      const slotHour = parseInt(slotStart.split(':')[0])
+      const currentHour = parseInt(currentTime.split(':')[0])
+      timeMatches = currentHour === slotHour
     }
-
-    return activeSlot || null
-  } catch (error) {
-    console.error('❌ Error getting schedule:', error)
-    return null
+    
+    console.log(`  Checking slot: ${slot.name || slot.slotName || 'Unnamed'}`)
+    console.log(`    Day: ${slotDay === null || slotDay === undefined ? 'Every day' : dayNames[slotDay]} (${slotDay}) - Match: ${dayMatches}`)
+    console.log(`    Time: ${slotStart}-${slotEnd || 'end of day'} - Match: ${timeMatches}`)
+    console.log(`    Active: ${slot.isActive}`)
+    
+    if (dayMatches && timeMatches && slot.isActive) {
+      console.log(`✅ Found active slot: ${slot.name || slot.slotName || 'Hourly Slot'}`)
+      console.log(`   Playlist ID: ${slot.playlistId}`)
+      return slot
+    }
   }
+  
+  console.log('⚠️ No active schedule slot found')
+  return null
 }
 
 /**
  * Get playlist with tracks
  */
-async function getPlaylist(playlistId: string) {
-  try {
-    const result = await dynamodb.send(new GetCommand({
-      TableName: PLAYLIST_TABLE,
-      Key: { id: playlistId }
-    }))
-
-    if (!result.Item) {
-      console.error(`❌ Playlist ${playlistId} not found`)
-      return null
-    }
-
-    console.log(`✅ Found playlist: ${result.Item.name}`)
-    return result.Item
-  } catch (error) {
-    console.error('❌ Error getting playlist:', error)
-    return null
+async function getPlaylistTracks(playlistId: string) {
+  const { Item: playlist } = await dynamodb.send(new GetCommand({
+    TableName: PLAYLIST_TABLE,
+    Key: { id: playlistId }
+  }))
+  
+  if (!playlist) {
+    throw new Error(`Playlist ${playlistId} not found`)
+  }
+  
+  // Parse tracks - they're already full track objects in the playlist
+  const tracks: Track[] = JSON.parse(playlist.tracks || '[]')
+  
+  console.log(`🎵 Playlist: ${playlist.name} (${tracks.length} tracks)`)
+  
+  return {
+    playlistId: playlist.id,
+    playlistName: playlist.name,
+    tracks
   }
 }
 
 /**
- * Load full track data for playlist tracks
+ * Send track to SQS queue
  */
-async function loadTracksData(playlistTracks: Track[]) {
-  const tracks: any[] = []
+async function sendTrackToQueue(track: any, playlistId: string, playlistName: string, scheduledAt: Date, position: number) {
+  // Get fileUrl - if missing from playlist, lookup from Track table
+  let fileUrl = track.fileUrl
   
-  // Limit to first 50 tracks for stream
-  const tracksToLoad = playlistTracks.slice(0, 50)
-  console.log(`📝 Loading ${tracksToLoad.length} tracks`)
-
-  for (const playlistTrack of tracksToLoad) {
+  if (!fileUrl && track.trackId) {
+    console.log(`⚠️ fileUrl missing, looking up Track ${track.trackId}`)
     try {
-      const trackId = playlistTrack.trackId
-
-      if (!trackId) {
-        console.warn('⚠️ Skipping track without ID')
-        continue
-      }
-
-      const result = await dynamodb.send(new GetCommand({
+      const { Item: fullTrack } = await dynamodb.send(new GetCommand({
         TableName: TRACK_TABLE,
-        Key: { id: trackId }
+        Key: { id: track.trackId }
       }))
-
-      if (result.Item) {
-        tracks.push(result.Item)
-      } else {
-        console.warn(`⚠️ Track ${trackId} not found in database`)
+      if (fullTrack?.fileUrl) {
+        fileUrl = fullTrack.fileUrl
       }
-    } catch (error) {
-      console.error(`❌ Error loading track:`, error)
+    } catch (err) {
+      console.error(`Failed to lookup track ${track.trackId}:`, err)
     }
   }
-
-  console.log(`✅ Loaded ${tracks.length} tracks`)
-  return tracks
-}
-
-/**
- * Generate M3U playlist content
- */
-function generateM3UPlaylist(tracks: any[]): string {
-  const lines = ['#EXTM3U']
   
-  for (const track of tracks) {
-    // EXTINF line with duration and title
-    const duration = Math.floor(track.trackDuration || 0)
-    const title = `${track.artist || 'Unknown'} - ${track.title || 'Unknown'}`
-    lines.push(`#EXTINF:${duration},${title}`)
-    
-    // File URL - S3 path that Liquidsoap can access via AWS CLI
-    // EC2 has IAM role with S3 read access
-    const fileUrl = track.fileUrl.startsWith('s3://') 
-      ? track.fileUrl 
-      : (track.fileUrl.startsWith('http') 
-        ? track.fileUrl 
-        : `s3://${STORAGE_BUCKET}/${track.fileUrl}`)
-    
-    lines.push(fileUrl)
+  // Construct proper S3 URL from fileUrl (which is relative path like "public/audio/filename.mp3")
+  if (fileUrl && !fileUrl.startsWith('s3://') && !fileUrl.startsWith('http')) {
+    fileUrl = `s3://${STORAGE_BUCKET}/${fileUrl}`
+  } else if (!fileUrl) {
+    // Fallback - should rarely happen
+    console.error(`❌ No fileUrl for track ${track.trackId}`)
+    fileUrl = `s3://${STORAGE_BUCKET}/public/audio/${track.trackId}.mp3`
   }
   
-  return lines.join('\n')
-}
-
-/**
- * Upload playlist to S3
- */
-async function uploadPlaylistToS3(playlistContent: string) {
-  try {
-    await s3.send(new PutObjectCommand({
-      Bucket: PLAYLIST_BUCKET,
-      Key: 'current-playlist.m3u',
-      Body: playlistContent,
-      ContentType: 'audio/x-mpegurl',
-      CacheControl: 'no-cache'
+  const message: SQSTrackMessage = {
+    trackId: track.trackId,
+    title: track.trackTitle || track.title || 'Unknown',
+    artist: track.trackArtist || track.artist || 'Unknown Artist',
+    fileUrl,
+    duration: track.trackDuration || track.duration || 180,
+    coverArtUrl: track.trackCoverArtUrl || track.coverArtUrl,
+    waveformUrl: track.waveformUrl,
+    genre: track.trackGenre || track.genre,
+    bpm: track.trackBpm || track.bpm,
+    key: track.trackKey || track.key,
+    energy: track.energy,
+    scheduledAt: scheduledAt.toISOString(),
+    playlistId,
+    playlistName
+  }
+  
+  await sqs.send(new SendMessageCommand({
+    QueueUrl: TRACK_QUEUE_URL,
+    MessageBody: JSON.stringify(message),
+    MessageGroupId: 'radio-stream', // Required for FIFO - ensures strict ordering
+  }))
+  
+  // Also log to DynamoDB for UI visibility
+  if (STREAM_QUEUE_TRACK_TABLE) {
+    const now = new Date()
+    const ttl = Math.floor(now.getTime() / 1000) + (24 * 60 * 60) // 24 hours from now
+    
+    await dynamodb.send(new PutCommand({
+      TableName: STREAM_QUEUE_TRACK_TABLE,
+      Item: {
+        id: `${Date.now()}-${track.trackId}`,
+        trackId: track.trackId,
+        artist: message.artist,
+        title: message.title,
+        version: track.version,
+        trackDuration: message.duration,
+        playlistId,
+        playlistName,
+        position,
+        queuedAt: now.toISOString(),
+        status: 'queued',
+        ttl,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      }
     }))
-
-    console.log('✅ Playlist uploaded to S3')
-    return true
-  } catch (error) {
-    console.error('❌ Error uploading playlist:', error)
-    return false
   }
+  
+  console.log(`📤 Sent to queue: ${track.trackArtist} - ${track.trackTitle}`)
 }
 
 /**
- * Main handler
+ * Main handler - HOURLY TRIGGER
  */
 export const handler = async (event: any) => {
-  console.log('🎵 Stream Playlist Updater started')
-  console.log('Event:', JSON.stringify(event, null, 2))
-
+  console.log('🎙️ Stream Playlist Updater (HOURLY) - Starting...')
+  console.log(`⏰ Triggered at: ${new Date().toISOString()}`)
+  
   try {
     // 1. Get current schedule slot
     const slot = await getCurrentScheduleSlot()
     
-    if (!slot) {
-      console.log('⏸️ No active schedule, keeping previous playlist')
+    if (!slot || !slot.playlistId) {
+      console.log('ℹ️ No active schedule slot - SILENCE (per requirement A)')
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: 'No active schedule' })
+        body: JSON.stringify({ 
+          message: 'No active schedule slot',
+          action: 'silence'
+        })
       }
     }
-
-    // 2. Get playlist
-    const playlist = await getPlaylist(slot.playlistId)
     
-    if (!playlist) {
-      console.error('❌ Failed to get playlist')
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: 'Playlist not found' })
-      }
-    }
-
-    // 3. Parse tracks
-    const parsedTracks = typeof playlist.tracks === 'string'
-      ? JSON.parse(playlist.tracks)
-      : playlist.tracks
-
-    console.log(`📋 Playlist has ${parsedTracks.length} tracks`)
-
-    // 4. Load full track data
-    const tracks = await loadTracksData(parsedTracks)
-
+    // 2. Get playlist and tracks
+    const { playlistId, playlistName, tracks } = await getPlaylistTracks(slot.playlistId)
+    
     if (tracks.length === 0) {
-      console.error('❌ No tracks loaded')
+      console.log('⚠️ Playlist has no tracks')
       return {
-        statusCode: 404,
-        body: JSON.stringify({ error: 'No tracks found' })
+        statusCode: 200,
+        body: JSON.stringify({ message: 'Playlist has no tracks' })
       }
     }
-
-    // 5. Generate M3U playlist
-    const m3uContent = generateM3UPlaylist(tracks)
-    console.log('📝 M3U playlist generated')
-    console.log('Preview:', m3uContent.split('\n').slice(0, 6).join('\n'))
-
-    // 6. Upload to S3
-    const uploaded = await uploadPlaylistToS3(m3uContent)
-
-    if (!uploaded) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to upload playlist' })
-      }
+    
+    // 3. PURGE QUEUE - Start fresh each hour!
+    console.log('🗑️ Purging old queue...')
+    try {
+      await sqs.send(new PurgeQueueCommand({
+        QueueUrl: TRACK_QUEUE_URL
+      }))
+      console.log('✅ Queue purged')
+      // Wait 60 seconds for purge to complete (AWS requirement)
+      await new Promise(resolve => setTimeout(resolve, 2000))
+    } catch (purgeError) {
+      console.log('⚠️ Purge failed (might be in cooldown), continuing anyway...')
     }
-
-    console.log('✅ Stream playlist updated successfully!')
-
+    
+    // 4. Download NEWS and queue it FIRST
+    console.log('📰 Downloading news...')
+    let newsQueued = false
+    try {
+      const newsUrl = await downloadNews()
+      
+      // Send news as first track
+      const newsMessage = {
+        trackId: `news-${Date.now()}`,
+        title: 'Splash FM Nieuws',
+        artist: 'Splash FM',
+        fileUrl: newsUrl,
+        duration: 300, // ~5 minutes
+        scheduledAt: new Date().toISOString(),
+        playlistId: 'NEWS',
+        playlistName: 'Nieuws'
+      }
+      
+      await sqs.send(new SendMessageCommand({
+        QueueUrl: TRACK_QUEUE_URL,
+        MessageBody: JSON.stringify(newsMessage),
+        MessageGroupId: 'radio-stream', // Required for FIFO - all messages in same group maintain order
+      }))
+      
+      console.log('✅ News queued as first item')
+      newsQueued = true
+    } catch (newsError) {
+      console.error('❌ Failed to download/queue news:', newsError)
+      console.log('⚠️ Continuing without news...')
+    }
+    
+    // 5. Queue ALL playlist tracks (not 2 random!)
+    console.log(`🎵 Queueing entire playlist: ${tracks.length} tracks`)
+    const now = new Date()
+    let scheduledTime = new Date(now.getTime() + (newsQueued ? 300000 : 0)) // +5 min if news
+    let tracksQueued = 0
+    
+    for (let i = 0; i < tracks.length; i++) {
+      const track = tracks[i]
+      
+      await sendTrackToQueue(track, playlistId, playlistName, scheduledTime, i + 1)
+      
+      // Next track starts after current duration
+      scheduledTime = new Date(scheduledTime.getTime() + ((track.trackDuration || 180) * 1000))
+      tracksQueued++
+    }
+    
+    console.log(`✅ HOURLY QUEUE COMPLETE!`)
+    console.log(`   📰 News: ${newsQueued ? 'YES' : 'NO'}`)
+    console.log(`   🎵 Tracks: ${tracksQueued}`)
+    console.log(`   ⏱️  Total duration: ~${Math.floor((scheduledTime.getTime() - now.getTime()) / 60000)} minutes`)
+    
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
-        playlistId: slot.playlistId,
-        tracksCount: tracks.length,
+        playlistId,
+        playlistName,
+        newsQueued,
+        tracksQueued,
+        totalDuration: Math.floor((scheduledTime.getTime() - now.getTime()) / 60000),
         slot: {
-          day: slot.dayOfWeek,
-          time: `${slot.startTime}-${slot.endTime}`
+          name: slot.name || slot.slotName,
+          day: slot.dayOfWeek === null ? 'Every day' : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][slot.dayOfWeek],
+          time: `${slot.startTime}-${slot.endTime || 'next hour'}`
         }
       })
     }
   } catch (error) {
-    console.error('❌ Error updating stream playlist:', error)
+    console.error('❌ Error updating stream queue:', error)
     return {
       statusCode: 500,
       body: JSON.stringify({
