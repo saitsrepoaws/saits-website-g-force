@@ -31,6 +31,7 @@ const PLAYER_STATE_TABLE = process.env.PLAYER_STATE_TABLE || ''
 const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''
 const STREAM_PLAYLIST_UPDATER_FUNCTION = process.env.STREAM_PLAYLIST_UPDATER_FUNCTION || ''
 const TRACK_TABLE = process.env.TRACK_TABLE || ''
+const PLAY_HISTORY_TABLE = process.env.PLAY_HISTORY_TABLE || ''
 const IOT_TOPIC = 'radio/stream/status'
 const NONSTOP_PLAYER_ID = 'nonstop'
 
@@ -95,6 +96,49 @@ async function triggerPlaylistUpdate() {
     return true
   } catch (error) {
     console.error('❌ Failed to trigger playlist updater:', error)
+    return false
+  }
+}
+
+/**
+ * Record track play and update statistics
+ */
+async function recordTrackPlay(previousTrack: { artist: string, title: string }, listeners: number) {
+  try {
+    const now = new Date().toISOString()
+    const playId = `${Date.now()}-${previousTrack.artist}-${previousTrack.title}`.replace(/[^a-zA-Z0-9-]/g, '_')
+    
+    console.log(`📊 Recording play: ${previousTrack.artist} - ${previousTrack.title}`)
+    
+    // 1. Record in play history
+    if (PLAY_HISTORY_TABLE) {
+      await dynamodb.send(new PutCommand({
+        TableName: PLAY_HISTORY_TABLE,
+        Item: {
+          id: playId,
+          trackId: playId, // We don't have trackId from filename, use constructed ID
+          artist: previousTrack.artist,
+          title: previousTrack.title,
+          playedAt: now,
+          duration: 0, // Unknown from current setup
+          source: 'stream',
+          listeners,
+          skipped: false,
+          createdAt: now,
+          updatedAt: now
+        }
+      }))
+      
+      console.log(`✅ Play recorded: ${playId}`)
+    }
+    
+    // 2. We can't update Track table directly without trackId
+    // This would require matching artist+title to track in Track table
+    // For now, just log the play in history
+    
+    return true
+  } catch (error) {
+    console.error('❌ Failed to record track play:', error)
     return false
   }
 }
@@ -179,6 +223,17 @@ export const handler = async (event: any) => {
       if (!currentState || currentState.currentTrackTitle !== newTrackTitle) {
         trackChanged = true
         trackStartTime = new Date()
+        
+        // Record play for PREVIOUS track (if exists)
+        if (currentState?.currentTrackArtist && currentState?.currentTrackTitle) {
+          await recordTrackPlay(
+            {
+              artist: currentState.currentTrackArtist,
+              title: currentState.currentTrackTitle
+            },
+            source?.listeners || 0
+          )
+        }
         
         // Reset playlist update trigger flag on track change
         await dynamodb.send(new PutCommand({

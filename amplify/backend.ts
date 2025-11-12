@@ -742,6 +742,7 @@ healthMonitorRule.addTarget(new targets.LambdaFunction(healthMonitorLambda))
 // 📡 STREAM STATUS PUBLISHER - IoT Real-time
 // ============================================
 const streamStatusLambda = backend.streamStatusPublisher.resources.lambda
+const trackPlayHistoryTable = backend.data.resources.tables['TrackPlayHistory']
 
 // Grant IoT publish permission
 streamStatusLambda.addToRolePolicy(
@@ -759,6 +760,7 @@ playlistBucket.grantRead(streamStatusLambda)
 playerStateTable.grantReadWriteData(streamStatusLambda)
 streamSettingsTable.grantReadData(streamStatusLambda)
 trackTable.grantReadData(streamStatusLambda)
+trackPlayHistoryTable.grantWriteData(streamStatusLambda)
 
 // Grant Lambda invoke permission to trigger stream playlist updater
 streamStatusLambda.addToRolePolicy(
@@ -774,6 +776,7 @@ backend.streamStatusPublisher.addEnvironment('PLAYLIST_BUCKET', playlistBucket.b
 backend.streamStatusPublisher.addEnvironment('PLAYER_STATE_TABLE', playerStateTable.tableName)
 backend.streamStatusPublisher.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
 backend.streamStatusPublisher.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.streamStatusPublisher.addEnvironment('PLAY_HISTORY_TABLE', trackPlayHistoryTable.tableName)
 backend.streamStatusPublisher.addEnvironment('STREAM_PLAYLIST_UPDATER_FUNCTION', streamPlaylistLambda.functionName)
 
 // EventBridge rule - Run every 1 minute for dynamic playlist updates (checks track timing)
@@ -818,7 +821,7 @@ new CfnOutput(streamMonitorLambda.stack, 'StreamMonitorLambdaName', {
 // 📊 TRACK COMPLETION HANDLER - Play Analytics
 // ============================================
 const trackCompletionLambda = backend.trackCompletionHandler.resources.lambda
-const trackPlayHistoryTable = backend.data.resources.tables['TrackPlayHistory']
+// trackPlayHistoryTable already declared above in streamStatusPublisher section
 
 // Grant table permissions
 trackPlayHistoryTable.grantWriteData(trackCompletionLambda)
