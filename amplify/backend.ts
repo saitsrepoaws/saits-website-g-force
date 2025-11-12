@@ -11,6 +11,7 @@ import { playerSimpleHandler } from './functions/player-simple-handler/resource'
 import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
+import { streamTrackPusher } from './functions/stream-track-pusher/resource'
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
@@ -57,6 +58,7 @@ export const backend = defineBackend({
   radioScheduler,
   crossfadeController,
   streamPlaylistUpdater,
+  streamTrackPusher,
   streamStatusPublisher,
   streamMonitor,
   trackCompletionHandler,
@@ -542,20 +544,8 @@ console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minu
 // Get Lambda for stream playlist updater
 const streamPlaylistLambda = backend.streamPlaylistUpdater.resources.lambda
 
-// Create FIFO SQS queue for track streaming (Lambda → Liquidsoap)
-// FIFO ensures strict ordering: News → Track 1 → Track 2 → ...
-const trackQueue = new sqs.Queue(
-  streamPlaylistLambda.stack,
-  'TrackStreamQueue',
-  {
-    queueName: 'radio-track-stream-queue.fifo', // FIFO queue MUST end with .fifo
-    fifo: true, // Enable FIFO mode
-    contentBasedDeduplication: true, // Auto-deduplication based on message body
-    visibilityTimeout: Duration.seconds(600), // 10 minutes per track (prevents in-flight buildup)
-    retentionPeriod: Duration.days(1), // Keep messages for 1 day
-    receiveMessageWaitTime: Duration.seconds(20), // Long polling
-  }
-)
+// NOTE: SQS queue removed - now using PUSH architecture with M3U files
+// Lambda generates M3U and pushes directly to EC2 via SSM
 
 // Create S3 bucket for playlists (legacy - will be replaced by SQS)
 const playlistBucket = new s3.Bucket(
@@ -581,8 +571,7 @@ trackTable.grantReadData(streamPlaylistLambda)
 streamSettingsTable.grantReadData(streamPlaylistLambda)
 streamQueueTrackTable.grantWriteData(streamPlaylistLambda) // Track queued songs for UI
 playlistBucket.grantWrite(streamPlaylistLambda)
-storageBucket.grantWrite(streamPlaylistLambda) // NEW: For uploading news MP3s
-trackQueue.grantSendMessages(streamPlaylistLambda) // NEW: SQS write access
+storageBucket.grantWrite(streamPlaylistLambda) // For uploading news MP3s
 
 // Grant explicit permission to scan and query Schedule table
 // Scan is needed because dayOfWeek can be null (= every day)
@@ -597,12 +586,15 @@ streamPlaylistLambda.addToRolePolicy(
   })
 )
 
-// Grant SQS purge permission for hourly queue reset
+// Grant SSM permissions to push M3U file to EC2
 streamPlaylistLambda.addToRolePolicy(
   new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,
-    actions: ['sqs:PurgeQueue', 'sqs:GetQueueAttributes'],
-    resources: [trackQueue.queueArn]
+    actions: ['ssm:SendCommand', 'ssm:GetCommandInvocation'],
+    resources: [
+      `arn:aws:ec2:*:${streamPlaylistLambda.stack.account}:instance/*`,
+      'arn:aws:ssm:*::document/AWS-RunShellScript'
+    ]
   })
 )
 
@@ -613,8 +605,7 @@ backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
-backend.streamPlaylistUpdater.addEnvironment('TRACK_QUEUE_URL', trackQueue.queueUrl) // NEW: SQS queue URL
-backend.streamPlaylistUpdater.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrackTable.tableName) // Track queue history
+backend.streamPlaylistUpdater.addEnvironment('EC2_INSTANCE_ID', 'i-021451e919d39c898') // EC2 Stream Server
 
 // EventBridge rule - Run HOURLY at :00 for radio station scheduling
 // Cron: minute hour day-of-month month day-of-week year
@@ -624,7 +615,7 @@ const streamSchedulerRule = new events.Rule(
   'StreamPlaylistSchedulerRule',
   {
     ruleName: 'StreamPlaylistHourly',
-    description: 'Updates stream playlist HOURLY - downloads news + queues full playlist per schedule',
+    description: 'Updates stream playlist HOURLY - downloads news + generates M3U + pushes to EC2',
     schedule: events.Schedule.cron({
       minute: '0',  // At :00
       hour: '*',    // Every hour
@@ -636,6 +627,61 @@ const streamSchedulerRule = new events.Rule(
 )
 
 streamSchedulerRule.addTarget(new targets.LambdaFunction(streamPlaylistLambda))
+
+// ============================================
+// 🎵 TRACK PUSHER - Smart 2-Track Buffer
+// ============================================
+// Runs every 2-3 minutes to maintain buffer
+const trackPusherLambda = backend.streamTrackPusher.resources.lambda
+
+// Grant permissions
+scheduleTable.grantReadData(trackPusherLambda)
+playlistTable.grantReadData(trackPusherLambda)
+trackTable.grantReadData(trackPusherLambda)
+
+// Grant SSM permissions
+trackPusherLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['ssm:SendCommand', 'ssm:GetCommandInvocation'],
+    resources: [
+      `arn:aws:ec2:*:${trackPusherLambda.stack.account}:instance/*`,
+      'arn:aws:ssm:*::document/AWS-RunShellScript'
+    ]
+  })
+)
+
+// Grant Scan permission
+trackPusherLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['dynamodb:Query', 'dynamodb:Scan'],
+    resources: [
+      scheduleTable.tableArn,
+      `${scheduleTable.tableArn}/index/*`
+    ]
+  })
+)
+
+// Add environment variables
+backend.streamTrackPusher.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
+backend.streamTrackPusher.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
+backend.streamTrackPusher.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.streamTrackPusher.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
+backend.streamTrackPusher.addEnvironment('EC2_INSTANCE_ID', 'i-021451e919d39c898')
+
+// EventBridge rule - Run every 3 minutes
+const trackPusherRule = new events.Rule(
+  trackPusherLambda.stack,
+  'TrackPusherRule',
+  {
+    ruleName: 'StreamTrackPusherEvery3Min',
+    description: 'Pushes next track to maintain 2-track buffer on EC2',
+    schedule: events.Schedule.rate(Duration.minutes(3))
+  }
+)
+
+trackPusherRule.addTarget(new targets.LambdaFunction(trackPusherLambda))
 
 // ============================================
 // 📡 STREAM STATUS PUBLISHER - IoT Real-time
@@ -693,14 +739,13 @@ streamStatusRule.addTarget(new targets.LambdaFunction(streamStatusLambda))
 // ============================================
 const streamMonitorLambda = backend.streamMonitor.resources.lambda
 
-// Grant SQS read access to get queue attributes and receive messages
-trackQueue.grant(streamMonitorLambda, 'sqs:GetQueueAttributes', 'sqs:ReceiveMessage')
+// NOTE: SQS removed - using PUSH architecture now
+// Stream monitor can check playlist file on EC2 instead
 
 // Grant DynamoDB read access to StreamQueueTrack table for queue history
 streamQueueTrackTable.grantReadData(streamMonitorLambda)
 
 // Add environment variables
-backend.streamMonitor.addEnvironment('TRACK_QUEUE_URL', trackQueue.queueUrl)
 backend.streamMonitor.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrackTable.tableName)
 
 // NOTE: IAM permission for authenticated users to invoke stream-monitor Lambda
@@ -811,8 +856,8 @@ const ec2Role = new iam.Role(streamPlaylistLambda.stack, 'StreamServerRole', {
 playlistBucket.grantRead(ec2Role)
 storageBucket.grantRead(ec2Role) // For reading audio files
 
-// Grant SQS read access to EC2 (for Liquidsoap to pull tracks)
-trackQueue.grantConsumeMessages(ec2Role)
+// NOTE: SQS removed - EC2 now reads from local M3U file
+// Liquidsoap uses playlist() operator with /var/radio/playlists/current.m3u
 
 // User data script for EC2
 const userData = ec2.UserData.forLinux()
@@ -1135,11 +1180,7 @@ new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
   exportName: 'PlaylistBucketName',
 })
 
-new CfnOutput(streamPlaylistLambda.stack, 'TrackQueueUrl', {
-  value: trackQueue.queueUrl,
-  description: 'SQS queue URL for track streaming',
-  exportName: 'TrackQueueUrl',
-})
+// NOTE: Removed TrackQueueUrl output - using M3U files now
 
 new CfnOutput(streamPlaylistLambda.stack, 'StreamServerInstanceId', {
   value: streamInstance.instanceId,
