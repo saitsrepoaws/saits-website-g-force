@@ -27,6 +27,10 @@ function Playlist() {
   const [newPlaylistKey, setNewPlaylistKey] = useState('')
   const [newPlaylistKeys, setNewPlaylistKeys] = useState<string[]>([]) // Multi-select keys
   const [newPlaylistTags, setNewPlaylistTags] = useState('')
+  // Jingle options
+  const [includeJingles, setIncludeJingles] = useState(false)
+  const [jinglesEveryN, setJinglesEveryN] = useState('2')
+  const [jingleGenre, setJingleGenre] = useState('WildFM Jingels')
   
   // Load playlists and genres
   useEffect(() => {
@@ -179,6 +183,10 @@ function Playlist() {
         tags: newPlaylistTags || undefined,
         maxTracks: 20,
         maxDuration: 59 * 60, // 59 minutes
+        // Jingle options
+        includeJingles,
+        jinglesEveryN: jinglesEveryN ? parseInt(jinglesEveryN) : undefined,
+        jingleGenre: jingleGenre || undefined,
       })
       
       if (errors) {
@@ -204,6 +212,9 @@ function Playlist() {
         setNewPlaylistBpmMax('')
         setNewPlaylistKeys([])
         setNewPlaylistTags('')
+        setIncludeJingles(false)
+        setJinglesEveryN('2')
+        setJingleGenre('WildFM Jingels')
       } else {
         // Show specific error message
         const errorMsg = data?.error || 'Failed to generate playlist'
@@ -807,6 +818,64 @@ function Playlist() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
                     />
                   </div>
+                </div>
+                
+                {/* Jingle Options */}
+                <div className="border-t pt-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <input
+                      type="checkbox"
+                      id="includeJingles"
+                      checked={includeJingles}
+                      onChange={(e) => setIncludeJingles(e.target.checked)}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <label htmlFor="includeJingles" className="text-sm font-medium text-gray-700 cursor-pointer">
+                      🎤 Include Jingles (Station IDs, Branding)
+                    </label>
+                  </div>
+                  
+                  {includeJingles && (
+                    <div className="ml-7 space-y-3">
+                      {/* Jingle Frequency */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Insert Jingle Every N Tracks
+                        </label>
+                        <select
+                          value={jinglesEveryN}
+                          onChange={(e) => setJinglesEveryN(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                        >
+                          <option value="2">Every 2 tracks</option>
+                          <option value="3">Every 3 tracks</option>
+                          <option value="4">Every 4 tracks</option>
+                          <option value="5">Every 5 tracks</option>
+                        </select>
+                      </div>
+                      
+                      {/* Jingle Genre */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Jingle Category
+                        </label>
+                        <select
+                          value={jingleGenre}
+                          onChange={(e) => setJingleGenre(e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                        >
+                          <option value="WildFM Jingels">WildFM Jingels</option>
+                          {availableGenres.filter(g => g.toLowerCase().includes('jingle') || g.toLowerCase().includes('id')).map(genre => (
+                            <option key={genre} value={genre}>{genre}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <p className="text-xs text-gray-500">
+                        💡 Jingles will be randomly inserted at the specified intervals to fill the hour perfectly
+                      </p>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Info Box */}

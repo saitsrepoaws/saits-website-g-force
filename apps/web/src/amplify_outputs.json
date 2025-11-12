@@ -1,3 +1,1932 @@
 {
+  "auth": {
+    "user_pool_id": "eu-west-1_x0kW3RbRF",
+    "aws_region": "eu-west-1",
+    "user_pool_client_id": "1b23ue66k3ipnsr02d8m3ru375",
+    "identity_pool_id": "eu-west-1:663600b7-5c9d-49b6-865e-2727c426f1f2",
+    "mfa_methods": [],
+    "standard_required_attributes": [
+      "email"
+    ],
+    "username_attributes": [
+      "email"
+    ],
+    "user_verification_types": [
+      "email"
+    ],
+    "groups": [],
+    "mfa_configuration": "NONE",
+    "password_policy": {
+      "min_length": 8,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_symbols": true,
+      "require_uppercase": true
+    },
+    "unauthenticated_identities_enabled": true
+  },
+  "data": {
+    "url": "https://3xebr33oejghvevq22tg52nbba.appsync-api.eu-west-1.amazonaws.com/graphql",
+    "aws_region": "eu-west-1",
+    "api_key": "da2-m6uv5vswjvag3a5r3h7vg3b2xa",
+    "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
+    "authorization_types": [
+      "API_KEY",
+      "AWS_IAM"
+    ],
+    "model_introspection": {
+      "version": 1,
+      "models": {
+        "Playlist": {
+          "name": "Playlist",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "coverImageUrl": {
+              "name": "coverImageUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "mood": {
+              "name": "mood",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bpmMin": {
+              "name": "bpmMin",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bpmMax": {
+              "name": "bpmMax",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "key": {
+              "name": "key",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "tags": {
+              "name": "tags",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "tracks": {
+              "name": "tracks",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "trackCount": {
+              "name": "trackCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "totalDuration": {
+              "name": "totalDuration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            }
+          },
+          "syncable": true,
+          "pluralName": "Playlists",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "Schedule": {
+          "name": "Schedule",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "dayOfWeek": {
+              "name": "dayOfWeek",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "startTime": {
+              "name": "startTime",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "endTime": {
+              "name": "endTime",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "startDate": {
+              "name": "startDate",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "endDate": {
+              "name": "endDate",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistId": {
+              "name": "playlistId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "isActive": {
+              "name": "isActive",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "priority": {
+              "name": "priority",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            }
+          },
+          "syncable": true,
+          "pluralName": "Schedules",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "name": "schedulesByDayOfWeekAndStartTime",
+                "queryField": "listScheduleByDayOfWeekAndStartTime",
+                "fields": [
+                  "dayOfWeek",
+                  "startTime"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "UserPreferences": {
+          "name": "UserPreferences",
+          "fields": {
+            "userId": {
+              "name": "userId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "notificationsEnabled": {
+              "name": "notificationsEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "notifyOnTrackChange": {
+              "name": "notifyOnTrackChange",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "notifyOnPlaylistUpdate": {
+              "name": "notifyOnPlaylistUpdate",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "notifyOnLogin": {
+              "name": "notifyOnLogin",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "theme": {
+              "name": "theme",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "defaultView": {
+              "name": "defaultView",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastLoginAt": {
+              "name": "lastLoginAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastLogoutAt": {
+              "name": "lastLogoutAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "loginCount": {
+              "name": "loginCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            }
+          },
+          "syncable": true,
+          "pluralName": "UserPreferences",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "userId"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "provider": "userPools",
+                    "ownerField": "owner",
+                    "allow": "owner",
+                    "identityClaim": "cognito:username",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  },
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": true,
+            "primaryKeyFieldName": "userId",
+            "sortKeyFieldNames": []
+          }
+        },
+        "PlayerState": {
+          "name": "PlayerState",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "playerId": {
+              "name": "playerId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "currentTrackId": {
+              "name": "currentTrackId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentTrackTitle": {
+              "name": "currentTrackTitle",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentTrackArtist": {
+              "name": "currentTrackArtist",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentPlaylistId": {
+              "name": "currentPlaylistId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "status": {
+              "name": "status",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastPosition": {
+              "name": "lastPosition",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "duration": {
+              "name": "duration",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "volume": {
+              "name": "volume",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "autoPlayEnabled": {
+              "name": "autoPlayEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentScheduleSlotId": {
+              "name": "currentScheduleSlotId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentScheduleSlotName": {
+              "name": "currentScheduleSlotName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastActive": {
+              "name": "lastActive",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastUpdated": {
+              "name": "lastUpdated",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "deviceInfo": {
+              "name": "deviceInfo",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "PlayerStates",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "StreamSettings": {
+          "name": "StreamSettings",
+          "fields": {
+            "settingKey": {
+              "name": "settingKey",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "playlistUpdateTriggerSeconds": {
+              "name": "playlistUpdateTriggerSeconds",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistUpdateMinTrackDuration": {
+              "name": "playlistUpdateMinTrackDuration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistUpdateFallbackInterval": {
+              "name": "playlistUpdateFallbackInterval",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "streamServerUrl": {
+              "name": "streamServerUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "streamMountPoint": {
+              "name": "streamMountPoint",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeEnabled": {
+              "name": "crossfadeEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeStartNext": {
+              "name": "crossfadeStartNext",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeFadeIn": {
+              "name": "crossfadeFadeIn",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeFadeOut": {
+              "name": "crossfadeFadeOut",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeNormalize": {
+              "name": "crossfadeNormalize",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "smartCrossfadeEnabled": {
+              "name": "smartCrossfadeEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "smartCrossfadeBpmTolerance": {
+              "name": "smartCrossfadeBpmTolerance",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "smartCrossfadeAutoAdjust": {
+              "name": "smartCrossfadeAutoAdjust",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "harmonicMixingEnabled": {
+              "name": "harmonicMixingEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "harmonicMixingStrict": {
+              "name": "harmonicMixingStrict",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "harmonicMixingBoost": {
+              "name": "harmonicMixingBoost",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "energyMatchingEnabled": {
+              "name": "energyMatchingEnabled",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "energyMatchingTolerance": {
+              "name": "energyMatchingTolerance",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "energyMatchingSmoothTransitions": {
+              "name": "energyMatchingSmoothTransitions",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadeConservative": {
+              "name": "crossfadeConservative",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "crossfadePreset": {
+              "name": "crossfadePreset",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastModifiedBy": {
+              "name": "lastModifiedBy",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            }
+          },
+          "syncable": true,
+          "pluralName": "StreamSettings",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "fields": [
+                  "settingKey"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": true,
+            "primaryKeyFieldName": "settingKey",
+            "sortKeyFieldNames": []
+          }
+        },
+        "StreamQueueTrack": {
+          "name": "StreamQueueTrack",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "trackId": {
+              "name": "trackId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "artist": {
+              "name": "artist",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "title": {
+              "name": "title",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "version": {
+              "name": "version",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "trackDuration": {
+              "name": "trackDuration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistId": {
+              "name": "playlistId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistName": {
+              "name": "playlistName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "position": {
+              "name": "position",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "queuedAt": {
+              "name": "queuedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": true,
+              "attributes": []
+            },
+            "status": {
+              "name": "status",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "completedAt": {
+              "name": "completedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ttl": {
+              "name": "ttl",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "StreamQueueTracks",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "TrackPlayHistory": {
+          "name": "TrackPlayHistory",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "trackId": {
+              "name": "trackId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "artist": {
+              "name": "artist",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "title": {
+              "name": "title",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "version": {
+              "name": "version",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistId": {
+              "name": "playlistId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playlistName": {
+              "name": "playlistName",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playedAt": {
+              "name": "playedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": true,
+              "attributes": []
+            },
+            "duration": {
+              "name": "duration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "source": {
+              "name": "source",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "listeners": {
+              "name": "listeners",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "skipped": {
+              "name": "skipped",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "TrackPlayHistories",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "name": "trackPlayHistoriesByTrackIdAndPlayedAt",
+                "queryField": "listTrackPlayHistoryByTrackIdAndPlayedAt",
+                "fields": [
+                  "trackId",
+                  "playedAt"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "StreamHealthLog": {
+          "name": "StreamHealthLog",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "timestamp": {
+              "name": "timestamp",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "icecastUp": {
+              "name": "icecastUp",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": true,
+              "attributes": []
+            },
+            "streamFlowing": {
+              "name": "streamFlowing",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": true,
+              "attributes": []
+            },
+            "liquidsoakRunning": {
+              "name": "liquidsoakRunning",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": true,
+              "attributes": []
+            },
+            "trackCount": {
+              "name": "trackCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": true,
+              "attributes": []
+            },
+            "bitrate": {
+              "name": "bitrate",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "listenerCount": {
+              "name": "listenerCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": true,
+              "attributes": []
+            },
+            "currentTrack": {
+              "name": "currentTrack",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "actionsTaken": {
+              "name": "actionsTaken",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "ttl": {
+              "name": "ttl",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "StreamHealthLogs",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "ListenerSession": {
+          "name": "ListenerSession",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "sessionId": {
+              "name": "sessionId",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "ipHash": {
+              "name": "ipHash",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "userAgent": {
+              "name": "userAgent",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "device": {
+              "name": "device",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "os": {
+              "name": "os",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "player": {
+              "name": "player",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "country": {
+              "name": "country",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "city": {
+              "name": "city",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "connectTime": {
+              "name": "connectTime",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": true,
+              "attributes": []
+            },
+            "disconnectTime": {
+              "name": "disconnectTime",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "duration": {
+              "name": "duration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "tracksHeard": {
+              "name": "tracksHeard",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "currentTrack": {
+              "name": "currentTrack",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "ListenerSessions",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "key",
+              "properties": {
+                "name": "listenerSessionsByIpHashAndConnectTime",
+                "queryField": "listListenerSessionByIpHashAndConnectTime",
+                "fields": [
+                  "ipHash",
+                  "connectTime"
+                ]
+              }
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "ListenerProfile": {
+          "name": "ListenerProfile",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "ipHash": {
+              "name": "ipHash",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "firstSeen": {
+              "name": "firstSeen",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": true,
+              "attributes": []
+            },
+            "lastSeen": {
+              "name": "lastSeen",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": true,
+              "attributes": []
+            },
+            "totalSessions": {
+              "name": "totalSessions",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "totalListenTime": {
+              "name": "totalListenTime",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "favoriteHours": {
+              "name": "favoriteHours",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "returningListener": {
+              "name": "returningListener",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false,
+              "attributes": []
+            },
+            "country": {
+              "name": "country",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "city": {
+              "name": "city",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastDevice": {
+              "name": "lastDevice",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastOs": {
+              "name": "lastOs",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastPlayer": {
+              "name": "lastPlayer",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "ListenerProfiles",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        },
+        "Track": {
+          "name": "Track",
+          "fields": {
+            "id": {
+              "name": "id",
+              "isArray": false,
+              "type": "ID",
+              "isRequired": true,
+              "attributes": []
+            },
+            "artist": {
+              "name": "artist",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "title": {
+              "name": "title",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true,
+              "attributes": []
+            },
+            "version": {
+              "name": "version",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "label": {
+              "name": "label",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "year": {
+              "name": "year",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "duration": {
+              "name": "duration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "fileUrl": {
+              "name": "fileUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "fileSize": {
+              "name": "fileSize",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "format": {
+              "name": "format",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "addedAt": {
+              "name": "addedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "bpm": {
+              "name": "bpm",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "key": {
+              "name": "key",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "energy": {
+              "name": "energy",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "danceability": {
+              "name": "danceability",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "valence": {
+              "name": "valence",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "coverArtUrl": {
+              "name": "coverArtUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "waveformUrl": {
+              "name": "waveformUrl",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "peaks": {
+              "name": "peaks",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false,
+              "attributes": []
+            },
+            "trimStart": {
+              "name": "trimStart",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "trimEnd": {
+              "name": "trimEnd",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "playCount": {
+              "name": "playCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "lastPlayedAt": {
+              "name": "lastPlayedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": []
+            },
+            "totalListeners": {
+              "name": "totalListeners",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "averageListeners": {
+              "name": "averageListeners",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "skipCount": {
+              "name": "skipCount",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false,
+              "attributes": []
+            },
+            "popularityScore": {
+              "name": "popularityScore",
+              "isArray": false,
+              "type": "Float",
+              "isRequired": false,
+              "attributes": []
+            },
+            "createdAt": {
+              "name": "createdAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            },
+            "updatedAt": {
+              "name": "updatedAt",
+              "isArray": false,
+              "type": "AWSDateTime",
+              "isRequired": false,
+              "attributes": [],
+              "isReadOnly": true
+            }
+          },
+          "syncable": true,
+          "pluralName": "Tracks",
+          "attributes": [
+            {
+              "type": "model",
+              "properties": {}
+            },
+            {
+              "type": "auth",
+              "properties": {
+                "rules": [
+                  {
+                    "allow": "private",
+                    "operations": [
+                      "create",
+                      "update",
+                      "delete",
+                      "read"
+                    ]
+                  },
+                  {
+                    "allow": "public",
+                    "provider": "apiKey",
+                    "operations": [
+                      "read"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "primaryKeyInfo": {
+            "isCustomPrimaryKey": false,
+            "primaryKeyFieldName": "id",
+            "sortKeyFieldNames": []
+          }
+        }
+      },
+      "enums": {},
+      "nonModels": {},
+      "queries": {
+        "generatePlaylist": {
+          "name": "generatePlaylist",
+          "isArray": false,
+          "type": "AWSJSON",
+          "isRequired": false,
+          "arguments": {
+            "name": {
+              "name": "name",
+              "isArray": false,
+              "type": "String",
+              "isRequired": true
+            },
+            "description": {
+              "name": "description",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "genre": {
+              "name": "genre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "mood": {
+              "name": "mood",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "bpmMin": {
+              "name": "bpmMin",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "bpmMax": {
+              "name": "bpmMax",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "keys": {
+              "name": "keys",
+              "isArray": true,
+              "type": "String",
+              "isRequired": false,
+              "isArrayNullable": true
+            },
+            "tags": {
+              "name": "tags",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
+            "maxTracks": {
+              "name": "maxTracks",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "maxDuration": {
+              "name": "maxDuration",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "includeJingles": {
+              "name": "includeJingles",
+              "isArray": false,
+              "type": "Boolean",
+              "isRequired": false
+            },
+            "jinglesEveryN": {
+              "name": "jinglesEveryN",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "jingleGenre": {
+              "name": "jingleGenre",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            }
+          }
+        }
+      }
+    }
+  },
+  "storage": {
+    "aws_region": "eu-west-1",
+    "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-ezjbtc4ovwwr",
+    "buckets": [
+      {
+        "name": "gforgeIotStorage",
+        "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-ezjbtc4ovwwr",
+        "aws_region": "eu-west-1",
+        "paths": {
+          "public/audio/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
+          },
+          "public/covers/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
+          },
+          "public/waveforms/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
+          }
+        }
+      }
+    ]
+  },
   "version": "1.4"
 }

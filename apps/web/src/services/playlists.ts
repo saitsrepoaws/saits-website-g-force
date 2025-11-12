@@ -20,6 +20,10 @@ interface GeneratePlaylistInput {
   tags?: string
   maxTracks?: number
   maxDuration?: number
+  // Jingle options
+  includeJingles?: boolean
+  jinglesEveryN?: number
+  jingleGenre?: string
 }
 
 // Lazy client - only create after Amplify.configure()
