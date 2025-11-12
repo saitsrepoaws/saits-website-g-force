@@ -23,6 +23,14 @@ function App() {
           />
           
           <NavigationCard
+            to="/dj-voice"
+            icon="🎤"
+            title="DJ Voice"
+            description="AI-powered voice synthesis for station IDs, intros, and live announcements."
+            disabled
+          />
+          
+          <NavigationCard
             to="/analytics"
             icon="📊"
             title="Analytics"
