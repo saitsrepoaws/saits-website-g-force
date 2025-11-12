@@ -1,36 +1,36 @@
 /**
- * Stream Playlist Updater Lambda - Radio Station Model
+ * Stream Playlist Updater Lambda - PUSH Architecture
  * 
  * Runs HOURLY (:00) via EventBridge
- * Downloads news + Queues entire playlist to SQS
+ * Downloads news + Generates M3U playlist + Pushes to EC2
  * 
  * FLOW:
- * 1. Download news MP3
+ * 1. Download news MP3 → Upload to S3
  * 2. Lookup schedule for current hour
  * 3. Get full playlist
- * 4. Queue: News → Track 1 → Track 2 → ... → Track N
- * 5. Liquidsoap plays in order with minimal buffer
+ * 4. Generate M3U file: News → Track 1 → Track 2 → ... → Track N
+ * 5. Upload M3U to EC2 /var/radio/playlists/current.m3u
+ * 6. Liquidsoap auto-reloads and plays!
  * 
  * ARCHITECTUUR:
- * Schedule → Playlist → Lambda → (News + Tracks) → SQS → Liquidsoap (EC2)
+ * Schedule → Playlist → Lambda → M3U → EC2 → Liquidsoap playlist()
  */
-import { SQSClient, SendMessageCommand, GetQueueAttributesCommand, PurgeQueueCommand } from '@aws-sdk/client-sqs'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand, PutCommand } from '@aws-sdk/lib-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { SSMClient, SendCommandCommand, GetCommandInvocationCommand } from '@aws-sdk/client-ssm'
 import * as https from 'https'
+import * as http from 'http'
 
-const sqs = new SQSClient({})
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 const s3 = new S3Client({})
+const ssm = new SSMClient({})
 
-const TRACK_QUEUE_URL = process.env.TRACK_QUEUE_URL || ''
 const STORAGE_BUCKET = process.env.STORAGE_BUCKET || ''
 const SCHEDULE_TABLE = process.env.SCHEDULE_TABLE || ''
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE || ''
 const TRACK_TABLE = process.env.TRACK_TABLE || ''
-const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''
-const STREAM_QUEUE_TRACK_TABLE = process.env.STREAM_QUEUE_TRACK_TABLE || ''
+const EC2_INSTANCE_ID = process.env.EC2_INSTANCE_ID || ''
 
 // News URL
 const NEWS_URL = 'http://www.downloadlokaalmedia.nl/special/nieuwswildfm.mp3'
@@ -49,21 +49,88 @@ interface Track {
   energy?: number
 }
 
-interface SQSTrackMessage {
-  trackId: string
-  title: string
-  artist: string
-  fileUrl: string
-  duration: number
-  coverArtUrl?: string
-  waveformUrl?: string
-  genre?: string
-  bpm?: number
-  key?: string
-  energy?: number
-  scheduledAt: string
-  playlistId: string
-  playlistName: string
+/**
+ * Download all files from S3 to EC2 in a single SSM command and WAIT for completion
+ */
+async function downloadAllFilesToEC2(downloads: Array<{s3Url: string, localPath: string}>): Promise<void> {
+  // Generate bash script to download all files
+  const commands = [
+    '#!/bin/bash',
+    'set -e',  // Exit on error
+    'echo "Starting batch download..."',
+    ...downloads.map(({s3Url, localPath}) => 
+      `echo "Downloading ${localPath}..." && aws s3 cp "${s3Url}" "${localPath}" --region eu-west-1 --quiet && chmod 644 "${localPath}"`
+    ),
+    'echo "All downloads complete!"'
+  ]
+  
+  // Send command
+  const result = await ssm.send(new SendCommandCommand({
+    InstanceIds: [EC2_INSTANCE_ID],
+    DocumentName: 'AWS-RunShellScript',
+    Parameters: {
+      commands
+    }
+  }))
+  
+  const commandId = result.Command?.CommandId
+  if (!commandId) {
+    throw new Error('No CommandId returned from SSM')
+  }
+  
+  console.log(`📤 SSM Command sent: ${commandId}`)
+  console.log(`⏳ Waiting for downloads to complete (max 2 minutes)...`)
+  
+  // Wait for command to complete
+  for (let i = 0; i < 24; i++) { // 24 * 5s = 120s = 2 minutes
+    await new Promise(resolve => setTimeout(resolve, 5000)) // Wait 5 seconds
+    
+    try {
+      const invocation = await ssm.send(new GetCommandInvocationCommand({
+        CommandId: commandId,
+        InstanceId: EC2_INSTANCE_ID
+      }))
+      
+      const status = invocation.Status
+      console.log(`  Status: ${status} (${i * 5}s)`)  
+      
+      if (status === 'Success') {
+        console.log(`✅ Downloads completed successfully!`)
+        return
+      } else if (status === 'Failed' || status === 'Cancelled' || status === 'TimedOut') {
+        throw new Error(`SSM command failed with status: ${status}`)
+      }
+    } catch (err) {
+      if (i < 3) continue // First few checks might fail, keep retrying
+      throw err
+    }
+  }
+  
+  console.log(`⚠️ Download timeout reached, proceeding anyway...`)
+}
+
+/**
+ * Generate M3U playlist file content with LOCAL file paths
+ */
+function generateM3U(newsLocalPath: string | null, tracks: Array<{track: Track, localPath: string}>): string {
+  let m3u = '#EXTM3U\n'
+  
+  // Add news first if available
+  if (newsLocalPath) {
+    m3u += `#EXTINF:300,Splash FM Nieuws\n`
+    m3u += `${newsLocalPath}\n`
+  }
+  
+  // Add all tracks with LOCAL paths
+  for (const {track, localPath} of tracks) {
+    const duration = track.trackDuration || 180
+    const artist = track.trackArtist || 'Unknown Artist'
+    const title = track.trackTitle || 'Unknown'
+    m3u += `#EXTINF:${duration},${artist} - ${title}\n`
+    m3u += `${localPath}\n`
+  }
+  
+  return m3u
 }
 
 /**
@@ -74,7 +141,10 @@ async function downloadNews(): Promise<string> {
   return new Promise((resolve, reject) => {
     console.log(`📰 Downloading news from ${NEWS_URL}`)
     
-    https.get(NEWS_URL, (response) => {
+    // Use http module for http:// URLs, https for https://
+    const httpModule = NEWS_URL.startsWith('https://') ? https : http
+    
+    httpModule.get(NEWS_URL, (response) => {
       if (response.statusCode !== 200) {
         reject(new Error(`Failed to download news: ${response.statusCode}`))
         return
@@ -117,16 +187,24 @@ async function downloadNews(): Promise<string> {
 
 /**
  * Get current active schedule slot
+ * NOTE: Converts UTC to CET (UTC+1) for schedule matching
  */
 async function getCurrentScheduleSlot() {
-  const now = new Date()
-  const dayOfWeek = now.getDay() // 0=Sunday, 1=Monday, ..., 6=Saturday
-  const currentTime = now.toTimeString().slice(0, 5) // HH:MM
+  const nowUTC = new Date()
+  
+  // Convert UTC to CET (UTC+1)
+  // Add 1 hour (3600000 milliseconds) for CET timezone
+  const nowCET = new Date(nowUTC.getTime() + (60 * 60 * 1000))
+  
+  const dayOfWeek = nowCET.getUTCDay() // 0=Sunday, 1=Monday, ..., 6=Saturday
+  const hours = nowCET.getUTCHours().toString().padStart(2, '0')
+  const minutes = nowCET.getUTCMinutes().toString().padStart(2, '0')
+  const currentTime = `${hours}:${minutes}` // HH:MM in CET
   
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const currentDayName = dayNames[dayOfWeek]
   
-  console.log(`🗓️ Current time: ${currentDayName} (${dayOfWeek}) ${currentTime}`)
+  console.log(`🗓️ Current time: ${currentDayName} (${dayOfWeek}) ${currentTime} CET (UTC: ${nowUTC.toISOString()})`)
   
   // Scan Schedule table (we need scan because dayOfWeek can be null = every day)
   const { Items = [] } = await dynamodb.send(new ScanCommand({
@@ -198,93 +276,69 @@ async function getPlaylistTracks(playlistId: string) {
 }
 
 /**
- * Send track to SQS queue
+ * Get correct fileUrl from Track table (playlist data may be outdated)
  */
-async function sendTrackToQueue(track: any, playlistId: string, playlistName: string, scheduledAt: Date, position: number) {
-  // Get fileUrl - if missing from playlist, lookup from Track table
-  let fileUrl = track.fileUrl
-  
-  if (!fileUrl && track.trackId) {
-    console.log(`⚠️ fileUrl missing, looking up Track ${track.trackId}`)
-    try {
-      const { Item: fullTrack } = await dynamodb.send(new GetCommand({
-        TableName: TRACK_TABLE,
-        Key: { id: track.trackId }
-      }))
-      if (fullTrack?.fileUrl) {
-        fileUrl = fullTrack.fileUrl
-      }
-    } catch (err) {
-      console.error(`Failed to lookup track ${track.trackId}:`, err)
-    }
-  }
-  
-  // Construct proper S3 URL from fileUrl (which is relative path like "public/audio/filename.mp3")
-  if (fileUrl && !fileUrl.startsWith('s3://') && !fileUrl.startsWith('http')) {
-    fileUrl = `s3://${STORAGE_BUCKET}/${fileUrl}`
-  } else if (!fileUrl) {
-    // Fallback - should rarely happen
-    console.error(`❌ No fileUrl for track ${track.trackId}`)
-    fileUrl = `s3://${STORAGE_BUCKET}/public/audio/${track.trackId}.mp3`
-  }
-  
-  const message: SQSTrackMessage = {
-    trackId: track.trackId,
-    title: track.trackTitle || track.title || 'Unknown',
-    artist: track.trackArtist || track.artist || 'Unknown Artist',
-    fileUrl,
-    duration: track.trackDuration || track.duration || 180,
-    coverArtUrl: track.trackCoverArtUrl || track.coverArtUrl,
-    waveformUrl: track.waveformUrl,
-    genre: track.trackGenre || track.genre,
-    bpm: track.trackBpm || track.bpm,
-    key: track.trackKey || track.key,
-    energy: track.energy,
-    scheduledAt: scheduledAt.toISOString(),
-    playlistId,
-    playlistName
-  }
-  
-  await sqs.send(new SendMessageCommand({
-    QueueUrl: TRACK_QUEUE_URL,
-    MessageBody: JSON.stringify(message),
-    MessageGroupId: 'radio-stream', // Required for FIFO - ensures strict ordering
-  }))
-  
-  // Also log to DynamoDB for UI visibility
-  if (STREAM_QUEUE_TRACK_TABLE) {
-    const now = new Date()
-    const ttl = Math.floor(now.getTime() / 1000) + (24 * 60 * 60) // 24 hours from now
+async function getTrackFileUrl(track: any): Promise<string> {
+  // Always lookup from Track table for correct S3 path
+  try {
+    const { Item: fullTrack } = await dynamodb.send(new GetCommand({
+      TableName: TRACK_TABLE,
+      Key: { id: track.trackId }
+    }))
     
-    await dynamodb.send(new PutCommand({
-      TableName: STREAM_QUEUE_TRACK_TABLE,
-      Item: {
-        id: `${Date.now()}-${track.trackId}`,
-        trackId: track.trackId,
-        artist: message.artist,
-        title: message.title,
-        version: track.version,
-        trackDuration: message.duration,
-        playlistId,
-        playlistName,
-        position,
-        queuedAt: now.toISOString(),
-        status: 'queued',
-        ttl,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
+    if (fullTrack?.fileUrl) {
+      let fileUrl = fullTrack.fileUrl
+      // Convert to S3 URL if needed
+      if (fileUrl && !fileUrl.startsWith('s3://') && !fileUrl.startsWith('http')) {
+        fileUrl = `s3://${STORAGE_BUCKET}/${fileUrl}`
+      }
+      return fileUrl
+    }
+  } catch (err) {
+    console.error(`⚠️ Failed to lookup track ${track.trackId}:`, err)
+  }
+  
+  // Fallback
+  console.error(`❌ No fileUrl for track ${track.trackId}`)
+  return `s3://${STORAGE_BUCKET}/public/audio/${track.trackId}.mp3`
+}
+
+/**
+ * Upload M3U playlist to EC2 via SSM
+ */
+async function uploadPlaylistToEC2(m3uContent: string): Promise<void> {
+  console.log('📤 Uploading M3U to EC2...')
+  
+  // Create M3U file on EC2 using SSM Run Command
+  const command = `
+cat > /var/radio/playlists/current.m3u << 'EOFM3U'
+${m3uContent}
+EOFM3U
+chmod 644 /var/radio/playlists/current.m3u
+echo "✅ M3U uploaded successfully"
+`
+  
+  try {
+    const result = await ssm.send(new SendCommandCommand({
+      InstanceIds: [EC2_INSTANCE_ID],
+      DocumentName: 'AWS-RunShellScript',
+      Parameters: {
+        commands: [command]
       }
     }))
+    
+    console.log(`✅ M3U uploaded to EC2, CommandId: ${result.Command?.CommandId}`)
+  } catch (error) {
+    console.error('❌ Failed to upload M3U to EC2:', error)
+    throw error
   }
-  
-  console.log(`📤 Sent to queue: ${track.trackArtist} - ${track.trackTitle}`)
 }
 
 /**
  * Main handler - HOURLY TRIGGER
  */
 export const handler = async (event: any) => {
-  console.log('🎙️ Stream Playlist Updater (HOURLY) - Starting...')
+  console.log('🎙️ Stream Playlist Updater (PUSH) - Starting...')
   console.log(`⏰ Triggered at: ${new Date().toISOString()}`)
   
   try {
@@ -292,7 +346,9 @@ export const handler = async (event: any) => {
     const slot = await getCurrentScheduleSlot()
     
     if (!slot || !slot.playlistId) {
-      console.log('ℹ️ No active schedule slot - SILENCE (per requirement A)')
+      console.log('ℹ️ No active schedule slot - Empty M3U (silence)')
+      // Upload empty M3U
+      await uploadPlaylistToEC2('#EXTM3U\n')
       return {
         statusCode: 200,
         body: JSON.stringify({ 
@@ -307,76 +363,91 @@ export const handler = async (event: any) => {
     
     if (tracks.length === 0) {
       console.log('⚠️ Playlist has no tracks')
+      await uploadPlaylistToEC2('#EXTM3U\n')
       return {
         statusCode: 200,
         body: JSON.stringify({ message: 'Playlist has no tracks' })
       }
     }
     
-    // 3. PURGE QUEUE - Start fresh each hour!
-    console.log('🗑️ Purging old queue...')
+    // 3. Cleanup old tracks on EC2 (keep disk clean)
+    console.log('🧹 Cleaning up old tracks...')
+    const cleanupCommand = `
+find /var/radio/tracks -type f -mmin +120 -delete
+echo "Cleanup complete"
+`
     try {
-      await sqs.send(new PurgeQueueCommand({
-        QueueUrl: TRACK_QUEUE_URL
+      await ssm.send(new SendCommandCommand({
+        InstanceIds: [EC2_INSTANCE_ID],
+        DocumentName: 'AWS-RunShellScript',
+        Parameters: { commands: [cleanupCommand] }
       }))
-      console.log('✅ Queue purged')
-      // Wait 60 seconds for purge to complete (AWS requirement)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-    } catch (purgeError) {
-      console.log('⚠️ Purge failed (might be in cooldown), continuing anyway...')
+    } catch (err) {
+      console.log('⚠️ Cleanup warning:', err)
     }
     
-    // 4. Download NEWS and queue it FIRST
-    console.log('📰 Downloading news...')
-    let newsQueued = false
+    // 4. Prepare downloads list
+    console.log('📋 Preparing download list...')
+    const downloads: Array<{s3Url: string, localPath: string}> = []
+    let newsLocalPath: string | null = null
+    
+    // Add news to downloads
     try {
-      const newsUrl = await downloadNews()
-      
-      // Send news as first track
-      const newsMessage = {
-        trackId: `news-${Date.now()}`,
-        title: 'Splash FM Nieuws',
-        artist: 'Splash FM',
-        fileUrl: newsUrl,
-        duration: 300, // ~5 minutes
-        scheduledAt: new Date().toISOString(),
-        playlistId: 'NEWS',
-        playlistName: 'Nieuws'
-      }
-      
-      await sqs.send(new SendMessageCommand({
-        QueueUrl: TRACK_QUEUE_URL,
-        MessageBody: JSON.stringify(newsMessage),
-        MessageGroupId: 'radio-stream', // Required for FIFO - all messages in same group maintain order
-      }))
-      
-      console.log('✅ News queued as first item')
-      newsQueued = true
+      const newsS3Url = await downloadNews()
+      newsLocalPath = '/var/radio/tracks/news-latest.mp3'
+      downloads.push({ s3Url: newsS3Url, localPath: newsLocalPath })
+      console.log(`📰 News queued for download`)
     } catch (newsError) {
-      console.error('❌ Failed to download/queue news:', newsError)
-      console.log('⚠️ Continuing without news...')
+      console.error('❌ Failed to fetch news:', newsError)
     }
     
-    // 5. Queue ALL playlist tracks (not 2 random!)
-    console.log(`🎵 Queueing entire playlist: ${tracks.length} tracks`)
-    const now = new Date()
-    let scheduledTime = new Date(now.getTime() + (newsQueued ? 300000 : 0)) // +5 min if news
-    let tracksQueued = 0
+    // 5. Add all tracks to downloads and prepare track list
+    console.log(`🎵 Preparing ${tracks.length} tracks...`)
+    const tracksWithPaths: Array<{track: Track, localPath: string}> = []
     
-    for (let i = 0; i < tracks.length; i++) {
-      const track = tracks[i]
-      
-      await sendTrackToQueue(track, playlistId, playlistName, scheduledTime, i + 1)
-      
-      // Next track starts after current duration
-      scheduledTime = new Date(scheduledTime.getTime() + ((track.trackDuration || 180) * 1000))
-      tracksQueued++
+    for (let index = 0; index < tracks.length; index++) {
+      const track = tracks[index]
+      try {
+        const s3Url = await getTrackFileUrl(track)
+        // Extract filename from S3 URL
+        const filename = s3Url.split('/').pop() || `track-${index}.mp3`
+        const localPath = `/var/radio/tracks/${filename}`
+        
+        downloads.push({ s3Url, localPath })
+        tracksWithPaths.push({ track, localPath })
+        console.log(`  ✓ ${index + 1}/${tracks.length}: ${track.trackArtist} - ${track.trackTitle}`)
+      } catch (err) {
+        console.error(`  ✗ Failed to get URL for track ${track.trackId}:`, err)
+      }
     }
     
-    console.log(`✅ HOURLY QUEUE COMPLETE!`)
-    console.log(`   📰 News: ${newsQueued ? 'YES' : 'NO'}`)
-    console.log(`   🎵 Tracks: ${tracksQueued}`)
-    console.log(`   ⏱️  Total duration: ~${Math.floor((scheduledTime.getTime() - now.getTime()) / 60000)} minutes`)
+    // 6. Execute batch download and WAIT for completion
+    console.log(`📥 Downloading ${downloads.length} files to EC2...`)
+    await downloadAllFilesToEC2(downloads)
+    console.log(`✅ All ${downloads.length} files downloaded!`)
+    
+    const successfulTracks = tracksWithPaths
+    
+    // 6. Generate M3U with LOCAL paths
+    console.log('🎵 Generating M3U with local paths...')
+    const m3uContent = generateM3U(newsLocalPath, successfulTracks)
+    
+    console.log('📋 M3U Preview:')
+    console.log(m3uContent.split('\n').slice(0, 10).join('\n') + '\n...')
+    
+    // 7. Upload M3U to EC2
+    await uploadPlaylistToEC2(m3uContent)
+    
+    // Calculate total duration
+    const newsTime = newsLocalPath ? 300 : 0
+    const tracksTime = successfulTracks.reduce((sum, {track}) => sum + (track.trackDuration || 180), 0)
+    const totalMinutes = Math.floor((newsTime + tracksTime) / 60)
+    
+    console.log(`✅ LOCAL FILE PLAYLIST COMPLETE!`)
+    console.log(`   📰 News: ${newsLocalPath ? 'YES' : 'NO'}`)
+    console.log(`   🎵 Tracks: ${successfulTracks.length}/${tracks.length}`)
+    console.log(`   💾 Storage: ~${Math.floor(tracksTime / 60)} min of audio`)
+    console.log(`   ⏱️  Total duration: ~${totalMinutes} minutes`)
     
     return {
       statusCode: 200,
@@ -384,9 +455,9 @@ export const handler = async (event: any) => {
         success: true,
         playlistId,
         playlistName,
-        newsQueued,
-        tracksQueued,
-        totalDuration: Math.floor((scheduledTime.getTime() - now.getTime()) / 60000),
+        hasNews: !!newsLocalPath,
+        trackCount: successfulTracks.length,
+        totalDuration: totalMinutes,
         slot: {
           name: slot.name || slot.slotName,
           day: slot.dayOfWeek === null ? 'Every day' : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][slot.dayOfWeek],
@@ -395,7 +466,7 @@ export const handler = async (event: any) => {
       })
     }
   } catch (error) {
-    console.error('❌ Error updating stream queue:', error)
+    console.error('❌ Error generating playlist:', error)
     return {
       statusCode: 500,
       body: JSON.stringify({

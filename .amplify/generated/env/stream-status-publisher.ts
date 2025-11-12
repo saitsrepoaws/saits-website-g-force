@@ -84,4 +84,7 @@ type LambdaProvidedEnvVars = {
 type AmplifyBackendEnvVars = {
   PLAYLIST_BUCKET: string;
   PLAYER_STATE_TABLE: string;
+  SETTINGS_TABLE: string;
+  TRACK_TABLE: string;
+  STREAM_PLAYLIST_UPDATER_FUNCTION: string;
 };

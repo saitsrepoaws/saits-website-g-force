@@ -82,7 +82,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "5630acd8915a57f9d3c49e8382584c37c2ad844d797d8b51afc8ec5cdcebcf6c.zip"
+     "S3Key": "01d63792bdf6e391a40c9a6b09087fd371e3ce75a7ed803f7e4230a4939e713a.zip"
     },
     "Environment": {
      "Variables": {
@@ -121,7 +121,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/custom-player-state-machine/StateMachineTrigger/Resource",
-    "aws:asset:path": "asset.5630acd8915a57f9d3c49e8382584c37c2ad844d797d8b51afc8ec5cdcebcf6c",
+    "aws:asset:path": "asset.01d63792bdf6e391a40c9a6b09087fd371e3ce75a7ed803f7e4230a4939e713a",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }

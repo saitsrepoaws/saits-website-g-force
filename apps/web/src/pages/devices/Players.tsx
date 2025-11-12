@@ -128,6 +128,25 @@ export default function Players() {
   return (
     <Layout title="Players" showBackButton backTo="/devices">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Splash FM Header */}
+        <div className="bg-gradient-to-r from-blue-900 via-indigo-800 to-orange-600 rounded-2xl shadow-2xl p-8 mb-6">
+          <div className="flex flex-col items-center gap-4">
+            <img 
+              src="/logosplashfmfm.png" 
+              alt="Splash FM" 
+              className="h-24 md:h-32 w-auto drop-shadow-2xl"
+            />
+            <div className="text-center">
+              <h1 className="text-white text-2xl md:text-3xl font-bold drop-shadow-lg">
+                Splash FM Radio Players
+              </h1>
+              <p className="text-blue-100 text-sm md:text-base mt-2">
+                🎵 Live 24/7 Electronic Music Stream
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Players Grid - 2 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Player 1 */}
@@ -152,22 +171,22 @@ export default function Players() {
         
         {/* Live Stream Status */}
         {streamStatus && (
-          <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl shadow-lg p-4 border-2 border-red-300">
+          <div className="bg-gradient-to-r from-cyan-50 via-blue-50 to-orange-50 rounded-xl shadow-lg p-6 border-2 border-gradient-to-r from-cyan-400 to-orange-400">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
                     <span className="text-3xl">🎙️</span>
                   </div>
                   {streamStatus.isLive && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full animate-pulse border-2 border-white"></div>
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full animate-pulse border-2 border-white"></div>
                   )}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-gray-800 text-xl">Live Stream</h3>
+                    <h3 className="font-bold bg-gradient-to-r from-cyan-600 to-orange-600 bg-clip-text text-transparent text-xl">Splash FM Live Stream</h3>
                     {streamStatus.isLive && (
-                      <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded uppercase animate-pulse">LIVE</span>
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs font-bold rounded uppercase animate-pulse">LIVE</span>
                     )}
                   </div>
                   {streamStatus.currentTrack ? (
@@ -186,16 +205,16 @@ export default function Players() {
               <div className="flex gap-2">
                 <button
                   onClick={fetchStreamStatus}
-                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
+                  className="px-3 py-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg shadow-md transition-all hover:shadow-lg flex items-center gap-2 border border-gray-200"
                   title="Refresh stream status"
                 >
                   <span>🔄</span>
                 </button>
                 <a
-                  href="http://46.137.184.91:8000/stream.mp3"
+                  href="http://46.137.184.91/stream.mp3"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-orange-500 hover:from-cyan-600 hover:to-orange-600 text-white font-semibold rounded-lg shadow-md transition-all hover:shadow-lg flex items-center gap-2"
                 >
                   <span>🎧</span>
                   <span>Listen</span>
@@ -205,12 +224,12 @@ export default function Players() {
             
             {/* Queue Preview */}
             {streamStatus.playlist.queue.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-red-200">
-                <p className="text-xs font-semibold text-gray-600 mb-2">COMING UP:</p>
+              <div className="mt-4 pt-4 border-t border-gradient-to-r from-cyan-200 to-orange-200">
+                <p className="text-xs font-semibold bg-gradient-to-r from-cyan-600 to-orange-600 bg-clip-text text-transparent mb-2">🎵 COMING UP:</p>
                 <div className="space-y-1">
                   {streamStatus.playlist.queue.slice(0, 3).map((track, idx) => (
                     <p key={idx} className="text-sm text-gray-700 flex items-center gap-2">
-                      <span className="text-gray-400">{idx + 1}.</span>
+                      <span className="text-gradient bg-gradient-to-r from-cyan-500 to-orange-500 bg-clip-text text-transparent font-bold">{idx + 1}.</span>
                       {track}
                     </p>
                   ))}

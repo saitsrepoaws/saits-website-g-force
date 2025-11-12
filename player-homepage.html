@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash FM Radio - Live 24/7</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #4fc3f7 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-img {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .logo-subtitle {
+            font-size: 1em;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 20px;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .now-playing {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .now-playing-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+
+        .track-info {
+            margin-bottom: 15px;
+        }
+
+        .artist {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            font-size: 1.8em;
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 15px 0;
+        }
+
+        .metadata-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .metadata-label {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .metadata-value {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 20px solid #ff6b35;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+        }
+
+        .pause-icon {
+            display: none;
+            width: 20px;
+            height: 24px;
+            border-left: 6px solid #ff6b35;
+            border-right: 6px solid #ff6b35;
+        }
+
+        .playing .play-icon {
+            display: none;
+        }
+
+        .playing .pause-icon {
+            display: block;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-icon {
+            font-size: 1.5em;
+        }
+
+        input[type="range"] {
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255, 0, 0, 0.2);
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .equalizer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 4px;
+            height: 40px;
+            margin: 20px 0;
+        }
+
+        .bar {
+            width: 4px;
+            background: white;
+            border-radius: 2px;
+            animation: equalize 0.8s infinite;
+        }
+
+        .bar:nth-child(1) { animation-delay: 0s; }
+        .bar:nth-child(2) { animation-delay: 0.1s; }
+        .bar:nth-child(3) { animation-delay: 0.2s; }
+        .bar:nth-child(4) { animation-delay: 0.3s; }
+        .bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes equalize {
+            0%, 100% { height: 10px; }
+            50% { height: 35px; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        audio {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <svg class="logo-img" viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+                <text x="20" y="200" font-family="Arial Black, sans-serif" font-size="180" font-weight="900" fill="#ff6b35" letter-spacing="-5">Splash</text>
+                <text x="620" y="200" font-family="Arial Black, sans-serif" font-size="180" font-weight="900" fill="#4fc3f7" letter-spacing="-5">FM</text>
+            </svg>
+            <p class="logo-subtitle">Powered by G-Forge Radio</p>
+        </div>
+
+        <div class="player-card">
+            <div class="now-playing">
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    <span>LIVE</span>
+                </div>
+                <div class="now-playing-label">NOW PLAYING</div>
+            </div>
+
+            <div class="track-info" id="trackInfo">
+                <div class="artist" id="artist">Loading...</div>
+                <div class="title" id="title">Connecting to stream...</div>
+            </div>
+
+            <div class="equalizer" id="equalizer" style="display: none;">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <div class="metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">LISTENERS</div>
+                    <div class="metadata-value" id="listeners">-</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">BITRATE</div>
+                    <div class="metadata-value" id="bitrate">-</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">STREAM UPTIME</div>
+                    <div class="metadata-value" id="streamUptime">-</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">SERVER UPTIME</div>
+                    <div class="metadata-value" id="serverUptime">-</div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="play-button" id="playButton" onclick="togglePlay()">
+                    <div class="play-icon"></div>
+                    <div class="pause-icon"></div>
+                </button>
+                <div class="volume-control">
+                    <span class="volume-icon">🔊</span>
+                    <input type="range" id="volume" min="0" max="100" value="70" oninput="setVolume(this.value)">
+                </div>
+            </div>
+
+            <div class="status" id="status">
+                Click play to start streaming
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="none">
+        <source src="/stream.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const equalizer = document.getElementById('equalizer');
+
+        let isPlaying = false;
+
+        // Set initial volume
+        audio.volume = 0.7;
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                playButton.classList.remove('playing');
+                equalizer.style.display = 'none';
+                document.getElementById('status').textContent = 'Paused';
+            } else {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    playButton.classList.add('playing');
+                    equalizer.style.display = 'flex';
+                    document.getElementById('status').textContent = 'Streaming...';
+                }).catch(err => {
+                    console.error('Play failed:', err);
+                    document.getElementById('status').textContent = 'Failed to connect';
+                });
+            }
+        }
+
+        function setVolume(value) {
+            audio.volume = value / 100;
+        }
+
+        // Format uptime
+        function formatUptime(minutes) {
+            if (minutes < 60) {
+                return minutes + 'm';
+            }
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            if (hours < 24) {
+                return hours + 'h ' + mins + 'm';
+            }
+            const days = Math.floor(hours / 24);
+            const hrs = hours % 24;
+            return days + 'd ' + hrs + 'h';
+        }
+
+        // Fetch stream metadata
+        async function updateMetadata() {
+            try {
+                const response = await fetch('/status-json.xsl');
+                const data = await response.json();
+                const source = data.icestats?.source;
+                const server = data.icestats;
+
+                if (source) {
+                    const fullTitle = source.title || 'Unknown Track';
+                    const parts = fullTitle.split(' - ');
+                    
+                    if (parts.length >= 2) {
+                        document.getElementById('artist').textContent = parts[0];
+                        document.getElementById('title').textContent = parts[1];
+                    } else {
+                        document.getElementById('artist').textContent = 'G-Forge Radio';
+                        document.getElementById('title').textContent = fullTitle;
+                    }
+
+                    document.getElementById('listeners').textContent = source.listeners || '0';
+                    document.getElementById('bitrate').textContent = (source.bitrate || '192') + ' kbps';
+                    
+                    // Calculate stream uptime
+                    if (source.stream_start_iso8601) {
+                        const start = new Date(source.stream_start_iso8601);
+                        const now = new Date();
+                        const diff = Math.floor((now - start) / 1000 / 60);
+                        document.getElementById('streamUptime').textContent = formatUptime(diff);
+                    }
+                }
+
+                // Calculate server uptime
+                if (server?.server_start_iso8601) {
+                    const start = new Date(server.server_start_iso8601);
+                    const now = new Date();
+                    const diff = Math.floor((now - start) / 1000 / 60);
+                    document.getElementById('serverUptime').textContent = formatUptime(diff);
+                }
+            } catch (error) {
+                console.error('Failed to fetch metadata:', error);
+            }
+        }
+
+        // Update metadata every 10 seconds
+        updateMetadata();
+        setInterval(updateMetadata, 10000);
+
+        // Auto-update on audio metadata change
+        audio.addEventListener('loadedmetadata', updateMetadata);
+    </script>
+</body>
+</html>

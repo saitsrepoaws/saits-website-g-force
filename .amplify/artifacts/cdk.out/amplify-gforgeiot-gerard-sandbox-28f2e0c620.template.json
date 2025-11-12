@@ -47,6 +47,7 @@
     "awsAppsyncAuthenticationType",
     "awsAppsyncRegion",
     "amplifyApiModelSchemaS3Uri",
+    "awsAppsyncApiKey",
     "awsAppsyncAdditionalAuthenticationTypes"
    ]
   },
@@ -225,6 +226,27 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstreamstatuspublisherlambda9D3869D5Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionstreammonitorlambda2FEFF530Ref"
+       ]
+      },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functiontrackcompletionhandlerlambda650BAF5BRef"
+       ]
+      },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "function1351588B",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functiongetcoverurllambdaEF0154EFRef"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -291,8 +313,16 @@
     ]
    }
   },
+  "awsAppsyncApiKey": {
+   "Value": {
+    "Fn::GetAtt": [
+     "data7552DF31",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIDefaultApiKeyBDC11378ApiKey"
+    ]
+   }
+  },
   "awsAppsyncAdditionalAuthenticationTypes": {
-   "Value": "AWS_IAM"
+   "Value": "API_KEY,AWS_IAM"
   },
   "storageRegion": {
    "Value": {
@@ -427,7 +457,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/e38dbf7b8d30973d1d9ec0d8c8c46d4413ebf897448f912caf4953ca305bdc13.json"
+       "/cdd5122025f7e9fbb864f42a1e7e706d81c64c726af453a49d3fbb9901e3cada.json"
       ]
      ]
     }
@@ -530,6 +560,18 @@
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
       ]
      },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3OutputsamplifygfoE07CACAA": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841OutputsamplifABC070FF": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
+      ]
+     },
      "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Ref": {
       "Fn::GetAtt": [
        "storage0EC3F24A",
@@ -540,6 +582,12 @@
       "Fn::GetAtt": [
        "data7552DF31",
        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
+      ]
+     },
+     "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifC4C9A1D1": {
+      "Fn::GetAtt": [
+       "data7552DF31",
+       "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
       ]
      },
      "referencetoamplifygforgeiotgerardsandbox28f2e0c620storageNestedStackstorageNestedStackResource9F56F57AOutputsamplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {
@@ -575,7 +623,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/daad37156072af54b816e4457432eac9984d783dcac25c903be4b3049006983a.json"
+       "/05e5c261e00d04be91289a4bb17416d879314a4c7fa3dbe019ab2bce26422372.json"
       ]
      ]
     }
@@ -643,7 +691,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/6610c8b743115b0405db4d5442910a6423e42d4d69da4b1658bdf8db80450109.json"
+       "/57f71c4dd4e6016eb2e19c7ce10390971a14d9db124d55cd11b634b1934f8030.json"
       ]
      ]
     }

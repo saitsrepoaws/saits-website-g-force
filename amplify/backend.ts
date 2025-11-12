@@ -12,6 +12,7 @@ import { radioScheduler } from './functions/radio-scheduler/resource'
 import { crossfadeController } from './functions/crossfade-controller/resource'
 import { streamPlaylistUpdater } from './functions/stream-playlist-updater/resource'
 import { streamTrackPusher } from './functions/stream-track-pusher/resource'
+import { streamHealthMonitor } from './functions/stream-health-monitor/resource'
 import { streamStatusPublisher } from './functions/stream-status-publisher/resource'
 import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
@@ -37,6 +38,7 @@ import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import * as sqs from 'aws-cdk-lib/aws-sqs'
+import * as sns from 'aws-cdk-lib/aws-sns'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join} from 'path'
@@ -59,6 +61,7 @@ export const backend = defineBackend({
   crossfadeController,
   streamPlaylistUpdater,
   streamTrackPusher,
+  streamHealthMonitor,
   streamStatusPublisher,
   streamMonitor,
   trackCompletionHandler,
@@ -682,6 +685,58 @@ const trackPusherRule = new events.Rule(
 )
 
 trackPusherRule.addTarget(new targets.LambdaFunction(trackPusherLambda))
+
+// ============================================
+// 🛡️ STREAM HEALTH MONITOR - Bulletproof!
+// ============================================
+const healthMonitorLambda = backend.streamHealthMonitor.resources.lambda
+const streamHealthLogTable = backend.data.resources.tables['StreamHealthLog']
+
+// Create SNS topic for alerts
+const alertTopic = new sns.Topic(
+  healthMonitorLambda.stack,
+  'StreamAlertTopic',
+  {
+    topicName: 'StreamHealthAlerts',
+    displayName: 'Splash FM Stream Health Alerts'
+  }
+)
+
+// Grant permissions
+streamHealthLogTable.grantWriteData(healthMonitorLambda)
+
+// Grant SSM permissions
+healthMonitorLambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: ['ssm:SendCommand', 'ssm:GetCommandInvocation'],
+    resources: [
+      `arn:aws:ec2:*:${healthMonitorLambda.stack.account}:instance/*`,
+      'arn:aws:ssm:*::document/AWS-RunShellScript'
+    ]
+  })
+)
+
+// Grant SNS publish
+alertTopic.grantPublish(healthMonitorLambda)
+
+// Add environment variables
+backend.streamHealthMonitor.addEnvironment('EC2_INSTANCE_ID', 'i-021451e919d39c898')
+backend.streamHealthMonitor.addEnvironment('SNS_ALERT_TOPIC', alertTopic.topicArn)
+backend.streamHealthMonitor.addEnvironment('HEALTH_LOG_TABLE', streamHealthLogTable.tableName)
+
+// EventBridge rule - Run every 1 minute
+const healthMonitorRule = new events.Rule(
+  healthMonitorLambda.stack,
+  'HealthMonitorRule',
+  {
+    ruleName: 'StreamHealthCheckEveryMinute',
+    description: 'Checks stream health every minute - bulletproof monitoring',
+    schedule: events.Schedule.rate(Duration.minutes(1))
+  }
+)
+
+healthMonitorRule.addTarget(new targets.LambdaFunction(healthMonitorLambda))
 
 // ============================================
 // 📡 STREAM STATUS PUBLISHER - IoT Real-time

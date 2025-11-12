@@ -1,6 +1,16 @@
-# Reference Index: Amplify Gen 2 & PubSub
+# Reference Index: Amplify Gen 2, PubSub & Audio Streaming
 
-## ⭐ **NIEUW: Complete IoT Setup Documentatie (31 Oct 2025)**
+## ⭐ **NIEUW: Liquidsoap Crossfade Documentatie (10 Nov 2025)**
+
+### **Audio Streaming:**
+- **`liquidsoap-crossfade.md`** 🎵 **CROSSFADE REFERENCE**
+  - Liquidsoap crossfade operators
+  - Out-of-the-box vs custom crossfades
+  - Smart crossfade implementation
+  - Autocue integration (2.2.5+)
+  - EC2 compatibility notes (2.0.2)
+
+## ⭐ **Complete IoT Setup Documentatie (31 Oct 2025)**
 
 ### **Quick Start:**
 - **`IOT_QUICK_REFERENCE.md`** ⚡ **START HIER!**

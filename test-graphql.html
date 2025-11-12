@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GraphQL API Test</title>
+</head>
+<body>
+    <h1>GraphQL API Test (No Amplify)</h1>
+    <button onclick="testGraphQL()">Test GraphQL Query</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testGraphQL() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Loading...';
+            
+            try {
+                // Load config
+                const config = await fetch('/amplify_outputs.json').then(r => r.json());
+                
+                console.log('Config loaded:', {
+                    endpoint: config.data.url,
+                    hasApiKey: !!config.data.api_key
+                });
+                
+                // Direct GraphQL call
+                const response = await fetch(config.data.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': config.data.api_key
+                    },
+                    body: JSON.stringify({
+                        query: `
+                            query ListTracks {
+                                listTracks(limit: 3) {
+                                    items {
+                                        id
+                                        artist
+                                        title
+                                        coverArtUrl
+                                        bpm
+                                        key
+                                    }
+                                }
+                            }
+                        `
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.errors) {
+                    resultEl.textContent = '❌ Errors:\n' + JSON.stringify(result.errors, null, 2);
+                } else {
+                    resultEl.textContent = '✅ Success:\n' + JSON.stringify(result.data, null, 2);
+                }
+                
+                console.log('Result:', result);
+            } catch (error) {
+                resultEl.textContent = '❌ Error:\n' + error.message;
+                console.error('Error:', error);
+            }
+        }
+        
+        console.log('✅ Test page loaded - NO Amplify imports');
+    </script>
+</body>
+</html>

@@ -14,6 +14,7 @@ import Players from './pages/devices/Players'
 import Planner from './pages/devices/Planner'
 import AudioSettings from './pages/devices/AudioSettings'
 import NetworkSettings from './pages/devices/NetworkSettings'
+import StreamSettings from './pages/devices/StreamSettings'
 import { configureAmplify } from './amplify-config'
 import Login from './pages/Login'
 import AuthGate from './routes/AuthGate'
@@ -106,6 +107,14 @@ const router = createBrowserRouter([
     element: (
       <AuthGate>
         <NetworkSettings />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/stream-settings', 
+    element: (
+      <AuthGate>
+        <StreamSettings />
       </AuthGate>
     )
   },

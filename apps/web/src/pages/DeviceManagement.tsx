@@ -52,6 +52,13 @@ function DeviceManagement() {
             title="Network"
             description="Configure IoT connection, network settings, and monitor connection status."
           />
+          
+          <NavigationCard
+            to="/devices/stream-settings"
+            icon="🎙️"
+            title="Stream Settings"
+            description="Configure dynamic playlist updates and stream server timing."
+          />
         </div>
       </div>
     </Layout>

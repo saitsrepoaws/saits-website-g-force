@@ -383,12 +383,19 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
       )}
       
       {/* Player Card */}
-      <div className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-6 space-y-4">
+      <div className="bg-gradient-to-br from-blue-900 via-indigo-800 to-orange-900 rounded-3xl shadow-2xl overflow-hidden border border-white/10 p-6 space-y-4">
         
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-1">{playerName}</h2>
-          <p className="text-blue-200 text-xs">ID: {playerId}</p>
+        {/* Splash FM Logo Header */}
+        <div className="flex flex-col items-center gap-3 pb-4 border-b border-white/10">
+          <img 
+            src="/logosplashfmfm.png" 
+            alt="Splash FM" 
+            className="h-16 w-auto drop-shadow-2xl"
+          />
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-white mb-1">{playerName}</h2>
+            <p className="text-blue-200 text-xs">ID: {playerId}</p>
+          </div>
         </div>
 
         {/* Connection Status */}
@@ -448,7 +455,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
                   </div>
                   <div className="relative h-1.5 bg-black/50 rounded-full overflow-hidden border border-white/10">
                     <div 
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 ease-linear"
+                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-orange-500 transition-all duration-300 ease-linear"
                       style={{ 
                         width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` 
                       }}
@@ -473,7 +480,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
             disabled={!(trackInfo) || playerStatus === 'playing'}
             className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
               trackInfo && playerStatus !== 'playing'
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/50 cursor-pointer'
+                ? 'bg-gradient-to-r from-cyan-500 to-orange-500 hover:from-cyan-600 hover:to-orange-600 text-white shadow-lg shadow-cyan-500/50 cursor-pointer'
                 : 'bg-gray-600/50 text-gray-400 cursor-not-allowed opacity-50'
             }`}
           >
@@ -494,7 +501,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
             disabled={playerStatus !== 'playing'}
             className={`w-full px-4 py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
               playerStatus === 'playing'
-                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-500/50 cursor-pointer'
+                ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg shadow-red-500/50 cursor-pointer'
                 : 'bg-gray-600/50 text-gray-400 cursor-not-allowed opacity-50'
             }`}
           >

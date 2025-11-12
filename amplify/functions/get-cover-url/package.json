@@ -1,0 +1,12 @@
+{
+  "name": "get-cover-url",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.922.0",
+    "@aws-sdk/s3-request-presigner": "^3.922.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

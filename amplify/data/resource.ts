@@ -115,6 +115,110 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.authenticated()]),
 
+  // StreamSettings model - global stream configuration
+  StreamSettings: a
+    .model({
+      settingKey: a.string().required(), // "playlist_update_timing"
+      
+      // Playlist Update Settings
+      playlistUpdateTriggerSeconds: a.integer().default(60), // Trigger N seconds before track end
+      playlistUpdateMinTrackDuration: a.integer().default(60), // Only trigger for tracks longer than N seconds
+      playlistUpdateFallbackInterval: a.integer().default(300), // Fallback: update every N seconds (5 min)
+      
+      // Stream Server Config
+      streamServerUrl: a.string(), // Icecast server URL
+      streamMountPoint: a.string().default('/stream.mp3'),
+      
+      // Crossfade Settings
+      crossfadeEnabled: a.boolean().default(true), // Enable/disable crossfade
+      crossfadeStartNext: a.float().default(3.0), // Start next track N seconds before end (1-10)
+      crossfadeFadeIn: a.float().default(2.0), // Fade in duration in seconds (0-10)
+      crossfadeFadeOut: a.float().default(2.0), // Fade out duration in seconds (0-10)
+      crossfadeNormalize: a.boolean().default(true), // Normalize audio levels
+      
+      // Smart Crossfade - BPM Matching
+      smartCrossfadeEnabled: a.boolean().default(false), // Enable BPM-aware crossfades
+      smartCrossfadeBpmTolerance: a.integer().default(5), // BPM difference tolerance (0-20)
+      smartCrossfadeAutoAdjust: a.boolean().default(true), // Auto-adjust crossfade duration based on BPM
+      
+      // Smart Crossfade - Harmonic Mixing
+      harmonicMixingEnabled: a.boolean().default(false), // Enable key-aware mixing
+      harmonicMixingStrict: a.boolean().default(false), // Only mix compatible keys (Camelot wheel)
+      harmonicMixingBoost: a.float().default(1.0), // Boost compatible transitions (0.5-2.0)
+      
+      // Smart Crossfade - Energy Analysis
+      energyMatchingEnabled: a.boolean().default(false), // Match energy levels
+      energyMatchingTolerance: a.float().default(0.2), // Energy difference tolerance (0-1)
+      energyMatchingSmoothTransitions: a.boolean().default(true), // Smooth energy jumps
+      
+      // Advanced Crossfade
+      crossfadeConservative: a.boolean().default(false), // Use conservative crossfade (longer, safer)
+      crossfadePreset: a.string().default('techno'), // Preset: techno, progressive, ambient, hardcore, custom
+      
+      // Metadata
+      lastModifiedBy: a.string(),
+      createdAt: a.datetime(),
+      updatedAt: a.datetime(),
+    })
+    .identifier(['settingKey'])
+    .authorization((allow) => [allow.authenticated()]),
+
+  // StreamQueueTrack model - tracks sent to SQS for streaming
+  // Used to show queue order and in-flight tracks in UI
+  StreamQueueTrack: a
+    .model({
+      trackId: a.string().required(),
+      artist: a.string(),
+      title: a.string(),
+      version: a.string(),
+      trackDuration: a.integer(), // seconds
+      playlistId: a.string(),
+      playlistName: a.string(),
+      position: a.integer(), // queue position when added
+      queuedAt: a.datetime().required(),
+      status: a.string().default('queued'), // queued, in-flight, completed, failed
+      completedAt: a.datetime(), // When track finished playing
+      ttl: a.integer(), // Unix timestamp for auto-deletion (24h after queued)
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
+  // TrackPlayHistory model - analytics and play count tracking
+  // Records every time a track is played on the stream
+  TrackPlayHistory: a
+    .model({
+      trackId: a.string().required(),
+      artist: a.string(),
+      title: a.string(),
+      version: a.string(),
+      playlistId: a.string(),
+      playlistName: a.string(),
+      playedAt: a.datetime().required(),
+      duration: a.integer(), // seconds
+      source: a.string().default('stream'), // stream, manual, test
+      listeners: a.integer(), // Concurrent listeners (from Icecast)
+      skipped: a.boolean().default(false), // If track was skipped
+    })
+    .secondaryIndexes((index) => [
+      index('trackId').sortKeys(['playedAt']), // Query plays by track
+    ])
+    .authorization((allow) => [allow.authenticated()]),
+
+  // Stream Health Log - monitoring and alerting
+  StreamHealthLog: a
+    .model({
+      timestamp: a.string().required(), // ISO timestamp as partition key
+      icecastUp: a.boolean().required(),
+      streamFlowing: a.boolean().required(),
+      liquidsoakRunning: a.boolean().required(),
+      trackCount: a.integer().required(),
+      bitrate: a.integer(),
+      listenerCount: a.integer().required(),
+      currentTrack: a.string(),
+      actionsTaken: a.string(), // JSON array of actions
+      ttl: a.integer(), // TTL for auto-cleanup after 7 days
+    })
+    .authorization((allow) => [allow.authenticated()]),
+
   // Track model - audio tracks in the Libery system
   // Format: Artist - Title (Version) [Label]
   Track: a
@@ -144,8 +248,19 @@ const schema = a.schema({
       peaks: a.string(), // JSON array of peak values for visualization
       trimStart: a.float(), // Time in seconds where audio actually starts
       trimEnd: a.float(), // Time in seconds where audio actually ends
+      
+      // Play Statistics (updated by TrackPlayHistory triggers)
+      playCount: a.integer().default(0), // Total times played on stream
+      lastPlayedAt: a.datetime(), // Last time track was played
+      totalListeners: a.integer().default(0), // Cumulative listener count
+      averageListeners: a.float(), // Average concurrent listeners when played
+      skipCount: a.integer().default(0), // Times track was skipped
+      popularityScore: a.float(), // Calculated score based on plays/listeners
     })
-    .authorization((allow) => [allow.authenticated()]),
+    .authorization((allow) => [
+      allow.authenticated(),
+      allow.publicApiKey().to(['read']) // Allow public read for player page
+    ]),
   
   // Custom query to generate playlist based on criteria
   generatePlaylist: a
@@ -174,5 +289,8 @@ export const data = defineData({
   schema,
   authorizationModes: {
     defaultAuthorizationMode: 'userPool',
+    apiKeyAuthorizationMode: {
+      expiresInDays: 365, // API key for public player page
+    },
   },
 })
