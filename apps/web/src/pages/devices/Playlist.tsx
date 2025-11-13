@@ -663,9 +663,11 @@ function Playlist() {
                         onChange={(e) => setNewPlaylistGenre(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
                       >
-                        <option value="">All genres...</option>
+                        <option value="">All genres ({totalTracksCount} tracks)</option>
                         {availableGenres.map(genre => (
-                          <option key={genre} value={genre}>{genre}</option>
+                          <option key={genre} value={genre}>
+                            {genre} ({genreTrackCounts[genre] || 0} tracks)
+                          </option>
                         ))}
                         <option value="Mixed">Mixed</option>
                       </select>
@@ -864,9 +866,13 @@ function Playlist() {
                           onChange={(e) => setJingleGenre(e.target.value)}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
                         >
-                          <option value="WildFM Jingels">WildFM Jingels</option>
+                          <option value="WildFM Jingels">
+                            WildFM Jingels ({genreTrackCounts['WildFM Jingels'] || 0} tracks)
+                          </option>
                           {availableGenres.filter(g => g.toLowerCase().includes('jingle') || g.toLowerCase().includes('id')).map(genre => (
-                            <option key={genre} value={genre}>{genre}</option>
+                            <option key={genre} value={genre}>
+                              {genre} ({genreTrackCounts[genre] || 0} tracks)
+                            </option>
                           ))}
                         </select>
                       </div>
