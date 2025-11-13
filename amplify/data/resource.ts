@@ -319,7 +319,8 @@ const schema = a.schema({
       keys: a.string().array(), // Multi-select keys for harmonic mixing
       tags: a.string(),
       maxTracks: a.integer(),
-      maxDuration: a.integer(),
+      minDuration: a.integer(), // Minimum playlist duration in seconds
+      maxDuration: a.integer(), // Maximum playlist duration in seconds
       // Jingle options
       includeJingles: a.boolean(), // Add jingles to playlist
       jinglesEveryN: a.integer(), // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
