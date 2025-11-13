@@ -92,11 +92,21 @@ function SortableTrackRow({
           {/* Jingle Info */}
           <div>
             <div className="text-sm font-bold text-purple-900 flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-purple-200 text-purple-700 text-xs font-bold rounded-full">JINGLE</span>
-              {track.trackTitle || 'Jingle'}
+              <span className="px-2 py-0.5 bg-purple-200 text-purple-700 text-xs font-bold rounded-full">🎤 JINGLE</span>
+              {track.trackTitle || 'Station ID'}
             </div>
-            <div className="text-xs text-purple-600 mt-1">
-              {track.trackGenre} • {formatDuration(track.trackDuration || 0)}
+            <div className="text-xs text-purple-600 mt-1 flex items-center gap-2">
+              <span>{track.trackGenre || 'Station ID'}</span>
+              <span>•</span>
+              <span>{formatDuration(track.trackDuration || 0)}</span>
+              {(track as any).trackTags && (
+                <>
+                  <span>•</span>
+                  <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">
+                    🏷️ {(track as any).trackTags}
+                  </span>
+                </>
+              )}
             </div>
           </div>
           
