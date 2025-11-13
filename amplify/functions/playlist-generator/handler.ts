@@ -362,7 +362,10 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     
     // 5. Select tracks (respect maxTracks and maxDuration)
     const maxTracks = input.maxTracks || 20
-    const maxDuration = input.maxDuration || (59 * 60) // 59 minutes default
+    const TARGET_DURATION = 60 * 60 // Target: exactly 60 minutes (3600 seconds)
+    const maxDuration = input.maxDuration || TARGET_DURATION
+    const MIN_ACCEPTABLE = TARGET_DURATION - 120 // Allow 58+ minutes (within 2 min of target)
+    const MAX_ACCEPTABLE = TARGET_DURATION + 60 // Allow up to 61 minutes
     
     const selectedTracks: Track[] = []
     const selectedTrackIds = new Set<string>() // Track duplicates
@@ -386,27 +389,65 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       // STRICT DURATION CHECK: Use full duration for safety
       const durationToCheck = track.duration || trackDuration
       
-      if (totalDuration + durationToCheck > maxDuration) {
-        console.log(`⏱️  Duration limit reached: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} + ${Math.floor(durationToCheck / 60)}min would exceed ${Math.floor(maxDuration / 60)}min`)
-        // Check if we should stop or skip this track
-        if (selectedTracks.length < 5) {
-          // Too few tracks, try next one
-          continue
-        } else {
-          // Enough tracks, stop here
+      // INTELLIGENT DURATION CHECK: Aim for exactly 60 minutes
+      const wouldExceed = totalDuration + durationToCheck > MAX_ACCEPTABLE
+      const tooShort = totalDuration < MIN_ACCEPTABLE
+      const nearTarget = totalDuration >= MIN_ACCEPTABLE && totalDuration <= MAX_ACCEPTABLE
+      
+      if (wouldExceed) {
+        console.log(`⏱️  Track would exceed 61min: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} + ${Math.floor(durationToCheck / 60)}:${(durationToCheck % 60).toString().padStart(2, '0')}`)
+        
+        // If we're near target (58-60 min), stop here - perfect!
+        if (nearTarget) {
+          console.log(`✅ Near-perfect duration reached: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
           break
         }
+        
+        // Too short still, try next track (might be shorter)
+        if (tooShort && selectedTracks.length < maxTracks) {
+          console.log(`   ⏭️  Skipping, looking for shorter track...`)
+          continue
+        }
+        
+        // Give up, we're as close as we can get
+        console.log(`   Stopping at ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+        break
       }
       
+      // Add track
       selectedTracks.push(track)
       selectedTrackIds.add(track.id)
       totalDuration += durationToCheck // Use safe duration
       totalActualDuration += trackDuration // Actual playable duration
+      
+      // Log and check if we've hit the sweet spot
+      console.log(`   ➕ Added: ${track.artist} - ${track.title} (${Math.floor(durationToCheck / 60)}:${(durationToCheck % 60).toString().padStart(2, '0')}) | Total: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+      
+      // Check if we've reached the perfect duration (58-61 minutes)
+      if (totalDuration >= MIN_ACCEPTABLE && totalDuration <= MAX_ACCEPTABLE) {
+        console.log(`✅ Perfect fit! Total: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} (target: 60:00)`)
+        break // Stop here, we're at the perfect duration!
+      }
     }
     
-    console.log(`✅ Selected ${selectedTracks.length} tracks (no duplicates)`)
-    console.log(`   Total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} (max: ${Math.floor(maxDuration / 60)}min)`)
-    console.log(`   Actual mix duration (trimmed): ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
+    const durationMinutes = Math.floor(totalDuration / 60)
+    const durationSeconds = Math.floor(totalDuration % 60)
+    const actualMinutes = Math.floor(totalActualDuration / 60)
+    const actualSeconds = Math.floor(totalActualDuration % 60)
+    const targetDiff = totalDuration - TARGET_DURATION
+    const targetDiffStr = targetDiff > 0 ? `+${Math.floor(targetDiff / 60)}:${(Math.abs(targetDiff) % 60).toString().padStart(2, '0')}` : `${Math.floor(targetDiff / 60)}:${(Math.abs(targetDiff) % 60).toString().padStart(2, '0')}`
+    
+    console.log(`✅ Selected ${selectedTracks.length} tracks (NO DUPLICATES! ✨)`)
+    console.log(`   Total duration: ${durationMinutes}:${durationSeconds.toString().padStart(2, '0')} (target: 60:00, diff: ${targetDiffStr})`)
+    console.log(`   Actual mix duration (trimmed): ${actualMinutes}:${actualSeconds.toString().padStart(2, '0')}`)
+    
+    if (Math.abs(targetDiff) <= 60) {
+      console.log(`   🎯 PERFECT! Within 1 minute of target!`)
+    } else if (Math.abs(targetDiff) <= 120) {
+      console.log(`   ✅ EXCELLENT! Within 2 minutes of target!`)
+    } else {
+      console.log(`   ⚠️  Could be closer to 60 minutes...`)
+    }
     
     // 5.5. Insert jingles if requested
     let finalTracks: Track[] = selectedTracks
@@ -444,9 +485,23 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
           return sum + duration
         }, 0)
         
+        const newDurationMin = Math.floor(totalDuration / 60)
+        const newDurationSec = Math.floor(totalDuration % 60)
+        const jingleDiff = totalDuration - TARGET_DURATION
+        const jingleDiffStr = jingleDiff > 0 ? `+${Math.floor(jingleDiff / 60)}:${(Math.abs(jingleDiff) % 60).toString().padStart(2, '0')}` : `${Math.floor(jingleDiff / 60)}:${(Math.abs(jingleDiff) % 60).toString().padStart(2, '0')}`
+        
         console.log(`✅ Inserted ${jinglesInserted} jingles`)
-        console.log(`   New total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
-        console.log(`   New actual duration: ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
+        console.log(`   New total duration: ${newDurationMin}:${newDurationSec.toString().padStart(2, '0')} (target: 60:00, diff: ${jingleDiffStr})`)
+        console.log(`   New actual duration: ${Math.floor(totalActualDuration / 60)}:${(Math.floor(totalActualDuration) % 60).toString().padStart(2, '0')}`)
+        
+        // Check if still close to target
+        if (Math.abs(jingleDiff) <= 60) {
+          console.log(`   🎯 PERFECT WITH JINGLES! Within 1 minute of 60:00!`)
+        } else if (Math.abs(jingleDiff) <= 180) {
+          console.log(`   ✅ GOOD! Within 3 minutes of 60:00 with jingles`)
+        } else {
+          console.log(`   ⚠️  With jingles: ${newDurationMin}:${newDurationSec.toString().padStart(2, '0')} (may need adjustment)`)
+        }
       }
     }
     
