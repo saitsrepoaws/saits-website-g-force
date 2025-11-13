@@ -63,7 +63,8 @@ interface GeneratePlaylistInput {
   // Jingle options
   includeJingles?: boolean // Add jingles to playlist
   jinglesEveryN?: number // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
-  jingleGenre?: string // Genre filter for jingles (default: 'WildFM Jingels')
+  jingleGenre?: string // Genre filter for jingles (default: 'Station ID')
+  jingleTags?: string // Tags filter for jingles (e.g. 'WildFM', 'Sweepers', etc.)
 }
 
 interface Track {
@@ -71,6 +72,7 @@ interface Track {
   title: string
   artist?: string
   genre?: string
+  tags?: string
   bpm?: number
   key?: string
   duration?: number
@@ -338,9 +340,24 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     // 4. Get jingles if requested
     let jingles: Track[] = []
     if (input.includeJingles) {
-      const jingleGenre = input.jingleGenre || 'WildFM Jingels'
-      jingles = allTracks.filter(t => t.genre === jingleGenre) as Track[]
-      console.log(`🎤 Found ${jingles.length} jingles (genre: ${jingleGenre})`)
+      const jingleGenre = input.jingleGenre || 'Station ID'
+      let filteredJingles = allTracks.filter(t => t.genre === jingleGenre) as Track[]
+      
+      // Further filter by tags if jingleTags is provided
+      if (input.jingleTags) {
+        const requestedTags = input.jingleTags.toLowerCase().split(',').map(t => t.trim())
+        filteredJingles = filteredJingles.filter(jingle => {
+          if (!jingle.tags) return false
+          const jingleTags = jingle.tags.toLowerCase().split(',').map(t => t.trim())
+          // Check if any requested tag matches any jingle tag
+          return requestedTags.some(reqTag => jingleTags.some(jTag => jTag.includes(reqTag)))
+        })
+        console.log(`🎤 Found ${filteredJingles.length} jingles (genre: ${jingleGenre}, tags: ${input.jingleTags})`)
+      } else {
+        console.log(`🎤 Found ${filteredJingles.length} jingles (genre: ${jingleGenre})`)
+      }
+      
+      jingles = filteredJingles
     }
     
     // 5. Select tracks (respect maxTracks and maxDuration)

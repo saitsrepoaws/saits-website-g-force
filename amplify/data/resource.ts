@@ -267,7 +267,8 @@ const schema = a.schema({
       title: a.string().required(), // Track title (parsed from filename or fallback to filename)
       version: a.string(), // Version/Mix info (parsed from filename, optional)
       label: a.string(), // Record label (parsed from filename, optional)
-      genre: a.string(), // Genre from ID3 tags
+      genre: a.string(), // Genre from ID3 tags or "Station ID" for jingles
+      tags: a.string(), // Tags for categorization (Hot Hits, Oldies, WildFM, Sweepers, etc.)
       year: a.integer(), // Release year from ID3 tags
       duration: a.integer(), // duration in seconds
       fileUrl: a.string(), // S3 URL or path to audio file
@@ -319,7 +320,8 @@ const schema = a.schema({
       // Jingle options
       includeJingles: a.boolean(), // Add jingles to playlist
       jinglesEveryN: a.integer(), // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
-      jingleGenre: a.string(), // Genre filter for jingles (default: 'WildFM Jingels')
+      jingleGenre: a.string(), // Genre filter for jingles (default: 'Station ID')
+      jingleTags: a.string(), // Tags filter for jingles (e.g. 'WildFM', 'Sweepers', etc.)
     })
     .returns(a.json())
     .authorization((allow) => [allow.authenticated()])
