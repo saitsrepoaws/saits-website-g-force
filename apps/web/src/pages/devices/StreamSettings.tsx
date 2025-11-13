@@ -676,6 +676,109 @@ function StreamSettings() {
           </div>
         </div>
 
+        {/* Video Clip Info */}
+        <div className="mt-6 bg-white border border-gray-300 rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">🎬</span>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Video Clips & Visual Streaming</h3>
+                <p className="text-sm text-gray-600">Track video clips draaien tijdens audio stream</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-50 to-red-50 border border-pink-200 rounded-lg p-5">
+              <div className="flex items-start gap-3">
+                <span className="text-3xl">📺</span>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-pink-900 mb-3">Toekomstige Functionaliteit</h4>
+                  
+                  <div className="space-y-3 text-sm text-pink-800">
+                    <div>
+                      <p className="font-medium mb-1">🎬 Video Clip Integratie:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li>Automatisch video clips ophalen per track</li>
+                        <li>YouTube, Vimeo of local video files</li>
+                        <li>Sync video met audio stream timing</li>
+                        <li>Fallback naar cover art + visualizer</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium mb-1">📺 Visual Output Options:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li>HLS video stream output</li>
+                        <li>WebRTC real-time video</li>
+                        <li>Video player widgets voor websites</li>
+                        <li>Smart TV & streaming device support</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium mb-1">🎨 Visual Features:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li>Audio visualizer als fallback</li>
+                        <li>Cover art slideshow met transitions</li>
+                        <li>Track metadata overlay (artist, title, BPM)</li>
+                        <li>Custom branding & logo's</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium mb-1">⚙️ Technical Details:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li><strong>Format:</strong> HLS (m3u8) + MP4 fallback</li>
+                        <li><strong>Resolution:</strong> 1080p / 720p / 480p adaptive</li>
+                        <li><strong>Storage:</strong> S3 + CloudFront CDN</li>
+                        <li><strong>Processing:</strong> FFmpeg on Lambda/EC2</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-pink-200">
+                    <p className="text-xs text-pink-700 italic">
+                      💡 <strong>Info:</strong> Video clip functionaliteit is in ontwikkeling. 
+                      Straks kunnen tracks automatisch gekoppeld worden aan video clips voor visuele radio streaming.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-pink-50 border border-pink-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>🎥</span>
+                  <span className="text-xs font-semibold text-pink-900">Video Sources</span>
+                </div>
+                <p className="text-xs text-pink-700">
+                  YouTube API, local files, visualizers
+                </p>
+              </div>
+
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>📡</span>
+                  <span className="text-xs font-semibold text-red-900">Stream Output</span>
+                </div>
+                <p className="text-xs text-red-700">
+                  HLS video stream, WebRTC, widgets
+                </p>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>🎨</span>
+                  <span className="text-xs font-semibold text-orange-900">Visual Effects</span>
+                </div>
+                <p className="text-xs text-orange-700">
+                  Visualizers, metadata overlay, branding
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Live Monitoring Section */}
         <div className="mt-6 bg-white border border-gray-300 rounded-lg shadow-sm">
           <button
