@@ -19,6 +19,6 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Run sandbox in watch mode (no --once flag)
-npx ampx sandbox
+pnpm --package=@aws-amplify/backend-cli dlx ampx sandbox
 
 # This will keep running until you Ctrl+C
