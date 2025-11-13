@@ -30,6 +30,7 @@ const STORAGE_BUCKET = process.env.STORAGE_BUCKET || ''
 const SCHEDULE_TABLE = process.env.SCHEDULE_TABLE || ''
 const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE || ''
 const TRACK_TABLE = process.env.TRACK_TABLE || ''
+const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''
 const EC2_INSTANCE_ID = process.env.EC2_INSTANCE_ID || ''
 
 // News URL
@@ -131,6 +132,26 @@ function generateM3U(newsLocalPath: string | null, tracks: Array<{track: Track, 
   }
   
   return m3u
+}
+
+/**
+ * Get news enabled setting from StreamSettings
+ */
+async function isNewsEnabled(): Promise<boolean> {
+  try {
+    const { Item } = await dynamodb.send(new GetCommand({
+      TableName: SETTINGS_TABLE,
+      Key: { settingKey: 'playlist_update_timing' }
+    }))
+    
+    // Default to false (OFF) if setting doesn't exist
+    const enabled = Item?.newsEnabled === true
+    console.log(`📰 News enabled: ${enabled}`)
+    return enabled
+  } catch (err) {
+    console.error('⚠️ Failed to get news setting, defaulting to OFF:', err)
+    return false
+  }
 }
 
 /**
@@ -391,14 +412,19 @@ echo "Cleanup complete"
     const downloads: Array<{s3Url: string, localPath: string}> = []
     let newsLocalPath: string | null = null
     
-    // Add news to downloads
-    try {
-      const newsS3Url = await downloadNews()
-      newsLocalPath = '/var/radio/tracks/news-latest.mp3'
-      downloads.push({ s3Url: newsS3Url, localPath: newsLocalPath })
-      console.log(`📰 News queued for download`)
-    } catch (newsError) {
-      console.error('❌ Failed to fetch news:', newsError)
+    // Check if news is enabled and add to downloads
+    const newsEnabledSetting = await isNewsEnabled()
+    if (newsEnabledSetting) {
+      try {
+        const newsS3Url = await downloadNews()
+        newsLocalPath = '/var/radio/tracks/news-latest.mp3'
+        downloads.push({ s3Url: newsS3Url, localPath: newsLocalPath })
+        console.log(`📰 News queued for download`)
+      } catch (newsError) {
+        console.error('❌ Failed to fetch news:', newsError)
+      }
+    } else {
+      console.log('📰 News disabled - skipping download')
     }
     
     // 5. Add all tracks to downloads and prepare track list

@@ -1051,7 +1051,7 @@
     "FunctionVersion": "2018-05-29",
     "Name": "MutationcreateStreamSettingsinit1Function",
     "RequestMappingTemplateS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a9fd40bcaba98a1601b745cecec36dcfdf2dc575910d38e7f089408bfd281d10.vtl"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/50d6a346d02f74981e15da185fb217fda580a10d893ce33a92df659eeda1a5b5.vtl"
     },
     "ResponseMappingTemplate": "$util.toJson({})"
    },

@@ -129,6 +129,9 @@ const schema = a.schema({
       streamServerUrl: a.string(), // Icecast server URL
       streamMountPoint: a.string().default('/stream.mp3'),
       
+      // News Settings
+      newsEnabled: a.boolean().default(false), // Enable/disable news bulletin (default OFF)
+      
       // Crossfade Settings
       crossfadeEnabled: a.boolean().default(true), // Enable/disable crossfade
       crossfadeStartNext: a.float().default(3.0), // Start next track N seconds before end (1-10)

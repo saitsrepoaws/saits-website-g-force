@@ -36,6 +36,9 @@ interface Settings {
   streamServerUrl?: string | null
   streamMountPoint?: string | null
   
+  // News Settings
+  newsEnabled?: boolean
+  
   // Crossfade Settings
   crossfadeEnabled?: boolean
   crossfadeStartNext?: number
@@ -274,6 +277,9 @@ function StreamSettings() {
         streamServerUrl: settings.streamServerUrl,
         streamMountPoint: settings.streamMountPoint,
         
+        // News
+        newsEnabled: settings.newsEnabled,
+        
         // Crossfade
         crossfadeEnabled: settings.crossfadeEnabled,
         crossfadeStartNext: settings.crossfadeStartNext,
@@ -488,6 +494,40 @@ function StreamSettings() {
                   {settings.streamServerUrl}{settings.streamMountPoint}
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* News Settings */}
+          <div className="p-6 border-t border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">📰 Nieuws Bulletin</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Schakel automatisch nieuws aan/uit aan het begin van elk uur
+            </p>
+            
+            <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div>
+                <p className="font-medium text-gray-900">Nieuws Enabled</p>
+                <p className="text-sm text-gray-600">Download en speel nieuws bulletin elk uur</p>
+              </div>
+              <button
+                onClick={() => setSettings({ ...settings, newsEnabled: !settings.newsEnabled })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  settings.newsEnabled ? 'bg-green-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    settings.newsEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>ℹ️ Info:</strong> Nieuws wordt automatisch gedownload en afgespeeld aan het begin van elk uur (volgende keer om 
+                <strong> {new Date(Date.now() + 3600000).getHours().toString().padStart(2, '0')}:00</strong>)
+              </p>
             </div>
           </div>
 
