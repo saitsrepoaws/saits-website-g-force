@@ -40,6 +40,13 @@ const PRESETS = {
     fadeOut: 0.5,
     description: 'Harde hit - track komt met vol volume binnen!'
   },
+  djblend: {
+    name: '🎛️ DJ Blend',
+    startNext: 4.0,
+    fadeIn: 3.0,
+    fadeOut: 3.0,
+    description: 'Perfect voor Dance/House/Techno - club sound!'
+  },
   techno: {
     name: '⚡ Techno',
     startNext: 3.0,

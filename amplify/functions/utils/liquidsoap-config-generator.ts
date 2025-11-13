@@ -111,7 +111,7 @@ export function validateCrossfadeSettings(settings: CrossfadeSettings): string[]
     errors.push('At least fade-out should be greater than 0 for smooth transitions')
   }
   
-  const validPresets = ['cut', 'techno', 'progressive', 'ambient', 'hardcore', 'custom']
+  const validPresets = ['cut', 'djblend', 'techno', 'progressive', 'ambient', 'hardcore', 'custom']
   if (!validPresets.includes(settings.preset)) {
     errors.push(`Invalid preset: ${settings.preset}. Must be one of: ${validPresets.join(', ')}`)
   }
