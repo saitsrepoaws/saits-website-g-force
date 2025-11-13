@@ -365,21 +365,32 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     const maxDuration = input.maxDuration || (59 * 60) // 59 minutes default
     
     const selectedTracks: Track[] = []
+    const selectedTrackIds = new Set<string>() // Track duplicates
     let totalDuration = 0
     let totalActualDuration = 0 // Duration without silence (using trim points)
     
     for (const track of filteredTracks) {
+      // DUPLICATE CHECK: Skip if already selected
+      if (selectedTrackIds.has(track.id)) {
+        console.log(`⏭️  Skipping duplicate: ${track.title}`)
+        continue
+      }
+      
       if (selectedTracks.length >= maxTracks) break
       
       // Use actual duration (trim points) if available, otherwise use full duration
       const trackDuration = track.trimStart !== undefined && track.trimEnd !== undefined
         ? (track.trimEnd - track.trimStart)
-        : (track.duration || 0)
+        : (track.duration || 180) // Default 3 min if no duration
       
-      if (totalActualDuration + trackDuration > maxDuration) {
+      // STRICT DURATION CHECK: Use full duration for safety
+      const durationToCheck = track.duration || trackDuration
+      
+      if (totalDuration + durationToCheck > maxDuration) {
+        console.log(`⏱️  Duration limit reached: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} + ${Math.floor(durationToCheck / 60)}min would exceed ${Math.floor(maxDuration / 60)}min`)
         // Check if we should stop or skip this track
         if (selectedTracks.length < 5) {
-          // Too few tracks, skip this one
+          // Too few tracks, try next one
           continue
         } else {
           // Enough tracks, stop here
@@ -388,52 +399,55 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
       }
       
       selectedTracks.push(track)
-      totalDuration += (track.duration || 0) // Full duration with silence
+      selectedTrackIds.add(track.id)
+      totalDuration += durationToCheck // Use safe duration
       totalActualDuration += trackDuration // Actual playable duration
     }
     
-    console.log(`✅ Selected ${selectedTracks.length} tracks`)
-    console.log(`   Total duration (with silence): ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+    console.log(`✅ Selected ${selectedTracks.length} tracks (no duplicates)`)
+    console.log(`   Total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')} (max: ${Math.floor(maxDuration / 60)}min)`)
     console.log(`   Actual mix duration (trimmed): ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
     
     // 5.5. Insert jingles if requested
     let finalTracks: Track[] = selectedTracks
-    if (input.includeJingles && jingles.length > 0) {
-      const jinglesEveryN = input.jinglesEveryN || 2 // Default: every 2 tracks
-      console.log(`🎤 Inserting jingles every ${jinglesEveryN} tracks...`)
-      
-      finalTracks = []
-      let jingleIndex = 0
-      
-      for (let i = 0; i < selectedTracks.length; i++) {
-        finalTracks.push(selectedTracks[i])
+    let jinglesInserted = 0
+    
+    if (input.includeJingles) {
+      if (jingles.length === 0) {
+        console.log(`⚠️  No jingles found matching criteria (genre: ${input.jingleGenre || 'Station ID'}, tags: ${input.jingleTags || 'any'})`)  
+      } else {
+        const jinglesEveryN = input.jinglesEveryN || 2 // Default: every 2 tracks
+        console.log(`🎤 Inserting jingles every ${jinglesEveryN} tracks (${jingles.length} jingles available)...`)
         
-        // Insert jingle after every N tracks (but not after the last track)
-        if ((i + 1) % jinglesEveryN === 0 && i < selectedTracks.length - 1) {
-          if (jingleIndex < jingles.length) {
-            finalTracks.push(jingles[jingleIndex])
+        finalTracks = []
+        let jingleIndex = 0
+        
+        for (let i = 0; i < selectedTracks.length; i++) {
+          finalTracks.push(selectedTracks[i])
+          
+          // Insert jingle after every N tracks (but not after the last track)
+          if ((i + 1) % jinglesEveryN === 0 && i < selectedTracks.length - 1) {
+            const jingle = jingles[jingleIndex % jingles.length] // Loop through jingles
+            finalTracks.push(jingle)
+            console.log(`   🎤 Inserted jingle: ${jingle.title} (after track ${i + 1})`)
             jingleIndex++
-            
-            // Reset jingle index if we run out (loop through jingles)
-            if (jingleIndex >= jingles.length) {
-              jingleIndex = 0
-            }
+            jinglesInserted++
           }
         }
+        
+        // Calculate new total duration with jingles
+        totalDuration = finalTracks.reduce((sum, t) => sum + (t.duration || 0), 0)
+        totalActualDuration = finalTracks.reduce((sum, t) => {
+          const duration = t.trimStart !== undefined && t.trimEnd !== undefined
+            ? (t.trimEnd - t.trimStart)
+            : (t.duration || 0)
+          return sum + duration
+        }, 0)
+        
+        console.log(`✅ Inserted ${jinglesInserted} jingles`)
+        console.log(`   New total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
+        console.log(`   New actual duration: ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
       }
-      
-      // Calculate new total duration with jingles
-      totalDuration = finalTracks.reduce((sum, t) => sum + (t.duration || 0), 0)
-      totalActualDuration = finalTracks.reduce((sum, t) => {
-        const duration = t.trimStart !== undefined && t.trimEnd !== undefined
-          ? (t.trimEnd - t.trimStart)
-          : (t.duration || 0)
-        return sum + duration
-      }, 0)
-      
-      console.log(`✅ Inserted ${finalTracks.length - selectedTracks.length} jingles`)
-      console.log(`   New total duration: ${Math.floor(totalDuration / 60)}:${(totalDuration % 60).toString().padStart(2, '0')}`)
-      console.log(`   New actual duration: ${Math.floor(totalActualDuration / 60)}:${(totalActualDuration % 60).toString().padStart(2, '0')}`)
     }
     
     // 6. Create PlaylistTrackItems with auto-mix points

@@ -876,18 +876,31 @@ function Playlist() {
                       
                       {/* Jingle Tags Filter */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Filter by Tags (Optional)
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Filter by Tags (Select one or more)
                         </label>
-                        <input
-                          type="text"
-                          value={jingleTags}
-                          onChange={(e) => setJingleTags(e.target.value)}
-                          placeholder="WildFM, Sweepers, Promos"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          💡 Leave empty for all Station IDs, or filter by specific tags
+                        <div className="grid grid-cols-2 gap-2">
+                          {['WildFM', 'Sweepers', 'Promos', 'Branding', 'Energy', 'Commercial'].map(tag => (
+                            <label key={tag} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-purple-50 border border-gray-200">
+                              <input
+                                type="checkbox"
+                                checked={jingleTags.split(',').map(t => t.trim()).includes(tag)}
+                                onChange={(e) => {
+                                  const currentTags = jingleTags.split(',').map(t => t.trim()).filter(Boolean)
+                                  if (e.target.checked) {
+                                    setJingleTags([...currentTags, tag].join(', '))
+                                  } else {
+                                    setJingleTags(currentTags.filter(t => t !== tag).join(', '))
+                                  }
+                                }}
+                                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                              />
+                              <span className="text-sm text-gray-700">{tag}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          💡 Leave unchecked for all Station IDs, or select specific categories
                         </p>
                       </div>
                       
