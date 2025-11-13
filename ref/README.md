@@ -1,50 +1,45 @@
-# Reference Index: Amplify Gen 2, PubSub & Audio Streaming
+# 📚 Reference Documentation
 
-## ⭐ **NIEUW: Liquidsoap Crossfade Documentatie (10 Nov 2025)**
+**Complete documentation index voor G-Forge IoT Radio Platform**
 
-### **Audio Streaming:**
-- **`liquidsoap-crossfade.md`** 🎵 **CROSSFADE REFERENCE**
-  - Liquidsoap crossfade operators
-  - Out-of-the-box vs custom crossfades
-  - Smart crossfade implementation
-  - Autocue integration (2.2.5+)
-  - EC2 compatibility notes (2.0.2)
+## 🎯 Start Here
 
-## ⭐ **Complete IoT Setup Documentatie (31 Oct 2025)**
+👉 **[INDEX.md](INDEX.md)** - Complete documentatie overzicht met alle links
 
-### **Quick Start:**
-- **`IOT_QUICK_REFERENCE.md`** ⚡ **START HIER!**
-  - Snelle naslagwerk
-  - Common patterns
-  - Troubleshooting guide
-  - Critical do's and don'ts
+## 📂 Folder Structure
 
-### **Complete Guides:**
-- **`IOT_SETUP_JOURNEY_31OCT2025.md`** 📖 **VOLLEDIGE JOURNEY**
-  - Alle 8 problemen + oplossingen
-  - Timeline van troubleshooting
-  - Code changes met uitleg
-  - Testing checklist
-  - Lessons learned
+```
+ref/
+├── INDEX.md                  ← Complete index van alle documentatie
+├── README.md                 ← Deze file
+├── architecture/             ← System design & architectuur
+├── deployment/               ← Infrastructure & IoT setup
+├── development/              ← Dev workflows & guides
+├── features/                 ← Feature documentatie
+├── troubleshooting/          ← Debug & troubleshooting
+└── [legacy files]           ← Specifieke reference docs
+```
 
-- **`SETUP_ANALYSE_2025.md`** 📊 **SETUP REVIEW**
-  - Score: **9.5/10** 🌟🌟🌟🌟✨
-  - Vergelijking met Amplify Gen 2 docs
-  - Best practices die we volgen
-  - Production checklist
+## 🚀 Quick Links
 
-## 📖 **Quick Reference Guides**
+- **Development:** [Development Workflow](development/DEVELOPMENT_WORKFLOW.md)
+- **Architecture:** [Architecture Diagram](architecture/ARCHITECTURE_DIAGRAM.md)  
+- **Troubleshooting:** [Lambda Troubleshooting](troubleshooting/LAMBDA_TROUBLESHOOTING.md)
+- **Deployment:** [EC2 IAM Setup](deployment/EC2_IAM_SETUP.md)
 
-- **`iot-pubsub-naslagwerk.md`** - **COMPLETE IoT & PubSub naslagwerk** (patterns, best practices, examples)
-- `amplify-gen2-overview.md` - High-level Gen 2 concepts and getting started
-- `backend-cli-commands.md` - `@aws-amplify/backend-cli` sandbox/deploy commands
-- `pubsub-gen2-react.md` - Gen 2 PubSub setup in React
-- `pubsub-js.md` - Amplify JS v6 PubSub APIs and patterns
-- `iot-policy-examples.md` - AWS IoT Core MQTT policy examples
+## 📝 Commit Strategie
 
-## 🎯 **Start Here**
+**✅ KLEINE, FREQUENTE COMMITS van werkende features!**
 
-**Voor Setup Review:** Begin met `SETUP_ANALYSE_2025.md` ⭐ **AANBEVOLEN!**  
-**Voor IoT/PubSub implementatie:** Check `iot-pubsub-naslagwerk.md`  
-**Voor Amplify setup:** Start met `amplify-gen2-overview.md`  
-**Voor commands:** Check `backend-cli-commands.md`
+```bash
+# Goed voorbeeld:
+git add -A
+git commit -m "feat: Add news toggle - working! 📰"
+git push
+
+# Test → Works → Commit → Push → Repeat!
+```
+
+---
+
+**See [INDEX.md](INDEX.md) for complete documentation overview**
