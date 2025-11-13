@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash FM - Live Radio Stream</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -2px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .now-playing {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .now-playing-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .track-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .track-artist {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        .play-button.playing {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 10px 50px rgba(102, 126, 234, 0.8);
+            }
+        }
+
+        .play-icon, .pause-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .play-icon {
+            border-width: 20px 0 20px 35px;
+            border-color: transparent transparent transparent white;
+            margin-left: 5px;
+        }
+
+        .pause-icon {
+            width: 30px;
+            height: 40px;
+            position: relative;
+            display: none;
+        }
+
+        .pause-icon::before,
+        .pause-icon::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 40px;
+            background: white;
+        }
+
+        .pause-icon::before {
+            left: 0;
+        }
+
+        .pause-icon::after {
+            right: 0;
+        }
+
+        .play-button.playing .play-icon {
+            display: none;
+        }
+
+        .play-button.playing .pause-icon {
+            display: block;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+
+        .status.live {
+            color: #10b981;
+        }
+
+        .status.loading {
+            color: #f59e0b;
+        }
+
+        .status.error {
+            color: #ef4444;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .volume-control {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            border: none;
+        }
+
+        .links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .link {
+            display: inline-block;
+            margin: 0 10px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .link:hover {
+            color: #764ba2;
+        }
+
+        @media (max-width: 640px) {
+            .player-card {
+                padding: 30px 20px;
+            }
+
+            .logo {
+                font-size: 36px;
+            }
+
+            .track-title {
+                font-size: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="player-card">
+            <div class="logo">SPLASH FM</div>
+            <div class="tagline">🎵 Professional Beat-Matched Radio</div>
+
+            <div class="now-playing">
+                <div class="now-playing-label">Now Playing</div>
+                <div class="track-title" id="trackTitle">Loading...</div>
+                <div class="track-artist" id="trackArtist">Getting stream info...</div>
+            </div>
+
+            <button class="play-button" id="playButton">
+                <div class="play-icon"></div>
+                <div class="pause-icon"></div>
+            </button>
+
+            <div class="status" id="status">Click to start streaming</div>
+
+            <div class="volume-control">
+                <input type="range" min="0" max="100" value="80" class="volume-slider" id="volumeSlider">
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-value" id="bitrate">192</span>
+                    <span class="stat-label">kbps</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="listeners">-</span>
+                    <span class="stat-label">Listeners</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">24/7</span>
+                    <span class="stat-label">Live</span>
+                </div>
+            </div>
+
+            <div class="links">
+                <a href="/status-json.xsl" class="link" target="_blank">📊 Stats</a>
+                <a href="https://stream.splashfm.nl/stream.mp3" class="link">🔗 Direct Stream</a>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer" preload="none">
+        <source src="https://stream.splashfm.nl/stream.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playButton = document.getElementById('playButton');
+        const statusElement = document.getElementById('status');
+        const trackTitle = document.getElementById('trackTitle');
+        const trackArtist = document.getElementById('trackArtist');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const listenersElement = document.getElementById('listeners');
+
+        let isPlaying = false;
+
+        // Set initial volume
+        audioPlayer.volume = volumeSlider.value / 100;
+
+        // Play/Pause toggle
+        playButton.addEventListener('click', function() {
+            if (isPlaying) {
+                audioPlayer.pause();
+                playButton.classList.remove('playing');
+                statusElement.textContent = 'Paused';
+                statusElement.className = 'status';
+                isPlaying = false;
+            } else {
+                statusElement.textContent = 'Loading stream...';
+                statusElement.className = 'status loading';
+                
+                audioPlayer.play().then(() => {
+                    playButton.classList.add('playing');
+                    statusElement.textContent = '🔴 LIVE';
+                    statusElement.className = 'status live';
+                    isPlaying = true;
+                }).catch(error => {
+                    console.error('Playback error:', error);
+                    statusElement.textContent = 'Error: Could not start stream';
+                    statusElement.className = 'status error';
+                });
+            }
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', function() {
+            audioPlayer.volume = this.value / 100;
+        });
+
+        // Fetch stream info
+        async function updateStreamInfo() {
+            try {
+                const response = await fetch('/status-json.xsl');
+                const data = await response.json();
+                
+                if (data.icestats && data.icestats.source) {
+                    const source = data.icestats.source;
+                    
+                    // Update now playing
+                    if (source.title) {
+                        const parts = source.title.split(' - ');
+                        if (parts.length >= 2) {
+                            trackArtist.textContent = parts[0];
+                            trackTitle.textContent = parts.slice(1).join(' - ');
+                        } else {
+                            trackTitle.textContent = source.title;
+                            trackArtist.textContent = source.server_name || 'Splash FM';
+                        }
+                    }
+                    
+                    // Update listeners
+                    if (source.listeners !== undefined) {
+                        listenersElement.textContent = source.listeners;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching stream info:', error);
+            }
+        }
+
+        // Update stream info every 10 seconds
+        updateStreamInfo();
+        setInterval(updateStreamInfo, 10000);
+
+        // Handle audio errors
+        audioPlayer.addEventListener('error', function(e) {
+            statusElement.textContent = 'Stream error - retrying...';
+            statusElement.className = 'status error';
+            playButton.classList.remove('playing');
+            isPlaying = false;
+            
+            // Try to reconnect after 3 seconds
+            setTimeout(() => {
+                if (!isPlaying) {
+                    statusElement.textContent = 'Click to start streaming';
+                    statusElement.className = 'status';
+                }
+            }, 3000);
+        });
+
+        // Show loading on waiting
+        audioPlayer.addEventListener('waiting', function() {
+            statusElement.textContent = 'Buffering...';
+            statusElement.className = 'status loading';
+        });
+
+        // Show playing on canplay
+        audioPlayer.addEventListener('canplay', function() {
+            if (isPlaying) {
+                statusElement.textContent = '🔴 LIVE';
+                statusElement.className = 'status live';
+            }
+        });
+    </script>
+</body>
+</html>
