@@ -813,7 +813,7 @@ This action cannot be undone!`
                               const newQueue = [...uploadQueue]
                               newQueue[index].isJingle = e.target.checked
                               if (e.target.checked && !newQueue[index].jingleCategory) {
-                                newQueue[index].jingleCategory = 'WildFM Jingels'
+                                newQueue[index].jingleCategory = 'Station ID'
                               }
                               setUploadQueue(newQueue)
                             }}
