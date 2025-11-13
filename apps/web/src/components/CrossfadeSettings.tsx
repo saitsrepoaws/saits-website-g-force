@@ -33,6 +33,13 @@ interface Props {
 }
 
 const PRESETS = {
+  cut: {
+    name: '🔪 Cut/Hit',
+    startNext: 1.5,
+    fadeIn: 0.0,
+    fadeOut: 0.5,
+    description: 'Harde hit - track komt met vol volume binnen!'
+  },
   techno: {
     name: '⚡ Techno',
     startNext: 3.0,

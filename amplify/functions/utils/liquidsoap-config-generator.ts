@@ -105,11 +105,13 @@ export function validateCrossfadeSettings(settings: CrossfadeSettings): string[]
     errors.push('Fade-out duration must be between 0 and 10 seconds')
   }
   
+  // Allow fadeIn=0 for instant "hit" transitions
+  // Only error if both are 0 (which would be a hard cut with no crossfade at all)
   if (settings.fadeIn === 0 && settings.fadeOut === 0) {
-    errors.push('At least one fade duration must be greater than 0')
+    errors.push('At least fade-out should be greater than 0 for smooth transitions')
   }
   
-  const validPresets = ['techno', 'progressive', 'ambient', 'hardcore', 'custom']
+  const validPresets = ['cut', 'techno', 'progressive', 'ambient', 'hardcore', 'custom']
   if (!validPresets.includes(settings.preset)) {
     errors.push(`Invalid preset: ${settings.preset}. Must be one of: ${validPresets.join(', ')}`)
   }
