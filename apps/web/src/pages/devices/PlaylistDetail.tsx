@@ -56,9 +56,10 @@ function SortableTrackRow({
   } = useSortable({ id: track.trackId })
 
   // Check if this is a jingle
-  const isJingle = track.trackGenre?.toLowerCase().includes('jingle') || 
+  const isJingle = track.trackGenre === 'Station ID' ||
+                   track.trackGenre?.toLowerCase().includes('jingle') || 
                    track.trackGenre?.toLowerCase().includes('id') ||
-                   track.trackGenre === 'WildFM Jingels'
+                   track.trackGenre === 'WildFM Jingels' // Legacy support
 
   const style = {
     transform: CSS.Transform.toString(transform),

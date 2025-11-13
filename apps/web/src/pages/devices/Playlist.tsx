@@ -30,7 +30,8 @@ function Playlist() {
   // Jingle options
   const [includeJingles, setIncludeJingles] = useState(false)
   const [jinglesEveryN, setJinglesEveryN] = useState('2')
-  const [jingleGenre, setJingleGenre] = useState('WildFM Jingels')
+  const [jingleGenre, setJingleGenre] = useState('Station ID')
+  const [jingleTags, setJingleTags] = useState('') // Filter jingles by tags: WildFM, Sweepers, etc.
   
   // Load playlists and genres
   useEffect(() => {
@@ -187,6 +188,7 @@ function Playlist() {
         includeJingles,
         jinglesEveryN: jinglesEveryN ? parseInt(jinglesEveryN) : undefined,
         jingleGenre: jingleGenre || undefined,
+        jingleTags: jingleTags || undefined,
       })
       
       if (errors) {
@@ -214,7 +216,8 @@ function Playlist() {
         setNewPlaylistTags('')
         setIncludeJingles(false)
         setJinglesEveryN('2')
-        setJingleGenre('WildFM Jingels')
+        setJingleGenre('Station ID')
+        setJingleTags('')
       } else {
         // Show specific error message
         const errorMsg = data?.error || 'Failed to generate playlist'
@@ -859,22 +862,33 @@ function Playlist() {
                       {/* Jingle Genre */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Jingle Category
+                          Jingle Genre
                         </label>
-                        <select
-                          value={jingleGenre}
-                          onChange={(e) => setJingleGenre(e.target.value)}
+                        <div className="p-2 bg-purple-50 border border-purple-200 rounded">
+                          <span className="text-sm font-medium text-purple-700">
+                            🎤 Station ID ({genreTrackCounts['Station ID'] || 0} tracks)
+                          </span>
+                          <p className="text-xs text-purple-600 mt-1">
+                            All jingles are stored with genre "Station ID"
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Jingle Tags Filter */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Filter by Tags (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={jingleTags}
+                          onChange={(e) => setJingleTags(e.target.value)}
+                          placeholder="WildFM, Sweepers, Promos"
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
-                        >
-                          <option value="WildFM Jingels">
-                            WildFM Jingels ({genreTrackCounts['WildFM Jingels'] || 0} tracks)
-                          </option>
-                          {availableGenres.filter(g => g.toLowerCase().includes('jingle') || g.toLowerCase().includes('id')).map(genre => (
-                            <option key={genre} value={genre}>
-                              {genre} ({genreTrackCounts[genre] || 0} tracks)
-                            </option>
-                          ))}
-                        </select>
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          💡 Leave empty for all Station IDs, or filter by specific tags
+                        </p>
                       </div>
                       
                       <p className="text-xs text-gray-500">

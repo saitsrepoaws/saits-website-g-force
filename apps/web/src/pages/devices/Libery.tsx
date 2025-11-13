@@ -188,8 +188,8 @@ function Libery() {
           status: 'pending' as const,
           // Jingle & Tags defaults
           isJingle,
-          jingleCategory: isJingle ? 'WildFM Jingels' : '',
-          tags: '', // User can add Hot Hits, Oldies, etc.
+          jingleCategory: 'Station ID', // Always Station ID for jingles
+          tags: '', // Use tags: WildFM, Sweepers, Promos, etc.
         }
       })
     )
@@ -824,33 +824,24 @@ This action cannot be undone!`
                           </label>
                         </div>
 
-                        {/* Jingle Category (only if isJingle) */}
+                        {/* Genre Info (only if isJingle) */}
                         {item.isJingle && (
                           <div className="col-span-3">
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
-                              Jingle Category
-                            </label>
-                            <select
-                              value={item.jingleCategory}
-                              onChange={(e) => {
-                                const newQueue = [...uploadQueue]
-                                newQueue[index].jingleCategory = e.target.value
-                                setUploadQueue(newQueue)
-                              }}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-purple-500"
-                            >
-                              <option value="WildFM Jingels">WildFM Jingels</option>
-                              <option value="Station IDs">Station IDs</option>
-                              <option value="Sweepers">Sweepers</option>
-                              <option value="Promos">Promos</option>
-                            </select>
+                            <div className="p-2 bg-purple-50 border border-purple-200 rounded">
+                              <span className="text-xs font-medium text-purple-700">
+                                🎤 Genre will be set to: <strong>Station ID</strong>
+                              </span>
+                              <p className="text-xs text-purple-600 mt-1">
+                                Use tags below to categorize: WildFM, Sweepers, Promos, etc.
+                              </p>
+                            </div>
                           </div>
                         )}
 
                         {/* Tags Field */}
                         <div className="col-span-3">
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            Tags (Hot Hits, Oldies, Party, Peak Time, etc.)
+                            {item.isJingle ? 'Tags (WildFM, Sweepers, Promos, etc.)' : 'Tags (Hot Hits, Oldies, Party, etc.)'}
                           </label>
                           <input
                             type="text"
@@ -860,11 +851,11 @@ This action cannot be undone!`
                               newQueue[index].tags = e.target.value
                               setUploadQueue(newQueue)
                             }}
-                            placeholder="Hot Hits, Oldies, Party (comma separated)"
+                            placeholder={item.isJingle ? "WildFM, Sweepers, Promos" : "Hot Hits, Oldies, Party"}
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            💡 Use tags to categorize tracks for smart playlist generation
+                            💡 {item.isJingle ? 'Tags categorize jingles for playlist generation' : 'Use tags to categorize tracks for smart playlist generation'}
                           </p>
                         </div>
                       </div>

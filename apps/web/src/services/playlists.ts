@@ -24,6 +24,7 @@ interface GeneratePlaylistInput {
   includeJingles?: boolean
   jinglesEveryN?: number
   jingleGenre?: string
+  jingleTags?: string // Filter jingles by tags: WildFM, Sweepers, etc.
 }
 
 // Lazy client - only create after Amplify.configure()
