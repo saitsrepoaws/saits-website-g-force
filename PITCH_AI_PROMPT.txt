@@ -1,0 +1,422 @@
+G-FORGE IOT RADIO PLATFORM - AI PRESENTATION PROMPT
+
+SYSTEM OVERVIEW:
+Professional cloud-based 24/7 radio streaming platform
+Built on AWS infrastructure with serverless architecture
+Complete solution from track upload to live broadcast
+DJ-quality audio mixing with automatic crossfades
+
+WHAT WE HAVE NOW (LIVE AND OPERATIONAL):
+
+Core Radio System:
+Live 24/7 radio stream at http://46.137.184.91/stream.mp3
+Liquidsoap 2.0.2 audio engine for professional mixing
+Icecast2 streaming server for reliable distribution
+EC2 server hosting with Nginx web server
+Automatic track playback with no gaps or silence
+
+Track Library Management:
+Database with over 1050 tracks
+Multi-file drag and drop upload interface
+Automatic metadata extraction including BPM, musical key, energy level, and danceability
+Automatic cover art download from Spotify API
+Waveform visualization generation for each track
+Real-time search and filtering by genre, label, artist, and title
+Duplicate detection during upload process
+Lambda-powered processing pipeline
+
+Jingles and Station IDs:
+11 professional jingles for SplashFM branding
+Short sweepers ranging from 4 to 13 seconds
+Full sing jingles ranging from 7 to 23 seconds
+Tag-based categorization system using SplashFM, Sweepers, and Promos
+Automatic jingle detection during upload
+
+Playlist System:
+Manual playlist creation and management interface
+Drag and drop track ordering
+Maximum 59 minutes per playlist for hourly rotation
+Real-time track duration calculation
+IoT-based playlist synchronization across system
+
+Automatic Playlist Generator:
+Smart track selection based on multiple criteria
+Genre filtering for Techno, House, Dance, and more
+BPM range matching for energy consistency
+Musical key compatibility for harmonic mixing
+Mood-based track selection
+Automatic jingle injection every 2, 3, 4, or 5 tracks
+Tag-based jingle filtering for brand consistency
+Smart jingle placement for natural breaks
+
+Scheduling System:
+Hourly playlist scheduling running 24/7
+Day-of-week based programming
+Hour-specific playlist assignment
+Automatic queue management via SQS FIFO
+Lambda-triggered hourly updates using EventBridge cron
+CET timezone support for European scheduling
+
+Professional Crossfade System:
+DJ Blend preset with 0.5 second fade out and 1.0 second fade in
+Techno preset with 2 second fades for energetic blends
+Progressive preset with 4 second fades for smooth transitions
+Hardcore preset with 1 second fades for hard cuts
+Custom preset support for specific needs
+Beat-matched transitions with no silence gaps
+Smart fade timing based on track characteristics
+
+News Integration:
+Hourly news bulletin download from external source
+Automatic insertion at start of each hour
+Toggle on/off control via user interface
+External source from downloadlokaalmedia.nl
+Smart scheduling only when enabled by user
+
+Web Interface:
+Modern React-based UI built with Vite and TypeScript
+Real-time stream monitoring dashboard
+Track library browser with cover art display
+Playlist editor with drag and drop functionality
+Upload manager with progress tracking
+Schedule manager for weekly programming
+Settings dashboard for crossfade and news control
+Responsive design for desktop and tablet
+
+Cloud Infrastructure on AWS:
+EC2 for stream server running Liquidsoap, Icecast, and Nginx
+S3 for audio file storage including tracks, news, and jingles
+DynamoDB for database storing tracks, playlists, schedules, and settings
+SQS FIFO for queue management with strict track ordering
+Lambda functions for audio metadata extraction, cover art downloading, waveform generation, and hourly playlist updates
+EventBridge for scheduled triggers using cron jobs
+IoT Core for real-time synchronization across components
+Amplify Gen 2 for backend framework providing GraphQL API
+
+Architecture Highlights:
+Serverless backend using AWS Amplify Gen 2
+GraphQL API for type-safe data operations
+Real-time updates via AWS IoT Core MQTT
+Automatic scaling via Lambda functions
+S3 presigned URLs for secure file access
+IAM role-based security model
+
+WHAT WE ARE BUILDING (IN PROGRESS):
+
+Dynamic Crossfade Configuration:
+Currently requires manual config update and Liquidsoap restart
+Building Lambda auto-update system from DynamoDB
+Goal is real-time crossfade changes without restart
+Improving operational efficiency
+
+Advanced Analytics:
+Track play statistics and counting
+Most played tracks per genre analysis
+Peak listening times identification
+Average session duration tracking
+Listener metrics integration with Icecast stats
+
+Cover Art Fallback System:
+Automatic fallback when Spotify has no cover
+Genre-based placeholder images
+Custom branding for jingles and station IDs
+
+Mobile App Interface:
+iOS app for remote management
+Android app for remote management
+Push notifications for stream status
+Mobile-optimized playlist editor
+
+WHAT NEEDS EXPANSION (IMPROVEMENTS):
+
+Track Library Enhancements:
+Batch edit functionality for multiple tracks
+Advanced search with BPM range, key, and energy level filters
+Automatic genre detection using AI
+Duplicate track merging tool
+Bulk tag editing capabilities
+
+Jingle Management:
+Dedicated jingle library browser interface
+Preview player for jingles before use
+Automatic volume normalization
+Time-based jingle rotation for morning versus evening
+Custom jingle upload with branding templates
+
+Playlist Intelligence:
+AI-powered playlist suggestions based on patterns
+Energy curve optimization detecting build-ups and breakdowns
+Harmonic mixing validation checking key compatibility
+BPM progression suggestions for smooth flow
+Mood-based automatic track ordering
+
+Advanced Scheduling:
+Multi-week scheduling templates
+Special event scheduling for holidays and theme days
+Playlist rotation rules to avoid repetition
+Time-weighted track selection for peak hours
+Backup playlist fallback system for safety
+
+Mixing Enhancements:
+Beat detection for automatic sync points
+Phrase-aware mixing using musical structure analysis
+EQ matching between tracks for consistency
+Automatic gain control for consistent volume
+Stereo enhancement processing for wider sound
+
+Content Integration:
+Support for multiple news sources
+Weather updates integration
+Optional traffic reports
+Sponsored content insertion capabilities
+Custom audio announcements
+
+UI and UX Improvements:
+Dark mode support for night usage
+Customizable dashboard layouts
+Keyboard shortcuts for power users
+Undo and redo functionality
+Multi-language support for Dutch and English
+
+Infrastructure Optimization:
+Multi-region deployment with failover support
+CDN integration for global distribution
+Automatic backup system for data safety
+Monitoring and alerting dashboard
+Cost optimization using S3 lifecycle policies
+
+WHAT IS ON THE ROADMAP (FUTURE FEATURES):
+
+External Sources and Autonomous Players:
+Icecast Server Integration at http://46.137.184.91:8000
+Remote playlist pushing to external players
+Multi-location audio streaming capability
+Autonomous player management via API
+Support for hardware players like Raspberry Pi
+Software clients for desktop and mobile
+Real-time track synchronization across network
+Distributed audio network architecture
+RESTful API for external integrations
+Webhook support for event notifications
+Third-party app integration capabilities
+
+Video Clips and Visual Streaming:
+Automatic video clip lookup using YouTube API
+Local video file library management
+Sync video with audio stream timing
+Fallback to cover art plus visualizer
+HLS video stream output in m3u8 format
+WebRTC real-time video streaming
+Video player widgets for websites
+Smart TV app support for HbbTV, Apple TV, and Android TV
+Audio visualizer as fallback option
+Cover art slideshow with transitions
+Track metadata overlay showing artist, title, and BPM
+Custom branding and logo insertion
+FFmpeg on Lambda/EC2 for video transcoding
+Multi-resolution encoding at 1080p, 720p, and 480p
+S3 plus CloudFront CDN distribution
+Adaptive bitrate streaming for quality
+
+Voice Cloning and AI Radio Hosts:
+Custom voice models for station hosts
+Automatic intro and outro generation
+Personalized track announcements
+Time, weather, and news updates in branded voice
+AI-generated talk segments
+Dynamic content based on time and audience
+Personality-driven station identity
+
+Machine Learning Features:
+AI-powered crossfade optimization
+Energy level matching between tracks
+Automatic EQ adjustment for consistency
+Genre-specific mixing rules
+Listener preference learning
+Automatic playlist optimization based on data
+Track discovery suggestions for variety
+Trending content detection
+
+Advanced Analytics and Insights:
+Real-time listener count tracking
+Geographic distribution of listeners
+Device type statistics
+Peak listening times analysis
+Track popularity metrics
+Skip rate analysis for content quality
+Engagement scoring system
+A/B testing for programming decisions
+
+Multi-Station Support:
+Multiple radio stations on one platform
+Shared track library across stations
+Independent scheduling per station
+Cross-station analytics for insights
+Custom branding per station
+Reseller and partner program
+SaaS deployment model for scalability
+
+Social Media Integration:
+Auto-posting now playing updates
+Automatic track sharing with Spotify and Apple Music links
+Listener engagement features
+Contest and giveaway management
+Song requests via social media
+Dedications and shout-outs
+Interactive polls for genre preference and favorite tracks
+Live chat integration
+
+Monetization Features:
+Automatic ad insertion for pre-roll and mid-roll
+Sponsored content scheduling
+Ad performance tracking
+Revenue reporting dashboard
+Premium listeners with ad-free experience
+Supporter perks and benefits
+Early access features for subscribers
+VIP content offerings
+
+Enterprise Features:
+Multi-user support with different access levels
+Role-based access control for admin, DJ, and viewer
+Team collaboration tools
+Activity logging and audit trails
+User permission management
+Music licensing integration with BUMA and STEMRA
+Play log export for royalty reporting
+GDPR compliance tools
+Content rights management system
+
+WHY THIS IS UNIQUE:
+
+Complete all-in-one platform requiring no separate tools
+From upload to live stream in single interface
+Cloud-native architecture with no local servers needed except stream endpoint
+DJ-grade crossfade system with professional quality
+Automatic BPM and key detection for smart mixing
+Beat-matched mixing with no silence gaps
+Smart playlist generation using multiple criteria
+Automatic jingle insertion for branding
+Harmonic mixing support for musical flow
+Energy curve optimization for listener engagement
+AWS cloud platform with proven reliability
+Serverless architecture with automatic scaling
+Global CDN ready for worldwide distribution
+Multi-region capable for failover
+Video streaming ready for future expansion
+AI integration planned for intelligence
+External source support for flexibility
+Multi-station capable for growth
+
+TARGET MARKETS:
+
+Online Radio Stations needing 24/7 automated streaming
+Bars and Restaurants requiring background music management
+Retail Stores wanting brand-consistent audio
+Events and Venues needing temporary radio solutions
+Podcasters looking for automated content scheduling
+Corporate clients wanting internal radio and audio branding
+
+REVENUE POTENTIAL:
+
+SaaS Subscription model with monthly or yearly per station pricing
+White Label solutions offering custom branded platforms
+Enterprise deployments for large-scale implementations
+Advertising through built-in ad network
+Premium Features including advanced analytics and AI capabilities
+
+COMPETITIVE ADVANTAGES:
+
+Versus Traditional Radio Software: Cloud-native with no hardware needed
+Versus Spotify and Music Streaming: Full control with custom branding
+Versus DIY Solutions: Professional quality requiring no technical knowledge
+Versus Broadcast.radio and Radionomik: More affordable with modern tech stack
+
+TECHNOLOGY STACK:
+
+Frontend using React 18 with TypeScript
+Vite for fast build tooling
+TailwindCSS for modern styling
+AWS Amplify UI components
+
+Backend using AWS Amplify Gen 2
+GraphQL API for type-safe operations
+Lambda functions for serverless computing
+DynamoDB for NoSQL database
+S3 for object storage
+SQS FIFO for message queueing
+EventBridge for scheduling
+IoT Core for real-time synchronization
+
+Audio Processing with Liquidsoap 2.0.2
+FFmpeg for metadata extraction
+Spotify API for cover art
+Essentia for audio analysis
+
+Streaming via Icecast2
+Nginx web server
+HLS protocol ready for video future
+
+Infrastructure on EC2 for stream server
+CloudFront ready for CDN
+Route53 ready for DNS
+IAM for security management
+
+CURRENT METRICS:
+
+Over 1050 tracks in library
+11 jingles for branding
+24/7 uptime on live stream
+59-minute hourly rotation
+0.5 to 1.0 second crossfade times for ultra-fast transitions
+4 Lambda functions for automation
+FIFO queue for strict ordering
+Real-time IoT synchronization
+Less than 2 second track upload processing
+Automatic metadata extraction
+99.9% uptime target
+60 second queue recovery time
+Instant UI updates via IoT
+
+DEVELOPMENT TIMELINE:
+
+Phase 1 Foundation - COMPLETED
+Basic streaming infrastructure
+Track library management
+Manual playlist system
+Web interface
+
+Phase 2 Automation - COMPLETED
+Automatic playlist generator
+Scheduled programming
+Crossfade presets
+News integration
+Jingle support
+
+Phase 3 Intelligence - IN PROGRESS
+Advanced analytics
+Dynamic configuration
+AI-powered suggestions
+Mobile apps
+
+Phase 4 Expansion - ROADMAP
+External sources integration
+Video streaming
+Voice cloning
+Multi-station support
+
+Phase 5 Enterprise - FUTURE
+White label solution
+SaaS platform
+Multi-user support
+Monetization features
+
+ELEVATOR PITCH:
+
+G-Forge IoT Radio Platform is a professional cloud-based radio streaming solution
+Upload your music, set your schedule, and we run 24/7 automatically with DJ-quality mixing
+Built on AWS for reliability and scalability
+Perfect for online radio stations, bars, retail, and events
+From hobby DJ to professional broadcaster in one platform
+
+END OF PROMPT
