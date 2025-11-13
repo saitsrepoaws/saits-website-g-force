@@ -586,6 +586,96 @@ function StreamSettings() {
           />
         </div>
 
+        {/* External Sources / Autonomous Players Info */}
+        <div className="mt-6 bg-white border border-gray-300 rounded-lg shadow-sm">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">📡</span>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Externe Bronnen & Autonome Players</h3>
+                <p className="text-sm text-gray-600">Aansluiting voor remote players en externe audio bronnen</p>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-5">
+              <div className="flex items-start gap-3">
+                <span className="text-3xl">🎛️</span>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-indigo-900 mb-3">Toekomstige Functionaliteit</h4>
+                  
+                  <div className="space-y-3 text-sm text-indigo-800">
+                    <div>
+                      <p className="font-medium mb-1">📡 Icecast Server Integratie:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li>Direct connectie met bestaande Icecast server</li>
+                        <li>Remote playlist & track management</li>
+                        <li>Autonome players kunnen koppelen</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium mb-1">🎵 Remote Player Capabilities:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li>Push playlists naar externe players</li>
+                        <li>Real-time track synchronisatie</li>
+                        <li>Multi-location audio streaming</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <p className="font-medium mb-1">⚙️ Server Details:</p>
+                      <ul className="ml-4 space-y-1 list-disc">
+                        <li><strong>Icecast Server:</strong> http://46.137.184.91:8000</li>
+                        <li><strong>Mount Point:</strong> {settings.streamMountPoint || '/stream.mp3'}</li>
+                        <li><strong>Status:</strong> <span className="text-green-700 font-semibold">Operationeel ✅</span></li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-indigo-200">
+                    <p className="text-xs text-indigo-700 italic">
+                      💡 <strong>Info:</strong> Deze feature is in voorbereiding. Externe bronnen kunnen straks via API worden gekoppeld 
+                      voor gedistribueerde audio streaming en remote playlist management.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>🔌</span>
+                  <span className="text-xs font-semibold text-blue-900">Source Types</span>
+                </div>
+                <p className="text-xs text-blue-700">
+                  Hardware players, software clients, mobile apps
+                </p>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>🌐</span>
+                  <span className="text-xs font-semibold text-green-900">Remote Control</span>
+                </div>
+                <p className="text-xs text-green-700">
+                  API endpoints voor playlist & track pushing
+                </p>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span>🎛️</span>
+                  <span className="text-xs font-semibold text-purple-900">Autonomous</span>
+                </div>
+                <p className="text-xs text-purple-700">
+                  Self-managing players met queue sync
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Live Monitoring Section */}
         <div className="mt-6 bg-white border border-gray-300 rounded-lg shadow-sm">
           <button
