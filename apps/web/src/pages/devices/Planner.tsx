@@ -15,11 +15,11 @@ interface TimeSlot {
   active: boolean
 }
 
-const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+// IMPORTANT: Days in same order as DynamoDB dayOfWeek (0=Sunday, 1=Monday, etc.)
+const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 
-// Schedule data is loaded from DynamoDB - no hardcoded defaults needed!
-
-// DAY mapping: Index to code
+// DAY mapping: Index to code (matches DynamoDB dayOfWeek field)
+// 0 = Sunday, 1 = Monday, 2 = Tuesday, etc.
 const DAY_INDEX_TO_CODE: Record<number, string> = {
   0: 'SUN',
   1: 'MON',
@@ -45,7 +45,7 @@ function Planner() {
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([])
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [showAddSlot, setShowAddSlot] = useState(false)
-  const [currentDay, setCurrentDay] = useState<string>('MON')
+  const [currentDay, setCurrentDay] = useState<string>('SUN') // Start with Sunday to match DB order
   const [showBulkEdit, setShowBulkEdit] = useState(false)
   const [bulkPlaylistId, setBulkPlaylistId] = useState<string>('')
   const [bulkDays, setBulkDays] = useState<string[]>([])
@@ -217,7 +217,7 @@ function Planner() {
       time: '00:00',
       name: 'New Slot',
       playlistId: null,
-      days: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+      days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], // Weekdays (Mon-Fri) as default
       duration: 60,
       active: true
     }
@@ -377,7 +377,7 @@ function Planner() {
     setTimeSlots(slots => slots.map(slot => ({
       ...slot,
       playlistId,
-      days: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+      days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], // Weekdays only
       active: true
     })))
     alert('✅ All slots filled with playlist for weekdays!')
@@ -563,7 +563,12 @@ function Planner() {
               </div>
               
               <div className="p-4 space-y-2 max-h-[600px] overflow-auto">
-                {(currentDay === 'ALL' ? timeSlots : filteredSlots).map(slot => {
+                {isLoading ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <div className="animate-spin text-4xl mb-3">⏳</div>
+                    <p>Loading schedules from database...</p>
+                  </div>
+                ) : (currentDay === 'ALL' ? timeSlots : filteredSlots).map(slot => {
                   const playlist = playlists.find(p => p.id === slot.playlistId)
                   const isSelected = selectedSlot?.id === slot.id
                   
@@ -665,7 +670,7 @@ function Planner() {
                   )
                 })}
                 
-                {(currentDay === 'ALL' ? timeSlots : filteredSlots).length === 0 && (
+                {!isLoading && (currentDay === 'ALL' ? timeSlots : filteredSlots).length === 0 && (
                   <div className="text-center py-12 text-gray-500">
                     <p>No time slots for {currentDay}</p>
                     <button
