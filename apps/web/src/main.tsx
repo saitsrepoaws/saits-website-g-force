@@ -4,6 +4,7 @@ import { Authenticator } from '@aws-amplify/ui-react'
 import './index.css'
 import './styles/theme.css'
 import App from './App.tsx'
+import SplashFMHome from './pages/SplashFMHome'
 import IoTContextTest from './pages/IoTContextTest'
 import MqttTest from './pages/MqttTest'
 import DeviceManagement from './pages/DeviceManagement'
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
   { 
     path: '/', 
+    element: <SplashFMHome />  // Public SplashFM branded player - no auth required
+  },
+  { 
+    path: '/dashboard', 
     element: (
       <AuthGate>
         <App />
