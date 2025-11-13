@@ -1,37 +1,57 @@
-# Scripts
+# Scripts - Development Workflow
 
 Handige scripts voor het starten en stoppen van de development omgeving.
 
-## 🚀 Start Scripts
+## ⭐ **AANBEVOLEN: 2 Terminal Workflow**
 
-### Start Alles (Sandbox + Dev Server)
-```bash
-./scripts/start-all.sh
-```
-Dit script:
-1. Start Amplify Sandbox (--once mode)
-2. Wacht tot sandbox klaar is
-3. Kopieert `amplify_outputs.json` naar `apps/web/public/`
-4. Start Vite dev server op http://localhost:5173
+Voor optimale development experience, gebruik **2 aparte terminal vensters**:
 
-### Start Alleen Sandbox
+### **Terminal 1: Amplify Sandbox (Watch Mode)**
 ```bash
 ./scripts/start-sandbox.sh
 ```
-Start alleen de Amplify Sandbox en genereert `amplify_outputs.json`.
+- ✅ **Watch mode** - blijft draaien
+- ✅ **Auto-detect** backend changes
+- ✅ **Auto-redeploy** Lambda's, GraphQL schema, etc.
+- ✅ **Updates** `amplify_outputs.json` automatisch
 
-**Let op:** Je moet daarna handmatig de outputs kopiëren:
-```bash
-cp amplify_outputs.json apps/web/public/amplify_outputs.json
-```
+**Laat dit draaien tijdens hele development sessie!**
 
-### Start Alleen Dev Server
+### **Terminal 2: Vite Dev Server (Hot Reload)**
 ```bash
 ./scripts/start-dev.sh
 ```
-Start alleen de Vite dev server voor de web app.
+- ✅ **Hot reload** - instant browser updates
+- ✅ **Auto-reload** bij frontend changes
+- ✅ **Fast HMR** (Hot Module Replacement)
+- ✅ **Dev server** op http://localhost:5173
 
-**Vereist:** `amplify_outputs.json` moet al bestaan in `apps/web/public/`
+**Laat dit draaien tijdens hele development sessie!**
+
+---
+
+## 📚 Volledige Documentatie
+
+**Zie:** `/docs/DEVELOPMENT_WORKFLOW.md` voor complete uitleg van:
+- 2-terminal setup
+- Watch mode vs one-shot mode
+- Auto-detect & auto-redeploy
+- Troubleshooting tips
+
+---
+
+## 🔄 Oude Workflow (Legacy)
+
+### Start Alles (One-Shot Mode)
+```bash
+./scripts/start-all.sh
+```
+⚠️ **Niet aanbevolen!** Dit script gebruikt `--once` mode:
+- ❌ Sandbox stopt na 1x deploy
+- ❌ Geen auto-detect van changes
+- ❌ Moet opnieuw runnen bij elke change
+
+**Gebruik liever de 2-terminal workflow hierboven!**
 
 ## 🛑 Stop Scripts
 

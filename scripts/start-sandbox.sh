@@ -1,15 +1,24 @@
 #!/bin/bash
-# Start Amplify Sandbox (once mode)
-# Outputs: amplify_outputs.json in repo root
+# Start Amplify Sandbox in WATCH MODE
+# Automatically detects backend changes and redeploys
+# Outputs: amplify_outputs.json in repo root (auto-updated)
 
-echo "🚀 Starting Amplify Sandbox..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+cd "$(dirname "$0")/.."
 
-pnpm --package=@aws-amplify/backend-cli dlx ampx sandbox --once --outputs-format json --outputs-out-dir .
-
+echo "🚀 Starting Amplify Sandbox (Watch Mode)..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "✅ Sandbox started!"
-echo "📄 Outputs: amplify_outputs.json"
+echo "📌 WATCH MODE:"
+echo "   • Sandbox blijft draaien"
+echo "   • Detecteert backend changes automatisch"
+echo "   • Redeploys Lambda's bij code changes"
+echo "   • Updates amplify_outputs.json automatisch"
 echo ""
-echo "Next step: Copy outputs to web app"
-echo "  cp amplify_outputs.json apps/web/public/amplify_outputs.json"
+echo "💡 TIP: Laat dit draaien in apart terminal venster"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Run sandbox in watch mode (no --once flag)
+npx ampx sandbox
+
+# This will keep running until you Ctrl+C
