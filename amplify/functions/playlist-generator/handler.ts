@@ -48,10 +48,16 @@ function getHarmonicScore(key1: string | undefined, key2: string | undefined): n
   return 0 // Not compatible
 }
 
+interface GenreMixItem {
+  genre: string
+  percentage: number
+}
+
 interface GeneratePlaylistInput {
   name: string
   description?: string
-  genre?: string
+  genre?: string // Legacy: single genre (backwards compatible)
+  genreMix?: string // NEW: JSON string with genre percentages
   mood?: string
   bpmMin?: number
   bpmMax?: number
@@ -144,10 +150,26 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     // 2. Filter tracks based on criteria
     let filteredTracks = allTracks as Track[]
     
+    // Parse genreMix if provided (NEW: Multi-genre support!)
+    let genreMixConfig: GenreMixItem[] | null = null
+    if (input.genreMix) {
+      try {
+        genreMixConfig = JSON.parse(input.genreMix)
+        console.log(`🎨 Multi-genre mix enabled:`, genreMixConfig)
+      } catch (e) {
+        console.error('❌ Failed to parse genreMix:', e)
+      }
+    }
+    
     // Genre filter
     if (input.genre) {
       filteredTracks = filteredTracks.filter(t => t.genre === input.genre)
       console.log(`🎵 Genre filter (${input.genre}): ${filteredTracks.length} tracks`)
+    } else if (genreMixConfig && genreMixConfig.length > 0) {
+      // Multi-genre: filter to include all genres in the mix
+      const genresInMix = genreMixConfig.map(g => g.genre)
+      filteredTracks = filteredTracks.filter(t => genresInMix.includes(t.genre || ''))
+      console.log(`🎨 Multi-genre filter (${genresInMix.join(', ')}): ${filteredTracks.length} tracks`)
     }
     
     // BPM range filter
@@ -372,7 +394,97 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
     let totalDuration = 0
     let totalActualDuration = 0 // Duration without silence (using trim points)
     
-    for (const track of filteredTracks) {
+    // NEW: Multi-genre percentage selection
+    if (genreMixConfig && genreMixConfig.length > 0) {
+      console.log('🎨 Starting MULTI-GENRE percentage-based selection!')
+      
+      // Calculate target duration per genre
+      const genreTargets = genreMixConfig.map(g => ({
+        genre: g.genre,
+        percentage: g.percentage,
+        targetDuration: Math.floor(TARGET_DURATION * (g.percentage / 100)),
+        currentDuration: 0,
+        tracks: [] as Track[]
+      }))
+      
+      console.log('🎯 Target durations per genre:')
+      genreTargets.forEach(gt => {
+        const mins = Math.floor(gt.targetDuration / 60)
+        const secs = gt.targetDuration % 60
+        console.log(`   ${gt.genre}: ${gt.percentage}% = ${mins}:${secs.toString().padStart(2, '0')} (${gt.targetDuration}s)`)
+      })
+      
+      // Select tracks per genre to meet percentage targets
+      for (const genreTarget of genreTargets) {
+        const genreTracks = filteredTracks.filter(t => t.genre === genreTarget.genre)
+        console.log(`\n🎵 Selecting for ${genreTarget.genre} (${genreTarget.percentage}%)...`)
+        
+        for (const track of genreTracks) {
+          if (selectedTrackIds.has(track.id)) continue
+          
+          const trackDuration = track.trimStart !== undefined && track.trimEnd !== undefined
+            ? (track.trimEnd - track.trimStart)
+            : (track.duration || 180)
+          
+          // Check if adding this track exceeds genre target significantly
+          if (genreTarget.currentDuration + trackDuration > genreTarget.targetDuration + 120) {
+            // Genre target reached, try next genre
+            break
+          }
+          
+          genreTarget.tracks.push(track)
+          genreTarget.currentDuration += trackDuration
+          selectedTrackIds.add(track.id)
+          
+          const mins = Math.floor(genreTarget.currentDuration / 60)
+          const secs = genreTarget.currentDuration % 60
+          console.log(`   ✅ ${track.artist} - ${track.title} (${Math.floor(trackDuration/60)}:${(trackDuration%60).toString().padStart(2,'0')}) | Total: ${mins}:${secs.toString().padStart(2,'0')}`)
+          
+          // Stop if we've reached the target for this genre
+          if (genreTarget.currentDuration >= genreTarget.targetDuration) {
+            break
+          }
+        }
+        
+        const finalMins = Math.floor(genreTarget.currentDuration / 60)
+        const finalSecs = genreTarget.currentDuration % 60
+        const targetMins = Math.floor(genreTarget.targetDuration / 60)
+        const targetSecs = genreTarget.targetDuration % 60
+        console.log(`   📊 ${genreTarget.genre}: ${finalMins}:${finalSecs.toString().padStart(2,'0')} / ${targetMins}:${targetSecs.toString().padStart(2,'0')} target`)
+      }
+      
+      // Now interleave tracks from different genres for nice mix
+      console.log('\n🔀 Interleaving genres for professional mix...')
+      let genreIndex = 0
+      while (genreTargets.some(gt => gt.tracks.length > 0)) {
+        const currentGenre = genreTargets[genreIndex % genreTargets.length]
+        if (currentGenre.tracks.length > 0) {
+          const track = currentGenre.tracks.shift()!
+          selectedTracks.push(track)
+          
+          const trackDuration = track.trimStart !== undefined && track.trimEnd !== undefined
+            ? (track.trimEnd - track.trimStart)
+            : (track.duration || 180)
+          const trackActualDuration = track.trimStart !== undefined && track.trimEnd !== undefined
+            ? (track.trimEnd - track.trimStart)
+            : (track.duration || 180)
+          
+          totalDuration += trackDuration
+          totalActualDuration += trackActualDuration
+        }
+        genreIndex++
+      }
+      
+      console.log(`\n✅ Multi-genre selection complete: ${selectedTracks.length} tracks`)
+      const totalMins = Math.floor(totalDuration / 60)
+      const totalSecs = totalDuration % 60
+      console.log(`   Total duration: ${totalMins}:${totalSecs.toString().padStart(2,'0')}`)
+      
+    } else {
+      // LEGACY: Single genre or no genre filter - original logic
+      console.log('📊 Using single-genre selection mode')
+      
+      for (const track of filteredTracks) {
       // DUPLICATE CHECK: Skip if already selected
       if (selectedTrackIds.has(track.id)) {
         console.log(`⏭️  Skipping duplicate: ${track.title}`)
@@ -429,6 +541,7 @@ export async function generatePlaylist(input: GeneratePlaylistInput) {
         break // Stop here, we're at the perfect duration!
       }
     }
+    } // Close legacy mode block
     
     const durationMinutes = Math.floor(totalDuration / 60)
     const durationSeconds = Math.floor(totalDuration % 60)

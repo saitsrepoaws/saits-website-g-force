@@ -312,7 +312,8 @@ const schema = a.schema({
     .arguments({
       name: a.string().required(),
       description: a.string(),
-      genre: a.string(),
+      genre: a.string(), // Legacy: single genre (backwards compatible)
+      genreMix: a.string(), // NEW: JSON string with genre percentages e.g. '[{"genre":"Dance","percentage":60},{"genre":"Pop","percentage":30},{"genre":"Rock","percentage":10}]'
       mood: a.string(),
       bpmMin: a.integer(),
       bpmMax: a.integer(),
