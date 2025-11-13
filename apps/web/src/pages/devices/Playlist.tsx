@@ -880,7 +880,7 @@ function Playlist() {
                           Filter by Tags (Select one or more)
                         </label>
                         <div className="grid grid-cols-2 gap-2">
-                          {['WildFM', 'Sweepers', 'Promos', 'Branding', 'Energy', 'Commercial'].map(tag => (
+                          {['WildFM', 'SplashFM', 'Sweepers', 'Promos', 'Branding', 'Energy'].map(tag => (
                             <label key={tag} className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-purple-50 border border-gray-200">
                               <input
                                 type="checkbox"

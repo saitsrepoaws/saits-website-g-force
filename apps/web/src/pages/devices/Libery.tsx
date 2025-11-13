@@ -832,7 +832,7 @@ This action cannot be undone!`
                                 🎤 Genre will be set to: <strong>Station ID</strong>
                               </span>
                               <p className="text-xs text-purple-600 mt-1">
-                                Use tags below to categorize: WildFM, Sweepers, Promos, etc.
+                                Use tags below to categorize: WildFM, SplashFM, Sweepers, Promos, etc.
                               </p>
                             </div>
                           </div>
@@ -841,7 +841,7 @@ This action cannot be undone!`
                         {/* Tags Field */}
                         <div className="col-span-3">
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            {item.isJingle ? 'Tags (WildFM, Sweepers, Promos, etc.)' : 'Tags (Hot Hits, Oldies, Party, etc.)'}
+                            {item.isJingle ? 'Tags (WildFM, SplashFM, Sweepers, Promos, etc.)' : 'Tags (Hot Hits, Oldies, Party, etc.)'}
                           </label>
                           <input
                             type="text"
@@ -851,7 +851,7 @@ This action cannot be undone!`
                               newQueue[index].tags = e.target.value
                               setUploadQueue(newQueue)
                             }}
-                            placeholder={item.isJingle ? "WildFM, Sweepers, Promos" : "Hot Hits, Oldies, Party"}
+                            placeholder={item.isJingle ? "WildFM, SplashFM, Sweepers, Promos" : "Hot Hits, Oldies, Party"}
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
                           />
                           <p className="text-xs text-gray-500 mt-1">
