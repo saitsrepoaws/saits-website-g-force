@@ -173,22 +173,44 @@ status_all() {
     
     echo ""
     
-    # Port checks
+    # Port checks (using ss, fallback to netstat)
     echo -e "${BLUE}Port Status:${NC}"
     echo -n "  Port 8000:   "
-    if netstat -tuln | grep -q ":8000 "; then
-        echo -e "${GREEN}✅ Listening${NC}"
+    if command -v ss &> /dev/null; then
+        if ss -tuln | grep -q ":8000 "; then
+            echo -e "${GREEN}✅ Listening${NC}"
+        else
+            echo -e "${RED}❌ Not listening${NC}"
+            all_ok=false
+        fi
+    elif command -v netstat &> /dev/null; then
+        if netstat -tuln | grep -q ":8000 "; then
+            echo -e "${GREEN}✅ Listening${NC}"
+        else
+            echo -e "${RED}❌ Not listening${NC}"
+            all_ok=false
+        fi
     else
-        echo -e "${RED}❌ Not listening${NC}"
-        all_ok=false
+        echo -e "${YELLOW}⚠️  Cannot check (ss/netstat not found)${NC}"
     fi
     
     echo -n "  Port 80:     "
-    if netstat -tuln | grep -q ":80 "; then
-        echo -e "${GREEN}✅ Listening${NC}"
+    if command -v ss &> /dev/null; then
+        if ss -tuln | grep -q ":80 "; then
+            echo -e "${GREEN}✅ Listening${NC}"
+        else
+            echo -e "${RED}❌ Not listening${NC}"
+            all_ok=false
+        fi
+    elif command -v netstat &> /dev/null; then
+        if netstat -tuln | grep -q ":80 "; then
+            echo -e "${GREEN}✅ Listening${NC}"
+        else
+            echo -e "${RED}❌ Not listening${NC}"
+            all_ok=false
+        fi
     else
-        echo -e "${RED}❌ Not listening${NC}"
-        all_ok=false
+        echo -e "${YELLOW}⚠️  Cannot check (ss/netstat not found)${NC}"
     fi
     
     echo ""

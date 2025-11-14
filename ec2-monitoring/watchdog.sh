@@ -73,15 +73,27 @@ if ! systemctl is-active --quiet nginx; then
     restart_service "nginx"
 fi
 
-# Check ports
-if ! netstat -tuln | grep -q ":8000 "; then
-    log "⚠️  Port 8000 not listening - Icecast may be down"
-    restart_service "icecast"
-fi
-
-if ! netstat -tuln | grep -q ":80 "; then
-    log "⚠️  Port 80 not listening - Nginx may be down"
-    restart_service "nginx"
+# Check ports (using ss, fallback to netstat)
+if command -v ss &> /dev/null; then
+    if ! ss -tuln | grep -q ":8000 "; then
+        log "⚠️  Port 8000 not listening - Icecast may be down"
+        restart_service "icecast"
+    fi
+    
+    if ! ss -tuln | grep -q ":80 "; then
+        log "⚠️  Port 80 not listening - Nginx may be down"
+        restart_service "nginx"
+    fi
+elif command -v netstat &> /dev/null; then
+    if ! netstat -tuln | grep -q ":8000 "; then
+        log "⚠️  Port 8000 not listening - Icecast may be down"
+        restart_service "icecast"
+    fi
+    
+    if ! netstat -tuln | grep -q ":80 "; then
+        log "⚠️  Port 80 not listening - Nginx may be down"
+        restart_service "nginx"
+    fi
 fi
 
 # Send alive metric to CloudWatch
