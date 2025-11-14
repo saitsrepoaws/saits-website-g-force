@@ -115,18 +115,23 @@ echo "✅ Downloaded: ${localPath}"
 
 /**
  * Download all files from S3 to EC2 in a single SSM command and WAIT for completion
+ * Uses aws s3 cp with VPC Endpoint (fast!) and counts errors
  */
 async function downloadAllFilesToEC2(downloads: Array<{s3Url: string, localPath: string}>): Promise<void> {
-  // Generate bash script to download all files via DIRECT HTTP (FAST!)
+  // Generate bash script to download all files via S3 VPC Endpoint (FAST!)
   const commands = [
     '#!/bin/bash',
-    'set -e',  // Exit on error
-    'echo "Starting batch HTTP download (fast mode)..."',
+    // NO set -e! Count errors instead
+    'SUCCESS=0',
+    'FAILED=0',
+    'echo "Starting batch download..."',
     ...downloads.map(({s3Url, localPath}) => {
-      // s3Url is now a direct HTTPS URL!
-      return `echo "wget ${localPath.split('/').pop()}..." && wget -q -O "${localPath}" "${s3Url}" && chmod 644 "${localPath}"`
+      const filename = localPath.split('/').pop()
+      return `echo "Downloading ${filename}..." && if aws s3 cp "${s3Url}" "${localPath}" 2>/dev/null; then ((SUCCESS++)); else ((FAILED++)); echo "FAILED: ${filename}" >&2; fi`
     }),
-    'echo "All downloads complete!"'
+    'echo ""',
+    'echo "Download summary: SUCCESS=$SUCCESS, FAILED=$FAILED"',
+    'if [ $FAILED -gt 0 ]; then exit 1; else exit 0; fi'
   ]
   
   // Send command
@@ -372,7 +377,7 @@ async function getPlaylistTracks(playlistId: string) {
 
 /**
  * Get correct fileUrl from Track table (playlist data may be outdated)
- * Returns DIRECT HTTP URL for fast downloads (no AWS CLI needed!)
+ * Returns S3 URL for aws s3 cp (uses VPC Endpoint for speed!)
  */
 async function getTrackFileUrl(track: any): Promise<string> {
   // Always lookup from Track table for correct path
@@ -385,16 +390,10 @@ async function getTrackFileUrl(track: any): Promise<string> {
     if (fullTrack?.fileUrl) {
       let fileUrl = fullTrack.fileUrl
       
-      // Convert to DIRECT HTTPS URL for fast wget/curl download
-      if (fileUrl && !fileUrl.startsWith('http')) {
-        // Remove s3:// prefix if present
-        if (fileUrl.startsWith('s3://')) {
-          fileUrl = fileUrl.replace(`s3://${STORAGE_BUCKET}/`, '')
-        }
-        
-        // Convert to direct HTTPS S3 URL (no presigning, assumes public read)
-        const region = 'eu-west-1'
-        fileUrl = `https://${STORAGE_BUCKET}.s3.${region}.amazonaws.com/${fileUrl}`
+      // Convert to S3 URL for aws s3 cp (uses VPC Endpoint!)
+      if (fileUrl && !fileUrl.startsWith('s3://')) {
+        // Add s3:// prefix if not present
+        fileUrl = `s3://${STORAGE_BUCKET}/${fileUrl}`
       }
       
       return fileUrl
@@ -403,10 +402,9 @@ async function getTrackFileUrl(track: any): Promise<string> {
     console.error(`⚠️ Failed to lookup track ${track.trackId}:`, err)
   }
   
-  // Fallback to direct HTTP URL
+  // Fallback to S3 URL
   console.error(`❌ No fileUrl for track ${track.trackId}`)
-  const region = 'eu-west-1'
-  return `https://${STORAGE_BUCKET}.s3.${region}.amazonaws.com/public/audio/${track.trackId}.mp3`
+  return `s3://${STORAGE_BUCKET}/public/audio/${track.trackId}.mp3`
 }
 
 /**
@@ -575,28 +573,13 @@ echo "Cleanup complete"
       }
     }
     
-    // 6. PROGRESSIVE DOWNLOAD STRATEGY
-    // Download first 4 tracks + news immediately, rest later
-    console.log(`📥 Progressive Download Strategy:`)
-    console.log(`   Initial: First 4 tracks + news (immediate)`)
-    console.log(`   Rest: ${Math.max(0, downloads.length - 5)} tracks (progressive)`)
+    // 6. Download ALL files in one batch for speed
+    console.log(`📥 Downloading ALL ${downloads.length} files in ONE batch...`)
+    console.log(`   Using S3 VPC Endpoint for fast parallel downloads`)
     
-    // Split downloads: initial batch vs progressive batch
-    const initialDownloads = downloads.slice(0, 5) // News + 4 tracks
-    const progressiveDownloads = downloads.slice(5) // Rest of tracks
-    
-    console.log(`📥 Downloading initial ${initialDownloads.length} files...`)
-    await downloadAllFilesToEC2(initialDownloads)
-    console.log(`✅ Initial ${initialDownloads.length} files downloaded!`)
-    
-    // Trigger progressive downloads asynchronously (fire and forget)
-    if (progressiveDownloads.length > 0) {
-      console.log(`🔄 Triggering progressive download for ${progressiveDownloads.length} remaining files...`)
-      // Don't await - let it run in background
-      downloadProgressively(progressiveDownloads).catch(err => {
-        console.error('⚠️ Progressive download error (non-blocking):', err)
-      })
-    }
+    // Download ALL files at once (fast with VPC Endpoint!)
+    await downloadAllFilesToEC2(downloads)
+    console.log(`✅ All ${downloads.length} files downloaded!`)
     
     const successfulTracks = tracksWithPaths
     
