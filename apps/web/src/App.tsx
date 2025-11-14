@@ -37,6 +37,13 @@ function App() {
             description="View real-time analytics and metrics from your IoT devices."
             disabled
           />
+          
+          <NavigationCard
+            to="/notes"
+            icon="📝"
+            title="Notes & TODO"
+            description="Project notes, future features, and development tasks."
+          />
         </div>
       </div>
     </Layout>

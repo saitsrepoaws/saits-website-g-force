@@ -10,6 +10,7 @@ import {
 } from '../../services/audioUpload'
 import { getUrl } from 'aws-amplify/storage'
 import { parseFilename } from '../../services/filenameParser'
+import { type TrackType, type CommercialCategory, type JingleCategory, detectTrackType, detectCommercialCategory, detectJingleCategory } from '../../types/commercials'
 
 interface FileUploadItem {
   file: File
@@ -21,10 +22,15 @@ interface FileUploadItem {
   progress: UploadProgress | null
   status: 'pending' | 'uploading' | 'success' | 'error' | 'skipped'
   error?: string
-  // Jingle & Tags fields
-  isJingle: boolean
-  jingleCategory: string
-  tags: string // Comma-separated: Hot Hits, Oldies, Party, etc.
+  
+  // Track Type Classification
+  trackType: TrackType // 'music', 'jingle', 'commercial'
+  
+  // Category fields (used based on trackType)
+  jingleCategory?: JingleCategory // For jingles: Station ID, Sweeper, etc.
+  commercialCategory?: CommercialCategory // For commercials: Product, Service, PSA, etc.
+  
+  tags: string // Comma-separated: Hot Hits, Oldies, Party, Sponsor names, etc.
 }
 
 function Libery() {
@@ -172,10 +178,8 @@ function Libery() {
         const metadata = await getAudioMetadata(file)
         const parsed = parseFilename(file.name)
         
-        // Auto-detect jingle based on filename
-        const isJingle = file.name.toLowerCase().includes('jingle') || 
-                        file.name.toLowerCase().includes('id') ||
-                        file.name.toLowerCase().includes('sweeper')
+        // Auto-detect track type based on filename
+        const trackType = detectTrackType(file.name)
         
         return {
           file,
@@ -186,10 +190,13 @@ function Libery() {
           duration: metadata.duration || 0,
           progress: null,
           status: 'pending' as const,
-          // Jingle & Tags defaults
-          isJingle,
-          jingleCategory: 'Station ID', // Always Station ID for jingles
-          tags: '', // Use tags: WildFM, Sweepers, Promos, etc.
+          
+          // Track Type & Categories
+          trackType,
+          jingleCategory: trackType === 'jingle' ? detectJingleCategory(file.name) : undefined,
+          commercialCategory: trackType === 'commercial' ? detectCommercialCategory(file.name) : undefined,
+          
+          tags: '', // Use tags: WildFM, Sweepers, Promos, Sponsor names, etc.
         }
       })
     )
@@ -247,8 +254,13 @@ function Libery() {
           fileSize: audioResult.size,
           format: audioResult.format,
           addedAt: new Date().toISOString(),
-          // Jingle & Tags
-          genre: item.isJingle ? item.jingleCategory : undefined,
+          
+          // Track Type & Categories
+          trackType: item.trackType,
+          jingleCategory: item.jingleCategory || undefined,
+          commercialCategory: item.commercialCategory || undefined,
+          genre: item.trackType === 'music' ? undefined : undefined, // Genre for music only (set by Lambda)
+          
           tags: item.tags || undefined,
         })
 

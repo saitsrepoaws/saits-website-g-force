@@ -10,7 +10,7 @@
 **Conclusie**: ✅ **JA, uitstekende voice cloning is mogelijk met Amplify v6!**
 
 Er zijn **3 hoofdopties** met verschillende trade-offs:
-1. **ElevenLabs API** - Beste kwaliteit, snelst te implementeren (1-2 dagen)
+1. **doe  API** - Beste kwaliteit, snelst te implementeren (1-2 dagen)
 2. **AWS Polly Brand Voice** - Enterprise, duurdere custom setup (maanden)
 3. **Open-source + AWS** - Zelfgehost, volledige controle (1-2 weken)
 

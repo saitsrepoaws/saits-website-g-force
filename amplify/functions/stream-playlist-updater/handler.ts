@@ -111,7 +111,7 @@ async function downloadAllFilesToEC2(downloads: Array<{s3Url: string, localPath:
 }
 
 /**
- * Generate M3U playlist file content with LOCAL file paths
+ * Generate M3U playlist file content with LOCAL file paths + COVER ART URLs
  */
 function generateM3U(newsLocalPath: string | null, tracks: Array<{track: Track, localPath: string}>): string {
   let m3u = '#EXTM3U\n'
@@ -122,12 +122,22 @@ function generateM3U(newsLocalPath: string | null, tracks: Array<{track: Track, 
     m3u += `${newsLocalPath}\n`
   }
   
-  // Add all tracks with LOCAL paths
+  // Add all tracks with LOCAL paths + COVER ART
   for (const {track, localPath} of tracks) {
     const duration = track.trackDuration || 180
     const artist = track.trackArtist || 'Unknown Artist'
     const title = track.trackTitle || 'Unknown'
+    const coverUrl = track.coverArtUrl || ''
+    
+    // Standard EXTINF line
     m3u += `#EXTINF:${duration},${artist} - ${title}\n`
+    
+    // Add cover art URL as extended tag (for Liquidsoap to parse)
+    if (coverUrl) {
+      m3u += `#EXTIMG:${coverUrl}\n`
+    }
+    
+    // Local file path
     m3u += `${localPath}\n`
   }
   
@@ -325,6 +335,49 @@ async function getTrackFileUrl(track: any): Promise<string> {
 }
 
 /**
+ * Upload covers mapping JSON to EC2 via SSM
+ */
+async function uploadCoversMapToEC2(tracks: Array<{track: Track, localPath: string}>): Promise<void> {
+  console.log('🖼️  Generating covers map...')
+  
+  // Build cover mapping: local path → cover URL
+  const coversMap: Record<string, string> = {}
+  for (const {track, localPath} of tracks) {
+    if (track.coverArtUrl) {
+      coversMap[localPath] = track.coverArtUrl
+    }
+  }
+  
+  const jsonContent = JSON.stringify(coversMap, null, 2)
+  
+  console.log(`📋 Covers map has ${Object.keys(coversMap).length} entries`)
+  
+  // Upload to EC2
+  const command = `
+cat > /var/radio/covers-map.json << 'EOFJSON'
+${jsonContent}
+EOFJSON
+chmod 644 /var/radio/covers-map.json
+echo "✅ Covers map uploaded"
+`
+  
+  try {
+    const result = await ssm.send(new SendCommandCommand({
+      InstanceIds: [EC2_INSTANCE_ID],
+      DocumentName: 'AWS-RunShellScript',
+      Parameters: {
+        commands: [command]
+      }
+    }))
+    
+    console.log(`✅ Covers map uploaded to EC2, CommandId: ${result.Command?.CommandId}`)
+  } catch (error) {
+    console.error('❌ Failed to upload covers map to EC2:', error)
+    throw error
+  }
+}
+
+/**
  * Upload M3U playlist to EC2 via SSM
  */
 async function uploadPlaylistToEC2(m3uContent: string): Promise<void> {
@@ -463,6 +516,9 @@ echo "Cleanup complete"
     
     // 7. Upload M3U to EC2
     await uploadPlaylistToEC2(m3uContent)
+    
+    // 8. Upload covers map to EC2
+    await uploadCoversMapToEC2(successfulTracks)
     
     // Calculate total duration
     const newsTime = newsLocalPath ? 300 : 0

@@ -15,7 +15,10 @@ import Planner from './pages/devices/Planner'
 import AudioSettings from './pages/devices/AudioSettings'
 import NetworkSettings from './pages/devices/NetworkSettings'
 import StreamSettings from './pages/devices/StreamSettings'
+import TrackQueueManager from './pages/devices/TrackQueueManager'
+import GenreMerger from './pages/devices/GenreMerger'
 import RadioStats from './pages/RadioStats'
+import Notes from './pages/Notes'
 import { configureAmplify } from './amplify-config'
 import Login from './pages/Login'
 import AuthGate from './routes/AuthGate'
@@ -120,10 +123,34 @@ const router = createBrowserRouter([
     )
   },
   { 
+    path: '/devices/track-queue-manager', 
+    element: (
+      <AuthGate>
+        <TrackQueueManager />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/devices/genre-merger', 
+    element: (
+      <AuthGate>
+        <GenreMerger />
+      </AuthGate>
+    )
+  },
+  { 
     path: '/radio-stats', 
     element: (
       <AuthGate>
         <RadioStats />
+      </AuthGate>
+    )
+  },
+  { 
+    path: '/notes', 
+    element: (
+      <AuthGate>
+        <Notes />
       </AuthGate>
     )
   },

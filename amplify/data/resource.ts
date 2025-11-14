@@ -270,7 +270,15 @@ const schema = a.schema({
       title: a.string().required(), // Track title (parsed from filename or fallback to filename)
       version: a.string(), // Version/Mix info (parsed from filename, optional)
       label: a.string(), // Record label (parsed from filename, optional)
-      genre: a.string(), // Genre from ID3 tags or "Station ID" for jingles
+      
+      // Track Type Classification
+      trackType: a.string().default('music'), // "music", "jingle", "commercial"
+      
+      // Category fields (used based on trackType)
+      genre: a.string(), // Genre from ID3 tags (for music tracks)
+      jingleCategory: a.string(), // Category for jingles: "Station ID", "Sweeper", "Promo", etc.
+      commercialCategory: a.string(), // Category for commercials: "Product", "Service", "PSA", "Promotion", etc.
+      
       tags: a.string(), // Tags for categorization (Hot Hits, Oldies, WildFM, Sweepers, etc.)
       year: a.integer(), // Release year from ID3 tags
       duration: a.integer(), // duration in seconds
@@ -327,6 +335,12 @@ const schema = a.schema({
       jinglesEveryN: a.integer(), // Insert jingle every N tracks (e.g. 2 = every 2 tracks)
       jingleGenre: a.string(), // Genre filter for jingles (default: 'Station ID')
       jingleTags: a.string(), // Tags filter for jingles (e.g. 'WildFM', 'Sweepers', etc.)
+      
+      // Commercial options (preparation for ad blocks)
+      includeCommercials: a.boolean(), // Add commercials to playlist
+      commercialsEveryN: a.integer(), // Insert commercial block every N tracks
+      commercialCategory: a.string(), // Category filter for commercials
+      commercialTags: a.string(), // Tags filter for commercials
     })
     .returns(a.json())
     .authorization((allow) => [allow.authenticated()])

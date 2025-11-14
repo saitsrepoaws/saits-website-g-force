@@ -59,6 +59,20 @@ function DeviceManagement() {
             title="Stream Settings"
             description="Configure dynamic playlist updates and stream server timing."
           />
+          
+          <NavigationCard
+            to="/devices/track-queue-manager"
+            icon="🎵"
+            title="Track Queue Manager"
+            description="Monitor and control the 2-track buffer streaming system."
+          />
+          
+          <NavigationCard
+            to="/devices/genre-merger"
+            icon="🎨"
+            title="Genre Merger"
+            description="Consolidate similar genres to clean up your music library."
+          />
         </div>
       </div>
     </Layout>

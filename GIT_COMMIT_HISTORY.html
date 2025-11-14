@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Forge IoT - Git Commit History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        
+        .filters {
+            padding: 20px 40px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .filters input, .filters select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            flex: 1;
+        }
+        
+        .filters button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .filters button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .date-group {
+            margin-bottom: 40px;
+        }
+        
+        .date-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .date-header:hover {
+            transform: translateX(5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .date-header .badge {
+            background: rgba(255,255,255,0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+        
+        .commits {
+            display: none;
+            padding-left: 20px;
+        }
+        
+        .commits.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .commit {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .commit:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .commit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .commit-time {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .commit-hash {
+            font-family: 'Courier New', monospace;
+            background: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+        
+        .commit-title {
+            font-size: 1.1em;
+            color: #212529;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .commit-author {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .commit-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .commit-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .commit-details pre {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #e9ecef;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2em;
+            color: #6c757d;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+        }
+        
+        .scroll-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .scroll-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-5px);
+        }
+        
+        .scroll-to-top.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Git Commit History</h1>
+            <p>G-Forge IoT - Splash FM Radio Platform</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalCommits">0</div>
+                <div class="stat-label">Total Commits</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalDays">0</div>
+                <div class="stat-label">Development Days</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="totalAuthors">0</div>
+                <div class="stat-label">Contributors</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="🔍 Search commits...">
+            <select id="dateFilter">
+                <option value="">All Dates</option>
+            </select>
+            <button onclick="resetFilters()">Clear Filters</button>
+        </div>
+        
+        <div class="content" id="content">
+            <div class="loading">⏳ Loading commit history...</div>
+        </div>
+    </div>
+    
+    <div class="scroll-to-top" onclick="scrollToTop()">
+        ↑
+    </div>
+    
+    <script>
+        // Will be populated by Python/Node script
+        
+        
+        function init() {
+            if (!commits || commits.length === 0) {
+                document.getElementById('content').innerHTML = '<div class="no-results">No commits found</div>';
+                return;
+            }
+            
+            renderStats();
+            renderCommits(commits);
+            setupFilters();
+            setupScrollButton();
+        }
+        
+        function renderStats() {
+            const dates = new Set(commits.map(c => c.date));
+            const authors = new Set(commits.map(c => c.author));
+            
+            document.getElementById('totalCommits').textContent = commits.length;
+            document.getElementById('totalDays').textContent = dates.size;
+            document.getElementById('totalAuthors').textContent = authors.size;
+        }
+        
+        function renderCommits(commitsToRender) {
+            const grouped = {};
+            
+            commitsToRender.forEach(commit => {
+                if (!grouped[commit.date]) {
+                    grouped[commit.date] = [];
+                }
+                grouped[commit.date].push(commit);
+            });
+            
+            const dates = Object.keys(grouped).sort().reverse();
+            let html = '';
+            
+            dates.forEach(date => {
+                const dayCommits = grouped[date];
+                html += `
+                    <div class="date-group">
+                        <div class="date-header" onclick="toggleDate('${date}')">
+                            <span>📅 ${formatDate(date)}</span>
+                            <span class="badge">${dayCommits.length} commits</span>
+                        </div>
+                        <div class="commits" id="commits-${date}">
+                            ${dayCommits.map(commit => renderCommit(commit)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('content').innerHTML = html;
+            populateDateFilter(dates);
+        }
+        
+        function renderCommit(commit) {
+            return `
+                <div class="commit" onclick="toggleCommit('${commit.hash}')">
+                    <div class="commit-header">
+                        <span class="commit-time">🕐 ${commit.time}</span>
+                        <span class="commit-hash">${commit.hash.substring(0, 8)}</span>
+                    </div>
+                    <div class="commit-title">${escapeHtml(commit.message)}</div>
+                    <div class="commit-author">👤 ${commit.author}</div>
+                    <div class="commit-details" id="details-${commit.hash}">
+                        <pre><strong>Full Hash:</strong> ${commit.hash}
+
+<strong>Date:</strong> ${commit.date} ${commit.time}
+
+<strong>Author:</strong> ${commit.author}
+
+<strong>Message:</strong>
+${escapeHtml(commit.message)}</pre>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function toggleDate(date) {
+            const elem = document.getElementById(`commits-${date}`);
+            elem.classList.toggle('active');
+        }
+        
+        function toggleCommit(hash) {
+            event.stopPropagation();
+            const elem = document.getElementById(`details-${hash}`);
+            elem.classList.toggle('active');
+        }
+        
+        function setupFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const dateFilter = document.getElementById('dateFilter');
+            
+            searchInput.addEventListener('input', filterCommits);
+            dateFilter.addEventListener('change', filterCommits);
+        }
+        
+        function filterCommits() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            let filtered = commits;
+            
+            if (search) {
+                filtered = filtered.filter(c => 
+                    c.message.toLowerCase().includes(search) ||
+                    c.author.toLowerCase().includes(search) ||
+                    c.hash.toLowerCase().includes(search)
+                );
+            }
+            
+            if (dateFilter) {
+                filtered = filtered.filter(c => c.date === dateFilter);
+            }
+            
+            renderCommits(filtered);
+            
+            if (filtered.length === 0) {
+                document.getElementById('content').innerHTML = 
+                    '<div class="no-results">No commits match your filters</div>';
+            }
+        }
+        
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateFilter').value = '';
+            filterCommits();
+        }
+        
+        function populateDateFilter(dates) {
+            const select = document.getElementById('dateFilter');
+            dates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = formatDate(date);
+                select.appendChild(option);
+            });
+        }
+        
+        function formatDate(dateStr) {
+            const [year, month, day] = dateStr.split('-');
+            const date = new Date(year, month - 1, day);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                           'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${days[date.getDay()]}, ${day} ${months[date.getMonth()]} ${year}`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function setupScrollButton() {
+            const button = document.querySelector('.scroll-to-top');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -18,6 +18,8 @@ import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
 // import { listenerTracker } from './functions/listener-tracker/resource' // DISABLED: esbuild bundling issue
 import { getCoverUrl } from './functions/get-cover-url/resource'
+import { trackQueueManager } from './functions/track-queue-manager/resource'
+import { genreMerger } from './functions/genre-merger/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -67,7 +69,9 @@ export const backend = defineBackend({
   streamMonitor,
   trackCompletionHandler,
   // listenerTracker, // DISABLED: esbuild bundling issue
-  getCoverUrl
+  getCoverUrl,
+  trackQueueManager,
+  genreMerger
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -870,6 +874,90 @@ trackCompletionLambda.addPermission('AllowIoTInvoke', {
 })
 
 console.log('✅ Track completion handler configured with IoT trigger')
+
+// ============================================
+// 🎵 TRACK QUEUE MANAGER - Hybrid SQS Streaming
+// ============================================
+const trackQueueManagerLambda = backend.trackQueueManager.resources.lambda
+const storageStack = backend.storage.resources.bucket.stack
+
+// Create SQS FIFO Queue in storage stack (has no dependency on data)
+const trackStreamQueue = new sqs.Queue(storageStack, 'RadioTrackStreamQueue', {
+  queueName: 'radio-track-stream-queue.fifo',
+  fifo: true,
+  contentBasedDeduplication: false, // We provide deduplication IDs
+  visibilityTimeout: Duration.seconds(300), // 5 minutes (track duration)
+  retentionPeriod: Duration.days(1),
+  receiveMessageWaitTime: Duration.seconds(20), // Long polling
+})
+
+console.log('✅ SQS FIFO queue created for track streaming')
+
+// Grant Lambda permissions
+trackTable.grantReadData(trackQueueManagerLambda)
+playlistTable.grantReadData(trackQueueManagerLambda)
+scheduleTable.grantReadData(trackQueueManagerLambda)
+streamSettingsTable.grantReadWriteData(trackQueueManagerLambda)
+trackStreamQueue.grantSendMessages(trackQueueManagerLambda)
+trackStreamQueue.grantConsumeMessages(trackQueueManagerLambda)
+
+// Add environment variables
+backend.trackQueueManager.addEnvironment('QUEUE_URL', trackStreamQueue.queueUrl)
+backend.trackQueueManager.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
+backend.trackQueueManager.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
+backend.trackQueueManager.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.trackQueueManager.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
+backend.trackQueueManager.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
+
+// EventBridge rule - Run hourly to initialize queue (in storage stack)
+const trackQueueInitRule = new events.Rule(
+  storageStack,
+  'TrackQueueInitRule',
+  {
+    ruleName: 'TrackQueueInitHourly',
+    description: 'Initializes track queue with 2 tracks at top of each hour',
+    schedule: events.Schedule.cron({ minute: '0' }), // Every hour at :00
+  }
+)
+
+trackQueueInitRule.addTarget(new targets.LambdaFunction(trackQueueManagerLambda))
+
+// Output SQS queue URL (in storage stack)
+new CfnOutput(storageStack, 'TrackStreamQueueUrl', {
+  value: trackStreamQueue.queueUrl,
+  description: 'SQS FIFO Queue URL for track streaming',
+  exportName: 'TrackStreamQueueUrl',
+})
+
+new CfnOutput(storageStack, 'TrackStreamQueueArn', {
+  value: trackStreamQueue.queueArn,
+  description: 'SQS FIFO Queue ARN for EC2 permissions',
+  exportName: 'TrackStreamQueueArn',
+})
+
+console.log('✅ Track queue manager configured with hourly trigger')
+
+// ============================================
+// 🎨 GENRE MERGER - Library Management
+// ============================================
+const genreMergerLambda = backend.genreMerger.resources.lambda
+
+// Grant permissions
+trackTable.grantReadWriteData(genreMergerLambda)
+playlistTable.grantReadWriteData(genreMergerLambda)
+
+// Add environment variables
+backend.genreMerger.addEnvironment('TRACK_TABLE', trackTable.tableName)
+backend.genreMerger.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
+
+// Output Lambda name
+new CfnOutput(genreMergerLambda.stack, 'GenreMergerLambdaName', {
+  value: genreMergerLambda.functionName,
+  description: 'Genre Merger Lambda function name',
+  exportName: 'GenreMergerLambdaName',
+})
+
+console.log('✅ Genre merger configured')
 
 // ============================================
 // 👥 LISTENER TRACKER - Detailed Analytics

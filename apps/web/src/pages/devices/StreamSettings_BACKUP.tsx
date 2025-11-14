@@ -21,7 +21,7 @@ function StreamSettings() {
     playlistUpdateMinTrackDuration: 60,
     playlistUpdateFallbackInterval: 300,
     streamServerUrl: 'http://46.137.184.91:8000',
-    streamMountPoint: '/stream.mp3'
+    streamMountPoint: '/stream-processed.mp3'
   })
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -47,7 +47,7 @@ function StreamSettings() {
           playlistUpdateMinTrackDuration: result.data.playlistUpdateMinTrackDuration || 60,
           playlistUpdateFallbackInterval: result.data.playlistUpdateFallbackInterval || 300,
           streamServerUrl: result.data.streamServerUrl || 'http://46.137.184.91:8000',
-          streamMountPoint: result.data.streamMountPoint || '/stream.mp3'
+          streamMountPoint: result.data.streamMountPoint || '/stream-processed.mp3'
         })
         console.log('✅ Settings loaded:', result.data)
       } else {

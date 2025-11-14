@@ -1827,6 +1827,12 @@
               "type": "String",
               "isRequired": false
             },
+            "genreMix": {
+              "name": "genreMix",
+              "isArray": false,
+              "type": "String",
+              "isRequired": false
+            },
             "mood": {
               "name": "mood",
               "isArray": false,
@@ -1860,6 +1866,12 @@
             },
             "maxTracks": {
               "name": "maxTracks",
+              "isArray": false,
+              "type": "Int",
+              "isRequired": false
+            },
+            "minDuration": {
+              "name": "minDuration",
               "isArray": false,
               "type": "Int",
               "isRequired": false

@@ -134,7 +134,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "3b487deb8d9bd82ab264ca460632179501dec6d59cf3becd9c763182094a59e1.zip"
+     "S3Key": "e5a61917e7d2e6433ba1f2cfae8cf85127990f31b119346716a6c2911a41cae9.zip"
     },
     "Environment": {
      "Variables": {
@@ -229,7 +229,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/playlist-generator-lambda/Resource",
-    "aws:asset:path": "asset.3b487deb8d9bd82ab264ca460632179501dec6d59cf3becd9c763182094a59e1",
+    "aws:asset:path": "asset.e5a61917e7d2e6433ba1f2cfae8cf85127990f31b119346716a6c2911a41cae9",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -287,7 +287,7 @@
      ]
     },
     "DefinitionS3Location": {
-     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/34b33a486d25a31fea85647c3d66ccd19c0edad374a5cabfd5c8441863c9833f.graphql"
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/84fdf3747dbae0d663d5b6800e0b18fea16551337c60a58cc8f996ba62018455.graphql"
     }
    },
    "UpdateReplacePolicy": "Delete",
@@ -305,7 +305,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1794565645
+    "Expires": 1794613586
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -1659,7 +1659,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "277ba9314103acccce1454d01e7af525b976a529cfe40b995a17ee62b13dbd2d.zip"
+     "18fb1faf97b9f7a82c2b1f9ffa4b7dca984a3dd6b44d6d9a47dd771f924a01e4.zip"
     ],
     "SourceMarkers": [
      {}
@@ -2172,7 +2172,7 @@
      }
     ],
     "SourceObjectKeys": [
-     "ad4cb1a300f133fa321f71c3f4b7b34e5b956da36cf3331be3259bf5d3f0865c.zip"
+     "e2f7cabae45153237702a8a8cdda364e89364443ebf7b5303885e2c57a6a79c1.zip"
     ],
     "SourceMarkers": [
      {}
@@ -2265,10 +2265,247 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/AMPLIFY_DATA_DEFAULT_NAMEParameter/Resource"
    }
   },
+  "genremergerlambdaServiceRole0430E056": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "genre-merger"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/genre-merger-lambda/ServiceRole/Resource"
+   }
+  },
+  "genremergerlambdaServiceRoleDefaultPolicyAEF6D749": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
+          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
+          "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "genremergerlambdaServiceRoleDefaultPolicyAEF6D749",
+    "Roles": [
+     {
+      "Ref": "genremergerlambdaServiceRole0430E056"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/genre-merger-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "genremergerlambdaBF245944": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "6816424d568c2d2d8bfaa46f18bd214f14b58566d76adc713929531383259dec.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "TRACK_TABLE": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
+                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "PLAYLIST_TABLE": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::GetAtt": [
+                "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
+                "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+               ]
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "genremergerlambdaServiceRole0430E056",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "genre-merger"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "genremergerlambdaServiceRoleDefaultPolicyAEF6D749",
+    "genremergerlambdaServiceRole0430E056"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/genre-merger-lambda/Resource",
+    "aws:asset:path": "asset.6816424d568c2d2d8bfaa46f18bd214f14b58566d76adc713929531383259dec",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VRyW7CMBD9Fu7GpekXhKD2UIookXqNBmcIBm/1OERRlH+v7LD19BbNPhnPsgVfzKCjuajPcyX3fNggBazLAOLMoKNqUKD3NVTG1ngivknw3hoRpDVMgubDzipkxcEk3FolRR/lxEZGb9UARBiI5xFYjU7ZXqMJfNmKM4bV3YjRfJjcJRCyicZyVzbBo8uzHtk0LB+Kg7nPWBzMGnr0P+gp6lKaRmGwj4gbGRk4R70RfPjw4I6/KncyjVEcTHK+17mTT6oUR9QQjdzJT+zZxhpcQYDStl6kvIcaGZHmQxm8NM0WPGgM6NOpbmIc2Q5pyk3HKgM00jQxaPpJ0VKw+h4Uz37j10+puGwFHQkled5RoWTa/1+jKL7AuVT7X8mttxdZo497jyy+nZ/o5ZJlPHvli9mJpJz71gSpke8m/APGFs57SQIAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1VSyW7CMBD9Fu7GpekXhKD2UEopkXpFgzMJBsd2PQ5RFOXfKzuE5fQWjWd1wpNkwRczaGkuivNcyQPvN0gei9yDODNoad8rqA8F7LUp8ER8E+G90cJLo5mEmvc7o5BlpY64NUqKLsiRDYze9j0QoSeeBmAFWmW6GrXny0ac0a9uRojm/egugZCNNKS7shHuVR71wMZmeZ+V+tZjVuo1dOh+0VHQudSVQm/uERMZGFhLnRa8/3Bgj38qtTK2kZU6Oj/r1MoHlYsj1hCM1MpP7NjGaFyBh9w0TsR3dzUwopr3uXdSV1twUKNHF1c1iWFgO6TxbVxW7qGSugpB402yhrypb0Fh7RO/XkqFYffQklCSpy1lSsb5nwoF8QXWxtxPKbfOXGSBbpr7u/G28QMLH4Cf6OWSJDx55YvZiaScu0Z7WSPfjfgPNbwaGVMCAAA="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/CDKMetadata/Default"
@@ -2466,6 +2703,123 @@
    },
    "us-west-2": {
     "value": "nodejs22.x"
+   }
+  }
+ },
+ "Outputs": {
+  "GenreMergerLambdaName": {
+   "Description": "Genre Merger Lambda function name",
+   "Value": {
+    "Ref": "genremergerlambdaBF245944"
+   },
+   "Export": {
+    "Name": "GenreMergerLambdaName"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataplaylistgeneratorlambda089A3058Ref": {
+   "Value": {
+    "Ref": "playlistgeneratorlambda1BE43B64"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620datagenremergerlambda8AA0356BRef": {
+   "Value": {
+    "Ref": "genremergerlambdaBF245944"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataGraphQLAPI42A6FA33",
+     "ApiId"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DGraphQLUrl": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataGraphQLAPI42A6FA33",
+     "GraphQLUrl"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiBED5CBE86DestinationBucketArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiB21775929",
+     "DestinationBucketArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIDefaultApiKeyBDC11378ApiKey": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataGraphQLAPIDefaultApiKey1C8ED374",
+     "ApiKey"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResource5343AC44",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataGraphQLAPI42A6FA33",
+     "Arn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceD78BFED4",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataPlayerStateNestedStackPlayerStateNestedStackResourceBD80A56B",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
+    ]
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResource3F17592B",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
+    ]
    }
   }
  },
@@ -2733,109 +3087,6 @@
      ]
     }
    ]
-  }
- },
- "Outputs": {
-  "amplifygforgeiotgerardsandbox28f2e0c620dataplaylistgeneratorlambda089A3058Ref": {
-   "Value": {
-    "Ref": "playlistgeneratorlambda1BE43B64"
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DApiId": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "ApiId"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DGraphQLUrl": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "GraphQLUrl"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiBED5CBE86DestinationBucketArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataAmplifyCodegenAssetsAmplifyCodegenAssetsDeploymentCustomResource1536MiB21775929",
-     "DestinationBucketArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIDefaultApiKeyBDC11378ApiKey": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPIDefaultApiKey1C8ED374",
-     "ApiKey"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataTrackNestedStackTrackNestedStackResourceC293D8A2",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackTrackTableD2F12813TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "Arn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleNestedStackScheduleNestedStackResource541111F8Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataScheduleNestedStackScheduleNestedStackResourceDB57E69F",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataScheduleScheduleTable577CC0C4TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResource5343AC44",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceDEDF7841Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataStreamQueueTrackNestedStackStreamQueueTrackNestedStackResourceD78BFED4",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamQueueTrackStreamQueueTrackTable3354021CTableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStateNestedStackPlayerStateNestedStackResource20537669Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataPlayerStateNestedStackPlayerStateNestedStackResourceBD80A56B",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlayerStatePlayerStateTable13FB9871TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResourceBDDCA00AOutputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataTrackPlayHistoryNestedStackTrackPlayHistoryNestedStackResource3F17592B",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackPlayHistoryTrackPlayHistoryTable2A61B0ABTableArn"
-    ]
-   }
   }
  }
 }

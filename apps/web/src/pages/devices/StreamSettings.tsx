@@ -72,7 +72,7 @@ function StreamSettings() {
     playlistUpdateMinTrackDuration: 60,
     playlistUpdateFallbackInterval: 300,
     streamServerUrl: 'http://46.137.184.91:8000',
-    streamMountPoint: '/stream.mp3',
+    streamMountPoint: '/stream-processed.mp3',
     
     // Crossfade defaults
     crossfadeEnabled: true,
@@ -214,7 +214,7 @@ function StreamSettings() {
           playlistUpdateMinTrackDuration: result.data.playlistUpdateMinTrackDuration || 60,
           playlistUpdateFallbackInterval: result.data.playlistUpdateFallbackInterval || 300,
           streamServerUrl: result.data.streamServerUrl || 'http://46.137.184.91:8000',
-          streamMountPoint: result.data.streamMountPoint || '/stream.mp3',
+          streamMountPoint: result.data.streamMountPoint || '/stream-processed.mp3',
           
           // Crossfade
           crossfadeEnabled: result.data.crossfadeEnabled ?? true,
@@ -473,18 +473,114 @@ function StreamSettings() {
                 />
               </div>
 
-              {/* Mount Point */}
+              {/* Stream Type Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stream Mount Point
+                  🎛️ Stream Type (Stereo Tool Processing)
                 </label>
-                <input
-                  type="text"
-                  value={settings.streamMountPoint || ''}
-                  onChange={(e) => setSettings({ ...settings, streamMountPoint: e.target.value })}
-                  placeholder="/stream.mp3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="space-y-3">
+                  {/* Processed Stream - RECOMMENDED */}
+                  <div 
+                    onClick={() => setSettings({ ...settings, streamMountPoint: '/stream-processed.mp3' })}
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      settings.streamMountPoint === '/stream-processed.mp3' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        settings.streamMountPoint === '/stream-processed.mp3'
+                          ? 'border-green-500 bg-green-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {settings.streamMountPoint === '/stream-processed.mp3' && (
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">Professional (Stereo Tool)</p>
+                          <span className="px-2 py-0.5 text-xs font-semibold text-white bg-green-600 rounded-full">AANBEVOLEN</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          /stream-processed.mp3 - Met Stereo Tool audio processing
+                        </p>
+                        <div className="mt-2 text-xs text-gray-500 space-y-0.5">
+                          <p>✓ Multiband compressie (punchier geluid)</p>
+                          <p>✓ EQ optimalisatie (gebalanceerde frequenties)</p>
+                          <p>✓ Loudness maximalisatie (competitief volume)</p>
+                          <p>✓ Stereo enhancement (breder soundstage)</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Main Stream */}
+                  <div 
+                    onClick={() => setSettings({ ...settings, streamMountPoint: '/stream.mp3' })}
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      settings.streamMountPoint === '/stream.mp3' 
+                        ? 'border-blue-500 bg-blue-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        settings.streamMountPoint === '/stream.mp3'
+                          ? 'border-blue-500 bg-blue-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {settings.streamMountPoint === '/stream.mp3' && (
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">Standaard Stream</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          /stream.mp3 - Normale stream zonder extra processing
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Basis streaming zonder Stereo Tool effecten
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Raw Stream - A/B Testing */}
+                  <div 
+                    onClick={() => setSettings({ ...settings, streamMountPoint: '/stream-raw.mp3' })}
+                    className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                      settings.streamMountPoint === '/stream-raw.mp3' 
+                        ? 'border-purple-500 bg-purple-50' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        settings.streamMountPoint === '/stream-raw.mp3'
+                          ? 'border-purple-500 bg-purple-500'
+                          : 'border-gray-300'
+                      }`}>
+                        {settings.streamMountPoint === '/stream-raw.mp3' && (
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">Raw (Unprocessed)</p>
+                          <span className="px-2 py-0.5 text-xs font-semibold text-purple-700 bg-purple-100 rounded-full">A/B TESTING</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">
+                          /stream-raw.mp3 - Directe output zonder processing
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Voor vergelijking tussen raw en processed audio
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Full URL Preview */}
