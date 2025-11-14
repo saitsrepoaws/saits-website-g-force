@@ -116,8 +116,14 @@ echo ""
 
 echo -e "${BLUE}🧹 Step 4/4: Cleaning up old snapshots...${NC}"
 
-# Calculate date threshold
-CUTOFF_DATE=$(date -u -d "$RETENTION_DAYS days ago" +%Y-%m-%d)
+# Calculate date threshold (compatible with macOS and Linux)
+if date -v-1d > /dev/null 2>&1; then
+    # macOS
+    CUTOFF_DATE=$(date -u -v-${RETENTION_DAYS}d +%Y-%m-%d)
+else
+    # Linux
+    CUTOFF_DATE=$(date -u -d "$RETENTION_DAYS days ago" +%Y-%m-%d)
+fi
 
 # Get old snapshots
 OLD_SNAPSHOTS=$(aws ec2 describe-snapshots \
