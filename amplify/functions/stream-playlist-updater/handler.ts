@@ -90,8 +90,8 @@ async function downloadProgressively(downloads: Array<{s3Url: string, localPath:
       console.log(`📥 Progressive download ${i + 1}/${downloads.length}: ${localPath.split('/').pop()}`)
       
       const command = `
-echo "Downloading ${localPath}..." && \
-aws s3 cp "${s3Url}" "${localPath}" --region eu-west-1 --quiet && \
+echo "Downloading ${localPath.split('/').pop()}..." && \
+wget -q -O "${localPath}" "${s3Url}" && \
 chmod 644 "${localPath}" && \
 echo "✅ Downloaded: ${localPath}"
 `
@@ -117,14 +117,15 @@ echo "✅ Downloaded: ${localPath}"
  * Download all files from S3 to EC2 in a single SSM command and WAIT for completion
  */
 async function downloadAllFilesToEC2(downloads: Array<{s3Url: string, localPath: string}>): Promise<void> {
-  // Generate bash script to download all files
+  // Generate bash script to download all files via DIRECT HTTP (FAST!)
   const commands = [
     '#!/bin/bash',
     'set -e',  // Exit on error
-    'echo "Starting batch download..."',
-    ...downloads.map(({s3Url, localPath}) => 
-      `echo "Downloading ${localPath}..." && aws s3 cp "${s3Url}" "${localPath}" --region eu-west-1 --quiet && chmod 644 "${localPath}"`
-    ),
+    'echo "Starting batch HTTP download (fast mode)..."',
+    ...downloads.map(({s3Url, localPath}) => {
+      // s3Url is now a direct HTTPS URL!
+      return `echo "wget ${localPath.split('/').pop()}..." && wget -q -O "${localPath}" "${s3Url}" && chmod 644 "${localPath}"`
+    }),
     'echo "All downloads complete!"'
   ]
   
@@ -371,9 +372,10 @@ async function getPlaylistTracks(playlistId: string) {
 
 /**
  * Get correct fileUrl from Track table (playlist data may be outdated)
+ * Returns DIRECT HTTP URL for fast downloads (no AWS CLI needed!)
  */
 async function getTrackFileUrl(track: any): Promise<string> {
-  // Always lookup from Track table for correct S3 path
+  // Always lookup from Track table for correct path
   try {
     const { Item: fullTrack } = await dynamodb.send(new GetCommand({
       TableName: TRACK_TABLE,
@@ -382,19 +384,29 @@ async function getTrackFileUrl(track: any): Promise<string> {
     
     if (fullTrack?.fileUrl) {
       let fileUrl = fullTrack.fileUrl
-      // Convert to S3 URL if needed
-      if (fileUrl && !fileUrl.startsWith('s3://') && !fileUrl.startsWith('http')) {
-        fileUrl = `s3://${STORAGE_BUCKET}/${fileUrl}`
+      
+      // Convert to DIRECT HTTPS URL for fast wget/curl download
+      if (fileUrl && !fileUrl.startsWith('http')) {
+        // Remove s3:// prefix if present
+        if (fileUrl.startsWith('s3://')) {
+          fileUrl = fileUrl.replace(`s3://${STORAGE_BUCKET}/`, '')
+        }
+        
+        // Convert to direct HTTPS S3 URL (no presigning, assumes public read)
+        const region = 'eu-west-1'
+        fileUrl = `https://${STORAGE_BUCKET}.s3.${region}.amazonaws.com/${fileUrl}`
       }
+      
       return fileUrl
     }
   } catch (err) {
     console.error(`⚠️ Failed to lookup track ${track.trackId}:`, err)
   }
   
-  // Fallback
+  // Fallback to direct HTTP URL
   console.error(`❌ No fileUrl for track ${track.trackId}`)
-  return `s3://${STORAGE_BUCKET}/public/audio/${track.trackId}.mp3`
+  const region = 'eu-west-1'
+  return `https://${STORAGE_BUCKET}.s3.${region}.amazonaws.com/public/audio/${track.trackId}.mp3`
 }
 
 /**
