@@ -11,31 +11,64 @@
             "file_path": "/tmp/liquidsoap.log",
             "log_group_name": "/splash-fm/liquidsoap",
             "log_stream_name": "{instance_id}",
-            "retention_in_days": 7
+            "retention_in_days": 7,
+            "timezone": "Local"
+          },
+          {
+            "file_path": "/var/log/nginx/access.log",
+            "log_group_name": "/splash-fm/nginx",
+            "log_stream_name": "{instance_id}-access",
+            "retention_in_days": 14,
+            "timezone": "Local"
           },
           {
             "file_path": "/var/log/nginx/error.log",
             "log_group_name": "/splash-fm/nginx",
             "log_stream_name": "{instance_id}-error",
-            "retention_in_days": 14
+            "retention_in_days": 14,
+            "timezone": "Local"
+          },
+          {
+            "file_path": "/var/log/icecast2/access.log",
+            "log_group_name": "/splash-fm/icecast",
+            "log_stream_name": "{instance_id}-access",
+            "retention_in_days": 7,
+            "timezone": "Local"
           },
           {
             "file_path": "/var/log/icecast2/error.log",
             "log_group_name": "/splash-fm/icecast",
             "log_stream_name": "{instance_id}-error",
-            "retention_in_days": 7
+            "retention_in_days": 7,
+            "timezone": "Local"
           },
           {
             "file_path": "/var/log/splash-health.log",
             "log_group_name": "/splash-fm/health",
             "log_stream_name": "{instance_id}",
-            "retention_in_days": 30
+            "retention_in_days": 30,
+            "timezone": "Local"
           },
           {
             "file_path": "/var/log/splash-watchdog.log",
             "log_group_name": "/splash-fm/watchdog",
             "log_stream_name": "{instance_id}",
-            "retention_in_days": 30
+            "retention_in_days": 30,
+            "timezone": "Local"
+          },
+          {
+            "file_path": "/var/log/splash-silence.log",
+            "log_group_name": "/splash-fm/silence-detection",
+            "log_stream_name": "{instance_id}",
+            "retention_in_days": 30,
+            "timezone": "Local"
+          },
+          {
+            "file_path": "/tmp/stereotool.log",
+            "log_group_name": "/splash-fm/stereotool",
+            "log_stream_name": "{instance_id}",
+            "retention_in_days": 7,
+            "timezone": "Local"
           }
         ]
       }

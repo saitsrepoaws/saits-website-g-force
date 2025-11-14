@@ -10,6 +10,9 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 # Watchdog - every 5 minutes
 */5 * * * * root /usr/local/bin/watchdog.sh >> /var/log/splash-watchdog.log 2>&1
 
+# Stream silence detection - every 3 minutes
+*/3 * * * * root /usr/local/bin/stream-silence-detector.sh >> /var/log/splash-silence.log 2>&1
+
 # Disk cleanup - daily at 03:00 CET
 0 2 * * * root /usr/local/bin/disk-cleanup.sh >> /var/log/splash-cleanup.log 2>&1
 
