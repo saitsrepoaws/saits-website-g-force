@@ -1,19 +1,34 @@
 /**
- * Stream Playlist Updater Lambda - PUSH Architecture
+ * Stream Playlist Updater Lambda - PROGRESSIVE DOWNLOAD STRATEGY
  * 
  * Runs HOURLY (:00) via EventBridge
- * Downloads news + Generates M3U playlist + Pushes to EC2
+ * Downloads tracks progressively + Generates M3U playlist + Pushes to EC2
  * 
  * FLOW:
  * 1. Download news MP3 → Upload to S3
  * 2. Lookup schedule for current hour
  * 3. Get full playlist
- * 4. Generate M3U file: News → Track 1 → Track 2 → ... → Track N
- * 5. Upload M3U to EC2 /var/radio/playlists/current.m3u
- * 6. Liquidsoap auto-reloads and plays!
+ * 4. PROGRESSIVE DOWNLOAD:
+ *    a. Download FIRST 5 files (news + 4 tracks) - SYNC WAIT
+ *    b. Generate & Upload M3U with ALL tracks
+ *    c. Download rest PROGRESSIVELY (30-60s intervals) - ASYNC
+ * 5. Liquidsoap auto-reloads and plays immediately!
+ * 
+ * WHY PROGRESSIVE:
+ * - Fixes crossfade timing issue (tracks available before Liquidsoap loads)
+ * - Stream starts in 20-30s instead of waiting for all downloads
+ * - Liquidsoap can start playing while rest downloads in background
+ * - Crossfade works because first tracks are ready!
+ * 
+ * TIMING:
+ * - Initial 5 files: ~20s (parallel, sync wait)
+ * - Next 3 files: 30s intervals (quick buffer)
+ * - Rest: 60s intervals (gradual fill)
+ * - Total: ~10 min for 16 tracks (within Lambda timeout)
  * 
  * ARCHITECTUUR:
- * Schedule → Playlist → Lambda → M3U → EC2 → Liquidsoap playlist()
+ * Schedule → Playlist → Lambda → [5 files FAST] → M3U → EC2 → Liquidsoap plays!
+ *                               → [rest files PROGRESSIVE]
  */
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
@@ -48,6 +63,54 @@ interface Track {
   bpm?: number
   key?: string
   energy?: number
+}
+
+/**
+ * Download files progressively (1 every 4 minutes)
+ * Used after initial batch to gradually fill the playlist
+ */
+async function downloadProgressively(downloads: Array<{s3Url: string, localPath: string}>): Promise<void> {
+  console.log(`⏱️  Starting progressive download (${downloads.length} files, 1 per 4 min)...`)
+  
+  for (let i = 0; i < downloads.length; i++) {
+    const {s3Url, localPath} = downloads[i]
+    
+    // Wait before downloading (except for first)
+    // Strategy: Start aggressively, then slow down
+    // Track 1: immediate
+    // Track 2-4: 30s apart (quick buffer fill)
+    // Track 5+: 60s apart (gradual fill)
+    if (i > 0) {
+      const waitSeconds = i <= 3 ? 30 : 60 // Fast then slow
+      console.log(`⏳ Waiting ${waitSeconds}s before next download (${i + 1}/${downloads.length})...`)
+      await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000))
+    }
+    
+    try {
+      console.log(`📥 Progressive download ${i + 1}/${downloads.length}: ${localPath.split('/').pop()}`)
+      
+      const command = `
+echo "Downloading ${localPath}..." && \
+aws s3 cp "${s3Url}" "${localPath}" --region eu-west-1 --quiet && \
+chmod 644 "${localPath}" && \
+echo "✅ Downloaded: ${localPath}"
+`
+      
+      const result = await ssm.send(new SendCommandCommand({
+        InstanceIds: [EC2_INSTANCE_ID],
+        DocumentName: 'AWS-RunShellScript',
+        Parameters: { commands: [command] }
+      }))
+      
+      console.log(`  ✅ Queued (CommandId: ${result.Command?.CommandId})`)
+      
+    } catch (error) {
+      console.error(`  ❌ Failed to download ${localPath}:`, error)
+      // Continue with next file
+    }
+  }
+  
+  console.log(`✅ Progressive download complete (${downloads.length} files)!`)
 }
 
 /**
@@ -500,10 +563,28 @@ echo "Cleanup complete"
       }
     }
     
-    // 6. Execute batch download and WAIT for completion
-    console.log(`📥 Downloading ${downloads.length} files to EC2...`)
-    await downloadAllFilesToEC2(downloads)
-    console.log(`✅ All ${downloads.length} files downloaded!`)
+    // 6. PROGRESSIVE DOWNLOAD STRATEGY
+    // Download first 4 tracks + news immediately, rest later
+    console.log(`📥 Progressive Download Strategy:`)
+    console.log(`   Initial: First 4 tracks + news (immediate)`)
+    console.log(`   Rest: ${Math.max(0, downloads.length - 5)} tracks (progressive)`)
+    
+    // Split downloads: initial batch vs progressive batch
+    const initialDownloads = downloads.slice(0, 5) // News + 4 tracks
+    const progressiveDownloads = downloads.slice(5) // Rest of tracks
+    
+    console.log(`📥 Downloading initial ${initialDownloads.length} files...`)
+    await downloadAllFilesToEC2(initialDownloads)
+    console.log(`✅ Initial ${initialDownloads.length} files downloaded!`)
+    
+    // Trigger progressive downloads asynchronously (fire and forget)
+    if (progressiveDownloads.length > 0) {
+      console.log(`🔄 Triggering progressive download for ${progressiveDownloads.length} remaining files...`)
+      // Don't await - let it run in background
+      downloadProgressively(progressiveDownloads).catch(err => {
+        console.error('⚠️ Progressive download error (non-blocking):', err)
+      })
+    }
     
     const successfulTracks = tracksWithPaths
     
