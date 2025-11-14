@@ -109,8 +109,14 @@ echo ""
 
 echo -e "${BLUE}🔄 Step 4/5: Restarting Liquidsoap...${NC}"
 
-ssh $EC2_HOST "sudo pkill -9 liquidsoap && sleep 3 && cd /opt/radio && nohup sudo liquidsoap radio.liq > /tmp/liquidsoap.log 2>&1 &"
-sleep 5
+# Stop Liquidsoap
+ssh $EC2_HOST "sudo pkill -9 liquidsoap" 2>/dev/null || true
+echo "   Liquidsoap stopped..."
+sleep 2
+
+# Start Liquidsoap in background (non-blocking)
+ssh $EC2_HOST "cd /opt/radio && nohup sudo liquidsoap radio.liq > /tmp/liquidsoap.log 2>&1 </dev/null & disown" &
+sleep 3
 
 echo -e "${GREEN}✅ Liquidsoap restarted${NC}"
 echo ""
@@ -128,9 +134,10 @@ else
     echo -e "${RED}⚠️  Warning: HTTP status $HTTP_CODE${NC}"
 fi
 
-# Check logs
+# Check logs (wait a bit for startup)
+sleep 2
 echo -e "   Checking Liquidsoap logs..."
-ssh $EC2_HOST "tail -5 /tmp/liquidsoap.log" | grep -i "crossfade\|loaded" || true
+ssh $EC2_HOST "tail -10 /tmp/liquidsoap.log 2>/dev/null | grep -i 'G-Forge\|crossfade\|loaded' || echo '   (Liquidsoap starting up...)'"
 
 echo ""
 

@@ -19,7 +19,9 @@
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 # Jingle detection threshold (seconds)
-jingle_threshold = 30.0
+# Anything under 1 minute = instant cut (no crossfade)
+# Includes: jingles, sweepers, IDs, gap killers
+jingle_threshold = 60.0
 
 # Crossfade settings - QUICK-MIX
 default_fade_in = 0.0    # NO FADE-IN!
