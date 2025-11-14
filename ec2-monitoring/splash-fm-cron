@@ -1,0 +1,17 @@
+# Splash FM Monitoring Cron Jobs
+# Install to: /etc/cron.d/splash-fm
+
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Health check - every minute
+*/1 * * * * root /usr/local/bin/health-check.sh >> /var/log/splash-health.log 2>&1
+
+# Watchdog - every 5 minutes
+*/5 * * * * root /usr/local/bin/watchdog.sh >> /var/log/splash-watchdog.log 2>&1
+
+# Disk cleanup - daily at 03:00 CET
+0 2 * * * root /usr/local/bin/disk-cleanup.sh >> /var/log/splash-cleanup.log 2>&1
+
+# Log stats - hourly
+0 * * * * root /usr/local/bin/log-stats.sh >> /var/log/splash-stats.log 2>&1
