@@ -9,5 +9,16 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0"
+  },
+  "esbuild": {
+    "external": [
+      "@aws-sdk/client-dynamodb",
+      "@aws-sdk/lib-dynamodb",
+      "@aws-sdk/client-s3",
+      "@aws-sdk/client-sqs",
+      "@aws-sdk/client-lambda",
+      "@aws-sdk/client-ssm",
+      "@aws-sdk/s3-request-presigner"
+    ]
   }
 }

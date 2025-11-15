@@ -1,7 +1,14 @@
 # 📚 Documentation Index - G-Forge IoT Radio Platform
 
-**Last Updated:** 13 November 2025  
+**Last Updated:** 15 November 2025  
 **Status:** Complete & Up-to-date
+
+---
+
+## 🎯 SYSTEM BLOCKS (BLOKKEN)
+
+### End-to-End Testing & Recovery
+- [BLOK LIBERY](BLOK_LIBERY_END_TO_END.md) - **📚 Track Library System** - Upload, metadata, BPM, cover art, waveform
 
 ---
 

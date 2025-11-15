@@ -15,5 +15,17 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "esbuild": "^0.25.11"
+  },
+  "esbuild": {
+    "external": [
+      "music-metadata",
+      "music-tempo",
+      "web-audio-api",
+      "essentia.js",
+      "@aws-sdk/client-dynamodb",
+      "@aws-sdk/lib-dynamodb",
+      "@aws-sdk/client-s3",
+      "@aws-sdk/client-lambda"
+    ]
   }
 }
