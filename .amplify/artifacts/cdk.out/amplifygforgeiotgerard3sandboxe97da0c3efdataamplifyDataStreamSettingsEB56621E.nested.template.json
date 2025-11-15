@@ -1,0 +1,2256 @@
+{
+ "Parameters": {
+  "DynamoDBModelTableReadIOPS": {
+   "Type": "Number",
+   "Default": 5,
+   "Description": "The number of read IOPS the table should support."
+  },
+  "DynamoDBModelTableWriteIOPS": {
+   "Type": "Number",
+   "Default": 5,
+   "Description": "The number of write IOPS the table should support."
+  },
+  "DynamoDBBillingMode": {
+   "Type": "String",
+   "Default": "PAY_PER_REQUEST",
+   "AllowedValues": [
+    "PAY_PER_REQUEST",
+    "PROVISIONED"
+   ],
+   "Description": "Configure @model types to create DynamoDB tables with PAY_PER_REQUEST or PROVISIONED billing modes."
+  },
+  "DynamoDBEnablePointInTimeRecovery": {
+   "Type": "String",
+   "Default": "false",
+   "AllowedValues": [
+    "true",
+    "false"
+   ],
+   "Description": "Whether to enable Point in Time Recovery on the table."
+  },
+  "DynamoDBEnableServerSideEncryption": {
+   "Type": "String",
+   "Default": "true",
+   "AllowedValues": [
+    "true",
+    "false"
+   ],
+   "Description": "Enable server side encryption powered by KMS."
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource4D06D762Outputsamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataAmplifyTableManagerTableManagerCustoB5BA981C": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref": {
+   "Type": "String"
+  }
+ },
+ "Conditions": {
+  "HasEnvironmentParameter": {
+   "Fn::Not": [
+    {
+     "Fn::Equals": [
+      "NONE",
+      "NONE"
+     ]
+    }
+   ]
+  },
+  "ShouldUsePayPerRequestBilling": {
+   "Fn::Equals": [
+    {
+     "Ref": "DynamoDBBillingMode"
+    },
+    "PAY_PER_REQUEST"
+   ]
+  },
+  "ShouldUsePointInTimeRecovery": {
+   "Fn::Equals": [
+    {
+     "Ref": "DynamoDBEnablePointInTimeRecovery"
+    },
+    "true"
+   ]
+  },
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Resources": {
+  "StreamSettingsTable": {
+   "Type": "Custom::AmplifyDynamoDBTable",
+   "Properties": {
+    "ServiceToken": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataAmplifyTableManagerNestedStackAmplifyTableManagerNestedStackResource4D06D762Outputsamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataAmplifyTableManagerTableManagerCustoB5BA981C"
+    },
+    "tableName": {
+     "Fn::Join": [
+      "",
+      [
+       "StreamSettings-",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "-NONE"
+      ]
+     ]
+    },
+    "attributeDefinitions": [
+     {
+      "attributeName": "settingKey",
+      "attributeType": "S"
+     }
+    ],
+    "keySchema": [
+     {
+      "attributeName": "settingKey",
+      "keyType": "HASH"
+     }
+    ],
+    "provisionedThroughput": {
+     "Fn::If": [
+      "ShouldUsePayPerRequestBilling",
+      {
+       "Ref": "AWS::NoValue"
+      },
+      {
+       "ReadCapacityUnits": {
+        "Ref": "DynamoDBModelTableReadIOPS"
+       },
+       "WriteCapacityUnits": {
+        "Ref": "DynamoDBModelTableWriteIOPS"
+       }
+      }
+     ]
+    },
+    "sseSpecification": {
+     "sseEnabled": false
+    },
+    "streamSpecification": {
+     "streamViewType": "NEW_AND_OLD_IMAGES"
+    },
+    "deletionProtectionEnabled": false,
+    "allowDestructiveGraphqlSchemaUpdates": true,
+    "replaceTableUponGsiUpdate": true,
+    "pointInTimeRecoverySpecification": {
+     "Fn::If": [
+      "ShouldUsePointInTimeRecovery",
+      {
+       "PointInTimeRecoveryEnabled": true
+      },
+      {
+       "Ref": "AWS::NoValue"
+      }
+     ]
+    },
+    "billingMode": {
+     "Fn::If": [
+      "ShouldUsePayPerRequestBilling",
+      "PAY_PER_REQUEST",
+      {
+       "Ref": "AWS::NoValue"
+      }
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/StreamSettingsTable/Default/Default"
+   }
+  },
+  "StreamSettingsIAMRole059FF553": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "appsync.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Policies": [
+     {
+      "PolicyDocument": {
+       "Statement": [
+        {
+         "Action": [
+          "dynamodb:BatchGetItem",
+          "dynamodb:BatchWriteItem",
+          "dynamodb:PutItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:GetItem",
+          "dynamodb:Scan",
+          "dynamodb:Query",
+          "dynamodb:UpdateItem",
+          "dynamodb:ConditionCheckItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator"
+         ],
+         "Effect": "Allow",
+         "Resource": [
+          {
+           "Fn::Sub": [
+            "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+            {
+             "tablename": {
+              "Fn::Join": [
+               "",
+               [
+                "StreamSettings-",
+                {
+                 "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+                },
+                "-NONE"
+               ]
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "Fn::Sub": [
+            "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+            {
+             "tablename": {
+              "Fn::Join": [
+               "",
+               [
+                "StreamSettings-",
+                {
+                 "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+                },
+                "-NONE"
+               ]
+              ]
+             }
+            }
+           ]
+          }
+         ]
+        }
+       ],
+       "Version": "2012-10-17"
+      },
+      "PolicyName": "DynamoDBAccess"
+     }
+    ],
+    "RoleName": {
+     "Fn::Join": [
+      "",
+      [
+       "StreamSettingsIAMRol1f9e4d-",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "-NONE"
+      ]
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "amplifyData"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/StreamSettingsIAMRole/Resource"
+   }
+  },
+  "StreamSettingsDataSource": {
+   "Type": "AWS::AppSync::DataSource",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DynamoDBConfig": {
+     "AwsRegion": {
+      "Ref": "AWS::Region"
+     },
+     "TableName": {
+      "Fn::Select": [
+       1,
+       {
+        "Fn::Split": [
+         "/",
+         {
+          "Fn::Select": [
+           5,
+           {
+            "Fn::Split": [
+             ":",
+             {
+              "Fn::GetAtt": [
+               "StreamSettingsTable",
+               "TableArn"
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    },
+    "Name": "StreamSettingsTable",
+    "ServiceRoleArn": {
+     "Fn::GetAtt": [
+      "StreamSettingsIAMRole059FF553",
+      "Arn"
+     ]
+    },
+    "Type": "AMAZON_DYNAMODB"
+   },
+   "DependsOn": [
+    "StreamSettingsIAMRole059FF553"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/StreamSettingsDataSource/Resource"
+   }
+  },
+  "QuerygetStreamSettingspreAuth0FunctionQuerygetStreamSettingspreAuth0FunctionAppSyncFunction4231AFAA": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerygetStreamSettingspreAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/592cb24e2080e104acb38ffdda009a23d6da9be4030481705daf430dfb00451b.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerygetStreamSettingspreAuth0Function/QuerygetStreamSettingspreAuth0Function.AppSyncFunction"
+   }
+  },
+  "QuerygetStreamSettingsauth0FunctionQuerygetStreamSettingsauth0FunctionAppSyncFunction9D04B18D": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerygetStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerygetStreamSettingsauth0Function/QuerygetStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "QuerygetStreamSettingspostAuth0FunctionQuerygetStreamSettingspostAuth0FunctionAppSyncFunction9923EAE1": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerygetStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerygetStreamSettingspostAuth0Function/QuerygetStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "QueryGetStreamSettingsDataResolverFnQueryGetStreamSettingsDataResolverFnAppSyncFunctionCA0EA82B": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QueryGetStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/08f4d557693d96c1a4efba0f9dc91330e4b19772fd5477c156468843e3d9cb5e.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4c6a2d29f01c6091bd1d9afe16e5849d456c96f17c3b215938c8067399532719.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QueryGetStreamSettingsDataResolverFn/QueryGetStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "GetStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "getStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerygetStreamSettingspreAuth0FunctionQuerygetStreamSettingspreAuth0FunctionAppSyncFunction4231AFAA",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QuerygetStreamSettingsauth0FunctionQuerygetStreamSettingsauth0FunctionAppSyncFunction9D04B18D",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QuerygetStreamSettingspostAuth0FunctionQuerygetStreamSettingspostAuth0FunctionAppSyncFunction9923EAE1",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QueryGetStreamSettingsDataResolverFnQueryGetStreamSettingsDataResolverFnAppSyncFunctionCA0EA82B",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "StreamSettingsTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Query"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/queryGetStreamSettingsResolver"
+   }
+  },
+  "QuerylistStreamSettingspreAuth0FunctionQuerylistStreamSettingspreAuth0FunctionAppSyncFunction22B25E63": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerylistStreamSettingspreAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/8e49e92543bcf7fb1098454b830362134ec364ef6b41e57c79361cba9a2605f1.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerylistStreamSettingspreAuth0Function/QuerylistStreamSettingspreAuth0Function.AppSyncFunction"
+   }
+  },
+  "QuerylistStreamSettingsauth0FunctionQuerylistStreamSettingsauth0FunctionAppSyncFunctionC4414C1B": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerylistStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/6677b1986afebbf1f4026c57099890e32ab4e450e422c5e3c930b085a73b6b60.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerylistStreamSettingsauth0Function/QuerylistStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "QuerylistStreamSettingspostAuth0FunctionQuerylistStreamSettingspostAuth0FunctionAppSyncFunction6E6D51EC": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QuerylistStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QuerylistStreamSettingspostAuth0Function/QuerylistStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "QueryListStreamSettingsDataResolverFnQueryListStreamSettingsDataResolverFnAppSyncFunction850F206A": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "QueryListStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9fcbe070ecd3023c5bf5b966fa9584757db9762eef123bad0820bd87591b2174.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/cc01911d0269d4080ea57505dc445dfc315ef7ad85d3d9d4ea1357858bff451d.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/QueryListStreamSettingsDataResolverFn/QueryListStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "ListStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "listStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "QuerylistStreamSettingspreAuth0FunctionQuerylistStreamSettingspreAuth0FunctionAppSyncFunction22B25E63",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QuerylistStreamSettingsauth0FunctionQuerylistStreamSettingsauth0FunctionAppSyncFunctionC4414C1B",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QuerylistStreamSettingspostAuth0FunctionQuerylistStreamSettingspostAuth0FunctionAppSyncFunction6E6D51EC",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "QueryListStreamSettingsDataResolverFnQueryListStreamSettingsDataResolverFnAppSyncFunction850F206A",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "StreamSettingsTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Query"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/queryListStreamSettingsResolver"
+   }
+  },
+  "MutationcreateStreamSettingsinit0FunctionMutationcreateStreamSettingsinit0FunctionAppSyncFunction451D5C08": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationcreateStreamSettingsinit0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/3cf32e28e3985b88b598dacbcc9a81cbb12cab62b6507082eb20a0702d3c197e.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationcreateStreamSettingsinit0Function/MutationcreateStreamSettingsinit0Function.AppSyncFunction"
+   }
+  },
+  "MutationcreateStreamSettingsinit1FunctionMutationcreateStreamSettingsinit1FunctionAppSyncFunction6BA60ACA": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationcreateStreamSettingsinit1Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/50d6a346d02f74981e15da185fb217fda580a10d893ce33a92df659eeda1a5b5.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationcreateStreamSettingsinit1Function/MutationcreateStreamSettingsinit1Function.AppSyncFunction"
+   }
+  },
+  "MutationcreateStreamSettingspreAuth0FunctionMutationcreateStreamSettingspreAuth0FunctionAppSyncFunction63B868B3": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationcreateStreamSettingspreAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e9382e19d492cdc15e9cb8775a4f9560430e8ea57512b92e2956bea8eefb8eb0.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationcreateStreamSettingspreAuth0Function/MutationcreateStreamSettingspreAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationcreateStreamSettingsauth0FunctionMutationcreateStreamSettingsauth0FunctionAppSyncFunction4A6E0699": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationcreateStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/163f1e92c10dcaf85e4690f19146fc5a18d1291ad6a6ad84db40c0c36d101fe9.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationcreateStreamSettingsauth0Function/MutationcreateStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "MutationcreateStreamSettingspostAuth0FunctionMutationcreateStreamSettingspostAuth0FunctionAppSyncFunctionF323ACF0": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationcreateStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationcreateStreamSettingspostAuth0Function/MutationcreateStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationCreateStreamSettingsDataResolverFnMutationCreateStreamSettingsDataResolverFnAppSyncFunction9F5228C0": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationCreateStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/64a9f0bed68315a48f048239b0d120da68831c5e7604adf601e646ff7294b493.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationCreateStreamSettingsDataResolverFn/MutationCreateStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "CreateStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "createStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationcreateStreamSettingsinit0FunctionMutationcreateStreamSettingsinit0FunctionAppSyncFunction451D5C08",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationcreateStreamSettingsinit1FunctionMutationcreateStreamSettingsinit1FunctionAppSyncFunction6BA60ACA",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationcreateStreamSettingspreAuth0FunctionMutationcreateStreamSettingspreAuth0FunctionAppSyncFunction63B868B3",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationcreateStreamSettingsauth0FunctionMutationcreateStreamSettingsauth0FunctionAppSyncFunction4A6E0699",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationcreateStreamSettingspostAuth0FunctionMutationcreateStreamSettingspostAuth0FunctionAppSyncFunctionF323ACF0",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationCreateStreamSettingsDataResolverFnMutationCreateStreamSettingsDataResolverFnAppSyncFunction9F5228C0",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "StreamSettingsTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Mutation"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/mutationCreateStreamSettingsResolver"
+   }
+  },
+  "MutationupdateStreamSettingsinit0FunctionMutationupdateStreamSettingsinit0FunctionAppSyncFunction6C3AB497": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationupdateStreamSettingsinit0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/06db846fd14e6fc371f22b12b5545ba8e2dbfeda85d8c8d586c71c282166657b.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationupdateStreamSettingsinit0Function/MutationupdateStreamSettingsinit0Function.AppSyncFunction"
+   }
+  },
+  "MutationupdateStreamSettingspreAuth0FunctionMutationupdateStreamSettingspreAuth0FunctionAppSyncFunction891B2999": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationupdateStreamSettingspreAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e9382e19d492cdc15e9cb8775a4f9560430e8ea57512b92e2956bea8eefb8eb0.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationupdateStreamSettingspreAuth0Function/MutationupdateStreamSettingspreAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationupdateStreamSettingsauth0FunctionMutationupdateStreamSettingsauth0FunctionAppSyncFunction0541BB92": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationupdateStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/58a246af4be16a1ddccdbae460faba9ba768ae2655833a75797307311c63ad0f.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationupdateStreamSettingsauth0Function/MutationupdateStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "MutationupdateStreamSettingspostAuth0FunctionMutationupdateStreamSettingspostAuth0FunctionAppSyncFunction13CE8DD6": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationupdateStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationupdateStreamSettingspostAuth0Function/MutationupdateStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationUpdateStreamSettingsDataResolverFnMutationUpdateStreamSettingsDataResolverFnAppSyncFunctionBB5372F4": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationUpdateStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/474bf0776ec2164a13191d1a0a9e057154931e4918fea5086f49850d02a5371b.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationUpdateStreamSettingsDataResolverFn/MutationUpdateStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "UpdateStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "updateStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationupdateStreamSettingsinit0FunctionMutationupdateStreamSettingsinit0FunctionAppSyncFunction6C3AB497",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationupdateStreamSettingspreAuth0FunctionMutationupdateStreamSettingspreAuth0FunctionAppSyncFunction891B2999",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationupdateStreamSettingsauth0FunctionMutationupdateStreamSettingsauth0FunctionAppSyncFunction0541BB92",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationupdateStreamSettingspostAuth0FunctionMutationupdateStreamSettingspostAuth0FunctionAppSyncFunction13CE8DD6",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationUpdateStreamSettingsDataResolverFnMutationUpdateStreamSettingsDataResolverFnAppSyncFunctionBB5372F4",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "StreamSettingsTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Mutation"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/mutationUpdateStreamSettingsResolver"
+   }
+  },
+  "MutationdeleteStreamSettingspreAuth0FunctionMutationdeleteStreamSettingspreAuth0FunctionAppSyncFunctionB8058B1D": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationdeleteStreamSettingspreAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9f3685b2088ca7296a7b6b03d94db46557528871278a8b229e1d5176a7e5bed8.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationdeleteStreamSettingspreAuth0Function/MutationdeleteStreamSettingspreAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationdeleteStreamSettingsauth0FunctionMutationdeleteStreamSettingsauth0FunctionAppSyncFunctionCE6AE1CA": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationdeleteStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1f5fed297da9c32ae3af922bf3a38ccf23b956078887d16891ec06c20c64722c.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d9026b39b763f6e1ba5a06488ea2fbfe6eb653fb4c7ebeb3d0aafabe2928d34b.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationdeleteStreamSettingsauth0Function/MutationdeleteStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "MutationdeleteStreamSettingspostAuth0FunctionMutationdeleteStreamSettingspostAuth0FunctionAppSyncFunction78918C98": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationdeleteStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationdeleteStreamSettingspostAuth0Function/MutationdeleteStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "MutationDeleteStreamSettingsDataResolverFnMutationDeleteStreamSettingsDataResolverFnAppSyncFunction19E0F893": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Fn::GetAtt": [
+      "StreamSettingsDataSource",
+      "Name"
+     ]
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "MutationDeleteStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4f7907d1209a2c9953a0c053df402c634e359546d70c7cc5c2e8e21ea734880f.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f4a52b72209a9dfa197b5e7367a5c378c5bb86de6e29ddd9e48b49a3fe54b249.vtl"
+    }
+   },
+   "DependsOn": [
+    "StreamSettingsDataSource"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/MutationDeleteStreamSettingsDataResolverFn/MutationDeleteStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "DeleteStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "deleteStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteStreamSettingspreAuth0FunctionMutationdeleteStreamSettingspreAuth0FunctionAppSyncFunctionB8058B1D",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteStreamSettingsauth0FunctionMutationdeleteStreamSettingsauth0FunctionAppSyncFunctionCE6AE1CA",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationdeleteStreamSettingspostAuth0FunctionMutationdeleteStreamSettingspostAuth0FunctionAppSyncFunction78918C98",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "MutationDeleteStreamSettingsDataResolverFnMutationDeleteStreamSettingsDataResolverFnAppSyncFunction19E0F893",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+       {
+        "Fn::Select": [
+         1,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::Select": [
+             5,
+             {
+              "Fn::Split": [
+               ":",
+               {
+                "Fn::GetAtt": [
+                 "StreamSettingsTable",
+                 "TableArn"
+                ]
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Mutation"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/mutationDeleteStreamSettingsResolver"
+   }
+  },
+  "SubscriptiononCreateStreamSettingsauth0FunctionSubscriptiononCreateStreamSettingsauth0FunctionAppSyncFunctionAF720648": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononCreateStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononCreateStreamSettingsauth0Function/SubscriptiononCreateStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptiononCreateStreamSettingspostAuth0FunctionSubscriptiononCreateStreamSettingspostAuth0FunctionAppSyncFunction26AE2F4F": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononCreateStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononCreateStreamSettingspostAuth0Function/SubscriptiononCreateStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptionOnCreateStreamSettingsDataResolverFnSubscriptionOnCreateStreamSettingsDataResolverFnAppSyncFunction412C4343": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptionOnCreateStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e0cff47fb007f0bbf2a4e43ca256d6aa7ec109821769fd79fa7c5e83f0e7f9fc.vtl"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptionOnCreateStreamSettingsDataResolverFn/SubscriptionOnCreateStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "SubscriptiononCreateStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "onCreateStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononCreateStreamSettingsauth0FunctionSubscriptiononCreateStreamSettingsauth0FunctionAppSyncFunctionAF720648",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononCreateStreamSettingspostAuth0FunctionSubscriptiononCreateStreamSettingspostAuth0FunctionAppSyncFunction26AE2F4F",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptionOnCreateStreamSettingsDataResolverFnSubscriptionOnCreateStreamSettingsDataResolverFnAppSyncFunction412C4343",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Subscription"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/subscriptionOnCreateStreamSettingsResolver"
+   }
+  },
+  "SubscriptiononUpdateStreamSettingsauth0FunctionSubscriptiononUpdateStreamSettingsauth0FunctionAppSyncFunctionFCB539B7": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononUpdateStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononUpdateStreamSettingsauth0Function/SubscriptiononUpdateStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptiononUpdateStreamSettingspostAuth0FunctionSubscriptiononUpdateStreamSettingspostAuth0FunctionAppSyncFunction42658AA1": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononUpdateStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononUpdateStreamSettingspostAuth0Function/SubscriptiononUpdateStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptionOnUpdateStreamSettingsDataResolverFnSubscriptionOnUpdateStreamSettingsDataResolverFnAppSyncFunctionA9673A4A": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptionOnUpdateStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e0cff47fb007f0bbf2a4e43ca256d6aa7ec109821769fd79fa7c5e83f0e7f9fc.vtl"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptionOnUpdateStreamSettingsDataResolverFn/SubscriptionOnUpdateStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "SubscriptiononUpdateStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "onUpdateStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononUpdateStreamSettingsauth0FunctionSubscriptiononUpdateStreamSettingsauth0FunctionAppSyncFunctionFCB539B7",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononUpdateStreamSettingspostAuth0FunctionSubscriptiononUpdateStreamSettingspostAuth0FunctionAppSyncFunction42658AA1",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptionOnUpdateStreamSettingsDataResolverFnSubscriptionOnUpdateStreamSettingsDataResolverFnAppSyncFunctionA9673A4A",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Subscription"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/subscriptionOnUpdateStreamSettingsResolver"
+   }
+  },
+  "SubscriptiononDeleteStreamSettingsauth0FunctionSubscriptiononDeleteStreamSettingsauth0FunctionAppSyncFunction0BB0DE99": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononDeleteStreamSettingsauth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4843bc77043eb1b2460e9b1e3df9218ebee2b5c86adc9e9f789a60b4f3a02049.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononDeleteStreamSettingsauth0Function/SubscriptiononDeleteStreamSettingsauth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptiononDeleteStreamSettingspostAuth0FunctionSubscriptiononDeleteStreamSettingspostAuth0FunctionAppSyncFunction5A6C4150": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptiononDeleteStreamSettingspostAuth0Function",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/c1721bcd774e27c514d3454b5be4f9bdd094c0161b57ddf053d618e3b0086a77.vtl"
+    },
+    "ResponseMappingTemplate": "$util.toJson({})"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptiononDeleteStreamSettingspostAuth0Function/SubscriptiononDeleteStreamSettingspostAuth0Function.AppSyncFunction"
+   }
+  },
+  "SubscriptionOnDeleteStreamSettingsDataResolverFnSubscriptionOnDeleteStreamSettingsDataResolverFnAppSyncFunctionB46BF739": {
+   "Type": "AWS::AppSync::FunctionConfiguration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "DataSourceName": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPINONEDS661311C6Name"
+    },
+    "FunctionVersion": "2018-05-29",
+    "Name": "SubscriptionOnDeleteStreamSettingsDataResolverFn",
+    "RequestMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fe3c43ada4b9d681a5e2312663ef7a73386424d73b73e51f8e2e9d4b50f7c502.vtl"
+    },
+    "ResponseMappingTemplateS3Location": {
+     "Fn::Sub": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e0cff47fb007f0bbf2a4e43ca256d6aa7ec109821769fd79fa7c5e83f0e7f9fc.vtl"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/SubscriptionOnDeleteStreamSettingsDataResolverFn/SubscriptionOnDeleteStreamSettingsDataResolverFn.AppSyncFunction"
+   }
+  },
+  "SubscriptiononDeleteStreamSettingsResolver": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+    },
+    "FieldName": "onDeleteStreamSettings",
+    "Kind": "PIPELINE",
+    "PipelineConfig": {
+     "Functions": [
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononDeleteStreamSettingsauth0FunctionSubscriptiononDeleteStreamSettingsauth0FunctionAppSyncFunction0BB0DE99",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptiononDeleteStreamSettingspostAuth0FunctionSubscriptiononDeleteStreamSettingspostAuth0FunctionAppSyncFunction5A6C4150",
+        "FunctionId"
+       ]
+      },
+      {
+       "Fn::GetAtt": [
+        "SubscriptionOnDeleteStreamSettingsDataResolverFnSubscriptionOnDeleteStreamSettingsDataResolverFnAppSyncFunctionB46BF739",
+        "FunctionId"
+       ]
+      }
+     ]
+    },
+    "RequestMappingTemplate": {
+     "Fn::Join": [
+      "",
+      [
+       "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteStreamSettings\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthauthenticatedUserRole2F11E686Ref"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":sts::",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":assumed-role/",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthunauthenticatedUserRoleFB62A2DERef"
+       },
+       "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efauthNestedStackauthNestedStackResourceD5036A97Outputsamplifygforgeiotgerard3sandboxe97da0c3efauthamplifyAuthIdentityPool9E906493Ref"
+       },
+       "\"))\n$util.qr($ctx.stash.put(\"adminRoles\", []))\n$util.toJson({})"
+      ]
+     ]
+    },
+    "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)",
+    "TypeName": "Subscription"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/subscriptionOnDeleteStreamSettingsResolver"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WO0W6DMAxFv6XvwWPpF6ygPW4T7L0yiUEpIUGx06pC/PsEnTrt6frIR/bVoHUJ5QFvXBg7Ft51sHwQC9lW0Iyq6sMXJpxIKG1QxWCduBhUQxxzMqSqzBKnP+zDc8Ybnxd7DzhF28E3dp5OyKQcTrA00T/s6GlVOM98DwaWetfrrkbB9nnyP73nYLYSVQy9G3LCvdHvZ3+ltCo+npGZhOFtC8VHOGUzkmwF1s39zDJnUfu6FRxcGFYVoiW48MtVa9CvUB4u7FyRchA3ETSP/AG67XqaNgEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/data/amplifyData/StreamSettings/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "GetAttStreamSettingsTableStreamArn": {
+   "Description": "Your DynamoDB table StreamArn.",
+   "Value": {
+    "Fn::GetAtt": [
+     "StreamSettingsTable",
+     "TableStreamArn"
+    ]
+   },
+   "Export": {
+    "Name": {
+     "Fn::Join": [
+      ":",
+      [
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "GetAtt:StreamSettingsTable:StreamArn"
+      ]
+     ]
+    }
+   }
+  },
+  "GetAttStreamSettingsTableName": {
+   "Description": "Your DynamoDB table name.",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "StreamSettings-",
+      {
+       "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+      },
+      "-NONE"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": {
+     "Fn::Join": [
+      ":",
+      [
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataGraphQLAPI33A02191ApiId"
+       },
+       "GetAtt:StreamSettingsTable:Name"
+      ]
+     ]
+    }
+   }
+  },
+  "amplifygforgeiotgerard3sandboxe97da0c3efdataamplifyDataStreamSettingsStreamSettingsTableBE719020TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "StreamSettingsTable",
+     "TableArn"
+    ]
+   }
+  }
+ }
+}

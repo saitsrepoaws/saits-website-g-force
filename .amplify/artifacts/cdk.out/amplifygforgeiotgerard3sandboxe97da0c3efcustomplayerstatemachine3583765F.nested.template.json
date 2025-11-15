@@ -1,0 +1,750 @@
+{
+ "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"AmplifySandbox\",\"createdWith\":\"1.16.1\",\"stackType\":\"custom\",\"metadata\":{}}",
+ "Resources": {
+  "StateMachineTriggerServiceRole7DACBDBA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/StateMachineTrigger/ServiceRole/Resource"
+   }
+  },
+  "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "states:StartExecution",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "PlayerStateMachineDF3FE3FD"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7",
+    "Roles": [
+     {
+      "Ref": "StateMachineTriggerServiceRole7DACBDBA"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/StateMachineTrigger/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "StateMachineTrigger27A3F693": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "5ae3a6b5a002696e8c71f26606220cf78cd1bb912f2c98e1a3abc8dc66822032.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "STATE_MACHINE_ARN": {
+       "Ref": "PlayerStateMachineDF3FE3FD"
+      }
+     }
+    },
+    "FunctionName": "state-machine-trigger",
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "StateMachineTriggerServiceRole7DACBDBA",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "StateMachineTriggerServiceRoleDefaultPolicy0E523DB7",
+    "StateMachineTriggerServiceRole7DACBDBA"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/StateMachineTrigger/Resource",
+    "aws:asset:path": "asset.5ae3a6b5a002696e8c71f26606220cf78cd1bb912f2c98e1a3abc8dc66822032",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "StateMachineTriggerInvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE2B1807B0": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "StateMachineTrigger27A3F693",
+      "Arn"
+     ]
+    },
+    "Principal": "iot.amazonaws.com"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/StateMachineTrigger/InvokeX1kgdpeq4A1b3T4Qgx5teuCJ9kkxQXuTuwWc9FHExDE="
+   }
+  },
+  "PlayerStateMachineRoleD8681A5A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "states.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/PlayerStateMachine/Role/Resource"
+   }
+  },
+  "PlayerStateMachineRoleDefaultPolicy5946B8E0": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayerloadhandlerlambda8DE09149Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayerloadhandlerlambda8DE09149Arn"
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": "iot:Publish",
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:*:*:topic/radio/player/*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "PlayerStateMachineRoleDefaultPolicy5946B8E0",
+    "Roles": [
+     {
+      "Ref": "PlayerStateMachineRoleD8681A5A"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/PlayerStateMachine/Role/DefaultPolicy/Resource"
+   }
+  },
+  "PlayerStateMachineDF3FE3FD": {
+   "Type": "AWS::StepFunctions::StateMachine",
+   "Properties": {
+    "DefinitionString": {
+     "Fn::Join": [
+      "",
+      [
+       "{\n  \"Comment\": \"Radio Player State Machine - Controls player state transitions and command orchestration\",\n  \"StartAt\": \"ParseCommand\",\n  \"States\": {\n    \"ParseCommand\": {\n      \"Type\": \"Pass\",\n      \"Comment\": \"Extract command details from IoT message\",\n      \"Parameters\": {\n        \"command.$\": \"$.command\",\n        \"playerId.$\": \"$.playerId\",\n        \"timestamp.$\": \"$.timestamp\"\n      },\n      \"Next\": \"RouteCommand\"\n    },\n    \n    \"RouteCommand\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Route to appropriate handler based on command type\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"LOAD\",\n          \"Next\": \"HandleLoadCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"PLAY\",\n          \"Next\": \"HandlePlayCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"PAUSE\",\n          \"Next\": \"HandlePauseCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"STOP\",\n          \"Next\": \"HandleStopCommand\"\n        },\n        {\n          \"Variable\": \"$.command\",\n          \"StringEquals\": \"UNLOAD\",\n          \"Next\": \"HandleUnloadCommand\"\n        }\n      ],\n      \"Default\": \"UnknownCommand\"\n    },\n    \n    \"HandleLoadCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process LOAD command - fetch playlist and track data\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayerloadhandlerlambda8DE09149Arn"
+       },
+       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\",\n          \"timestamp.$\": \"$.timestamp\"\n        }\n      },\n      \"ResultPath\": \"$.loadResult\",\n      \"Next\": \"ValidateLoadResult\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"ValidateLoadResult\": {\n      \"Type\": \"Choice\",\n      \"Comment\": \"Check if track data was successfully loaded\",\n      \"Choices\": [\n        {\n          \"Variable\": \"$.loadResult.Payload.success\",\n          \"BooleanEquals\": true,\n          \"Next\": \"PublishLoadResponse\"\n        }\n      ],\n      \"Default\": \"HandleError\"\n    },\n    \n    \"PublishLoadResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish LOAD command response with track data to IoT via Lambda\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+       },
+       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"LOAD\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"params\": {\n              \"playlist.$\": \"$.loadResult.Payload.playlist\",\n              \"schedule.$\": \"$.loadResult.Payload.schedule\",\n              \"currentTrack.$\": \"$.loadResult.Payload.currentTrack\",\n              \"track.$\": \"$.loadResult.Payload.track\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandlePlayCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PLAY command - validate state and respond\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+       },
+       "\",\n        \"Payload\": {\n          \"command.$\": \"$.command\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.playResult\",\n      \"Next\": \"PublishPlayResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"PublishPlayResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish PLAY command response to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+       },
+       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"PLAY\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\"\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"HandlePauseCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process PAUSE command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+       },
+       "\",\n        \"Payload\": {\n          \"command\": \"PAUSE\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandleStopCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process STOP command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+       },
+       "\",\n        \"Payload\": {\n          \"command\": \"STOP\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"HandleUnloadCommand\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Process UNLOAD command\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn"
+       },
+       "\",\n        \"Payload\": {\n          \"command\": \"UNLOAD\",\n          \"playerId.$\": \"$.playerId\"\n        }\n      },\n      \"ResultPath\": \"$.result\",\n      \"Next\": \"PublishSimpleResponse\",\n      \"Catch\": [\n        {\n          \"ErrorEquals\": [\"States.ALL\"],\n          \"Next\": \"HandleError\",\n          \"ResultPath\": \"$.error\"\n        }\n      ]\n    },\n    \n    \"PublishSimpleResponse\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Publish simple command response (PAUSE/STOP/UNLOAD) to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+       },
+       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command.$\": \"$.result.Payload.command\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\"\n          }\n        }\n      },\n      \"ResultPath\": \"$.publishResult\",\n      \"Next\": \"CommandSuccess\"\n    },\n    \n    \"UnknownCommand\": {\n      \"Type\": \"Fail\",\n      \"Comment\": \"Unknown command type received\",\n      \"Error\": \"UnknownCommandError\",\n      \"Cause\": \"The command type is not recognized by the state machine\"\n    },\n    \n    \"HandleError\": {\n      \"Type\": \"Task\",\n      \"Comment\": \"Handle errors and publish error response to IoT\",\n      \"Resource\": \"arn:aws:states:::lambda:invoke\",\n      \"Parameters\": {\n        \"FunctionName\": \"",
+       {
+        "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn"
+       },
+       "\",\n        \"Payload\": {\n          \"topic.$\": \"States.Format('radio/player/{}/command', $.playerId)\",\n          \"message\": {\n            \"command\": \"ERROR\",\n            \"playerId.$\": \"$.playerId\",\n            \"timestamp.$\": \"$$.State.EnteredTime\",\n            \"error\": {\n              \"message.$\": \"$.error.Cause\",\n              \"originalCommand.$\": \"$.command\"\n            }\n          }\n        }\n      },\n      \"ResultPath\": \"$.errorPublishResult\",\n      \"Next\": \"CommandFailed\"\n    },\n    \n    \"CommandSuccess\": {\n      \"Type\": \"Succeed\",\n      \"Comment\": \"Command processed successfully\"\n    },\n    \n    \"CommandFailed\": {\n      \"Type\": \"Fail\",\n      \"Comment\": \"Command processing failed\",\n      \"Error\": \"CommandProcessingError\",\n      \"Cause\": \"Failed to process player command\"\n    }\n  }\n}\n"
+      ]
+     ]
+    },
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "PlayerStateMachineRoleD8681A5A",
+      "Arn"
+     ]
+    },
+    "StateMachineName": "RadioPlayerStateMachineV2",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "DependsOn": [
+    "PlayerStateMachineRoleDefaultPolicy5946B8E0",
+    "PlayerStateMachineRoleD8681A5A"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/PlayerStateMachine/Resource"
+   }
+  },
+  "PlayerCommandRule": {
+   "Type": "AWS::IoT::TopicRule",
+   "Properties": {
+    "RuleName": "RadioPlayerCommandRuleV2",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TopicRulePayload": {
+     "Actions": [
+      {
+       "Lambda": {
+        "FunctionArn": {
+         "Fn::GetAtt": [
+          "StateMachineTrigger27A3F693",
+          "Arn"
+         ]
+        }
+       }
+      }
+     ],
+     "AwsIotSqlVersion": "2016-03-23",
+     "Description": "Trigger Lambda for player command requests",
+     "Sql": "SELECT * FROM 'radio/player/+/command-request'"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/PlayerCommandRule"
+   }
+  },
+  "CrossFadeControlRule": {
+   "Type": "AWS::IoT::TopicRule",
+   "Properties": {
+    "RuleName": "RadioCrossFadeControlRule_v2",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "TopicRulePayload": {
+     "Actions": [
+      {
+       "Lambda": {
+        "FunctionArn": {
+         "Ref": "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctioncrossfadecontrollerlambda57D6C218Arn"
+        }
+       }
+      }
+     ],
+     "AwsIotSqlVersion": "2016-03-23",
+     "Description": "Trigger cross-fade controller for START/STOP commands",
+     "Sql": "SELECT * FROM 'radio/crossfade/control'"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/CrossFadeControlRule"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02PwW6DQAxEvyV349LNFzRIvTWpoHfkLCZ1gF2EvY0qxL9XQFX19DyyZkbj0Lkc8wM9NPNNl/VyxfnMatxURr4Demg99zRcG6pDbPiueN7wmoI3iQGEBpzL2DMUbdj4Hnvx36vcrwX0WJMqm+LLCtAjnpLv2E6kDHs8zkUb/lJXM0+DqEoMC6jx2P7+FOfKyPiN/KeErfa/XkCiYdGGjziKL1PPC5SsMU2eYauvjG4SbqvxkmxMtsA6De/69OUcumfMD3cVyaYUTAbGcucPEiQKVS0BAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard3-sandbox-e97da0c3ef/custom-player-state-machine/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Outputs": {
+  "PlayerStateMachineArn": {
+   "Description": "ARN of the Player State Machine",
+   "Value": {
+    "Ref": "PlayerStateMachineDF3FE3FD"
+   }
+  },
+  "IoTRuleArn": {
+   "Description": "ARN of the IoT Rule for player commands",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:iot:",
+      {
+       "Ref": "AWS::Region"
+      },
+      ":",
+      {
+       "Ref": "AWS::AccountId"
+      },
+      ":rule/RadioPlayerCommandRuleV2"
+     ]
+    ]
+   }
+  },
+  "CrossFadeIoTRuleArn": {
+   "Description": "ARN of the IoT Rule for cross-fade control",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "arn:aws:iot:",
+      {
+       "Ref": "AWS::Region"
+      },
+      ":",
+      {
+       "Ref": "AWS::AccountId"
+      },
+      ":rule/RadioCrossFadeControlRule_v2"
+     ]
+    ]
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayerloadhandlerlambda8DE09149Arn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayeriotpublisherlambda4B735D22Arn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctionplayersimplehandlerlambdaF59E518EArn": {
+   "Type": "String"
+  },
+  "referencetoamplifygforgeiotgerard3sandboxe97da0c3effunctionNestedStackfunctionNestedStackResource89931112Outputsamplifygforgeiotgerard3sandboxe97da0c3effunctioncrossfadecontrollerlambda57D6C218Arn": {
+   "Type": "String"
+  }
+ }
+}

@@ -230,6 +230,7 @@ unauthenticatedRole.addManagedPolicy(
 new CfnOutput(backend.auth.stack, 'IoTCognitoPolicyName', {
   value: 'RadioPlayerCognitoPolicy',
   description: 'IoT Policy name (existing) that gets attached to Cognito Identity',
+  exportName: 'IoTCognitoPolicyName',
 })
 
 // Create policy statements that will be attached to BOTH roles
@@ -319,8 +320,8 @@ const cloudFrontDistribution = new cloudfront.Distribution(
         backend.storage.stack,
         'AudioCachePolicy',
         {
-          cachePolicyName: 'AudioFilesCache-v2',
-          comment: 'Cache policy for audio files with auth params (v2)',
+          cachePolicyName: 'AudioFilesCache',
+          comment: 'Cache policy for audio files with auth params',
           defaultTtl: Duration.minutes(15), // Match presigned URL expiry
           maxTtl: Duration.hours(1), // Max 1 hour
           minTtl: Duration.seconds(0),
@@ -342,11 +343,13 @@ const cloudFrontDistribution = new cloudfront.Distribution(
 new CfnOutput(backend.storage.stack, 'CloudFrontDomain', {
   value: cloudFrontDistribution.distributionDomainName,
   description: 'CloudFront distribution domain for storage assets',
+  exportName: 'StorageCloudFrontDomain',
 })
 
 new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
   value: cloudFrontDistribution.distributionId,
   description: 'CloudFront distribution ID',
+  exportName: 'StorageCloudFrontDistributionId',
 })
 
 // =============================================================================
@@ -481,6 +484,7 @@ const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
 new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
   value: playerStateMachine.stateMachineArn,
   description: 'ARN of the Player State Machine',
+  exportName: 'PlayerStateMachineArn',
 })
 
 // IoT Rule output
@@ -497,7 +501,7 @@ new CfnOutput(stateMachineStack, 'IoTRuleArn', {
 crossfadeControllerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
 
 const crossfadeIotRule = new iot.CfnTopicRule(stateMachineStack, 'CrossFadeControlRule', {
-  ruleName: 'RadioCrossFadeControlRule_v2',
+  ruleName: 'RadioCrossFadeControlRule',
   topicRulePayload: {
     sql: "SELECT * FROM 'radio/crossfade/control'",
     description: 'Trigger cross-fade controller for START/STOP commands',
@@ -516,6 +520,7 @@ const crossfadeIotRule = new iot.CfnTopicRule(stateMachineStack, 'CrossFadeContr
 new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
   value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${crossfadeIotRule.ruleName}`,
   description: 'ARN of the IoT Rule for cross-fade control',
+  exportName: 'PlayerCommandIoTRuleArn',
 })
 
 // =============================================================================
@@ -524,7 +529,7 @@ new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
 
 // Create EventBridge rule to trigger radio scheduler every minute
 const schedulerRule = new events.Rule(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRule', {
-  ruleName: 'RadioSchedulerEveryMinute-v2',
+  ruleName: 'RadioSchedulerEveryMinute',
   description: 'Triggers radio scheduler Lambda every minute to broadcast next track',
   schedule: events.Schedule.rate(Duration.minutes(1)),
 })
@@ -536,6 +541,7 @@ schedulerRule.addTarget(new targets.LambdaFunction(radioSchedulerLambda))
 new CfnOutput(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRuleArn', {
   value: schedulerRule.ruleArn,
   description: 'EventBridge rule that triggers radio scheduler every minute',
+  exportName: 'RadioSchedulerRuleArn',
 })
 
 console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minute)')
@@ -617,7 +623,7 @@ const streamSchedulerRule = new events.Rule(
   streamPlaylistLambda.stack,
   'StreamPlaylistSchedulerRule',
   {
-    ruleName: 'StreamPlaylistHourly-v2',
+    ruleName: 'StreamPlaylistHourly',
     description: 'Updates stream playlist HOURLY - downloads news + generates M3U + pushes to EC2',
     schedule: events.Schedule.cron({
       minute: '0',  // At :00
@@ -681,7 +687,7 @@ const trackPusherRule = new events.Rule(
   trackPusherLambda.stack,
   'TrackPusherRule',
   {
-    ruleName: 'StreamTrackPusherEvery3Min-v2',
+    ruleName: 'StreamTrackPusherEvery3Min',
     description: 'Pushes next track to maintain 2-track buffer on EC2',
     schedule: events.Schedule.rate(Duration.minutes(3))
   }
@@ -737,7 +743,7 @@ const healthMonitorRule = new events.Rule(
   healthMonitorLambda.stack,
   'HealthMonitorRule',
   {
-    ruleName: 'StreamHealthCheckEveryMinute-v2',
+    ruleName: 'StreamHealthCheckEveryMinute',
     description: 'Checks stream health every minute - bulletproof monitoring',
     schedule: events.Schedule.rate(Duration.minutes(1))
   }
@@ -792,7 +798,7 @@ const streamStatusRule = new events.Rule(
   streamStatusLambda.stack,
   'StreamStatusPublisherRule',
   {
-    ruleName: 'StreamStatusEveryMinute-v2',
+    ruleName: 'StreamStatusEveryMinute',
     description: 'Publishes stream status to IoT and checks for dynamic playlist updates every minute',
     schedule: events.Schedule.rate(Duration.minutes(1)),
   }
@@ -822,6 +828,7 @@ backend.streamMonitor.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrac
 new CfnOutput(streamMonitorLambda.stack, 'StreamMonitorLambdaName', {
   value: streamMonitorLambda.functionName,
   description: 'Stream Monitor Lambda function name',
+  exportName: 'StreamMonitorLambdaName',
 })
 
 // ============================================
@@ -846,7 +853,7 @@ if (backend.data.resources.tables['StreamQueueTrack']) {
 
 // IoT Rule to trigger on stream status updates (track changes)
 const trackCompletionRule = new iot.CfnTopicRule(trackCompletionLambda.stack, 'TrackCompletionRule', {
-  ruleName: 'TrackCompletionRule_v2',
+  ruleName: 'TrackCompletionRule',
   topicRulePayload: {
     description: 'Triggers track completion handler when track finishes playing',
     sql: "SELECT * FROM 'radio/stream/status' WHERE previousTrack.trackId <> ''",
@@ -876,7 +883,7 @@ const storageStack = backend.storage.resources.bucket.stack
 
 // Create SQS FIFO Queue in storage stack (has no dependency on data)
 const trackStreamQueue = new sqs.Queue(storageStack, 'RadioTrackStreamQueue', {
-  queueName: 'radio-track-stream-queue-v2.fifo',
+  queueName: 'radio-track-stream-queue.fifo',
   fifo: true,
   contentBasedDeduplication: false, // We provide deduplication IDs
   visibilityTimeout: Duration.seconds(300), // 5 minutes (track duration)
@@ -907,8 +914,8 @@ const trackQueueInitRule = new events.Rule(
   storageStack,
   'TrackQueueInitRule',
   {
-    ruleName: 'TrackQueueInitHourly-v2',
-    description: 'Initializes track queue with 2 tracks at top of each hour (v2)',
+    ruleName: 'TrackQueueInitHourly',
+    description: 'Initializes track queue with 2 tracks at top of each hour',
     schedule: events.Schedule.cron({ minute: '0' }), // Every hour at :00
   }
 )
@@ -919,11 +926,13 @@ trackQueueInitRule.addTarget(new targets.LambdaFunction(trackQueueManagerLambda)
 new CfnOutput(storageStack, 'TrackStreamQueueUrl', {
   value: trackStreamQueue.queueUrl,
   description: 'SQS FIFO Queue URL for track streaming',
+  exportName: 'TrackStreamQueueUrl',
 })
 
 new CfnOutput(storageStack, 'TrackStreamQueueArn', {
   value: trackStreamQueue.queueArn,
   description: 'SQS FIFO Queue ARN for EC2 permissions',
+  exportName: 'TrackStreamQueueArn',
 })
 
 console.log('✅ Track queue manager configured with hourly trigger')
@@ -945,6 +954,7 @@ backend.genreMerger.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
 new CfnOutput(genreMergerLambda.stack, 'GenreMergerLambdaName', {
   value: genreMergerLambda.functionName,
   description: 'Genre Merger Lambda function name',
+  exportName: 'GenreMergerLambdaName',
 })
 
 console.log('✅ Genre merger configured')
@@ -971,7 +981,7 @@ const listenerTrackerRule = new events.Rule(
   listenerTrackerLambda.stack,
   'ListenerTrackerRule',
   {
-    ruleName: 'ListenerTrackerEveryMinute-v2',
+    ruleName: 'ListenerTrackerEveryMinute',
     description: 'Tracks detailed listener analytics every minute',
     schedule: events.Schedule.rate(Duration.minutes(1))
   }
@@ -1338,21 +1348,25 @@ const eip = new ec2.CfnEIP(streamPlaylistLambda.stack, 'StreamServerEIP', {
 new CfnOutput(streamPlaylistLambda.stack, 'StreamServerPublicIP', {
   value: eip.ref,
   description: 'Elastic IP of stream server (fixed)',
+  exportName: 'StreamServerPublicIP',
 })
 
 new CfnOutput(streamPlaylistLambda.stack, 'StreamURL', {
   value: `http://${eip.ref}:8000/stream.mp3`,
   description: 'Radio stream URL',
+  exportName: 'StreamURL',
 })
 
 new CfnOutput(streamPlaylistLambda.stack, 'IcecastAdminURL', {
   value: `http://${eip.ref}:8000/admin/`,
   description: 'Icecast admin interface',
+  exportName: 'IcecastAdminURL',
 })
 
 new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
   value: playlistBucket.bucketName,
   description: 'S3 bucket for playlists',
+  exportName: 'PlaylistBucketName',
 })
 
 // NOTE: Removed TrackQueueUrl output - using M3U files now
@@ -1360,6 +1374,7 @@ new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
 new CfnOutput(streamPlaylistLambda.stack, 'StreamServerInstanceId', {
   value: streamInstance.instanceId,
   description: 'EC2 instance ID for stream server',
+  exportName: 'StreamServerInstanceId',
 })
 
 // =============================================================================
@@ -1389,6 +1404,7 @@ const coverUrlFunctionUrl = getCoverUrlLambda.addFunctionUrl({
 new CfnOutput(backend.getCoverUrl.resources.lambda.stack, 'CoverUrlFunctionUrl', {
   value: coverUrlFunctionUrl.url,
   description: 'Public URL for getting cover art signed URLs',
+  exportName: 'CoverUrlFunctionUrl',
 })
 
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
