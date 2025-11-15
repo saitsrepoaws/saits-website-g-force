@@ -8,7 +8,77 @@
 ## 🎯 SYSTEM BLOCKS (BLOKKEN)
 
 ### End-to-End Testing & Recovery
-- [BLOK LIBERY](BLOK_LIBERY_END_TO_END.md) - **📚 Track Library System** - Upload, metadata, BPM, cover art, waveform
+
+De complete G-Forge radio platform bestaat uit 6 hoofdblokken. Elk blok heeft eigen documentatie voor testing, troubleshooting en recovery.
+
+**📋 Overview:** [System Blocks Overview](SYSTEM_BLOCKS_OVERVIEW.md) - Complete overzicht van alle 6 blokken
+
+**Status Legend:**
+- ✅ Documented & Tested
+- 🚧 Documentation in progress
+- ⏳ Pending documentation
+
+---
+
+#### 1. BLOK LIBERY - Track Library System ✅
+- [BLOK LIBERY](BLOK_LIBERY_END_TO_END.md) - **📚 Track Library**
+- Upload MP3, metadata extraction, BPM/Key detection, cover art, waveform generation
+- Components: Libery UI, audio-metadata Lambda, waveform-generator Lambda, audio-analyzer Docker Lambda
+- Status: ✅ Documented & Working
+
+#### 2. BLOK PLAY - Real-time Player 🚧
+- [BLOK PLAY](BLOK_PLAY_END_TO_END.md) - **🎵 Radio Player**
+- Real-time audio player, IoT PubSub, track info, now playing, sync across devices
+- Components: Player UI, player-iot-publisher Lambda, player-load-handler Lambda, IoT Core
+- Status: 🚧 Pending documentation
+
+#### 3. BLOK PLAYLIST - Playlist Management 🚧
+- [BLOK PLAYLIST](BLOK_PLAYLIST_END_TO_END.md) - **📋 Playlist System**
+- Create playlists, smart generation, genre mix, BPM/Key filtering, track selection
+- Components: Playlist UI, playlist-generator Lambda, track-queue-manager Lambda, genre-merger Lambda
+- Status: 🚧 Pending documentation
+
+#### 4. BLOK PLANNER - Radio Scheduler 🚧
+- [BLOK PLANNER](BLOK_PLANNER_END_TO_END.md) - **📅 Radio Station Scheduler**
+- Hourly scheduling, time slots, playlist rotation, news bulletins, automated programming
+- Components: Scheduler UI, radio-scheduler Lambda, stream-playlist-updater Lambda, EventBridge
+- Status: 🚧 Pending documentation
+
+#### 5. BLOK EC2 - Stream Server 🚧
+- [BLOK EC2](BLOK_EC2_END_TO_END.md) - **🖥️ Stream Server Infrastructure**
+- EC2 instance, Liquidsoap, Icecast, Nginx, Stereo Tool, SQS queue processing
+- Components: EC2 (46.137.184.91), Liquidsoap config, stream-monitor Lambda, CloudFront
+- Status: 🚧 Pending documentation
+
+#### 6. BLOK STREAMING - Audio Processing 🚧
+- [BLOK STREAMING](BLOK_STREAMING_END_TO_END.md) - **🎚️ Audio Processing Pipeline**
+- Crossfade, normalization, EQ, Stereo Tool processing, track transitions, audio quality
+- Components: crossfade-controller Lambda, Stereo Tool, Liquidsoap audio processing
+- Status: 🚧 Pending documentation
+
+---
+
+### Testing Strategy
+
+**Systematische aanpak:**
+1. Test elk BLOK individueel (unit test)
+2. Test BLOKken samen (integration test)
+3. Test complete flow (end-to-end test)
+
+**Test volgorde:**
+```
+BLOK LIBERY (upload) 
+    ↓
+BLOK PLAYLIST (organize)
+    ↓
+BLOK PLANNER (schedule)
+    ↓
+BLOK EC2 (stream)
+    ↓
+BLOK STREAMING (process)
+    ↓
+BLOK PLAY (listen)
+```
 
 ---
 
