@@ -25,7 +25,7 @@ const dynamoClient = new DynamoDBClient({})
 const dynamodb = DynamoDBDocumentClient.from(dynamoClient)
 const lambda = new LambdaClient({})
 
-const ICECAST_URL = 'http://46.137.184.91:8000'
+const ICECAST_URL = 'http://79.125.44.178:8000'
 const PLAYLIST_BUCKET = process.env.PLAYLIST_BUCKET || ''
 const PLAYER_STATE_TABLE = process.env.PLAYER_STATE_TABLE || ''
 const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''

@@ -46,7 +46,7 @@ interface HealthCheck {
  */
 async function checkIcecast(): Promise<{ up: boolean, bitrate: number | null, listeners: number, track: string | null }> {
   return new Promise((resolve) => {
-    const req = http.get('http://46.137.184.91:8000/status-json.xsl', (res) => {
+    const req = http.get('http://79.125.44.178:8000/status-json.xsl', (res) => {
       let data = ''
       
       res.on('data', (chunk) => data += chunk)

@@ -13,7 +13,7 @@ import { createHash } from 'crypto'
 
 const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
-const ICECAST_URL = 'http://46.137.184.91:8000'
+const ICECAST_URL = 'http://79.125.44.178:8000'
 const ICECAST_ADMIN_USER = 'admin'
 const ICECAST_ADMIN_PASS = 'gforge2024radio'
 const SESSION_TABLE = process.env.SESSION_TABLE || ''
