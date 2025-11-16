@@ -10,6 +10,11 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "test:smoke": "./tests/scripts/run-smoke-tests.sh",
+    "test:regression": "./tests/scripts/run-regression-tests.sh",
+    "test:all": "./tests/scripts/run-all-tests.sh",
+    "test:watch": "vitest watch",
+    "test:ui": "vitest --ui",
     "format": "prettier -w .",
     "typecheck": "tsc -v && turbo run typecheck"
   },
@@ -18,12 +23,15 @@
   "license": "ISC",
   "devDependencies": {
     "@aws-amplify/backend": "^1.16.1",
+    "@types/node": "^20.19.22",
+    "@vitest/ui": "^4.0.9",
     "aws-cdk-lib": "^2.220.0",
     "esbuild": "^0.25.11",
     "eslint": "^9.38.0",
     "prettier": "^3.6.2",
     "turbo": "^2.5.8",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.932.0",
