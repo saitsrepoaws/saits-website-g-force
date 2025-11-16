@@ -1,0 +1,48 @@
+# =============================================================================
+# G-FORGE RADIO - SMOKE TESTS
+# =============================================================================
+#
+# Quick sanity checks to ensure basic functionality
+# Duration: < 30 seconds
+# Pass rate required: >= 90% (11/12 tests)
+#
+# =============================================================================
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - npm install -g pnpm@10.19.0
+      
+  pre_build:
+    commands:
+      - echo "🔥 Running Smoke Tests..."
+      - pnpm install --frozen-lockfile
+      
+  build:
+    commands:
+      - echo "🧪 Smoke Test Suite - Critical Functionality"
+      - pnpm run test:smoke
+      
+  post_build:
+    commands:
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then
+          echo "✅ Smoke tests PASSED"
+        else
+          echo "❌ Smoke tests FAILED - blocking deployment"
+          exit 1
+        fi
+
+reports:
+  smoke_tests:
+    files:
+      - 'test-results/smoke/*.xml'
+    file-format: 'JUNITXML'
+
+cache:
+  paths:
+    - 'node_modules/**/*'

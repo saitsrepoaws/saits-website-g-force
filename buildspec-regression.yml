@@ -1,0 +1,48 @@
+# =============================================================================
+# G-FORGE RADIO - REGRESSION TESTS
+# =============================================================================
+#
+# Comprehensive test suite for all features
+# Duration: 2-5 minutes
+# Pass rate required: >= 85% (40/48 tests)
+#
+# =============================================================================
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - npm install -g pnpm@10.19.0
+      
+  pre_build:
+    commands:
+      - echo "🔬 Running Regression Tests..."
+      - pnpm install --frozen-lockfile
+      
+  build:
+    commands:
+      - echo "🧪 Regression Test Suite - Full Coverage"
+      - pnpm run test:regression
+      
+  post_build:
+    commands:
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then
+          echo "✅ Regression tests PASSED"
+        else
+          echo "❌ Regression tests FAILED - blocking deployment"
+          exit 1
+        fi
+
+reports:
+  regression_tests:
+    files:
+      - 'test-results/regression/*.xml'
+    file-format: 'JUNITXML'
+
+cache:
+  paths:
+    - 'node_modules/**/*'
