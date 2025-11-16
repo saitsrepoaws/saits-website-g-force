@@ -20,6 +20,7 @@ import { trackCompletionHandler } from './functions/track-completion-handler/res
 import { getCoverUrl } from './functions/get-cover-url/resource'
 import { trackQueueManager } from './functions/track-queue-manager/resource'
 import { genreMerger } from './functions/genre-merger/resource'
+import { playerConnectHandler } from './functions/player-connect-handler/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -71,7 +72,8 @@ export const backend = defineBackend({
   // listenerTracker, // DISABLED: esbuild bundling issue
   getCoverUrl,
   trackQueueManager,
-  genreMerger
+  genreMerger,
+  playerConnectHandler
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -517,6 +519,50 @@ new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
   value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${crossfadeIotRule.ruleName}`,
   description: 'ARN of the IoT Rule for cross-fade control',
 })
+
+// =============================================================================
+// Player Connect Handler - IoT Lifecycle Event
+// =============================================================================
+// Gerard's brilliant idea: Send current track to player immediately on connect! ⚡
+
+const playerConnectLambda = backend.playerConnectHandler.resources.lambda
+
+// Grant IoT permission to invoke player-connect-handler
+playerConnectLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
+
+// Grant Lambda permission to publish to IoT (player-specific topics)
+playerConnectLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/stream/player/*'],
+  })
+)
+
+// IoT Lifecycle Rule - triggers when player connects
+const playerConnectRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerConnectLifecycleRule', {
+  ruleName: 'PlayerConnectLifecycle_v2',
+  topicRulePayload: {
+    sql: "SELECT * FROM '$aws/events/presence/connected/+'",
+    description: 'Trigger Lambda when player connects to send current track instantly',
+    actions: [
+      {
+        lambda: {
+          functionArn: playerConnectLambda.functionArn,
+        },
+      },
+    ],
+    awsIotSqlVersion: '2016-03-23',
+  },
+})
+
+// Player Connect Rule output
+new CfnOutput(stateMachineStack, 'PlayerConnectRuleArn', {
+  value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${playerConnectRule.ruleName}`,
+  description: 'ARN of the IoT Lifecycle Rule for player connect events',
+})
+
+console.log('📡 Player Connect Handler configured with IoT Lifecycle event')
 
 // =============================================================================
 // Radio Scheduler - EventBridge Schedule (runs every minute)
