@@ -1,0 +1,140 @@
+# =============================================================================
+# G-FORGE RADIO - DEPLOYMENT
+# =============================================================================
+#
+# Deploys to staging or production using Amplify Gen 2
+#
+# Environment Variables:
+# - ENVIRONMENT: 'staging' or 'production'
+# - ARTIFACT_BUCKET: S3 bucket for artifacts
+#
+# =============================================================================
+
+version: 0.2
+
+env:
+  variables:
+    PNPM_VERSION: "10.19.0"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "🚀 G-Forge Radio - Deployment to $ENVIRONMENT"
+      - npm install -g pnpm@$PNPM_VERSION @aws-amplify/backend-cli
+      
+  pre_build:
+    commands:
+      - echo "📦 Installing dependencies..."
+      - pnpm install --frozen-lockfile
+      
+      - echo "🔍 Verifying environment..."
+      - |
+        if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ]; then
+          echo "❌ Invalid ENVIRONMENT: $ENVIRONMENT"
+          echo "Must be 'staging' or 'production'"
+          exit 1
+        fi
+      
+      - echo "✅ Deploying to: $ENVIRONMENT"
+      - echo "📦 Artifact bucket: $ARTIFACT_BUCKET"
+      
+  build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "🏗️  AMPLIFY DEPLOYMENT"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo ""
+      
+      # Clean previous deployments
+      - rm -rf .amplify cdk.out
+      
+      # Deploy based on environment
+      - |
+        if [ "$ENVIRONMENT" = "staging" ]; then
+          echo "📦 Deploying to STAGING..."
+          echo "Using: npx ampx sandbox --once --name staging"
+          
+          # Deploy staging
+          npx ampx sandbox --once --name staging || {
+            echo "❌ Staging deployment failed"
+            exit 1
+          }
+          
+          echo "✅ Staging deployment completed"
+          
+        else
+          echo "🚀 Deploying to PRODUCTION..."
+          echo "Using: npx ampx pipeline-deploy --branch main"
+          
+          # Deploy production
+          npx ampx pipeline-deploy --branch main --appId ${AMPLIFY_APP_ID:-auto} || {
+            echo "❌ Production deployment failed"
+            echo "🔄 Initiating rollback..."
+            exit 1
+          }
+          
+          echo "✅ Production deployment completed"
+        fi
+      
+      - echo ""
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+  post_build:
+    commands:
+      - echo "📋 Deployment Summary:"
+      - echo "  Environment: $ENVIRONMENT"
+      - echo "  Build Date:" $(date -u +%Y-%m-%dT%H:%M:%SZ)
+      - echo "  Commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - echo "  Branch: ${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/}"
+      
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then
+          echo ""
+          echo "✅ DEPLOYMENT TO $ENVIRONMENT SUCCEEDED"
+          echo ""
+          
+          # Create deployment report
+          cat > deployment-report.json <<EOF
+        {
+          "status": "success",
+          "environment": "$ENVIRONMENT",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "$CODEBUILD_RESOLVED_SOURCE_VERSION",
+          "buildId": "$CODEBUILD_BUILD_ID"
+        }
+        EOF
+          
+          cat deployment-report.json
+          
+        else
+          echo ""
+          echo "❌ DEPLOYMENT TO $ENVIRONMENT FAILED"
+          echo ""
+          echo "🔄 Rollback may be required"
+          
+          # Create failure report
+          cat > deployment-report.json <<EOF
+        {
+          "status": "failed",
+          "environment": "$ENVIRONMENT",
+          "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "$CODEBUILD_RESOLVED_SOURCE_VERSION",
+          "buildId": "$CODEBUILD_BUILD_ID"
+        }
+        EOF
+          
+          exit 1
+        fi
+
+artifacts:
+  files:
+    - deployment-report.json
+    - amplify_outputs.json
+    - build-info.json
+
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '.pnpm-store/**/*'

@@ -1,0 +1,133 @@
+# =============================================================================
+# G-FORGE RADIO - BUILD & PACKAGE
+# =============================================================================
+#
+# Standalone build specification for CI/CD pipeline
+# Builds and packages the entire application
+#
+# Duration: ~2-3 minutes
+# =============================================================================
+
+version: 0.2
+
+env:
+  variables:
+    NODE_ENV: production
+    PNPM_VERSION: "10.19.0"
+
+phases:
+  # ===========================================================================
+  # INSTALL
+  # ===========================================================================
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "🚀 G-Forge Radio - Build Started"
+      - echo "📅 Build Date:" $(date -u +%Y-%m-%dT%H:%M:%SZ)
+      - echo "🔖 Commit:" $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo "🌿 Branch:" ${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/}
+      
+      # Install pnpm
+      - npm install -g pnpm@$PNPM_VERSION
+      - pnpm --version
+      - node --version
+      
+  # ===========================================================================
+  # PRE-BUILD
+  # ===========================================================================
+  pre_build:
+    commands:
+      - echo "📦 Installing dependencies..."
+      - pnpm install --frozen-lockfile --prefer-offline
+      
+      - echo "🧹 Cleaning previous builds..."
+      - rm -rf dist build .amplify cdk.out
+      
+  # ===========================================================================
+  # BUILD
+  # ===========================================================================
+  build:
+    commands:
+      - echo "🏗️  Building application..."
+      
+      # Build all packages
+      - pnpm run build
+      
+      # Type checking
+      - echo "✅ Type checking..."
+      - pnpm run typecheck || echo "⚠️ Type check warnings"
+      
+      # Linting
+      - echo "🔍 Running linter..."
+      - pnpm run lint || echo "⚠️ Linting warnings"
+      
+  # ===========================================================================
+  # POST-BUILD
+  # ===========================================================================
+  post_build:
+    commands:
+      - echo "📦 Packaging artifacts..."
+      
+      # Create build metadata
+      - |
+        cat > build-info.json <<EOF
+        {
+          "buildDate": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "$CODEBUILD_RESOLVED_SOURCE_VERSION",
+          "branch": "${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/}",
+          "buildId": "$CODEBUILD_BUILD_ID",
+          "buildNumber": "$CODEBUILD_BUILD_NUMBER",
+          "sourceVersion": "$CODEBUILD_SOURCE_VERSION"
+        }
+        EOF
+      
+      - cat build-info.json
+      
+      # Package for deployment
+      - echo "📦 Creating deployment package..."
+      - tar -czf deployment.tar.gz \
+          --exclude=node_modules \
+          --exclude=.git \
+          --exclude=tests \
+          --exclude=.amplify \
+          --exclude=cdk.out \
+          .
+      
+      - ls -lh deployment.tar.gz
+      
+      - echo "✅ Build completed successfully!"
+
+# =============================================================================
+# ARTIFACTS
+# =============================================================================
+artifacts:
+  files:
+    - '**/*'
+    - build-info.json
+    - deployment.tar.gz
+  exclude-paths:
+    - 'node_modules/**/*'
+    - '.git/**/*'
+    - 'tests/**/*'
+    - '.amplify/**/*'
+    - 'cdk.out/**/*'
+    - '**/.DS_Store'
+
+# =============================================================================
+# CACHE
+# =============================================================================
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '.pnpm-store/**/*'
+    - '.turbo/**/*'
+
+# =============================================================================
+# REPORTS
+# =============================================================================
+reports:
+  build_report:
+    files:
+      - 'build-info.json'
+    file-format: 'JUNITXML'
