@@ -72,7 +72,7 @@ Status: Deployed
 
 ### Origin Configuration
 ```
-Origin: ec2-46-137-184-91.eu-west-1.compute.amazonaws.com
+Origin: ec2-79.125.44.178.eu-west-1.compute.amazonaws.com
 Port: 8000 (Icecast)
 Protocol: HTTP
 Timeout: 30s
@@ -139,7 +139,7 @@ HTTP:  http://www.splashfm.nl
 
 ### Direct/Fallback (EC2)
 ```
-HTTP: http://46.137.184.91:8000/stream.mp3
+HTTP: http://79.125.44.178:8000/stream.mp3
 ```
 
 ---
@@ -172,7 +172,7 @@ HTTP: http://46.137.184.91:8000/stream.mp3
          │ (Origin: EC2:8000)
          ▼
 ┌─────────────────────────────────────┐
-│  EC2: 46.137.184.91:8000            │
+│  EC2: 79.125.44.178:8000            │
 │  • Icecast2 Server                  │
 │  • Liquidsoap Playout               │
 │  • Advanced Crossfade               │
@@ -406,7 +406,7 @@ aws cloudfront get-distribution --id E2VXYMID4ZAMSJ \
 **Solution:**
 ```bash
 # 1. Check origin (EC2) is accessible
-curl -I http://46.137.184.91:8000/stream.mp3
+curl -I http://79.125.44.178:8000/stream.mp3
 
 # 2. Verify Icecast is running
 ssh radio-ec2 "sudo systemctl status icecast2"
@@ -422,7 +422,7 @@ aws cloudfront get-distribution --id E2VXYMID4ZAMSJ \
 **Solution:**
 ```bash
 # 1. Test direct EC2 URL first
-curl http://46.137.184.91:8000/stream.mp3 | head -c 1000
+curl http://79.125.44.178:8000/stream.mp3 | head -c 1000
 
 # 2. Check CloudFront is passing through correctly
 curl https://stream.splashfm.nl/stream.mp3 | head -c 1000
@@ -444,7 +444,7 @@ export const STREAM_CONFIG = {
   primaryUrl: 'https://stream.splashfm.nl/stream.mp3',
   
   // Fallback: Direct EC2 (if CloudFront fails)
-  fallbackUrl: 'http://46.137.184.91:8000/stream.mp3',
+  fallbackUrl: 'http://79.125.44.178:8000/stream.mp3',
   
   // Status page
   statusUrl: 'https://stream.splashfm.nl/status-json.xsl'
@@ -482,7 +482,7 @@ const Player = () => {
 
 <script>
   const player = document.getElementById('radio-player');
-  const fallbackUrl = 'http://46.137.184.91:8000/stream.mp3';
+  const fallbackUrl = 'http://79.125.44.178:8000/stream.mp3';
   
   player.addEventListener('error', () => {
     console.warn('Switching to fallback stream');

@@ -1,7 +1,7 @@
 # 🔍 EC2 Inspection Report - Crossfade Integration
 
 **Date**: 9 November 2025, 19:30 CET
-**Instance**: i-0426ac5a6811b0d2a (46.137.184.91)
+**Instance**: i-0426ac5a6811b0d2a (79.125.44.178)
 **Method**: AWS SSM Session Manager
 
 ---
@@ -12,7 +12,7 @@
 ```
 Liquidsoap: Active (running normally)
 Icecast:    Active (running normally)
-Stream:     LIVE on http://46.137.184.91:8000/stream.mp3
+Stream:     LIVE on http://79.125.44.178:8000/stream.mp3
 ```
 
 ### 📁 File Locations on EC2

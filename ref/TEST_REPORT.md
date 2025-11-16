@@ -203,7 +203,7 @@ radio = normalize(radio)
 
 **EC2 Instance**:
 ```
-IP: 46.137.184.91
+IP: 79.125.44.178
 Instance ID: i-0426ac5a6811b0d2a
 State: running
 ```
@@ -224,7 +224,7 @@ State: running
 }
 ```
 
-**Stream URL**: http://46.137.184.91:8000/stream.mp3
+**Stream URL**: http://79.125.44.178:8000/stream.mp3
 **Public URL**: http://radio.g-forge.com:8000/stream.mp3
 
 ✅ **Stream has been running since Friday 7 Nov, 20:54 UTC**
@@ -466,7 +466,7 @@ Schema: Extended ✓
 
 ### Icecast
 ```
-Server: 46.137.184.91:8000
+Server: 79.125.44.178:8000
 Status: Live since 2025-11-07 20:54:53
 Current Track: Playing ✓
 Bitrate: 192 kbps

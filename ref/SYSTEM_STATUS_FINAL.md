@@ -8,7 +8,7 @@
 ## 🎵 **PLAYER PAGINA**
 
 ```
-URL:          http://46.137.184.91/
+URL:          http://79.125.44.178/
 Design:       ✅ Oranje/Blauwe gradient (ORIGINEEL)
 Logo:         ✅ SVG "Splash FM" logo
 Stream:       ✅ Stereo Tool Processed Output
@@ -30,7 +30,7 @@ Audio:        ✅ WERKT! Audio data verified
 ```
 1. /stream-processed.mp3  ✅ Stereo Tool Professional (192 kbps)
    └─ Via: Liquidsoap → stream-raw → Stereo Tool → Icecast
-   └─ URL: http://46.137.184.91:8000/stream-processed.mp3
+   └─ URL: http://79.125.44.178:8000/stream-processed.mp3
 
 2. /stream-raw.mp3        ✅ Raw Liquidsoap Output (192 kbps)
    └─ Voor: Stereo Tool input
@@ -114,13 +114,13 @@ http://localhost:9001
 
 ### **Audio Data Test:**
 ```bash
-curl -s http://46.137.184.91:8000/stream-processed.mp3 | head -c 5000 | wc -c
+curl -s http://79.125.44.178:8000/stream-processed.mp3 | head -c 5000 | wc -c
 # Output: 5000 bytes ✅
 ```
 
 ### **Stream Status:**
 ```bash
-curl -s http://46.137.184.91:8000/status-json.xsl | jq '.icestats.source'
+curl -s http://79.125.44.178:8000/status-json.xsl | jq '.icestats.source'
 ```
 
 ### **Nu speelt:**
@@ -135,15 +135,15 @@ Title:  Give U Some
 
 ```
 🎵 Player (MOBIEL/DESKTOP):
-   http://46.137.184.91/
+   http://79.125.44.178/
 
 📊 Icecast Status:
-   http://46.137.184.91:8000/status-json.xsl
+   http://79.125.44.178:8000/status-json.xsl
 
 🔗 Direct Streams:
-   Main:      http://46.137.184.91/stream.mp3
-   Raw:       http://46.137.184.91:8000/stream-raw.mp3
-   Processed: http://46.137.184.91:8000/stream-processed.mp3
+   Main:      http://79.125.44.178/stream.mp3
+   Raw:       http://79.125.44.178:8000/stream-raw.mp3
+   Processed: http://79.125.44.178:8000/stream-processed.mp3
 
 🎚️ Stereo Tools:
    ssh -N -L 9001:localhost:9001 radio-ec2

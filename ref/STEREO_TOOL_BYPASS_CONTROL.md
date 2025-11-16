@@ -52,7 +52,7 @@ UI updates in real-time!
                   │ SSM RunCommand
                   ↓
 ┌─────────────────────────────────────────────────────┐
-│  EC2 Instance (46.137.184.91)                       │
+│  EC2 Instance (79.125.44.178)                       │
 │  - stereo-tool-cmd process                          │
 │  - Start/Stop/Bypass commands                       │
 │  - Status reporting                                 │

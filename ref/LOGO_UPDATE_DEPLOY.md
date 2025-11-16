@@ -91,14 +91,14 @@ grep logosplashfmfm /var/www/splashfm/index.html
 
 ### **3. HTTP Test:**
 ```bash
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 → HTTP/1.1 200 OK
 ✅ Player accessible
 ```
 
 ### **4. Logo Accessibility:**
 ```bash
-curl -I http://46.137.184.91/logosplashfmfm.png
+curl -I http://79.125.44.178/logosplashfmfm.png
 → HTTP/1.1 200 OK
 → Content-Type: image/png
 → Content-Length: 92KB

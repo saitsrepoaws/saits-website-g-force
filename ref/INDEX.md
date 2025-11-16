@@ -87,7 +87,7 @@ De complete G-Forge radio platform bestaat uit 6 hoofdblokken. Elk blok heeft ei
 #### 5. BLOK EC2 - Stream Server 🚧
 - [BLOK EC2](BLOK_EC2_END_TO_END.md) - **🖥️ Stream Server Infrastructure**
 - EC2 instance, Liquidsoap, Icecast, Nginx, Stereo Tool, SQS queue processing
-- Components: EC2 (46.137.184.91), Liquidsoap config, stream-monitor Lambda, CloudFront
+- Components: EC2 (79.125.44.178), Liquidsoap config, stream-monitor Lambda, CloudFront
 - Status: 🚧 Pending documentation
 
 #### 6. BLOK STREAMING - Audio Processing 🚧

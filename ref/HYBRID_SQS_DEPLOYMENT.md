@@ -184,7 +184,7 @@ aws sqs get-queue-attributes \
 ssh radio-ec2 "tail -f /tmp/liquidsoap.log"
 
 # Check stream status
-curl http://46.137.184.91/status-json.xsl | jq '.icestats.source'
+curl http://79.125.44.178/status-json.xsl | jq '.icestats.source'
 
 # Monitor Lambda
 aws logs tail /aws/lambda/$LAMBDA_NAME --follow --region eu-west-1
@@ -314,7 +314,7 @@ aws cloudwatch get-metric-statistics \
 ### **Stream Health:**
 ```bash
 # Icecast status
-curl -s http://46.137.184.91/status-json.xsl | \
+curl -s http://79.125.44.178/status-json.xsl | \
   jq '.icestats.source[] | {mount, title, listeners}'
 ```
 

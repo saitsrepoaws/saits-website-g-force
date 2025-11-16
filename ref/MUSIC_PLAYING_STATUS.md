@@ -8,7 +8,7 @@
 ## 🎵 **CURRENT STREAM STATUS:**
 
 ```
-🎧 Stream URL:     http://46.137.184.91/stream.mp3
+🎧 Stream URL:     http://79.125.44.178/stream.mp3
 🎵 Nu speelt:      Alaia & Gallo - Lipstick
 👥 Listeners:      1
 ✅ Status:         PLAYING
@@ -35,7 +35,7 @@
 📂 Tracks:         /var/radio/tracks/*.wav/*.mp3
 🎚️  Liquidsoap:     /opt/radio/radio.liq (file-based)
 🔊 Icecast:        localhost:8000
-🌐 Stream:         http://46.137.184.91/stream.mp3
+🌐 Stream:         http://79.125.44.178/stream.mp3
 ```
 
 ---
@@ -191,11 +191,11 @@ NU gewoon genieten van de stream! 😎
 ## 🌐 **LINKS:**
 
 ```
-🎧 Stream:          http://46.137.184.91/stream.mp3
-📊 Status:          http://46.137.184.91:8000/status-json.xsl
+🎧 Stream:          http://79.125.44.178/stream.mp3
+📊 Status:          http://79.125.44.178:8000/status-json.xsl
 🎚️  Stereo Tools:   ssh -N -L 9001:localhost:9001 radio-ec2
                     → http://localhost:9001
-🎨 Player:          http://46.137.184.91/ (SplashFM homepage)
+🎨 Player:          http://79.125.44.178/ (SplashFM homepage)
 ```
 
 ---

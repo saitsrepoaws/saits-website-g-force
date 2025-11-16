@@ -193,7 +193,7 @@ Result: ✅ SUCCESS
 └─────────────────────────────────────────────────────────┘
                ↓
 ┌─────────────────────────────────────────────────────────┐
-│  LIQUIDSOAP (EC2: 46.137.184.91)                       │
+│  LIQUIDSOAP (EC2: 79.125.44.178)                       │
 │  ├─ Check queue size every 10s                         │
 │  ├─ If size < 2 → Invoke Lambda async                  │
 │  ├─ Receive message from SQS (long polling 20s)        │

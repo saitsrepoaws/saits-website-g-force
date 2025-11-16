@@ -39,7 +39,7 @@ Result:   🎉 FUCKING LEGENDARY! 🎉
 ```
 ✅ SQS FIFO Queue              2 TRACKS QUEUED
 ✅ Liquidsoap updated          NIEUWE QUEUE URL
-✅ EC2 running                 46.137.184.91
+✅ EC2 running                 79.125.44.178
 ✅ Dev server                  http://localhost:5173
 ```
 
@@ -65,7 +65,7 @@ Result:   🎉 FUCKING LEGENDARY! 🎉
 
 ┌─────────────────────────────────────────┐
 │  🎙️  LIQUIDSOAP                         │
-│  46.137.184.91                          │
+│  79.125.44.178                          │
 │  PID: 410880                            │
 │  Status: ✅ RUNNING                     │
 │  Queue: FIFO (updated!)                 │
@@ -127,10 +127,10 @@ Features:
 ### **4. Check Stream (when ready):**
 ```bash
 # Stream URL:
-http://46.137.184.91/stream.mp3
+http://79.125.44.178/stream.mp3
 
 # Status page:
-http://46.137.184.91/
+http://79.125.44.178/
 ```
 
 ---

@@ -191,7 +191,7 @@ EventBridge triggers (every hour)
 **Purpose:** EC2 streaming infrastructure met Liquidsoap + Icecast
 
 **Components:**
-- EC2 Instance: `i-021451e919d39c898` (46.137.184.91)
+- EC2 Instance: `i-021451e919d39c898` (79.125.44.178)
 - Liquidsoap: Audio playout engine
 - Icecast: Streaming server
 - Nginx: Reverse proxy + web server

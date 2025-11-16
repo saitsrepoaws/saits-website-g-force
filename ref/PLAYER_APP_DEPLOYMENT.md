@@ -2,7 +2,7 @@
 
 **Datum:** 14 November 2025, 17:10 CET  
 **Status:** ✅ DEPLOYED  
-**URL:** http://46.137.184.91/player/
+**URL:** http://79.125.44.178/player/
 
 ---
 
@@ -19,7 +19,7 @@ Permissions: 755
 ```nginx
 server {
     listen 80;
-    server_name 46.137.184.91 radio.g-forge.com splashfm.nl;
+    server_name 79.125.44.178 radio.g-forge.com splashfm.nl;
     root /var/www/splashfm;
     
     # React Player App
@@ -160,7 +160,7 @@ sudo mv /var/www/splashfm/player.backup-20251114-171000 /var/www/splashfm/player
 
 ### **Stream Status:**
 ```javascript
-fetch('http://46.137.184.91:8000/status-json.xsl')
+fetch('http://79.125.44.178:8000/status-json.xsl')
   .then(res => res.json())
   .then(data => {
     const track = data.icestats.source.title
@@ -190,18 +190,18 @@ npm run dev
 ### **Production Check:**
 ```bash
 # HTTP status
-curl -I http://46.137.184.91/player/
+curl -I http://79.125.44.178/player/
 
 # Load HTML
-curl -s http://46.137.184.91/player/ | head -20
+curl -s http://79.125.44.178/player/ | head -20
 
 # Assets loading
-curl -I http://46.137.184.91/player/assets/index-xxx.js
+curl -I http://79.125.44.178/player/assets/index-xxx.js
 ```
 
 ### **Browser Test:**
 ```
-1. Open: http://46.137.184.91/player/
+1. Open: http://79.125.44.178/player/
 2. Check console for errors
 3. Verify stream playing
 4. Test controls (play/pause)
@@ -280,8 +280,8 @@ export default defineConfig({
 ```nginx
 location /player {
     # CORS not needed - same origin!
-    # Player served from 46.137.184.91
-    # API also from 46.137.184.91
+    # Player served from 79.125.44.178
+    # API also from 79.125.44.178
 }
 ```
 
@@ -333,11 +333,11 @@ sudo systemctl reload nginx
 ## 🎯 **URLs OVERZICHT:**
 
 ```
-Main Site:       http://46.137.184.91/
-Player App:      http://46.137.184.91/player/
-Stream:          http://46.137.184.91/stream.mp3
-Status API:      http://46.137.184.91/status-json.xsl
-Admin (old):     http://46.137.184.91/admin.html
+Main Site:       http://79.125.44.178/
+Player App:      http://79.125.44.178/player/
+Stream:          http://79.125.44.178/stream.mp3
+Status API:      http://79.125.44.178/status-json.xsl
+Admin (old):     http://79.125.44.178/admin.html
 ```
 
 ---
@@ -358,7 +358,7 @@ Deploy:
 ☐ Verify permissions
 
 After Deploy:
-☐ Test URL: http://46.137.184.91/player/
+☐ Test URL: http://79.125.44.178/player/
 ☐ Check browser console (no errors)
 ☐ Test stream playback
 ☐ Verify waveform renders

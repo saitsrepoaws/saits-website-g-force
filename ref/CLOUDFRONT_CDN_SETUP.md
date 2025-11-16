@@ -14,7 +14,7 @@ https://splashfm.nl/stream-processed.mp3
     ↓
 AWS CloudFront CDN (SSL terminatie, caching, DDoS)
     ↓
-Origin: 46.137.184.91 (Nginx reverse proxy)
+Origin: 79.125.44.178 (Nginx reverse proxy)
     ↓
 Icecast: localhost:8000/stream-processed.mp3
     ↓
@@ -28,7 +28,7 @@ Icecast: localhost:8000/stream-processed.mp3
 ### **1. Player gebruikt nu RELATIEVE URL:**
 ```html
 <!-- ❌ FOUT (direct IP): -->
-<source src="http://46.137.184.91:8000/stream-processed.mp3">
+<source src="http://79.125.44.178:8000/stream-processed.mp3">
 
 <!-- ✅ CORRECT (via CDN): -->
 <source src="/stream-processed.mp3">
@@ -50,7 +50,7 @@ location /stream-processed.mp3 {
 ### **3. CloudFront Distribution:**
 ```
 Domain:  splashfm.nl
-Origin:  46.137.184.91
+Origin:  79.125.44.178
 SSL:     ✅ HTTPS enabled
 Cache:   Configured for streaming
 ```
@@ -104,7 +104,7 @@ curl -I https://splashfm.nl/stream-processed.mp3
    https://www.splashfm.nl/
 
 ✅ Direct (HTTP - voor testen):
-   http://46.137.184.91/
+   http://79.125.44.178/
 ```
 
 ---
@@ -139,7 +139,7 @@ curl -I https://splashfm.nl/stream-processed.mp3
 │  (DDoS)         │
 └────────┬────────┘
          │
-         │ http://46.137.184.91/stream-processed.mp3
+         │ http://79.125.44.178/stream-processed.mp3
          ↓
 ┌─────────────────┐
 │  Nginx (Origin) │
@@ -177,7 +177,7 @@ Player URL:       /stream-processed.mp3 (relatief)
                   ↓
 Via CDN:          https://splashfm.nl (CloudFront)
                   ↓
-Naar Origin:      46.137.184.91 (Nginx)
+Naar Origin:      79.125.44.178 (Nginx)
                   ↓
 Naar Icecast:     localhost:8000
                   ↓

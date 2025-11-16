@@ -173,8 +173,8 @@ const signedUrl = await getSignedUrl(s3Client, getObjectCommand, {
 ✅ Lambda:               DEPLOYED & WORKING
 ✅ SQS Queue:            2 tracks queued
 ⚠️  Stream:              SILENT (parsing issue)
-✅ Stereo Tools:         http://46.137.184.91:9001
-✅ Icecast:              http://46.137.184.91:8000
+✅ Stereo Tools:         http://79.125.44.178:9001
+✅ Icecast:              http://79.125.44.178:8000
 ```
 
 ---

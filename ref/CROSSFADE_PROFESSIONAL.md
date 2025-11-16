@@ -86,5 +86,5 @@ radio = smart_cross(
 Playlist → Crossfade (5s) → [StereoTool] → MP3 Encoder (192kbps) → Icecast
 ```
 
-**Stream**: http://46.137.184.91:8000/stream.mp3
+**Stream**: http://79.125.44.178:8000/stream.mp3
 **Config**: `/opt/radio/radio.liq` on EC2

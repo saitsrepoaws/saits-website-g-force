@@ -27,7 +27,7 @@ Port 9001: ✅ OPEN (0.0.0.0/0)
 
 ### **URL:**
 ```
-http://46.137.184.91:9001
+http://79.125.44.178:9001
 ```
 
 ### **Status:**
@@ -119,7 +119,7 @@ location /stereo-tools/ {
 }
 
 # Then access:
-http://46.137.184.91/stereo-tools/
+http://79.125.44.178/stereo-tools/
 ```
 
 ### **Option 4: Check License/Registration**

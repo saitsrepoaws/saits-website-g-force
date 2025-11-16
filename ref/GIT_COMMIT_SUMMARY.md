@@ -65,7 +65,7 @@ Technical:
 - Commercial auto-detection in upload flow
 
 Infrastructure:
-- EC2: 46.137.184.91 (Liquidsoap, Icecast, Stereo Tool, Nginx)
+- EC2: 79.125.44.178 (Liquidsoap, Icecast, Stereo Tool, Nginx)
 - CDN: https://splashfm.nl
 - Streams: /stream.mp3, /stream-raw.mp3, /stream-processed.mp3
 

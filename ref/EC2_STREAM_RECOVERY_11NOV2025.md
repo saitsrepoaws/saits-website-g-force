@@ -16,7 +16,7 @@ Stream was volledig dood na sandbox redeploy.
 ### Instance Status
 - **Oude ID**: `i-0174c8094bb791cbc` ❌ (bestaat niet meer)
 - **Nieuwe ID**: `i-021451e919d39c898` ✅ (running)
-- **IP**: `46.137.184.91` (zelfde Elastic IP)
+- **IP**: `79.125.44.178` (zelfde Elastic IP)
 
 ### User Data Failure
 ```
@@ -38,7 +38,7 @@ aws ssm send-command --instance-ids i-021451e919d39c898 ...
 
 # SSH config updated
 Host radio-ec2
-    HostName 46.137.184.91
+    HostName 79.125.44.178
     User ubuntu
     IdentityFile ~/.ssh/ec2-radio-key
 ```
@@ -107,9 +107,9 @@ aws s3 cp s3://radio-playlists-035636364722/splash-fm-standalone.html /var/www/r
 ```
 
 ### URLs
-- **Homepage**: http://46.137.184.91/
-- **Stream**: http://46.137.184.91/stream.mp3
-- **Status**: http://46.137.184.91/status-json.xsl
+- **Homepage**: http://79.125.44.178/
+- **Stream**: http://79.125.44.178/stream.mp3
+- **Status**: http://79.125.44.178/status-json.xsl
 
 ---
 
@@ -143,7 +143,7 @@ sudo systemctl reload nginx
 
 ### Check Stream
 ```bash
-curl -s http://46.137.184.91/status-json.xsl | jq -r '.icestats.source'
+curl -s http://79.125.44.178/status-json.xsl | jq -r '.icestats.source'
 ```
 
 ---
@@ -225,7 +225,7 @@ Voor volgende keer dat stream down is:
 
 6. **Verify Stream**
    ```bash
-   curl http://46.137.184.91/status-json.xsl | jq
+   curl http://79.125.44.178/status-json.xsl | jq
    ```
 
 ---

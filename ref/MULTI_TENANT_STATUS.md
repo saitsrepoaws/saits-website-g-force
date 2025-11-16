@@ -253,7 +253,7 @@ const splashFmStation = await createStation({
   name: "SplashFM",
   slug: "splashfm",
   cognitoGroup: "splashfm",
-  streamUrl: "http://46.137.184.91:8000/stream.mp3",
+  streamUrl: "http://79.125.44.178:8000/stream.mp3",
   timezone: "Europe/Amsterdam",
   primaryColor: "#ff6b35"
 })

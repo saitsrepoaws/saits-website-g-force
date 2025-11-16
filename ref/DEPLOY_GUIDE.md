@@ -1,7 +1,7 @@
 # 🚀 Deploy Guide - Quick Reference
 
 **Date:** 14 November 2025  
-**System:** EC2 (46.137.184.91) + S3 + Local Git
+**System:** EC2 (79.125.44.178) + S3 + Local Git
 
 ---
 
@@ -168,7 +168,7 @@ nano server-configs/nginx-splashfm.conf
 # Deploy (auto Nginx reload)
 ./deploy.sh nginx
 
-# Test: curl http://46.137.184.91/
+# Test: curl http://79.125.44.178/
 ```
 
 ### **3. Change Icecast settings:**
@@ -220,7 +220,7 @@ nano server-configs/stereotool-relay.sh
    Tool:      AWS S3 (versioning enabled)
 
 3. 🖥️ EC2 INSTANCE
-   Location:  46.137.184.91
+   Location:  79.125.44.178
    Purpose:   Live production configs
    Tool:      SSH/SCP
 ```
@@ -265,7 +265,7 @@ ssh radio-ec2 "systemctl status liquidsoap nginx icecast2"
 
 ```bash
 # Stream check (auto bij deploy)
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 
 # Liquidsoap logs
 ssh radio-ec2 "tail -20 /tmp/liquidsoap.log"
@@ -392,7 +392,7 @@ server-configs/stereotool-relay.sh    → /usr/local/bin/stereotool-relay.sh
 ./restart-liquidsoap.sh
 
 # Check stream
-curl http://46.137.184.91/
+curl http://79.125.44.178/
 ```
 
 ---
@@ -427,7 +427,7 @@ ssh radio-ec2 "tail -20 /tmp/liquidsoap.log"
 nano server-configs/nginx-splashfm.conf
 # Add: add_header Access-Control-Allow-Origin "*";
 ./deploy.sh nginx
-curl -I http://46.137.184.91/stream.mp3
+curl -I http://79.125.44.178/stream.mp3
 ```
 
 ### **Example 3: New Icecast mount point**
