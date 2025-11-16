@@ -21,6 +21,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
   // 📊 LOCAL STATE
   // ============================================
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [showIoTStatus, setShowIoTStatus] = useState(false)
   
   // Track info for UI display
   const [trackInfo, setTrackInfo] = useState<any>(null)
@@ -398,22 +399,35 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
           </div>
         </div>
 
-        {/* Connection Status */}
-        <div className="flex items-center justify-center gap-4 text-xs mb-4">
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${iot.connectionState === 'Connected' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-            <span className="text-white font-medium">
-              {iot.connectionState === 'Connected' ? 'IoT' : 'Offline'}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
-            <span className="text-white font-medium">
-              {isSubscribed ? 'Sub' : 'No Sub'}
-            </span>
-          </div>
+        {/* IoT Status Toggle */}
+        <div className="flex items-center justify-center mb-2">
+          <button
+            onClick={() => setShowIoTStatus(!showIoTStatus)}
+            className="px-3 py-1 text-xs text-white/60 hover:text-white/90 transition-colors"
+            title={showIoTStatus ? 'Hide IoT status' : 'Show IoT status'}
+          >
+            {showIoTStatus ? '▼ Hide Debug' : '▶ Show Debug'}
+          </button>
         </div>
+
+        {/* Connection Status (Collapsible) */}
+        {showIoTStatus && (
+          <div className="flex items-center justify-center gap-4 text-xs mb-4 animate-fadeIn">
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${iot.connectionState === 'Connected' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+              <span className="text-white font-medium">
+                {iot.connectionState === 'Connected' ? 'IoT' : 'Offline'}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
+              <span className="text-white font-medium">
+                {isSubscribed ? 'Sub' : 'No Sub'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Cover Art Display */}
         {coverArtUrl && (
