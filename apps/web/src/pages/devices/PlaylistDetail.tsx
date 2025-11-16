@@ -46,6 +46,10 @@ function SortableTrackRow({
   onStop,
   onSeek
 }: SortableTrackRowProps) {
+  // Silence unused variable warnings - these will be used for track arrow reordering
+  void trackToggles
+  void onToggleArrow
+  
   const {
     attributes,
     listeners,

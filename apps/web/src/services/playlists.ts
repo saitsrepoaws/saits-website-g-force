@@ -1,12 +1,9 @@
 // Service layer for Playlist data operations
 import { generateClient } from 'aws-amplify/data'
 import type { 
-  Playlist, 
   CreatePlaylistInput, 
   UpdatePlaylistInput,
-  PlaylistTrackItem,
-  parsePlaylistTracks,
-  serializePlaylistTracks 
+  PlaylistTrackItem
 } from '../types/playlist'
 
 interface GeneratePlaylistInput {

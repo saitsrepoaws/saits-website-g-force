@@ -30,6 +30,9 @@ const DAY_INDEX_TO_CODE: Record<number, string> = {
   6: 'SAT'
 }
 
+// Day code to index mapping - for future schedule conflict detection
+// TODO: Use this when implementing schedule overlap validation
+/*
 const DAY_CODE_TO_INDEX: Record<string, number> = {
   SUN: 0,
   MON: 1,
@@ -39,6 +42,7 @@ const DAY_CODE_TO_INDEX: Record<string, number> = {
   FRI: 5,
   SAT: 6
 }
+*/
 
 function Planner() {
   const [playlists, setPlaylists] = useState<Playlist[]>([])

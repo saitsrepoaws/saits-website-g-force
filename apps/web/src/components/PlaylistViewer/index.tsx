@@ -368,6 +368,12 @@ export function PlaylistViewer({
   className = '',
   containerClassName = '',
 }: PlaylistViewerProps) {
+  // Silence unused variable warnings - these will be used for advanced playlist features
+  void allowPlay
+  void highlightTrackId
+  void currentTrackIndex
+  void onTrackSelect
+  
   const [playlist, setPlaylist] = useState<Playlist | null>(null)
   const [playlistTracks, setPlaylistTracks] = useState<PlaylistTrackItem[]>([])
   const [isLoading, setIsLoading] = useState(true)

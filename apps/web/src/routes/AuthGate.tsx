@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthenticator } from '@aws-amplify/ui-react'
 
@@ -13,7 +13,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     }
   }, [authStatus, location.pathname, navigate])
 
-  if (authStatus === 'configuring' || authStatus === 'loading') {
+  if (authStatus === 'configuring') {
     return <div className="p-6 text-sm text-gray-600">Loading...</div>
   }
   if (authStatus !== 'authenticated') return null

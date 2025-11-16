@@ -41,6 +41,12 @@ export function getTabId(): string {
   return TAB_ID
 }
 
+export function isEnabled(): boolean {
+  // Check if IoT endpoint is configured
+  const endpoint = (import.meta as any).env?.VITE_AWS_IOT_ENDPOINT as string | undefined
+  return !!endpoint
+}
+
 export function resetPubSub() {
   console.log('🔄 RESETTING PUBSUB INSTANCE')
   log('warn', 'Manually resetting PubSub instance')

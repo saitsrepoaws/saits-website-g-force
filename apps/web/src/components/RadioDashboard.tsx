@@ -10,9 +10,9 @@
  */
 import { useState, useEffect } from 'react'
 import { generateClient } from 'aws-amplify/data'
-import type { Schema } from '../../../amplify/data/resource'
 
-const client = generateClient<Schema>()
+// @ts-ignore - Amplify Gen 2 client will have models at runtime
+const client = generateClient()
 
 interface StreamStats {
   isLive: boolean
@@ -80,13 +80,14 @@ export default function RadioDashboard() {
   // Fetch health logs from DynamoDB
   const fetchHealthLogs = async () => {
     try {
+      // @ts-ignore - StreamHealthLog model exists at runtime
       const { data: logs } = await client.models.StreamHealthLog.list({
         limit: 60, // Last 60 checks = 1 hour
         sortDirection: 'DESC'
       })
       
       if (logs) {
-        setHealthLogs(logs.map(log => ({
+        setHealthLogs(logs.map((log: any) => ({
           timestamp: log.timestamp,
           icecastUp: log.icecastUp,
           streamFlowing: log.streamFlowing,

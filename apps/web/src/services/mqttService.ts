@@ -18,7 +18,9 @@ export class MQTTService {
   private subscriptions: Map<string, Set<MessageCallback>> = new Map()
   private connectionCallbacks: Set<ConnectionCallback> = new Set()
   private reconnectAttempts: number = 0
-  private maxReconnectAttempts: number = 5
+  // TODO: Implement auto-reconnect logic using maxReconnectAttempts
+  // private maxReconnectAttempts: number = 5
+  // private currentReconnectAttempt: number = 0
 
   constructor(endpoint: string, region: string = 'eu-west-1') {
     this.endpoint = endpoint

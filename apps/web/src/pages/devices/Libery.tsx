@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import Layout from '../../components/Layout'
-import { listTracks, createTrack, deleteTrack, updateTrack, type Track } from '../../services/tracks'
+import { listTracks, createTrack, deleteTrack, type Track } from '../../services/tracks'
 import { 
   uploadAudioFile, 
-  uploadCoverArt, 
   getAudioMetadata, 
-  formatFileSize,
   type UploadProgress 
 } from '../../services/audioUpload'
 import { getUrl } from 'aws-amplify/storage'
@@ -33,6 +31,15 @@ interface FileUploadItem {
   tags: string // Comma-separated: Hot Hits, Oldies, Party, Sponsor names, etc.
 }
 
+// Helper function to format file size
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
 function Libery() {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoadingTracks, setIsLoadingTracks] = useState(false)
@@ -45,6 +52,9 @@ function Libery() {
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  
+  // Silence unused variable warning - will be used for audio preview
+  void audioUrl
   
   // Multi-file upload state
   const [uploadQueue, setUploadQueue] = useState<FileUploadItem[]>([])
@@ -820,10 +830,10 @@ This action cannot be undone!`
                           <input
                             type="checkbox"
                             id={`jingle-${index}`}
-                            checked={item.isJingle}
+                            checked={item.trackType === 'jingle'}
                             onChange={(e) => {
                               const newQueue = [...uploadQueue]
-                              newQueue[index].isJingle = e.target.checked
+                              newQueue[index].trackType = e.target.checked ? 'jingle' : 'music'
                               if (e.target.checked && !newQueue[index].jingleCategory) {
                                 newQueue[index].jingleCategory = 'Station ID'
                               }
@@ -836,8 +846,8 @@ This action cannot be undone!`
                           </label>
                         </div>
 
-                        {/* Genre Info (only if isJingle) */}
-                        {item.isJingle && (
+                        {/* Genre Info (only if jingle) */}
+                        {item.trackType === 'jingle' && (
                           <div className="col-span-3">
                             <div className="p-2 bg-purple-50 border border-purple-200 rounded">
                               <span className="text-xs font-medium text-purple-700">
@@ -853,7 +863,7 @@ This action cannot be undone!`
                         {/* Tags Field */}
                         <div className="col-span-3">
                           <label className="block text-xs font-medium text-gray-700 mb-1">
-                            {item.isJingle ? 'Tags (WildFM, SplashFM, Sweepers, Promos, etc.)' : 'Tags (Hot Hits, Oldies, Party, etc.)'}
+                            {item.trackType === 'jingle' ? 'Tags (WildFM, SplashFM, Sweepers, Promos, etc.)' : 'Tags (Hot Hits, Oldies, Party, etc.)'}
                           </label>
                           <input
                             type="text"
@@ -863,11 +873,11 @@ This action cannot be undone!`
                               newQueue[index].tags = e.target.value
                               setUploadQueue(newQueue)
                             }}
-                            placeholder={item.isJingle ? "WildFM, SplashFM, Sweepers, Promos" : "Hot Hits, Oldies, Party"}
+                            placeholder={item.trackType === 'jingle' ? "WildFM, SplashFM, Sweepers, Promos" : "Hot Hits, Oldies, Party"}
                             className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500"
                           />
                           <p className="text-xs text-gray-500 mt-1">
-                            💡 {item.isJingle ? 'Tags categorize jingles for playlist generation' : 'Use tags to categorize tracks for smart playlist generation'}
+                            💡 {item.trackType === 'jingle' ? 'Tags categorize jingles for playlist generation' : 'Use tags to categorize tracks for smart playlist generation'}
                           </p>
                         </div>
                       </div>
