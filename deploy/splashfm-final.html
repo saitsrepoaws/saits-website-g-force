@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splash FM Radio - Live 24/7</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="preload" as="image" href="/logosplashfmfm.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -298,7 +297,11 @@
         let lastTrackId = null;
         let pollInterval = null;
 
+        // AWS IoT Configuration
         const IDENTITY_POOL_ID = 'eu-west-1:345056ed-fefd-4ab5-97c6-a7b5ec4073ea';
+        const IOT_ENDPOINT = 'd08571201ngqyrl7gmlrx-ats.iot.eu-west-1.amazonaws.com';
+        const IOT_TOPIC = 'radio/stream/nowplaying';
+        
         AWS.config.region = 'eu-west-1';
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
             IdentityPoolId: IDENTITY_POOL_ID
