@@ -7,7 +7,6 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     
     <!-- ⚡ PERFORMANCE OPTIMIZATION ⚡ -->
-    <!-- Preconnect to stream server for faster connection -->
     <link rel="preconnect" href="https://splashfm.nl">
     <link rel="dns-prefetch" href="https://splashfm.nl">
     
@@ -410,22 +409,29 @@
             <div class="status" id="status">Ready to play ⚡</div>
 
             <!-- ⚡ OPTIMIZED AUDIO ELEMENT ⚡ -->
-            <!-- preload="auto" = Start loading immediately for instant playback -->
             <audio id="audioPlayer" preload="auto" crossorigin="anonymous">
                 <source src="https://splashfm.nl/splashfm.mp3" type="audio/mpeg">
             </audio>
         </div>
     </div>
 
-    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1691.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/paho-mqtt.min.js"></script>
-    
-    <script>
-        console.log('🎛️ Stereo Tool Professional Audio Processing');
-        console.log('🌐 CloudFront CDN: d4clnrcifbyms.cloudfront.net');
-        console.log('⚡ HTTP/3 enabled for best performance');
-        console.log('📡 IoT Core: Server-Sent Events (Real-time!)');
-        console.log('⚡ FAST MODE: Auto-preload enabled!');
+    <!-- AWS SDK v3 for IoT (modular, smaller!) -->
+    <script type="module">
+        console.log('📡 Real-time IoT MQTT Subscription Active!');
+        console.log('⚡ Using AWS SDK v3 (lightweight!)');
+        
+        // Import from CDN (using importmap would be better but this works!)
+        const { CognitoIdentityClient } = await import('https://cdn.jsdelivr.net/npm/@aws-sdk/client-cognito-identity@3/+esm');
+        const { fromCognitoIdentityPool } = await import('https://cdn.jsdelivr.net/npm/@aws-sdk/credential-providers@3/+esm');
+        const { mqtt, iot } = await import('https://cdn.jsdelivr.net/npm/aws-iot-device-sdk-v2@1/+esm');
+        
+        // Configuration
+        const IOT_ENDPOINT = 'd08571201ngqyrl7gmlrx-ats.iot.eu-west-1.amazonaws.com';
+        const IDENTITY_POOL_ID = 'eu-west-1:345056ed-fefd-4ab5-97c6-a7b5ec4073ea';
+        const IOT_TOPIC = 'radio/stream/nowplaying';
+        const REGION = 'eu-west-1';
+        
+        let mqttConnection = null;
         
         const audio = document.getElementById('audioPlayer');
         const playButton = document.getElementById('playButton');
@@ -435,21 +441,6 @@
         const status = document.getElementById('status');
         
         let isPlaying = false;
-        let lastTrackId = null;
-        let pollInterval = null;
-
-        // ⚡ FAST STARTUP: Start preloading immediately
-        console.log('⚡ Preloading stream for instant playback...');
-
-        // AWS IoT Configuration
-        const IDENTITY_POOL_ID = 'eu-west-1:345056ed-fefd-4ab5-97c6-a7b5ec4073ea';
-        const IOT_ENDPOINT = 'd08571201ngqyrl7gmlrx-ats.iot.eu-west-1.amazonaws.com';
-        const IOT_TOPIC = 'radio/stream/nowplaying';
-        
-        AWS.config.region = 'eu-west-1';
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: IDENTITY_POOL_ID
-        });
 
         function updateIoTStatus(state, text) {
             const iotDot = document.getElementById('iotDot');
@@ -467,57 +458,104 @@
             setTimeout(() => iotDot.classList.remove('flash'), 400);
         }
 
-        async function initializeIoT() {
+        // REAL MQTT SUBSCRIPTION! 🔥
+        async function connectToIoT() {
             try {
                 updateIoTStatus('connecting', 'IoT: Connecting...');
+                console.log('🔐 Getting Cognito credentials...');
                 
-                await AWS.config.credentials.getPromise();
-                console.log('✅ Cognito credentials obtained');
-                console.log('🔑 Identity ID:', AWS.config.credentials.identityId);
+                // Get credentials
+                const credentials = fromCognitoIdentityPool({
+                    identityPoolId: IDENTITY_POOL_ID,
+                    clientConfig: { region: REGION }
+                });
                 
-                const iot = new AWS.Iot({region: 'eu-west-1'});
-                const policyName = 'PlayerIoTPolicy';
-                const target = AWS.config.credentials.identityId;
+                const creds = await credentials();
+                console.log('✅ Credentials obtained!');
                 
-                try {
-                    await iot.attachPolicy({policyName, target}).promise();
-                    console.log('✅ IoT policy attached');
-                } catch (err) {
-                    if (err.code !== 'ResourceAlreadyExistsException') {
-                        console.warn('⚠️ Policy attach:', err.message);
-                    }
-                }
+                // Create MQTT connection
+                console.log('🔌 Creating MQTT connection...');
                 
-                updateIoTStatus('connected', 'IoT: Connected');
-                console.log('📡 Connected to IoT topic:', IOT_TOPIC);
+                const config = iot.AwsIotMqttConnectionConfigBuilder.new_with_websockets()
+                    .with_clean_session(true)
+                    .with_client_id(`splash-player-${Date.now()}`)
+                    .with_endpoint(IOT_ENDPOINT)
+                    .with_credentials(
+                        REGION,
+                        creds.accessKeyId,
+                        creds.secretAccessKey,
+                        creds.sessionToken
+                    )
+                    .build();
+                
+                const client = new mqtt.MqttClient();
+                mqttConnection = client.new_connection(config);
+                
+                // Connection events
+                mqttConnection.on('connect', () => {
+                    console.log('✅ MQTT Connected!');
+                    updateIoTStatus('connected', 'IoT: Connected');
+                    
+                    // Subscribe to topic
+                    console.log('📡 Subscribing to:', IOT_TOPIC);
+                    mqttConnection.subscribe(
+                        IOT_TOPIC,
+                        mqtt.QoS.AtLeastOnce,
+                        (topic, payload) => {
+                            try {
+                                const message = JSON.parse(new TextDecoder().decode(payload));
+                                console.log('🔥 IoT Message received!', message);
+                                
+                                flashIoTDot();
+                                
+                                if (message.artist && message.title) {
+                                    document.getElementById('artistInfo').textContent = message.artist;
+                                    document.getElementById('trackInfo').textContent = message.title;
+                                }
+                            } catch (error) {
+                                console.error('❌ Error parsing message:', error);
+                            }
+                        }
+                    ).then(() => {
+                        console.log('✅ Subscribed to:', IOT_TOPIC);
+                        console.log('📥 Waiting for real-time updates...');
+                    });
+                });
+                
+                mqttConnection.on('disconnect', () => {
+                    console.log('⚠️ MQTT Disconnected');
+                    updateIoTStatus('connecting', 'IoT: Reconnecting...');
+                });
+                
+                mqttConnection.on('error', (error) => {
+                    console.error('❌ MQTT Error:', error);
+                    updateIoTStatus('offline', 'IoT: Error');
+                });
+                
+                // Connect!
+                await mqttConnection.connect();
                 
             } catch (error) {
-                console.error('❌ IoT initialization failed:', error);
-                updateIoTStatus('offline', 'IoT: Offline');
+                console.error('❌ IoT connection failed:', error);
+                updateIoTStatus('offline', 'IoT: Failed');
+                
+                // Fallback to polling
+                console.log('⚠️ Falling back to polling...');
+                startMetadataPolling();
             }
         }
 
-        initializeIoT();
-
-        // Real-time IoT update function (called from Lambda/external)
-        window.updateFromIoT = function(artist, title) {
-            console.log('🔥 IoT Update received!', {artist, title});
-            flashIoTDot();
-            
-            document.getElementById('artistInfo').textContent = artist;
-            document.getElementById('trackInfo').textContent = title;
-        };
-
+        // Fallback polling
+        let pollInterval = null;
+        
         function startMetadataPolling() {
-            console.log('📡 Starting metadata monitoring...');
+            console.log('📡 Starting fallback metadata polling...');
             
             updateMetadata();
             
             pollInterval = setInterval(() => {
                 updateMetadata();
             }, 5000);
-            
-            console.log('✅ Monitoring started (5 sec interval)');
         }
 
         async function updateMetadata() {
@@ -542,15 +580,16 @@
             }
         }
 
-        // 🎵 OPTIMIZED PLAY BUTTON - INSTANT START! ⚡
+        // Start IoT connection
+        connectToIoT();
+
+        // Play button
         playButton.addEventListener('click', async () => {
-            // Ripple effect
             playButton.classList.add('ripple');
             setTimeout(() => playButton.classList.remove('ripple'), 600);
             
             if (!isPlaying) {
-                // ⚡ Much faster! Stream already preloaded
-                console.log('⚡ Starting playback (instant!)...');
+                console.log('⚡ Starting playback...');
                 status.textContent = 'Starting... ⚡';
                 status.classList.add('loading');
                 
@@ -559,7 +598,7 @@
                     await audio.play();
                     const loadTime = (performance.now() - startTime).toFixed(0);
                     
-                    console.log(`✅ Started in ${loadTime}ms! ⚡`);
+                    console.log(`✅ Started in ${loadTime}ms!`);
                     
                     isPlaying = true;
                     playIcon.style.display = 'none';
@@ -568,7 +607,7 @@
                     status.textContent = `🎵 Playing (${loadTime}ms start)`;
                     status.classList.remove('loading');
                     
-                    if (!pollInterval) startMetadataPolling();
+                    if (!pollInterval && !mqttConnection) startMetadataPolling();
                     
                 } catch (error) {
                     status.textContent = '❌ Failed to start stream';
@@ -592,7 +631,7 @@
         });
         audio.volume = 0.7;
 
-        // Update status on events
+        // Audio events
         audio.addEventListener('waiting', () => {
             status.textContent = 'Buffering...';
             status.classList.add('loading');
@@ -615,18 +654,17 @@
             console.error('Audio error:', e);
         });
 
-        // ⚡ Monitor preload progress
+        // Preload monitoring
         audio.addEventListener('loadstart', () => {
             console.log('⚡ Stream preload started...');
         });
         
         audio.addEventListener('canplay', () => {
             console.log('✅ Stream ready to play!');
-            status.textContent = 'Ready to play ⚡ (preloaded!)';
+            status.textContent = 'Ready to play ⚡';
         });
 
-        console.log('✅ Player initialized!');
-        console.log('⚡ FAST MODE ACTIVE - Instant playback enabled!');
+        console.log('✅ Player initialized with REAL-TIME IoT! 🚀');
     </script>
 </body>
 </html>
