@@ -24,6 +24,7 @@ import { playerConnectHandler } from './functions/player-connect-handler/resourc
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
+import { createEC2Parameters, grantEC2ParameterAccess } from './backend/ec2-config'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
@@ -654,7 +655,10 @@ backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
-backend.streamPlaylistUpdater.addEnvironment('EC2_INSTANCE_ID', 'i-021451e919d39c898') // EC2 Stream Server
+backend.streamPlaylistUpdater.addEnvironment('EC2_PARAM_PREFIX', '/gforge-radio/ec2') // Parameter Store prefix
+
+// Grant Parameter Store access
+grantEC2ParameterAccess(streamPlaylistLambda, streamPlaylistLambda.stack)
 
 // EventBridge rule - Run HOURLY at :00 for radio station scheduling
 // Cron: minute hour day-of-month month day-of-week year
@@ -1029,20 +1033,32 @@ listenerTrackerRule.addTarget(new targets.LambdaFunction(listenerTrackerLambda))
 console.log('✅ Listener tracker configured')
 
 // =============================================================================
-// 🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP
+// 🎙️ EC2 CONFIGURATION - Parameter Store
 // =============================================================================
 // 
 // ⚠️ NOTE: EC2 instance is MANUALLY MANAGED (not via CloudFormation)
 // Current IP: 79.125.44.178
+// Instance ID: i-021451e919d39c898
 // Services: Icecast, Liquidsoap, Nginx
 // Status: ✅ RUNNING
 // 
-// VPC/EC2 CloudFormation code REMOVED to prevent deployment conflicts
-// Code backed up to: ref/EC2_CLOUDFORMATION_CODE_BACKUP_16NOV2025.md
-// Previous failed stack: function1351588B (DELETE_FAILED due to NLB dependencies)
+// Configuration stored in AWS Systems Manager Parameter Store:
+// - /gforge-radio/ec2/instance-id
+// - /gforge-radio/ec2/public-ip
+// - /gforge-radio/ec2/region
 // 
+// Lambda functions read from Parameter Store (no hardcoded values!)
 // =============================================================================
 
+// Create EC2 configuration in Parameter Store
+const ec2Config = createEC2Parameters(storageStack, {
+  instanceId: 'i-054754fbca0bda346',  // SplashFM-StreamServer-Restored
+  publicIp: '54.171.0.54',            // Elastic IP (fixed!)
+  elasticIp: '54.171.0.54',           // Elastic IP allocation
+  region: 'eu-west-1'                 // Region
+})
+
+console.log('📦 EC2 configuration stored in Parameter Store')
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
 
 // =============================================================================
