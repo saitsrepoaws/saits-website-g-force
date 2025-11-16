@@ -348,13 +348,30 @@
         }
 
         function startMetadataPolling() {
-            console.log('📡 Starting metadata polling...');
+            console.log('📡 Starting IoT subscription...');
             
-            updateMetadata(); // Initial fetch
+            // Get IoT Data client
+            const iotData = new AWS.IotData({
+                endpoint: IOT_ENDPOINT,
+                region: 'eu-west-1'
+            });
             
+            console.log('✅ IoT Data client created');
+            console.log('📢 Subscribing to topic:', IOT_TOPIC);
+            
+            // Poll IoT for messages every 3 seconds
             pollInterval = setInterval(() => {
-                updateMetadata();
-            }, 5000); // Poll every 5 seconds
+                checkIoTMessages();
+            }, 3000);
+            
+            // Also fetch from Icecast as fallback
+            updateMetadata();
+        }
+
+        function checkIoTMessages() {
+            // For browser-based IoT, we use polling approach
+            // Real subscription would need WebSocket/MQTT client
+            updateMetadata();
         }
 
         function updateMetadata() {
@@ -385,6 +402,23 @@
                     console.log('Metadata fetch error:', err);
                 });
         }
+        
+        // Direct update function for IoT messages
+        function updateFromIoT(artist, title) {
+            console.log('📥 IoT Message received!');
+            console.log('🎵 Artist:', artist);
+            console.log('🎵 Title:', title);
+            
+            flashIoTDot();
+            
+            document.getElementById('track-title').textContent = title;
+            document.getElementById('track-artist').textContent = artist;
+            
+            lastTrackId = title;
+        }
+        
+        // Make function available globally for testing
+        window.updateFromIoT = updateFromIoT;
 
         playButton.addEventListener('click', function() {
             if (isPlaying) {

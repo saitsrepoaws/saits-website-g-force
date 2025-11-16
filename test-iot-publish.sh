@@ -55,10 +55,17 @@ echo ""
 echo "📡 Publishing to IoT Core..."
 echo ""
 
+# Save payload to temp file
+TEMP_FILE=$(mktemp)
+echo -n "$PAYLOAD" > "$TEMP_FILE"
+
 aws iot-data publish \
     --topic "$IOT_TOPIC" \
-    --payload "$PAYLOAD" \
+    --payload "file://$TEMP_FILE" \
     --region "$REGION"
+
+# Cleanup
+rm -f "$TEMP_FILE"
 
 if [ $? -eq 0 ]; then
     echo ""
