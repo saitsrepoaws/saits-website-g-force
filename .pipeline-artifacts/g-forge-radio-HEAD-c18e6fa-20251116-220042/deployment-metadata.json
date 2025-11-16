@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-11-16T21:00:42Z",
+  "branch": "HEAD",
+  "commit": "c18e6fa",
+  "blokPlay": false,
+  "blokLibery": false,
+  "blokPlaylist": false,
+  "blokPlanner": false,
+  "blokEc2": false,
+  "blokStreaming": false,
+  "source": "local-mac",
+  "user": "gerard"
+}
