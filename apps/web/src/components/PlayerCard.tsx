@@ -399,7 +399,7 @@ export default function PlayerCard({ playerId, playerName, onTrackEnded }: Playe
         </div>
 
         {/* Connection Status */}
-        <div className="flex items-center justify-center gap-4 text-xs">
+        <div className="flex items-center justify-center gap-4 text-xs mb-4">
           <div className="flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${iot.connectionState === 'Connected' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`} />
             <span className="text-white font-medium">
