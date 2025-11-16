@@ -3,6 +3,8 @@
 **Last Updated:** 16 November 2025  
 **Status:** Complete & Up-to-date
 
+**📋 [TODO List](../TODO.md)** - Complete takenlijst (alles wat klaar is en nog moet)
+
 ---
 
 ## 🔥 LATEST UPDATES (16 Nov 2025)
