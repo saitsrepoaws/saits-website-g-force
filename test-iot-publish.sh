@@ -62,7 +62,8 @@ echo -n "$PAYLOAD" > "$TEMP_FILE"
 aws iot-data publish \
     --topic "$IOT_TOPIC" \
     --payload "file://$TEMP_FILE" \
-    --region "$REGION"
+    --region "$REGION" \
+    --cli-binary-format raw-in-base64-out
 
 # Cleanup
 rm -f "$TEMP_FILE"
