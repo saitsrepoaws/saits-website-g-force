@@ -253,10 +253,11 @@ echo "Deployment options:"
 echo ""
 echo "1) New sandbox with identifier (recommended)"
 echo "2) Update existing sandbox"
-echo "3) Skip deployment (artifact only)"
+echo "3) Commit-based subdomain (auto: $COMMIT.splashfm.nl)"
+echo "4) Skip deployment (artifact only)"
 echo ""
 
-read -p "Select option (1-3): " DEPLOY_OPTION
+read -p "Select option (1-4): " DEPLOY_OPTION
 
 case $DEPLOY_OPTION in
   1)
@@ -291,6 +292,48 @@ case $DEPLOY_OPTION in
     
   3)
     echo ""
+    SANDBOX_ID="commit-$COMMIT"
+    SUBDOMAIN="$COMMIT.splashfm.nl"
+    
+    echo "🌐 Deploying with commit-based subdomain"
+    echo "   Commit:     $COMMIT"
+    echo "   Sandbox:    $SANDBOX_ID"
+    echo "   Subdomain:  $SUBDOMAIN"
+    echo ""
+    
+    # Deploy sandbox first
+    echo "📦 Deploying Amplify sandbox..."
+    pnpm exec ampx sandbox --identifier "$SANDBOX_ID" --once
+    
+    # Get Amplify app ID (from outputs)
+    echo ""
+    echo "🔍 Getting Amplify app ID..."
+    APP_ID=$(aws amplify list-apps --query "apps[?name=='g-forge-iot-$SANDBOX_ID'].appId" --output text 2>/dev/null || echo "")
+    
+    if [ -z "$APP_ID" ]; then
+      echo "⚠️  Could not find Amplify app automatically"
+      read -p "Enter Amplify app ID: " APP_ID
+    else
+      echo "✅ Found app ID: $APP_ID"
+    fi
+    
+    # Create subdomain
+    echo ""
+    echo "🌐 Creating Route53 subdomain..."
+    chmod +x "$PROJECT_ROOT/pipeline/scripts/create-sandbox-subdomain.sh"
+    "$PROJECT_ROOT/pipeline/scripts/create-sandbox-subdomain.sh" "$APP_ID"
+    
+    echo ""
+    echo "✅ Sandbox deployed with custom subdomain!"
+    echo ""
+    echo "   🌐 URL: https://$SUBDOMAIN"
+    echo "   📦 Sandbox: $SANDBOX_ID"
+    echo ""
+    echo "⏳ Note: SSL certificate may take 5-10 minutes to provision"
+    ;;
+    
+  4)
+    echo ""
     echo "Skipping deployment (artifact only)"
     ;;
     
@@ -319,9 +362,22 @@ echo ""
 echo "Artifact location:"
 echo "  $ARTIFACT_DIR/$ARTIFACT_NAME"
 echo ""
+if [ "$DEPLOY_OPTION" = "3" ] && [ -n "$SUBDOMAIN" ]; then
+  echo "Sandbox URL:"
+  echo "  🌐 https://$SUBDOMAIN"
+  echo ""
+fi
 echo "Next steps:"
 echo "  - View deployed stack in AWS Console"
-echo "  - Test the deployed application"
+if [ "$DEPLOY_OPTION" = "3" ]; then
+  echo "  - Wait 5-10 min for SSL certificate"
+  echo "  - Test sandbox: https://$SUBDOMAIN"
+else
+  echo "  - Test the deployed application"
+fi
 echo "  - Monitor CloudWatch logs"
+if [ "$DEPLOY_OPTION" = "3" ]; then
+  echo "  - Cleanup subdomain: ./pipeline/scripts/cleanup-sandbox-subdomain.sh $COMMIT"
+fi
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
