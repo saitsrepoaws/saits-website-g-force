@@ -218,31 +218,62 @@ Integrate with GitHub Actions:
 
 ## 🧹 Cleanup Strategy
 
-### Manual Cleanup (Recommended)
-After testing is done:
+### ✅ Automatic Cleanup (RECOMMENDED)
+Use the integrated cleanup script that removes BOTH sandbox AND Route53 record:
 
 ```bash
-# Delete Route53 record
+# Delete sandbox + Route53 in one command
+./pipeline/scripts/delete-sandbox-with-cleanup.sh commit-28a3670
+```
+
+**What it does:**
+1. ✅ Checks if commit-based sandbox
+2. ✅ Deletes Route53 CNAME record
+3. ✅ Deletes Amplify sandbox
+4. ✅ Confirms before deletion
+5. ✅ Shows cleanup summary
+
+### Manual Cleanup (Legacy)
+If you only want to delete the Route53 record:
+
+```bash
+# Delete Route53 record only
 ./pipeline/scripts/cleanup-sandbox-subdomain.sh 28a3670
 
-# Delete Amplify sandbox
+# Delete Amplify sandbox separately
 pnpm exec ampx sandbox delete --identifier commit-28a3670
 ```
 
-### Bulk Cleanup
-Remove all old commit-based sandboxes:
+### List All Sandboxes
+View all sandboxes and Route53 records:
 
 ```bash
-# List all commit subdomains
-aws route53 list-resource-record-sets \
-  --hosted-zone-id Z047697515CJEX2WUTUFW \
-  --query "ResourceRecordSets[?Type=='CNAME' && contains(Name, 'splashfm.nl')].Name" \
-  --output text | tr '\t' '\n' | while read subdomain; do
-    COMMIT=$(echo "$subdomain" | cut -d'.' -f1)
-    echo "Deleting: $subdomain"
-    ./pipeline/scripts/cleanup-sandbox-subdomain.sh "$COMMIT"
-  done
+./pipeline/scripts/list-all-sandboxes.sh
 ```
+
+**Output:**
+- 📦 All Amplify sandboxes
+- 🌐 All Route53 CNAME records
+- ⚠️ Orphaned records (DNS without sandbox)
+- 📊 Cleanup commands
+
+### Bulk Cleanup by Age
+Remove sandboxes older than X days (default: 7):
+
+```bash
+# Delete sandboxes older than 7 days
+./pipeline/scripts/cleanup-old-sandboxes.sh
+
+# Or specify custom age
+./pipeline/scripts/cleanup-old-sandboxes.sh 14  # 14 days
+```
+
+**What it does:**
+1. ✅ Scans all Amplify sandboxes
+2. ✅ Finds sandboxes older than X days
+3. ✅ Shows list for confirmation
+4. ✅ Deletes sandbox + Route53 record
+5. ✅ Reports success/failure
 
 ### Automated Cleanup (Future)
 Lambda function that runs weekly:
@@ -414,6 +445,48 @@ New sandbox: 9876543 → Reuse resources
 
 ---
 
+## 🎯 Best Practices
+
+### ✅ DO:
+1. **Always use the integrated cleanup script**
+   - `delete-sandbox-with-cleanup.sh` removes BOTH sandbox AND DNS
+   - Prevents orphaned Route53 records
+   
+2. **List sandboxes regularly**
+   - Run `list-all-sandboxes.sh` weekly
+   - Check for orphaned records
+   
+3. **Cleanup old sandboxes**
+   - Run `cleanup-old-sandboxes.sh` monthly
+   - Default 7 days is good for testing
+   
+4. **Use descriptive commit messages**
+   - Subdomain = commit hash
+   - Good commit message helps identify sandbox
+   
+5. **Share sandbox URLs with team**
+   - `https://28a3670.splashfm.nl` is professional
+   - Better than `d1abc123.amplifyapp.com`
+
+### ❌ DON'T:
+1. **Don't delete sandbox manually without DNS cleanup**
+   - Always use `delete-sandbox-with-cleanup.sh`
+   - Orphaned DNS records cost money (minimal, but still)
+   
+2. **Don't keep sandboxes forever**
+   - Delete after testing (within 7 days)
+   - Use bulk cleanup for old sandboxes
+   
+3. **Don't use production data in sandboxes**
+   - Sandboxes are for testing only
+   - Use test/dummy data
+   
+4. **Don't share sandbox credentials**
+   - Each developer deploys their own sandbox
+   - Use same Cognito pool for auth
+
+---
+
 ## ✅ Summary
 
 **What We Built:**
@@ -421,7 +494,9 @@ New sandbox: 9876543 → Reuse resources
 - ✅ Route53 integration (CNAME records)
 - ✅ Amplify custom domain configuration
 - ✅ SSL certificate provisioning (ACM)
-- ✅ Cleanup scripts for old sandboxes
+- ✅ **Integrated cleanup script (sandbox + DNS)**
+- ✅ **List all sandboxes script**
+- ✅ **Bulk cleanup by age script**
 - ✅ Pipeline integration (option 3)
 
 **Benefits:**
@@ -429,12 +504,24 @@ New sandbox: 9876543 → Reuse resources
 - 🌐 Clean, professional URLs
 - 💰 Cost: ~$0.01/month extra
 - 🔒 Secure (same as production)
-- 🧹 Easy cleanup
+- 🧹 Automatic cleanup (no orphaned records!)
+
+**Cleanup Commands:**
+```bash
+# List all sandboxes
+./pipeline/scripts/list-all-sandboxes.sh
+
+# Delete single sandbox (+ DNS)
+./pipeline/scripts/delete-sandbox-with-cleanup.sh commit-28a3670
+
+# Bulk cleanup (7 days old)
+./pipeline/scripts/cleanup-old-sandboxes.sh
+```
 
 **Next Steps:**
 - Deploy with option 3
 - Test your feature
 - Share URL with team
-- Cleanup when done
+- Cleanup when done (automatic!)
 
-**Gerard's Innovation:** Brilliant idea om de zone file te gebruiken! 💪🎯
+**Gerard's Innovation:** Brilliant idea om de zone file te gebruiken + auto-cleanup! 💪🎯
