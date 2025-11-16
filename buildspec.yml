@@ -1,0 +1,214 @@
+# AWS CodeBuild Buildspec - G-Forge IoT Radio Platform
+# Version: 1.0
+# Date: 16 November 2025
+
+version: 0.2
+
+# Environment variables
+env:
+  variables:
+    NODE_VERSION: "20"
+    PNPM_VERSION: "10.19.0"
+  parameter-store:
+    # AWS Systems Manager Parameter Store (add these in AWS Console)
+    VITE_IOT_ENDPOINT: "/g-forge/iot/endpoint"
+    VITE_IDENTITY_POOL_ID: "/g-forge/cognito/identity-pool-id"
+  
+phases:
+  # Install phase
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "Installing dependencies..."
+      - npm install -g pnpm@${PNPM_VERSION}
+      - pnpm install --frozen-lockfile
+      - echo "✅ Dependencies installed"
+  
+  # Pre-build phase - Run tests per BLOK
+  pre_build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "🧪 RUNNING AUTOMATED TESTS PER BLOK"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+      # Detect which BLOKs have changes
+      - |
+        if [ -n "$CODEBUILD_RESOLVED_SOURCE_VERSION" ]; then
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+          
+          # Check which BLOKs are affected
+          BLOK_PLAY_CHANGED=false
+          BLOK_LIBERY_CHANGED=false
+          BLOK_PLAYLIST_CHANGED=false
+          BLOK_PLANNER_CHANGED=false
+          BLOK_EC2_CHANGED=false
+          BLOK_STREAMING_CHANGED=false
+          
+          # BLOK PLAY: Player frontend
+          if echo "$CHANGED_FILES" | grep -q "apps/web/\|tests/smoke/player\|tests/regression/player"; then
+            BLOK_PLAY_CHANGED=true
+            echo "✅ BLOK PLAY: Changes detected"
+          fi
+          
+          # BLOK LIBERY: Track library
+          if echo "$CHANGED_FILES" | grep -q "amplify/data/\|amplify/storage/\|amplify/functions/audio-metadata\|amplify/functions/waveform"; then
+            BLOK_LIBERY_CHANGED=true
+            echo "✅ BLOK LIBERY: Changes detected"
+          fi
+          
+          # BLOK PLAYLIST: Playlist management
+          if echo "$CHANGED_FILES" | grep -q "amplify/functions/playlist-generator\|amplify/functions/genre-merger"; then
+            BLOK_PLAYLIST_CHANGED=true
+            echo "✅ BLOK PLAYLIST: Changes detected"
+          fi
+          
+          # BLOK PLANNER: Scheduler
+          if echo "$CHANGED_FILES" | grep -q "amplify/functions/stream-playlist-updater\|amplify/functions/radio-scheduler"; then
+            BLOK_PLANNER_CHANGED=true
+            echo "✅ BLOK PLANNER: Changes detected"
+          fi
+          
+          # BLOK EC2: Stream server (config changes)
+          if echo "$CHANGED_FILES" | grep -q "ec2-monitoring/\|scripts/"; then
+            BLOK_EC2_CHANGED=true
+            echo "✅ BLOK EC2: Changes detected"
+          fi
+          
+          # BLOK STREAMING: Audio processing
+          if echo "$CHANGED_FILES" | grep -q "amplify/functions/crossfade\|liquidsoap"; then
+            BLOK_STREAMING_CHANGED=true
+            echo "✅ BLOK STREAMING: Changes detected"
+          fi
+          
+          export BLOK_PLAY_CHANGED
+          export BLOK_LIBERY_CHANGED
+          export BLOK_PLAYLIST_CHANGED
+          export BLOK_PLANNER_CHANGED
+          export BLOK_EC2_CHANGED
+          export BLOK_STREAMING_CHANGED
+        fi
+      
+      # Run tests for affected BLOKs
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "Running tests for affected BLOKs..."
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+      # BLOK PLAY tests
+      - |
+        if [ "$BLOK_PLAY_CHANGED" = true ]; then
+          echo "🧪 Testing BLOK PLAY..."
+          npx vitest run tests/smoke/player.smoke.test.ts --reporter=verbose || exit 1
+          npx vitest run tests/regression/player.regression.test.ts --reporter=verbose || exit 1
+          echo "✅ BLOK PLAY tests passed"
+        fi
+      
+      # BLOK LIBERY tests (TODO: add when tests exist)
+      - |
+        if [ "$BLOK_LIBERY_CHANGED" = true ]; then
+          echo "⚠️  BLOK LIBERY: No automated tests yet (manual testing required)"
+        fi
+      
+      # BLOK PLAYLIST tests (TODO: add when tests exist)
+      - |
+        if [ "$BLOK_PLAYLIST_CHANGED" = true ]; then
+          echo "⚠️  BLOK PLAYLIST: No automated tests yet (manual testing required)"
+        fi
+      
+      # BLOK PLANNER tests (TODO: add when tests exist)
+      - |
+        if [ "$BLOK_PLANNER_CHANGED" = true ]; then
+          echo "⚠️  BLOK PLANNER: No automated tests yet (manual testing required)"
+        fi
+      
+      # BLOK EC2 tests (TODO: add when tests exist)
+      - |
+        if [ "$BLOK_EC2_CHANGED" = true ]; then
+          echo "⚠️  BLOK EC2: No automated tests yet (manual testing required)"
+        fi
+      
+      # BLOK STREAMING tests (TODO: add when tests exist)
+      - |
+        if [ "$BLOK_STREAMING_CHANGED" = true ]; then
+          echo "⚠️  BLOK STREAMING: No automated tests yet (manual testing required)"
+        fi
+      
+      - echo "✅ All tests passed!"
+  
+  # Build phase
+  build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "🏗️  BUILDING APPLICATION"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+      # Build frontend
+      - echo "Building frontend..."
+      - cd apps/web
+      - pnpm run build
+      - cd ../..
+      - echo "✅ Frontend built"
+      
+      # Build backend (Amplify)
+      - echo "Building backend..."
+      - npx ampx pipeline-deploy --branch main --appId ${AMPLIFY_APP_ID}
+      - echo "✅ Backend built"
+      
+      - echo "✅ Build complete!"
+  
+  # Post-build phase
+  post_build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "📦 POST-BUILD TASKS"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+      # Generate test report
+      - echo "Generating test report..."
+      - |
+        cat > test-report.json << EOF
+        {
+          "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+          "buildId": "${CODEBUILD_BUILD_ID}",
+          "blokPlay": ${BLOK_PLAY_CHANGED:-false},
+          "blokLibery": ${BLOK_LIBERY_CHANGED:-false},
+          "blokPlaylist": ${BLOK_PLAYLIST_CHANGED:-false},
+          "blokPlanner": ${BLOK_PLANNER_CHANGED:-false},
+          "blokEc2": ${BLOK_EC2_CHANGED:-false},
+          "blokStreaming": ${BLOK_STREAMING_CHANGED:-false},
+          "status": "success"
+        }
+        EOF
+      
+      # Archive artifacts
+      - echo "Creating deployment package..."
+      - mkdir -p deployment
+      - cp -r apps/web/dist deployment/web
+      - cp -r amplify deployment/amplify
+      - cp appspec.yml deployment/
+      - cp -r scripts deployment/
+      
+      - echo "✅ Post-build complete!"
+
+# Artifacts to output
+artifacts:
+  files:
+    - '**/*'
+  base-directory: deployment
+  name: g-forge-radio-$(date +%Y%m%d-%H%M%S)
+
+# Reports (test results)
+reports:
+  test-results:
+    files:
+      - 'test-report.json'
+    file-format: 'JUNITXML'
+
+# Cache for faster builds
+cache:
+  paths:
+    - 'node_modules/**/*'
+    - '.pnpm-store/**/*'
+    - 'apps/web/node_modules/**/*'

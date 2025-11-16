@@ -1,0 +1,55 @@
+# AWS CodeDeploy AppSpec - G-Forge IoT Radio Platform
+# Version: 1.0
+# Date: 16 November 2025
+
+version: 0.0
+os: linux
+
+# Files to deploy
+files:
+  # Frontend dist to web server
+  - source: web/
+    destination: /var/www/splashfm/
+    
+  # Amplify backend configs
+  - source: amplify/
+    destination: /opt/g-forge/amplify/
+    
+  # Deployment scripts
+  - source: scripts/
+    destination: /opt/g-forge/scripts/
+
+# Deployment hooks
+hooks:
+  # Before installation
+  ApplicationStop:
+    - location: scripts/deploy/stop-services.sh
+      timeout: 300
+      runas: root
+  
+  # Before install
+  BeforeInstall:
+    - location: scripts/deploy/backup-current.sh
+      timeout: 300
+      runas: root
+  
+  # After install
+  AfterInstall:
+    - location: scripts/deploy/set-permissions.sh
+      timeout: 300
+      runas: root
+    - location: scripts/deploy/update-configs.sh
+      timeout: 300
+      runas: root
+  
+  # Application start
+  ApplicationStart:
+    - location: scripts/deploy/start-services.sh
+      timeout: 300
+      runas: root
+  
+  # Validation
+  ValidateService:
+    - location: scripts/deploy/validate-deployment.sh
+      timeout: 600
+      runas: root

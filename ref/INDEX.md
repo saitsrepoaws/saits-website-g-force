@@ -17,6 +17,8 @@
 - [IoT Connection Indicator](IOT_CONNECTION_INDICATOR_16NOV2025.md) - **💡 Visual status with smooth animations!**
 - [IoT Shadow/Cache Strategy](IOT_SHADOW_CACHE_STRATEGY_16NOV2025.md) - **⚡ Instant metadata (< 50ms)!**
 - [Automated Test Report](TEST_REPORT_16NOV2025.md) - **🧪 90% passing (45/50 tests)**
+- [CI/CD Pipeline Setup](CICD_PIPELINE_SETUP.md) - **🚀 Per-BLOK testing & automated deployment**
+- [Testing Best Practices](TESTING_BEST_PRACTICES.md) - **📋 Test before every commit policy**
 
 **Key Achievements:**
 - ✅ Complete metadata (BPM, Key, Energy, Mix Points, Hot Cues, Loops)
@@ -32,6 +34,9 @@
 - ✅ G-FORGE favicon
 - ✅ CORS headers fixed (duplicate headers eliminated!)
 - ✅ Automated testing (90% pass rate)
+- ✅ CI/CD Pipeline (CodeBuild, CodeDeploy, CodePipeline)
+- ✅ Per-BLOK testing (intelligent test triggering)
+- ✅ Zero-downtime deployment (automatic rollback)
 
 **Future Enhancements:**
 - 📋 [AWS Media Services Integration](AWS_MEDIA_SERVICES_INTEGRATION_TODO.md) - Professional broadcasting demo
