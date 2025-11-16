@@ -1,0 +1,80 @@
+version: 1
+
+# Amplify Hosting Build Configuration
+# Used when deploying via AWS Amplify Hosting
+
+# Backend configuration
+backend:
+  phases:
+    build:
+      commands:
+        - npm install -g pnpm@latest
+        - pnpm install
+        - pnpm exec ampx pipeline-deploy --branch $AWS_BRANCH --appId $AWS_APP_ID
+
+# Frontend configuration
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        - echo "🔧 INSTALLING DEPENDENCIES"
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        - npm install -g pnpm@latest
+        - pnpm install
+        - echo "✅ Dependencies installed"
+    
+    build:
+      commands:
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        - echo "🧪 RUNNING TESTS (BLOK-based)"
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        # Detect changed BLOKs
+        - |
+          if [ -n "$AWS_COMMIT_ID" ]; then
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "all")
+            echo "Changed files: $CHANGED_FILES"
+            
+            # Check BLOK PLAY
+            if echo "$CHANGED_FILES" | grep -q "apps/web/\|tests/smoke/player\|tests/regression/player" || [ "$CHANGED_FILES" = "all" ]; then
+              echo "🧪 Testing BLOK PLAY..."
+              pnpm run test:smoke || exit 1
+              pnpm run test:regression || exit 1
+              echo "✅ BLOK PLAY tests passed"
+            fi
+          fi
+        
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        - echo "🏗️  BUILDING FRONTEND"
+        - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        
+        - cd apps/web
+        - pnpm run build
+        - echo "✅ Frontend built"
+  
+  artifacts:
+    baseDirectory: apps/web/dist
+    files:
+      - '**/*'
+  
+  cache:
+    paths:
+      - node_modules/**/*
+      - .pnpm-store/**/*
+      - apps/web/node_modules/**/*
+
+# Custom headers for security
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: 'Strict-Transport-Security'
+        value: 'max-age=31536000; includeSubDomains'
+      - key: 'X-Frame-Options'
+        value: 'SAMEORIGIN'
+      - key: 'X-Content-Type-Options'
+        value: 'nosniff'
+      - key: 'X-XSS-Protection'
+        value: '1; mode=block'
+      - key: 'Referrer-Policy'
+        value: 'strict-origin-when-cross-origin'
