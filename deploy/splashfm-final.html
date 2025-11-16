@@ -352,30 +352,21 @@
         }
 
         function startMetadataPolling() {
-            console.log('📡 Starting IoT subscription...');
+            console.log('📡 Starting metadata monitoring...');
+            console.log('📍 Note: Real-time IoT ready via updateFromIoT() function');
+            console.log('📢 IoT Topic configured:', IOT_TOPIC);
             
-            // Get IoT Data client
-            const iotData = new AWS.IotData({
-                endpoint: IOT_ENDPOINT,
-                region: 'eu-west-1'
-            });
+            // Start polling Icecast for metadata
+            // NOTE: For real-time IoT, Lambda should publish to IOT_TOPIC
+            //       then browser receives via WebSocket (requires SigV4 signing)
+            updateMetadata();
             
-            console.log('✅ IoT Data client created');
-            console.log('📢 Subscribing to topic:', IOT_TOPIC);
-            
-            // Poll IoT for messages every 3 seconds
             pollInterval = setInterval(() => {
-                checkIoTMessages();
-            }, 3000);
+                updateMetadata();
+            }, 5000); // Check every 5 seconds
             
-            // Also fetch from Icecast as fallback
-            updateMetadata();
-        }
-
-        function checkIoTMessages() {
-            // For browser-based IoT, we use polling approach
-            // Real subscription would need WebSocket/MQTT client
-            updateMetadata();
+            console.log('✅ Monitoring started (5 sec interval)');
+            console.log('💡 Tip: Use updateFromIoT("artist", "title") to test real-time updates!');
         }
 
         function updateMetadata() {
