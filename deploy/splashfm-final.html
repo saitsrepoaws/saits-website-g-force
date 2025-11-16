@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splash FM Radio - Live 24/7</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    
+    <!-- ⚡ PERFORMANCE OPTIMIZATION ⚡ -->
+    <!-- Preconnect to stream server for faster connection -->
+    <link rel="preconnect" href="https://splashfm.nl">
+    <link rel="dns-prefetch" href="https://splashfm.nl">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -401,9 +407,11 @@
                 </div>
             </div>
 
-            <div class="status" id="status">Ready to play</div>
+            <div class="status" id="status">Ready to play ⚡</div>
 
-            <audio id="audioPlayer" preload="none">
+            <!-- ⚡ OPTIMIZED AUDIO ELEMENT ⚡ -->
+            <!-- preload="auto" = Start loading immediately for instant playback -->
+            <audio id="audioPlayer" preload="auto" crossorigin="anonymous">
                 <source src="https://splashfm.nl/splashfm.mp3" type="audio/mpeg">
             </audio>
         </div>
@@ -416,7 +424,8 @@
         console.log('🎛️ Stereo Tool Professional Audio Processing');
         console.log('🌐 CloudFront CDN: d4clnrcifbyms.cloudfront.net');
         console.log('⚡ HTTP/3 enabled for best performance');
-        console.log('�� IoT Core: Server-Sent Events (Real-time!)');
+        console.log('📡 IoT Core: Server-Sent Events (Real-time!)');
+        console.log('⚡ FAST MODE: Auto-preload enabled!');
         
         const audio = document.getElementById('audioPlayer');
         const playButton = document.getElementById('playButton');
@@ -428,6 +437,9 @@
         let isPlaying = false;
         let lastTrackId = null;
         let pollInterval = null;
+
+        // ⚡ FAST STARTUP: Start preloading immediately
+        console.log('⚡ Preloading stream for instant playback...');
 
         // AWS IoT Configuration
         const IDENTITY_POOL_ID = 'eu-west-1:345056ed-fefd-4ab5-97c6-a7b5ec4073ea';
@@ -498,8 +510,6 @@
 
         function startMetadataPolling() {
             console.log('📡 Starting metadata monitoring...');
-            console.log('📍 Note: Real-time IoT ready via updateFromIoT() function');
-            console.log('📢 IoT Topic configured:', IOT_TOPIC);
             
             updateMetadata();
             
@@ -508,7 +518,6 @@
             }, 5000);
             
             console.log('✅ Monitoring started (5 sec interval)');
-            console.log('💡 Tip: Use updateFromIoT("artist", "title") to test real-time updates!');
         }
 
         async function updateMetadata() {
@@ -533,23 +542,30 @@
             }
         }
 
-        // 🎵 IMPROVED PLAY BUTTON INTERACTIONS 🎵
+        // 🎵 OPTIMIZED PLAY BUTTON - INSTANT START! ⚡
         playButton.addEventListener('click', async () => {
             // Ripple effect
             playButton.classList.add('ripple');
             setTimeout(() => playButton.classList.remove('ripple'), 600);
             
             if (!isPlaying) {
-                status.textContent = 'Loading stream...';
+                // ⚡ Much faster! Stream already preloaded
+                console.log('⚡ Starting playback (instant!)...');
+                status.textContent = 'Starting... ⚡';
                 status.classList.add('loading');
                 
                 try {
+                    const startTime = performance.now();
                     await audio.play();
+                    const loadTime = (performance.now() - startTime).toFixed(0);
+                    
+                    console.log(`✅ Started in ${loadTime}ms! ⚡`);
+                    
                     isPlaying = true;
                     playIcon.style.display = 'none';
                     pauseIcon.style.display = 'block';
                     playButton.classList.add('playing');
-                    status.textContent = '🎵 Live Stream Playing';
+                    status.textContent = `🎵 Playing (${loadTime}ms start)`;
                     status.classList.remove('loading');
                     
                     if (!pollInterval) startMetadataPolling();
@@ -599,8 +615,18 @@
             console.error('Audio error:', e);
         });
 
+        // ⚡ Monitor preload progress
+        audio.addEventListener('loadstart', () => {
+            console.log('⚡ Stream preload started...');
+        });
+        
+        audio.addEventListener('canplay', () => {
+            console.log('✅ Stream ready to play!');
+            status.textContent = 'Ready to play ⚡ (preloaded!)';
+        });
+
         console.log('✅ Player initialized!');
-        console.log('🎮 Controls ready');
+        console.log('⚡ FAST MODE ACTIVE - Instant playback enabled!');
     </script>
 </body>
 </html>
