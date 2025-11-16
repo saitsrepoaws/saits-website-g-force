@@ -88,6 +88,17 @@
             50% { opacity: 0.6; transform: scale(1.1); }
         }
 
+        /* Flash effect on message activity */
+        @keyframes message-flash {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.8; box-shadow: 0 0 20px currentColor; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .iot-dot.flash {
+            animation: message-flash 0.3s ease-out !important;
+        }
+
         .player-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -544,8 +555,22 @@
         }
 
         // ============================================
-        // 📡 IoT Connection
+        // 💫 Flash Effect on Message Activity
         // ============================================
+        function flashIoTDot() {
+            const dot = document.getElementById('iotDot');
+            dot.classList.add('flash');
+            setTimeout(() => {
+                dot.classList.remove('flash');
+            }, 300);
+        }
+
+        // ============================================
+        // 📡 IoT Connection with MQTT
+        // ============================================
+        let mqttClient = null;
+        let messageCount = 0;
+
         function initializeIoT() {
             updateIoTStatus('connecting', 'Connecting...');
             
@@ -560,7 +585,7 @@
                 console.log('✅ Cognito credentials obtained');
                 console.log('🔑 Identity ID:', AWS.config.credentials.identityId);
                 
-                // Attach IoT policy
+                // Attach IoT policy then connect
                 attachIoTPolicy();
             });
         }
@@ -580,12 +605,54 @@
                 
                 console.log('✅ IoT policy attached (or already exists)');
                 
-                // Simulate successful connection for now
-                // Real MQTT connection would go here
+                // Connect to MQTT
+                connectMQTT();
+            });
+        }
+
+        function connectMQTT() {
+            console.log('🔌 Connecting to MQTT over WebSocket...');
+            
+            try {
+                // Use AWS IoT Device SDK approach
+                const iotData = new AWS.IotData({
+                    endpoint: IOT_ENDPOINT,
+                    region: AWS_REGION
+                });
+                
+                // Create WebSocket URL with SigV4
+                const endpoint = `wss://${IOT_ENDPOINT}/mqtt`;
+                const clientId = 'splash-fm-player-' + Math.random().toString(36).substring(7);
+                
+                console.log('📡 Client ID:', clientId);
+                console.log('🔗 Endpoint:', endpoint);
+                
+                // For browser MQTT, we'll simulate connection for now
+                // Real implementation would use Paho MQTT or AWS IoT Device SDK for JavaScript
+                
+                // Simulate successful connection
                 setTimeout(() => {
                     updateIoTStatus('connected', 'Connected');
+                    console.log('✅ MQTT connected (simulated)');
+                    
+                    // Simulate incoming messages for demo
+                    startMessageSimulation();
                 }, 1000);
-            });
+                
+            } catch (error) {
+                console.error('❌ MQTT connection failed:', error);
+                updateIoTStatus('offline', 'Connection Failed');
+            }
+        }
+
+        // Simulate messages for demo (flash effect test)
+        function startMessageSimulation() {
+            // Simulate incoming message every 5 seconds
+            setInterval(() => {
+                messageCount++;
+                console.log(`📥 Message ${messageCount} received (simulated)`);
+                flashIoTDot(); // Flash on incoming message!
+            }, 5000);
         }
 
         // Play/Pause functionality
