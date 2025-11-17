@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'G-Forge Radio - CloudWatch Permissions for EC2 StreamServer Role'
+
+Parameters:
+  EC2RoleName:
+    Type: String
+    Default: 'amplify-gforgeiot-gerard-s-StreamServerRole6A0ED596-PDlQLOv2V4ju'
+    Description: Name of the EC2 IAM role to attach CloudWatch permissions to
+
+Resources:
+  # CloudWatch Permissions Policy for EC2 Role
+  CloudWatchLogsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: StreamServerCloudWatchAccess
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          # CloudWatch Logs Access
+          - Sid: CloudWatchLogsAccess
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogGroups
+              - logs:DescribeLogStreams
+              - logs:PutRetentionPolicy
+            Resource:
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/g-forge-radio/*'
+              - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/g-forge-radio/*:*'
+          
+          # CloudWatch Metrics Access
+          - Sid: CloudWatchMetricsAccess
+            Effect: Allow
+            Action:
+              - cloudwatch:PutMetricData
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:ListMetrics
+            Resource: '*'
+            Condition:
+              StringEquals:
+                cloudwatch:namespace: 'GForgeRadio/StreamServer'
+          
+          # EC2 Metadata Access
+          - Sid: EC2MetadataAccess
+            Effect: Allow
+            Action:
+              - ec2:DescribeVolumes
+              - ec2:DescribeTags
+              - ec2:DescribeInstances
+            Resource: '*'
+      Roles:
+        - !Ref EC2RoleName
+
+Outputs:
+  PolicyName:
+    Description: Name of the CloudWatch permissions policy
+    Value: !Ref CloudWatchLogsPolicy
+    Export:
+      Name: !Sub '${AWS::StackName}-PolicyName'
+  
+  RoleName:
+    Description: Name of the EC2 role with CloudWatch permissions
+    Value: !Ref EC2RoleName
+    Export:
+      Name: !Sub '${AWS::StackName}-RoleName'
+  
+  NextSteps:
+    Description: Next steps after deploying this stack
+    Value: 'Run scripts/setup-cloudwatch-logging.sh on EC2 to configure logging'
