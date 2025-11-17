@@ -58,8 +58,8 @@ AMI_ID="ami-0123456789abcdef0"
 aws ec2 run-instances \
   --image-id $AMI_ID \
   --instance-type t3.small \
-  --subnet-id subnet-0b65a010f3283e56f \
-  --security-group-ids sg-0d77592e5d47c3761 \
+  --subnet-id subnet-0cdb078c275014e24 \
+  --security-group-ids sg-005c8d71776faf97b \
   --region eu-west-1 \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=AMI-Test}]'
 ```

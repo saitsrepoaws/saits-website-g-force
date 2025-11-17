@@ -13,8 +13,8 @@ AMI_NAME="g-forge-radio-base-v1.0"
 AMI_DESCRIPTION="Ubuntu 22.04 with Liquidsoap 2.4.0 (Docker), Icecast, Nginx, CodeDeploy Agent"
 INSTANCE_TYPE="t3.small"
 REGION="eu-west-1"
-SUBNET_ID="subnet-0b65a010f3283e56f"  # Your existing subnet
-SECURITY_GROUP="sg-0d77592e5d47c3761"   # Your existing SG
+SUBNET_ID="subnet-0cdb078c275014e24"  # Same subnet as current EC2
+SECURITY_GROUP="sg-005c8d71776faf97b"   # Same SG as current EC2
 
 echo "📋 Configuration:"
 echo "  AMI Name: $AMI_NAME"

@@ -72,8 +72,8 @@ chmod +x build-base-ami.sh
 aws ec2 run-instances \
   --image-id ami-0d64bb532e0502c46 \
   --instance-type t3.small \
-  --subnet-id subnet-0b65a010f3283e56f \
-  --security-group-ids sg-0d77592e5d47c3761 \
+  --subnet-id subnet-0cdb078c275014e24 \
+  --security-group-ids sg-005c8d71776faf97b \
   --user-data file://ami-setup.sh \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=AMI-Build-Temp}]' \
   --region eu-west-1
@@ -112,8 +112,8 @@ aws ec2 wait image-available --image-ids <ami-id>
 aws ec2 run-instances \
   --image-id <your-ami-id> \
   --instance-type t3.small \
-  --subnet-id subnet-0b65a010f3283e56f \
-  --security-group-ids sg-0d77592e5d47c3761 \
+  --subnet-id subnet-0cdb078c275014e24 \
+  --security-group-ids sg-005c8d71776faf97b \
   --region eu-west-1
 
 # Verify:
