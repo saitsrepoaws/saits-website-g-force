@@ -331,7 +331,7 @@ export class StreamServerStack extends Stack {
       'echo "Stream URL: http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):8000/stream.mp3"'
     )
 
-    // EC2 Instance
+    // EC2 Instance with larger root volume
     const instance = new ec2.Instance(this, 'StreamServer', {
       vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
@@ -343,6 +343,13 @@ export class StreamServerStack extends Stack {
         '/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id',
         { os: ec2.OperatingSystemType.LINUX }
       ),
+      blockDevices: [{
+        deviceName: '/dev/sda1',
+        volume: ec2.BlockDeviceVolume.ebs(20, {
+          volumeType: ec2.EbsDeviceVolumeType.GP3,
+          deleteOnTermination: true
+        })
+      }],
       securityGroup,
       role,
       userData,
