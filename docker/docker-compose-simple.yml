@@ -1,0 +1,99 @@
+version: '3.8'
+
+################################################################################
+# G-FORGE RADIO - Docker Compose (Simplified - No Stereo Tool)
+################################################################################
+# All services run in RAM for maximum performance
+# Location: /mnt/ramdisk/docker-compose.yml
+################################################################################
+
+services:
+  
+  # ============================================================================
+  # LIQUIDSOAP - Audio Automation Engine
+  # ============================================================================
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.5
+    container_name: liquidsoap
+    restart: unless-stopped
+    networks:
+      - radio-network
+    volumes:
+      - /mnt/ramdisk/configs/liquidsoap:/etc/liquidsoap:ro
+      - /mnt/ramdisk/logs:/var/log/liquidsoap
+      - /data/media:/media:ro
+      - /root/.aws:/root/.aws:ro
+    environment:
+      - TZ=Europe/Amsterdam
+      - AWS_REGION=eu-west-1
+      - SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/035636364722/radio-track-stream-queue.fifo
+    command: liquidsoap /etc/liquidsoap/radio.liq
+    depends_on:
+      - icecast
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # ICECAST2 - Stream Distribution Server
+  # ============================================================================
+  icecast:
+    image: moul/icecast:latest
+    container_name: icecast
+    restart: unless-stopped
+    networks:
+      - radio-network
+    ports:
+      - "8000:8000"
+    volumes:
+      - /mnt/ramdisk/configs/icecast/icecast.xml:/etc/icecast2/icecast.xml:ro
+      - /mnt/ramdisk/logs:/var/log/icecast2
+    environment:
+      - TZ=Europe/Amsterdam
+      - ICECAST_SOURCE_PASSWORD=hackme
+      - ICECAST_RELAY_PASSWORD=hackme
+      - ICECAST_ADMIN_PASSWORD=hackme
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # NGINX - Reverse Proxy
+  # ============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    networks:
+      - radio-network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /mnt/ramdisk/configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /mnt/ramdisk/configs/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - /mnt/ramdisk/logs:/var/log/nginx
+      - /data/certs:/etc/nginx/certs:ro
+    environment:
+      - TZ=Europe/Amsterdam
+    depends_on:
+      - icecast
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+################################################################################
+# NETWORKS
+################################################################################
+networks:
+  radio-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
