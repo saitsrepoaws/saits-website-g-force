@@ -1,0 +1,29 @@
+[Unit]
+Description=G-Forge Radio - IoT Queue Listener
+Documentation=https://github.com/saitsrepoaws/saits-website-g-force
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/radio
+ExecStart=/opt/radio/iot-queue-listener.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/iot-queue.log
+StandardError=append:/var/log/iot-queue.log
+
+# Environment
+Environment="AWS_DEFAULT_REGION=eu-west-1"
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Security
+NoNewPrivileges=false
+PrivateTmp=false
+
+# Resource limits
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

@@ -42,6 +42,9 @@ hooks:
     - location: scripts/deploy/update-configs.sh
       timeout: 300
       runas: root
+    - location: scripts/deploy/install-iot-queue-services.sh
+      timeout: 300
+      runas: root
   
   # Application start
   ApplicationStart:
