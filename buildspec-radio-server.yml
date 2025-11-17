@@ -95,6 +95,47 @@ phases:
       - echo ""
       - echo "Build complete: $(date)"
       - echo ""
+      
+      # Save build parameters to Parameter Store
+      - |
+        echo "💾 Saving build parameters to Parameter Store..."
+        PARAM_PATH="/g-forge-radio/production/build"
+        
+        aws ssm put-parameter \
+          --name "$PARAM_PATH/last-build-id" \
+          --value "$CODEBUILD_BUILD_ID" \
+          --type "String" \
+          --overwrite \
+          --region $AWS_REGION \
+          --tags Key=Application,Value=g-forge-radio Key=CostCenter,Value=g-forge-radio || true
+        
+        aws ssm put-parameter \
+          --name "$PARAM_PATH/last-build-number" \
+          --value "$CODEBUILD_BUILD_NUMBER" \
+          --type "String" \
+          --overwrite \
+          --region $AWS_REGION \
+          --tags Key=Application,Value=g-forge-radio Key=CostCenter,Value=g-forge-radio || true
+        
+        aws ssm put-parameter \
+          --name "$PARAM_PATH/last-commit" \
+          --value "$CODEBUILD_RESOLVED_SOURCE_VERSION" \
+          --type "String" \
+          --overwrite \
+          --region $AWS_REGION \
+          --tags Key=Application,Value=g-forge-radio Key=CostCenter,Value=g-forge-radio || true
+        
+        aws ssm put-parameter \
+          --name "$PARAM_PATH/last-build-time" \
+          --value "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+          --type "String" \
+          --overwrite \
+          --region $AWS_REGION \
+          --tags Key=Application,Value=g-forge-radio Key=CostCenter,Value=g-forge-radio || true
+        
+        echo "✅ Build parameters saved to Parameter Store"
+      
+      - echo ""
       - echo "✅ Artifact ready for CodeDeploy!"
       - echo ""
       - echo "Next step: CodeDeploy will:"
@@ -105,7 +146,8 @@ phases:
       - echo "  5. Set permissions (AfterInstall)"
       - echo "  6. Update configs (AfterInstall)"
       - echo "  7. Start services (ApplicationStart)"
-      - echo "  8. Validate (ValidateService)"
+      - echo "  8. Save deployment parameters (ApplicationStart)"
+      - echo "  9. Validate (ValidateService)"
       - echo ""
 
 artifacts:

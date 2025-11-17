@@ -42,6 +42,9 @@ hooks:
     - location: scripts/deploy/start-services.sh
       timeout: 300
       runas: root
+    - location: pipeline/scripts/save-deployment-parameters.sh
+      timeout: 60
+      runas: root
   
   # Validation
   ValidateService:
