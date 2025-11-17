@@ -24,6 +24,12 @@ hooks:
     - location: scripts/deploy/backup-current.sh
       timeout: 300
       runas: root
+    - location: scripts/deploy/setup-ramdisk.sh
+      timeout: 300
+      runas: root
+    - location: scripts/deploy/pull-configs-from-parameter-store.sh
+      timeout: 300
+      runas: root
     - location: scripts/deploy/install-dependencies.sh
       timeout: 1800
       runas: root
@@ -39,6 +45,9 @@ hooks:
   
   # Application start
   ApplicationStart:
+    - location: scripts/deploy/start-docker-containers.sh
+      timeout: 300
+      runas: root
     - location: scripts/deploy/start-services.sh
       timeout: 300
       runas: root
