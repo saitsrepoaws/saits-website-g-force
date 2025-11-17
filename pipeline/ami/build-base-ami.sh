@@ -62,15 +62,16 @@ echo ""
 
 # Step 4: Run setup script via SSM
 echo "🔧 Step 4: Running setup script via SSM..."
-echo "   Reading setup script..."
-SETUP_SCRIPT=$(cat $(dirname $0)/ami-setup.sh)
+echo "   Encoding and sending setup script..."
 
-echo "   Sending command to instance..."
+# Base64 encode the setup script for safe transfer
+SETUP_SCRIPT_B64=$(cat $(dirname $0)/ami-setup.sh | base64)
+
 CMD_ID=$(aws ssm send-command \
   --instance-ids $INSTANCE_ID \
   --document-name "AWS-RunShellScript" \
   --comment "AMI Setup - Installing all dependencies" \
-  --parameters "commands=[\"$SETUP_SCRIPT\"]" \
+  --parameters commands="echo '$SETUP_SCRIPT_B64' | base64 -d > /tmp/ami-setup.sh && chmod +x /tmp/ami-setup.sh && bash /tmp/ami-setup.sh" \
   --region $REGION \
   --query 'Command.CommandId' \
   --output text)
