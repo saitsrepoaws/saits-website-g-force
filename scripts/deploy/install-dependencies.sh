@@ -22,11 +22,21 @@ if [ -f "/opt/g-forge/.dependencies-installed" ]; then
   exit 0
 fi
 
-# Run the complete setup script
-SCRIPT_DIR="/opt/g-forge-iot/pipeline/ami"
-if [ -f "$SCRIPT_DIR/ami-setup.sh" ]; then
+# Find the setup script in the deployment directory
+# CodeDeploy extracts files to /opt/codedeploy-agent/deployment-root/{deployment-group-id}/{deployment-id}/deployment-archive/
+# We can use the DEPLOYMENT_GROUP_ID and DEPLOYMENT_ID environment variables
+# OR we can run the script inline since we have it in the repo
+
+# Get the deployment directory from CodeDeploy environment
+DEPLOYMENT_DIR="${DEPLOYMENT_ROOT_DIRECTORY:-/opt/codedeploy-agent/deployment-root}"
+
+# Find ami-setup.sh in the deployment archive
+SCRIPT_PATH=$(find "$DEPLOYMENT_DIR" -name "ami-setup.sh" -path "*/pipeline/ami/*" 2>/dev/null | head -1)
+
+if [ -n "$SCRIPT_PATH" ] && [ -f "$SCRIPT_PATH" ]; then
   echo "🚀 Running complete setup script..."
-  bash "$SCRIPT_DIR/ami-setup.sh"
+  echo "   Script: $SCRIPT_PATH"
+  bash "$SCRIPT_PATH"
   
   # Mark as installed
   mkdir -p /opt/g-forge
@@ -35,7 +45,9 @@ if [ -f "$SCRIPT_DIR/ami-setup.sh" ]; then
   echo ""
   echo "✅ Dependencies installed successfully!"
 else
-  echo "❌ Setup script not found at $SCRIPT_DIR/ami-setup.sh"
+  echo "❌ Setup script not found in deployment directory"
+  echo "   Searched in: $DEPLOYMENT_DIR"
+  echo "   Result: $SCRIPT_PATH"
   exit 1
 fi
 
