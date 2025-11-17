@@ -2,7 +2,8 @@
 # Backup Current Deployment - CodeDeploy Hook
 # G-Forge IoT Radio Platform
 
-set -e
+# Allow script to continue on errors (fresh instance may have nothing to backup)
+set +e
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "💾 BACKING UP CURRENT DEPLOYMENT"
@@ -30,3 +31,4 @@ echo "Cleaning old backups..."
 ls -t /opt/g-forge/backups/ | tail -n +6 | xargs -I {} rm -rf /opt/g-forge/backups/{}
 
 echo "✅ Backup complete: $BACKUP_DIR"
+exit 0
