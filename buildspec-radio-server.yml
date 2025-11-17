@@ -1,0 +1,118 @@
+version: 0.2
+
+################################################################################
+# AWS CODEBUILD BUILDSPEC - RADIO SERVER DEPLOYMENT
+################################################################################
+# Purpose: Build and deploy complete radio streaming server
+# Method: CodeDeploy with artifact containing entire repo
+# Target: EC2 instances with CodeDeploy agent
+################################################################################
+
+env:
+  variables:
+    AWS_REGION: "eu-west-1"
+    APPLICATION_NAME: "g-forge-radio"
+    DEPLOYMENT_GROUP: "radio-production"
+  
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "🔧 Installing dependencies..."
+      - npm install -g aws-cdk
+      - aws --version
+      
+  pre_build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "📋 PRE-BUILD: Preparing deployment artifact"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo ""
+      - echo "Time: $(date)"
+      - echo "Commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - echo "Branch: $CODEBUILD_SOURCE_VERSION"
+      - echo ""
+      
+      # Verify critical files exist
+      - |
+        echo "Checking critical files..."
+        if [ ! -f "appspec.yml" ]; then
+          echo "❌ appspec.yml not found!"
+          exit 1
+        fi
+        echo "✅ appspec.yml found"
+        
+        if [ ! -f "pipeline/ami/ami-setup.sh" ]; then
+          echo "❌ ami-setup.sh not found!"
+          exit 1
+        fi
+        echo "✅ ami-setup.sh found"
+        
+        if [ ! -d "scripts/deploy" ]; then
+          echo "❌ deploy scripts not found!"
+          exit 1
+        fi
+        echo "✅ deploy scripts found"
+      
+      - echo ""
+      - echo "✅ Pre-build checks passed!"
+      - echo ""
+  
+  build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "🏗️  BUILD: Creating deployment artifact"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo ""
+      
+      # Create deployment info file
+      - |
+        cat > deployment-info.json << EOF
+        {
+          "buildTime": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "commit": "$CODEBUILD_RESOLVED_SOURCE_VERSION",
+          "branch": "$CODEBUILD_SOURCE_VERSION",
+          "buildNumber": "$CODEBUILD_BUILD_NUMBER",
+          "buildId": "$CODEBUILD_BUILD_ID"
+        }
+        EOF
+      
+      - echo "✅ Deployment artifact ready!"
+      - echo ""
+      - echo "📦 Artifact contents:"
+      - echo "   - appspec.yml (CodeDeploy configuration)"
+      - echo "   - pipeline/ami/ami-setup.sh (complete installation)"
+      - echo "   - scripts/deploy/* (deployment hooks)"
+      - echo "   - deployment-info.json (build metadata)"
+      - echo ""
+  
+  post_build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "📦 POST-BUILD: Finalizing"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo ""
+      - echo "Build complete: $(date)"
+      - echo ""
+      - echo "✅ Artifact ready for CodeDeploy!"
+      - echo ""
+      - echo "Next step: CodeDeploy will:"
+      - echo "  1. Stop services (ApplicationStop)"
+      - echo "  2. Backup current files (BeforeInstall)"
+      - echo "  3. Install dependencies (BeforeInstall)"
+      - echo "  4. Deploy files (Install)"
+      - echo "  5. Set permissions (AfterInstall)"
+      - echo "  6. Update configs (AfterInstall)"
+      - echo "  7. Start services (ApplicationStart)"
+      - echo "  8. Validate (ValidateService)"
+      - echo ""
+
+artifacts:
+  files:
+    - '**/*'
+  name: radio-server-$(date +%Y%m%d-%H%M%S)
+
+cache:
+  paths:
+    - 'node_modules/**/*'

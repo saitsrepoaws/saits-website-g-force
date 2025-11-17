@@ -7,17 +7,9 @@ os: linux
 
 # Files to deploy
 files:
-  # Frontend dist to web server
-  - source: web/
-    destination: /var/www/splashfm/
-    
-  # Amplify backend configs
-  - source: amplify/
-    destination: /opt/g-forge/amplify/
-    
-  # Deployment scripts
-  - source: scripts/
-    destination: /opt/g-forge/scripts/
+  # Complete repo to /opt/g-forge-iot for CodeDeploy
+  - source: /
+    destination: /opt/g-forge-iot/
 
 # Deployment hooks
 hooks:
@@ -31,6 +23,9 @@ hooks:
   BeforeInstall:
     - location: scripts/deploy/backup-current.sh
       timeout: 300
+      runas: root
+    - location: scripts/deploy/install-dependencies.sh
+      timeout: 1800
       runas: root
   
   # After install
