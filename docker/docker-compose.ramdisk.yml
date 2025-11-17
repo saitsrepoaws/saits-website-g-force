@@ -1,0 +1,165 @@
+version: '3.8'
+
+################################################################################
+# G-FORGE RADIO - Docker Compose (RAM Disk Edition)
+################################################################################
+# All services run in RAM for maximum performance
+# Location: /mnt/ramdisk/docker-compose.yml
+# Start: docker-compose up -d
+# Stop: docker-compose down
+################################################################################
+
+services:
+  
+  # ============================================================================
+  # LIQUIDSOAP - Audio Automation Engine
+  # ============================================================================
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.5
+    container_name: liquidsoap
+    restart: unless-stopped
+    networks:
+      - radio-network
+    volumes:
+      # Config from RAM disk
+      - /mnt/ramdisk/configs/liquidsoap:/etc/liquidsoap:ro
+      # Logs to RAM disk (super fast!)
+      - /mnt/ramdisk/logs:/var/log/liquidsoap
+      # Persistent storage for audio files
+      - /data/media:/media:ro
+      # AWS credentials for SQS
+      - /root/.aws:/root/.aws:ro
+    environment:
+      - TZ=Europe/Amsterdam
+      - AWS_REGION=eu-west-1
+      - SQS_QUEUE_URL=https://sqs.eu-west-1.amazonaws.com/035636364722/radio-track-stream-queue.fifo
+    command: liquidsoap /etc/liquidsoap/radio.liq
+    depends_on:
+      - icecast
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # ICECAST2 - Stream Distribution Server
+  # ============================================================================
+  icecast:
+    image: moul/icecast:latest
+    container_name: icecast
+    restart: unless-stopped
+    networks:
+      - radio-network
+    ports:
+      - "8000:8000"
+    volumes:
+      # Config from RAM disk
+      - /mnt/ramdisk/configs/icecast/icecast.xml:/etc/icecast2/icecast.xml:ro
+      # Logs to RAM disk
+      - /mnt/ramdisk/logs:/var/log/icecast2
+    environment:
+      - TZ=Europe/Amsterdam
+      - ICECAST_SOURCE_PASSWORD=hackme
+      - ICECAST_RELAY_PASSWORD=hackme
+      - ICECAST_ADMIN_PASSWORD=hackme
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # STEREO TOOL - Professional Audio Processing
+  # ============================================================================
+  stereo-tool:
+    image: thimslugga/stereo-tool:latest
+    container_name: stereo-tool
+    restart: unless-stopped
+    networks:
+      - radio-network
+    volumes:
+      # Config from RAM disk
+      - /mnt/ramdisk/configs/stereo-tool:/config:ro
+      # Logs to RAM disk
+      - /mnt/ramdisk/logs:/var/log/stereo-tool
+    environment:
+      - TZ=Europe/Amsterdam
+    # Stereo Tool listens for incoming audio and outputs processed audio
+    # Liquidsoap → Stereo Tool → Icecast
+    ports:
+      - "9000:9000"  # Input
+      - "9001:9001"  # Output
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # NGINX - Reverse Proxy & Load Balancer
+  # ============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    networks:
+      - radio-network
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Config from RAM disk
+      - /mnt/ramdisk/configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /mnt/ramdisk/configs/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      # Logs to RAM disk
+      - /mnt/ramdisk/logs:/var/log/nginx
+      # SSL certificates from persistent storage
+      - /data/certs:/etc/nginx/certs:ro
+      # Web root (optional, for player page)
+      - /var/www/splashfm:/usr/share/nginx/html:ro
+    environment:
+      - TZ=Europe/Amsterdam
+    depends_on:
+      - icecast
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+################################################################################
+# NETWORKS
+################################################################################
+networks:
+  radio-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+################################################################################
+# VOLUMES (None needed - everything in RAM!)
+################################################################################
+# All configs and logs are on RAM disk (/mnt/ramdisk)
+# Only persistent data (audio files, certs) from /data volume
+
+################################################################################
+# USAGE:
+################################################################################
+# Start:    docker-compose -f /mnt/ramdisk/docker-compose.yml up -d
+# Stop:     docker-compose -f /mnt/ramdisk/docker-compose.yml down
+# Restart:  docker-compose -f /mnt/ramdisk/docker-compose.yml restart
+# Logs:     docker-compose -f /mnt/ramdisk/docker-compose.yml logs -f
+# Status:   docker-compose -f /mnt/ramdisk/docker-compose.yml ps
+#
+# Update config:
+#   1. Edit file in /mnt/ramdisk/configs/
+#   2. docker-compose restart <service>
+#   3. Done! (< 2 seconds)
+#
+# Update image:
+#   1. docker-compose pull <service>
+#   2. docker-compose up -d <service>
+#   3. Done!
+################################################################################
