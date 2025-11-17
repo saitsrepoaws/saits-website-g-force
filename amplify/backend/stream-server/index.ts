@@ -79,6 +79,45 @@ export class StreamServerStack extends Stack {
       ]
     })
 
+    // CloudWatch Logs & Metrics Permissions
+    role.addToPolicy(new iam.PolicyStatement({
+      sid: 'CloudWatchLogsFullAccess',
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'logs:CreateLogGroup',
+        'logs:CreateLogStream',
+        'logs:PutLogEvents',
+        'logs:DescribeLogGroups',
+        'logs:DescribeLogStreams'
+      ],
+      resources: [
+        `arn:aws:logs:${this.region}:${this.account}:log-group:/g-forge-radio/*`,
+        `arn:aws:logs:${this.region}:${this.account}:log-group:/g-forge-radio/*:*`
+      ]
+    }))
+
+    role.addToPolicy(new iam.PolicyStatement({
+      sid: 'CloudWatchMetricsAccess',
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'cloudwatch:PutMetricData',
+        'cloudwatch:GetMetricStatistics',
+        'cloudwatch:ListMetrics'
+      ],
+      resources: ['*']
+    }))
+
+    role.addToPolicy(new iam.PolicyStatement({
+      sid: 'EC2MetadataAccess',
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'ec2:DescribeVolumes',
+        'ec2:DescribeTags',
+        'ec2:DescribeInstances'
+      ],
+      resources: ['*']
+    }))
+
     // Grant S3 access to EC2
     playlistBucket.grantRead(role)
 
