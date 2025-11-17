@@ -1,7 +1,124 @@
 # 📚 Documentation Index - G-Forge IoT Radio Platform
 
-**Last Updated:** 13 November 2025  
+**Last Updated:** 16 November 2025  
 **Status:** Complete & Up-to-date
+
+**📋 [TODO List](../TODO.md)** - Complete takenlijst (alles wat klaar is en nog moet)
+
+---
+
+## 🔥 LATEST UPDATES (16 Nov 2025)
+
+### Professional DJ Platform - MAXIMUM POWER MODE! ⚡
+- [Professional DJ Platform](PROFESSIONAL_DJ_PLATFORM_16NOV2025.md) - **🎛️ Complete metadata system**
+- [IoT Quick Reference](IOT_QUICK_REFERENCE_16NOV2025.md) - **📡 IoT topics & commands**
+- [Smoketest Checklist](SMOKETEST_CHECKLIST_16NOV2025.md) - **🧪 8-step validation**
+- [Ultra-Low Latency Optimization](ULTRA_LOW_LATENCY_OPTIMIZATION_16NOV2025.md) - **⚡ 6x faster streaming!**
+- [IoT Anonymous Users Architecture](IOT_ANONYMOUS_USERS_ARCHITECTURE_16NOV2025.md) - **👥 Real-time messaging**
+- [Player Performance Optimization](PLAYER_PERFORMANCE_OPTIMIZATION_16NOV2025.md) - **🚀 5x smaller, 3.5x faster!**
+- [IoT Connection Indicator](IOT_CONNECTION_INDICATOR_16NOV2025.md) - **💡 Visual status with smooth animations!**
+- [IoT Shadow/Cache Strategy](IOT_SHADOW_CACHE_STRATEGY_16NOV2025.md) - **⚡ Instant metadata (< 50ms)!**
+- [Automated Test Report](TEST_REPORT_16NOV2025.md) - **🧪 90% passing (45/50 tests)**
+- [CI/CD Pipeline Setup](CICD_PIPELINE_SETUP.md) - **🚀 Per-BLOK testing & automated deployment**
+- [Testing Best Practices](TESTING_BEST_PRACTICES.md) - **📋 Test before every commit policy**
+
+**Key Achievements:**
+- ✅ Complete metadata (BPM, Key, Energy, Mix Points, Hot Cues, Loops)
+- ✅ IoT publishing (nowplaying with full metadata)
+- ✅ IoT remote control (restart, cleanup, health, skip)
+- ✅ Ultra-low latency (< 500ms stream start, 6x faster!)
+- ✅ Player URL fixed (HTTPS port 443, clean URL)
+- ✅ Complete test suite (60 tests: 12 smoke + 48 regression)
+- ✅ Anonymous user IoT access (Cognito Identity Pools)
+- ✅ Player performance optimized (5x smaller, 3.5x faster!)
+- ✅ IoT indicator with smooth animations (🔴🟠🟢)
+- ✅ Stats panel (latency, uptime, metadata)
+- ✅ G-FORGE favicon
+- ✅ CORS headers fixed (duplicate headers eliminated!)
+- ✅ Automated testing (90% pass rate)
+- ✅ CI/CD Pipeline (CodeBuild, CodeDeploy, CodePipeline)
+- ✅ Per-BLOK testing (intelligent test triggering)
+- ✅ Zero-downtime deployment (automatic rollback)
+
+**Future Enhancements:**
+- 📋 [AWS Media Services Integration](AWS_MEDIA_SERVICES_INTEGRATION_TODO.md) - Professional broadcasting demo
+
+---
+
+## 🎯 SYSTEM BLOCKS (BLOKKEN)
+
+### End-to-End Testing & Recovery
+
+De complete G-Forge radio platform bestaat uit 6 hoofdblokken. Elk blok heeft eigen documentatie voor testing, troubleshooting en recovery.
+
+**📋 Overview:** [System Blocks Overview](SYSTEM_BLOCKS_OVERVIEW.md) - Complete overzicht van alle 6 blokken
+
+**Status Legend:**
+- ✅ Documented & Tested
+- 🚧 Documentation in progress
+- ⏳ Pending documentation
+
+---
+
+#### 1. BLOK LIBERY - Track Library System ✅
+- [BLOK LIBERY](BLOK_LIBERY_END_TO_END.md) - **📚 Track Library**
+- Upload MP3, metadata extraction, BPM/Key detection, cover art, waveform generation
+- Components: Libery UI, audio-metadata Lambda, waveform-generator Lambda, audio-analyzer Docker Lambda
+- Status: ✅ Documented & Working
+
+#### 2. BLOK PLAY - Real-time Player 🚧
+- [BLOK PLAY](BLOK_PLAY_END_TO_END.md) - **🎵 Radio Player**
+- Real-time audio player, IoT PubSub, track info, now playing, sync across devices
+- Components: Player UI, player-iot-publisher Lambda, player-load-handler Lambda, IoT Core
+- Status: 🚧 Pending documentation
+
+#### 3. BLOK PLAYLIST - Playlist Management 🚧
+- [BLOK PLAYLIST](BLOK_PLAYLIST_END_TO_END.md) - **📋 Playlist System**
+- Create playlists, smart generation, genre mix, BPM/Key filtering, track selection
+- Components: Playlist UI, playlist-generator Lambda, track-queue-manager Lambda, genre-merger Lambda
+- Status: 🚧 Pending documentation
+
+#### 4. BLOK PLANNER - Radio Scheduler 🚧
+- [BLOK PLANNER](BLOK_PLANNER_END_TO_END.md) - **📅 Radio Station Scheduler**
+- Hourly scheduling, time slots, playlist rotation, news bulletins, automated programming
+- Components: Scheduler UI, radio-scheduler Lambda, stream-playlist-updater Lambda, EventBridge
+- Status: 🚧 Pending documentation
+
+#### 5. BLOK EC2 - Stream Server 🚧
+- [BLOK EC2](BLOK_EC2_END_TO_END.md) - **🖥️ Stream Server Infrastructure**
+- EC2 instance, Liquidsoap, Icecast, Nginx, Stereo Tool, SQS queue processing
+- Components: EC2 (79.125.44.178), Liquidsoap config, stream-monitor Lambda, CloudFront
+- Status: 🚧 Pending documentation
+
+#### 6. BLOK STREAMING - Audio Processing 🚧
+- [BLOK STREAMING](BLOK_STREAMING_END_TO_END.md) - **🎚️ Audio Processing Pipeline**
+- Crossfade, normalization, EQ, Stereo Tool processing, track transitions, audio quality
+- Components: crossfade-controller Lambda, Stereo Tool, Liquidsoap audio processing
+- Status: 🚧 Pending documentation
+
+---
+
+### Testing Strategy
+
+**Systematische aanpak:**
+1. Test elk BLOK individueel (unit test)
+2. Test BLOKken samen (integration test)
+3. Test complete flow (end-to-end test)
+
+**Test volgorde:**
+```
+BLOK LIBERY (upload) 
+    ↓
+BLOK PLAYLIST (organize)
+    ↓
+BLOK PLANNER (schedule)
+    ↓
+BLOK EC2 (stream)
+    ↓
+BLOK STREAMING (process)
+    ↓
+BLOK PLAY (listen)
+```
 
 ---
 

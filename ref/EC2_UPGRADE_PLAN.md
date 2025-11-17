@@ -184,8 +184,8 @@ aws ec2 associate-address \
 
 **4. Verify**
 ```bash
-curl http://46.137.184.91/
-curl http://46.137.184.91:8000/status-json.xsl
+curl http://79.125.44.178/
+curl http://79.125.44.178:8000/status-json.xsl
 ```
 
 ### Fase 5: Cleanup (Later)

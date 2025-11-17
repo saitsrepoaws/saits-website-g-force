@@ -29,7 +29,7 @@ Complete monitoring, health checks, service management, en CloudWatch integratie
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│              EC2 Instance (46.137.184.91)          │
+│              EC2 Instance (79.125.44.178)          │
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │  📦 Services:                                       │

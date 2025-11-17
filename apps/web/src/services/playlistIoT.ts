@@ -1,5 +1,5 @@
 // IoT/PubSub service for real-time playlist updates
-import { PubSub } from '@aws-amplify/pubsub'
+// PubSub imported via pubsub service
 import { Hub } from 'aws-amplify/utils'
 import type { PlaylistEvent, PlaylistTrackItem } from '../types/playlist'
 
@@ -29,7 +29,7 @@ class PlaylistIoTService {
    * Subscribe to playlist events
    * Returns unsubscribe function
    */
-  subscribeToPlaylist(playlistId: string, callback: (event: PlaylistEvent) => void) {
+  subscribeToPlaylist(playlistId: string, _callback: (event: PlaylistEvent) => void) {
     const topic = `playlist/${playlistId}/events`
     
     console.log(`📡 Subscribing to: ${topic} (IoT Core not configured - using local state only)`)

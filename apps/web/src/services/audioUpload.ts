@@ -55,11 +55,11 @@ export async function uploadAudioFile(
       options: {
         contentType: file.type,
         onProgress: (event) => {
-          if (onProgress && event.total) {
+          if (onProgress && event.totalBytes) {
             onProgress({
-              loaded: event.loaded,
-              total: event.total,
-              percentage: Math.round((event.loaded / event.total) * 100),
+              loaded: event.transferredBytes || 0,
+              total: event.totalBytes,
+              percentage: Math.round(((event.transferredBytes || 0) / event.totalBytes) * 100),
             })
           }
         },
@@ -111,11 +111,11 @@ export async function uploadCoverArt(
       options: {
         contentType: file.type,
         onProgress: (event) => {
-          if (onProgress && event.total) {
+          if (onProgress && event.totalBytes) {
             onProgress({
-              loaded: event.loaded,
-              total: event.total,
-              percentage: Math.round((event.loaded / event.total) * 100),
+              loaded: event.transferredBytes || 0,
+              total: event.totalBytes,
+              percentage: Math.round(((event.transferredBytes || 0) / event.totalBytes) * 100),
             })
           }
         },

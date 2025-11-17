@@ -147,7 +147,7 @@ ssh radio-ec2 '/usr/local/bin/service-manager.sh stop'
 
 **Verify:**
 ```bash
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 # Should: Connection refused or timeout
 ```
 
@@ -171,7 +171,7 @@ ssh radio-ec2 '/usr/local/bin/service-manager.sh start'
 
 **Verify:**
 ```bash
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 # Should: HTTP/1.1 200 OK
 ```
 
@@ -541,10 +541,10 @@ ssh radio-ec2 '/usr/local/bin/service-manager.sh start'
 ### **Step 4: Verify Stream**
 ```bash
 # HTTP check
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 
 # Stream check
-curl -s --max-time 5 http://46.137.184.91/stream.mp3 | head -c 1000 | wc -c
+curl -s --max-time 5 http://79.125.44.178/stream.mp3 | head -c 1000 | wc -c
 # Should: 1000 bytes
 ```
 

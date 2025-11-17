@@ -51,9 +51,9 @@ export function usePlayerState(options: UsePlayerStateOptions): UsePlayerStateRe
     try {
       const fullStateData: PlayerStateData = {
         playerId,
-        trackId: currentTrack?.id || '',
-        trackTitle: currentTrack?.title || '',
-        trackArtist: currentTrack?.artist || '',
+        currentTrackId: currentTrack?.id || '',
+        currentTrackTitle: currentTrack?.title || '',
+        currentTrackArtist: currentTrack?.artist || '',
         status: isPlaying ? 'playing' : 'stopped',
         lastPosition: 0,
         duration: 0,
@@ -80,11 +80,11 @@ export function usePlayerState(options: UsePlayerStateOptions): UsePlayerStateRe
       console.log('🔄 Restoring player state for:', playerId)
       const state = await getPlayerState(playerId)
       
-      if (state) {
-        setPlayerStateId(state.id)
-        setBackendState(state)
-        console.log('✅ Player state restored:', state.trackTitle)
-        return state
+      if (state && state.data) {
+        setPlayerStateId(state.data.id)
+        setBackendState(state.data)
+        console.log('✅ Player state restored:', state.data.currentTrackTitle)
+        return state.data
       } else {
         console.log('ℹ️ No previous state found')
         return null

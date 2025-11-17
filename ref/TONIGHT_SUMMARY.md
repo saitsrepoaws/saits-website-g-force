@@ -234,7 +234,7 @@ mutation {
 
 ### **2. Check Stream Status** ✅
 ```bash
-curl http://46.137.184.91:8000/status-json.xsl | jq '.'
+curl http://79.125.44.178:8000/status-json.xsl | jq '.'
 ```
 
 ### **3. Browse Documentation** ✅

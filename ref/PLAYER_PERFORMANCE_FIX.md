@@ -8,7 +8,7 @@
 
 ## 🎯 **PROBLEEM:**
 
-De SplashFM web player op http://46.137.184.91/ startte **langzaam** (2-4 seconden vertraging) wanneer gebruikers op PLAY klikten.
+De SplashFM web player op http://79.125.44.178/ startte **langzaam** (2-4 seconden vertraging) wanneer gebruikers op PLAY klikten.
 
 ---
 
@@ -87,11 +87,11 @@ grep 'preload=' /var/www/splashfm/index.html
 ### **Stap 3: Testing** ✅
 ```bash
 # HTTP Response time:
-time curl -s -o /dev/null http://46.137.184.91/
+time curl -s -o /dev/null http://79.125.44.178/
 # Result: 0.014s (14ms) ✅
 
 # Player accessible:
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 # HTTP/1.1 200 OK ✅
 ```
 
@@ -272,8 +272,8 @@ Usage: ./player-restore.sh [backup-file]
 
 ## 🔗 **LINKS:**
 
-- Player URL: http://46.137.184.91/
-- Stream Status: http://46.137.184.91/status-json.xsl
+- Player URL: http://79.125.44.178/
+- Stream Status: http://79.125.44.178/status-json.xsl
 - Deploy Script: `./player-deploy.sh`
 - Restore Script: `./player-restore.sh`
 

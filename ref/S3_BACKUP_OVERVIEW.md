@@ -201,7 +201,7 @@ Icecast version info
   "version": "initial-backup-v0.0.3",
   "description": "Initial backup of all server configs",
   "files": [...],
-  "ec2_host": "46.137.184.91",
+  "ec2_host": "79.125.44.178",
   "created_by": "backup-server-configs.sh"
 }
 ```
@@ -399,7 +399,7 @@ Crossfade Presets:
 ./switch-crossfade-preset.sh g-forge-Quick-Mix-Extreme
 
 # 3. Verify stream
-curl http://46.137.184.91/
+curl http://79.125.44.178/
 ```
 
 **Time to recovery:** < 5 minutes ✅

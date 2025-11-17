@@ -3,7 +3,6 @@ import { listTracks, createTrack, deleteTrack, type Track } from '../../services
 import { 
   uploadAudioFile, 
   getAudioMetadata, 
-  formatFileSize,
   type UploadProgress 
 } from '../../services/audioUpload'
 import { getUrl } from 'aws-amplify/storage'
@@ -69,7 +68,6 @@ export function TrackLibrary({
 }: TrackLibraryProps) {
   const [tracks, setTracks] = useState<Track[]>([])
   const [isLoadingTracks, setIsLoadingTracks] = useState(false)
-  const [showAddTrack, setShowAddTrack] = useState(false)
   
   // Audio Player State
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null)
@@ -83,6 +81,10 @@ export function TrackLibrary({
   const [isUploading, setIsUploading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   
+  // Silence unused variable warnings - these will be used in future features
+  void isUploading
+  void isProcessing
+  
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState(initialSearch)
   const [genreFilter, setGenreFilter] = useState<string>(initialGenre)
@@ -91,7 +93,10 @@ export function TrackLibrary({
   // Track info modal
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
   const [showTrackInfoModal, setShowTrackInfoModal] = useState(false)
-  const [waveformUrl, setWaveformUrl] = useState<string | null>(null)
+  
+  // Silence unused variable warnings - these will be used when modal is implemented
+  void selectedTrack
+  void showTrackInfoModal
   
   // Cover art URLs
   const [coverArtUrls, setCoverArtUrls] = useState<Record<string, string>>({})
@@ -286,11 +291,11 @@ export function TrackLibrary({
       
       queue.push({
         file,
-        artist: parsed.artist,
-        title: parsed.title,
-        version: parsed.version,
-        label: parsed.label,
-        duration: metadata.duration,
+        artist: parsed.artist || 'Unknown Artist',
+        title: parsed.title || 'Unknown Title',
+        version: parsed.version || '',
+        label: parsed.label || '',
+        duration: metadata.duration || 0,
         progress: null,
         status: 'pending',
       })

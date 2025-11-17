@@ -11,13 +11,21 @@ export default function PubSubPanel() {
 
   useEffect(() => {
     if (!enabled) return
-    const sub = pubsubSubscribe(
+    
+    let mounted = true
+    
+    pubsubSubscribe(
       { topic },
       (data) => setLogs((l) => [JSON.stringify(data), ...l]),
       (err) => setLogs((l) => [String(err), ...l])
-    )
-    subRef.current = sub
+    ).then((sub) => {
+      if (mounted && sub) {
+        subRef.current = sub
+      }
+    })
+    
     return () => {
+      mounted = false
       try { subRef.current?.unsubscribe?.() } catch {}
     }
   }, [enabled, topic])

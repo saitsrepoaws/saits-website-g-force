@@ -56,7 +56,7 @@ https://splashfm.nl/stream-raw.mp3
 ## 🔧 **INFRASTRUCTURE:**
 
 ### **EC2 Server:**
-- IP: 46.137.184.91
+- IP: 79.125.44.178
 - Services: Liquidsoap, Icecast2, Stereo Tool, Nginx
 - Region: eu-west-1
 

@@ -327,7 +327,7 @@ Based on expert research documented in: `CROSSFADE_HIT_RADIO_RESEARCH.md`
 
 ### **EC2 Location:**
 ```
-Server:  46.137.184.91 (radio-ec2)
+Server:  79.125.44.178 (radio-ec2)
 Path:    /opt/radio/advanced-crossfade.liq
 Main:    /opt/radio/radio.liq
 Logs:    /tmp/liquidsoap.log
@@ -359,7 +359,7 @@ ssh radio-ec2 "tail -f /tmp/liquidsoap.log | grep -i 'crossfade\|jingle'"
 
 ### **Stream health:**
 ```bash
-curl -I http://46.137.184.91/
+curl -I http://79.125.44.178/
 ```
 
 ---
@@ -416,7 +416,7 @@ Path: /crossfade-presets/
 
 **Server:**
 ```
-Host: radio-ec2 (46.137.184.91)
+Host: radio-ec2 (79.125.44.178)
 SSH:  ssh radio-ec2
 ```
 
@@ -424,6 +424,6 @@ SSH:  ssh radio-ec2
 
 **Status:** ✅ PRODUCTION READY  
 **Active:** g-forge-Quick-Mix-Extreme (SLAM style)  
-**Stream:** http://46.137.184.91/stream.mp3
+**Stream:** http://79.125.44.178/stream.mp3
 
 🎛️ **EASY SWITCHING. PROFESSIONAL SOUND. S3 VERSIONED.**

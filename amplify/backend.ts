@@ -20,9 +20,11 @@ import { trackCompletionHandler } from './functions/track-completion-handler/res
 import { getCoverUrl } from './functions/get-cover-url/resource'
 import { trackQueueManager } from './functions/track-queue-manager/resource'
 import { genreMerger } from './functions/genre-merger/resource'
+import { playerConnectHandler } from './functions/player-connect-handler/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
+import { createEC2Parameters, grantEC2ParameterAccess } from './backend/ec2-config'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
@@ -71,7 +73,8 @@ export const backend = defineBackend({
   // listenerTracker, // DISABLED: esbuild bundling issue
   getCoverUrl,
   trackQueueManager,
-  genreMerger
+  genreMerger,
+  playerConnectHandler
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -230,7 +233,6 @@ unauthenticatedRole.addManagedPolicy(
 new CfnOutput(backend.auth.stack, 'IoTCognitoPolicyName', {
   value: 'RadioPlayerCognitoPolicy',
   description: 'IoT Policy name (existing) that gets attached to Cognito Identity',
-  exportName: 'IoTCognitoPolicyName',
 })
 
 // Create policy statements that will be attached to BOTH roles
@@ -320,8 +322,8 @@ const cloudFrontDistribution = new cloudfront.Distribution(
         backend.storage.stack,
         'AudioCachePolicy',
         {
-          cachePolicyName: 'AudioFilesCache',
-          comment: 'Cache policy for audio files with auth params',
+          cachePolicyName: 'AudioFilesCache-v2',
+          comment: 'Cache policy for audio files with auth params (v2)',
           defaultTtl: Duration.minutes(15), // Match presigned URL expiry
           maxTtl: Duration.hours(1), // Max 1 hour
           minTtl: Duration.seconds(0),
@@ -343,13 +345,11 @@ const cloudFrontDistribution = new cloudfront.Distribution(
 new CfnOutput(backend.storage.stack, 'CloudFrontDomain', {
   value: cloudFrontDistribution.distributionDomainName,
   description: 'CloudFront distribution domain for storage assets',
-  exportName: 'StorageCloudFrontDomain',
 })
 
 new CfnOutput(backend.storage.stack, 'CloudFrontDistributionId', {
   value: cloudFrontDistribution.distributionId,
   description: 'CloudFront distribution ID',
-  exportName: 'StorageCloudFrontDistributionId',
 })
 
 // =============================================================================
@@ -484,7 +484,6 @@ const iotRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerCommandRule', {
 new CfnOutput(stateMachineStack, 'PlayerStateMachineArn', {
   value: playerStateMachine.stateMachineArn,
   description: 'ARN of the Player State Machine',
-  exportName: 'PlayerStateMachineArn',
 })
 
 // IoT Rule output
@@ -501,7 +500,7 @@ new CfnOutput(stateMachineStack, 'IoTRuleArn', {
 crossfadeControllerLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
 
 const crossfadeIotRule = new iot.CfnTopicRule(stateMachineStack, 'CrossFadeControlRule', {
-  ruleName: 'RadioCrossFadeControlRule',
+  ruleName: 'RadioCrossFadeControlRule_v2',
   topicRulePayload: {
     sql: "SELECT * FROM 'radio/crossfade/control'",
     description: 'Trigger cross-fade controller for START/STOP commands',
@@ -520,8 +519,51 @@ const crossfadeIotRule = new iot.CfnTopicRule(stateMachineStack, 'CrossFadeContr
 new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
   value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${crossfadeIotRule.ruleName}`,
   description: 'ARN of the IoT Rule for cross-fade control',
-  exportName: 'PlayerCommandIoTRuleArn',
 })
+
+// =============================================================================
+// Player Connect Handler - IoT Lifecycle Event
+// =============================================================================
+// Gerard's brilliant idea: Send current track to player immediately on connect! ⚡
+
+const playerConnectLambda = backend.playerConnectHandler.resources.lambda
+
+// Grant IoT permission to invoke player-connect-handler
+playerConnectLambda.grantInvoke(new ServicePrincipal('iot.amazonaws.com'))
+
+// Grant Lambda permission to publish to IoT (player-specific topics)
+playerConnectLambda.addToRolePolicy(
+  new PolicyStatement({
+    effect: Effect.ALLOW,
+    actions: ['iot:Publish'],
+    resources: ['arn:aws:iot:*:*:topic/radio/stream/player/*'],
+  })
+)
+
+// IoT Lifecycle Rule - triggers when player connects
+const playerConnectRule = new iot.CfnTopicRule(stateMachineStack, 'PlayerConnectLifecycleRule', {
+  ruleName: 'PlayerConnectLifecycle_v2',
+  topicRulePayload: {
+    sql: "SELECT * FROM '$aws/events/presence/connected/+'",
+    description: 'Trigger Lambda when player connects to send current track instantly',
+    actions: [
+      {
+        lambda: {
+          functionArn: playerConnectLambda.functionArn,
+        },
+      },
+    ],
+    awsIotSqlVersion: '2016-03-23',
+  },
+})
+
+// Player Connect Rule output
+new CfnOutput(stateMachineStack, 'PlayerConnectRuleArn', {
+  value: `arn:aws:iot:${stateMachineStack.region}:${stateMachineStack.account}:rule/${playerConnectRule.ruleName}`,
+  description: 'ARN of the IoT Lifecycle Rule for player connect events',
+})
+
+console.log('📡 Player Connect Handler configured with IoT Lifecycle event')
 
 // =============================================================================
 // Radio Scheduler - EventBridge Schedule (runs every minute)
@@ -529,7 +571,7 @@ new CfnOutput(stateMachineStack, 'CrossFadeIoTRuleArn', {
 
 // Create EventBridge rule to trigger radio scheduler every minute
 const schedulerRule = new events.Rule(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRule', {
-  ruleName: 'RadioSchedulerEveryMinute',
+  ruleName: 'RadioSchedulerEveryMinute-v2',
   description: 'Triggers radio scheduler Lambda every minute to broadcast next track',
   schedule: events.Schedule.rate(Duration.minutes(1)),
 })
@@ -541,7 +583,6 @@ schedulerRule.addTarget(new targets.LambdaFunction(radioSchedulerLambda))
 new CfnOutput(backend.radioScheduler.resources.lambda.stack, 'RadioSchedulerRuleArn', {
   value: schedulerRule.ruleArn,
   description: 'EventBridge rule that triggers radio scheduler every minute',
-  exportName: 'RadioSchedulerRuleArn',
 })
 
 console.log('📻 Radio Scheduler Lambda deployed with EventBridge (rate: 1 minute)')
@@ -614,7 +655,10 @@ backend.streamPlaylistUpdater.addEnvironment('TRACK_TABLE', trackTable.tableName
 backend.streamPlaylistUpdater.addEnvironment('PLAYLIST_BUCKET', playlistBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
 backend.streamPlaylistUpdater.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
-backend.streamPlaylistUpdater.addEnvironment('EC2_INSTANCE_ID', 'i-021451e919d39c898') // EC2 Stream Server
+backend.streamPlaylistUpdater.addEnvironment('EC2_PARAM_PREFIX', '/gforge-radio/ec2') // Parameter Store prefix
+
+// Grant Parameter Store access
+grantEC2ParameterAccess(streamPlaylistLambda, streamPlaylistLambda.stack)
 
 // EventBridge rule - Run HOURLY at :00 for radio station scheduling
 // Cron: minute hour day-of-month month day-of-week year
@@ -623,7 +667,7 @@ const streamSchedulerRule = new events.Rule(
   streamPlaylistLambda.stack,
   'StreamPlaylistSchedulerRule',
   {
-    ruleName: 'StreamPlaylistHourly',
+    ruleName: 'StreamPlaylistHourly-v2',
     description: 'Updates stream playlist HOURLY - downloads news + generates M3U + pushes to EC2',
     schedule: events.Schedule.cron({
       minute: '0',  // At :00
@@ -687,7 +731,7 @@ const trackPusherRule = new events.Rule(
   trackPusherLambda.stack,
   'TrackPusherRule',
   {
-    ruleName: 'StreamTrackPusherEvery3Min',
+    ruleName: 'StreamTrackPusherEvery3Min-v2',
     description: 'Pushes next track to maintain 2-track buffer on EC2',
     schedule: events.Schedule.rate(Duration.minutes(3))
   }
@@ -743,7 +787,7 @@ const healthMonitorRule = new events.Rule(
   healthMonitorLambda.stack,
   'HealthMonitorRule',
   {
-    ruleName: 'StreamHealthCheckEveryMinute',
+    ruleName: 'StreamHealthCheckEveryMinute-v2',
     description: 'Checks stream health every minute - bulletproof monitoring',
     schedule: events.Schedule.rate(Duration.minutes(1))
   }
@@ -798,7 +842,7 @@ const streamStatusRule = new events.Rule(
   streamStatusLambda.stack,
   'StreamStatusPublisherRule',
   {
-    ruleName: 'StreamStatusEveryMinute',
+    ruleName: 'StreamStatusEveryMinute-v2',
     description: 'Publishes stream status to IoT and checks for dynamic playlist updates every minute',
     schedule: events.Schedule.rate(Duration.minutes(1)),
   }
@@ -828,7 +872,6 @@ backend.streamMonitor.addEnvironment('STREAM_QUEUE_TRACK_TABLE', streamQueueTrac
 new CfnOutput(streamMonitorLambda.stack, 'StreamMonitorLambdaName', {
   value: streamMonitorLambda.functionName,
   description: 'Stream Monitor Lambda function name',
-  exportName: 'StreamMonitorLambdaName',
 })
 
 // ============================================
@@ -853,7 +896,7 @@ if (backend.data.resources.tables['StreamQueueTrack']) {
 
 // IoT Rule to trigger on stream status updates (track changes)
 const trackCompletionRule = new iot.CfnTopicRule(trackCompletionLambda.stack, 'TrackCompletionRule', {
-  ruleName: 'TrackCompletionRule',
+  ruleName: 'TrackCompletionRule_v2',
   topicRulePayload: {
     description: 'Triggers track completion handler when track finishes playing',
     sql: "SELECT * FROM 'radio/stream/status' WHERE previousTrack.trackId <> ''",
@@ -883,7 +926,7 @@ const storageStack = backend.storage.resources.bucket.stack
 
 // Create SQS FIFO Queue in storage stack (has no dependency on data)
 const trackStreamQueue = new sqs.Queue(storageStack, 'RadioTrackStreamQueue', {
-  queueName: 'radio-track-stream-queue.fifo',
+  queueName: 'radio-track-stream-queue-v2.fifo',
   fifo: true,
   contentBasedDeduplication: false, // We provide deduplication IDs
   visibilityTimeout: Duration.seconds(300), // 5 minutes (track duration)
@@ -914,8 +957,8 @@ const trackQueueInitRule = new events.Rule(
   storageStack,
   'TrackQueueInitRule',
   {
-    ruleName: 'TrackQueueInitHourly',
-    description: 'Initializes track queue with 2 tracks at top of each hour',
+    ruleName: 'TrackQueueInitHourly-v2',
+    description: 'Initializes track queue with 2 tracks at top of each hour (v2)',
     schedule: events.Schedule.cron({ minute: '0' }), // Every hour at :00
   }
 )
@@ -926,13 +969,11 @@ trackQueueInitRule.addTarget(new targets.LambdaFunction(trackQueueManagerLambda)
 new CfnOutput(storageStack, 'TrackStreamQueueUrl', {
   value: trackStreamQueue.queueUrl,
   description: 'SQS FIFO Queue URL for track streaming',
-  exportName: 'TrackStreamQueueUrl',
 })
 
 new CfnOutput(storageStack, 'TrackStreamQueueArn', {
   value: trackStreamQueue.queueArn,
   description: 'SQS FIFO Queue ARN for EC2 permissions',
-  exportName: 'TrackStreamQueueArn',
 })
 
 console.log('✅ Track queue manager configured with hourly trigger')
@@ -954,7 +995,6 @@ backend.genreMerger.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
 new CfnOutput(genreMergerLambda.stack, 'GenreMergerLambdaName', {
   value: genreMergerLambda.functionName,
   description: 'Genre Merger Lambda function name',
-  exportName: 'GenreMergerLambdaName',
 })
 
 console.log('✅ Genre merger configured')
@@ -981,7 +1021,7 @@ const listenerTrackerRule = new events.Rule(
   listenerTrackerLambda.stack,
   'ListenerTrackerRule',
   {
-    ruleName: 'ListenerTrackerEveryMinute',
+    ruleName: 'ListenerTrackerEveryMinute-v2',
     description: 'Tracks detailed listener analytics every minute',
     schedule: events.Schedule.rate(Duration.minutes(1))
   }
@@ -992,390 +1032,34 @@ listenerTrackerRule.addTarget(new targets.LambdaFunction(listenerTrackerLambda))
 
 console.log('✅ Listener tracker configured')
 
-// VPC for EC2 Stream Server
-const vpc = new ec2.Vpc(streamPlaylistLambda.stack, 'StreamVPC', {
-  maxAzs: 2,
-  natGateways: 0, // Use public subnet only for cost
-  subnetConfiguration: [
-    {
-      name: 'Public',
-      subnetType: ec2.SubnetType.PUBLIC,
-      cidrMask: 24
-    }
-  ]
+// =============================================================================
+// 🎙️ EC2 CONFIGURATION - Parameter Store
+// =============================================================================
+// 
+// ⚠️ NOTE: EC2 instance is MANUALLY MANAGED (not via CloudFormation)
+// Current IP: 79.125.44.178
+// Instance ID: i-021451e919d39c898
+// Services: Icecast, Liquidsoap, Nginx
+// Status: ✅ RUNNING
+// 
+// Configuration stored in AWS Systems Manager Parameter Store:
+// - /gforge-radio/ec2/instance-id
+// - /gforge-radio/ec2/public-ip
+// - /gforge-radio/ec2/region
+// 
+// Lambda functions read from Parameter Store (no hardcoded values!)
+// =============================================================================
+
+// Create EC2 configuration in Parameter Store
+const ec2Config = createEC2Parameters(storageStack, {
+  instanceId: 'i-054754fbca0bda346',  // SplashFM-StreamServer-Restored
+  publicIp: '54.171.0.54',            // Elastic IP (fixed!)
+  elasticIp: '54.171.0.54',           // Elastic IP allocation
+  region: 'eu-west-1'                 // Region
 })
 
-// Security Group for Stream Server
-const streamSG = new ec2.SecurityGroup(streamPlaylistLambda.stack, 'StreamSG', {
-  vpc,
-  description: 'Security group for Icecast stream server',
-  allowAllOutbound: true
-})
-
-// Allow Icecast port 8000
-streamSG.addIngressRule(
-  ec2.Peer.anyIpv4(),
-  ec2.Port.tcp(8000),
-  'Allow Icecast streaming'
-)
-
-// Allow SSH
-streamSG.addIngressRule(
-  ec2.Peer.anyIpv4(),
-  ec2.Port.tcp(22),
-  'Allow SSH access'
-)
-
-// Allow HTTP
-streamSG.addIngressRule(
-  ec2.Peer.anyIpv4(),
-  ec2.Port.tcp(80),
-  'Allow HTTP access'
-)
-
-// IAM Role for EC2
-const ec2Role = new iam.Role(streamPlaylistLambda.stack, 'StreamServerRole', {
-  assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
-  managedPolicies: [
-    iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore')
-  ]
-})
-
-// Grant S3 read access to EC2 (includes GetObject, ListBucket, GetBucketLocation)
-playlistBucket.grantRead(ec2Role)
-storageBucket.grantRead(ec2Role) // For reading audio files
-
-// NOTE: SQS removed - EC2 now reads from local M3U file
-// Liquidsoap uses playlist() operator with /var/radio/playlists/current.m3u
-
-// User data script for EC2
-const userData = ec2.UserData.forLinux()
-userData.addCommands(
-  '#!/bin/bash',
-  'set -e',
-  'exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1',
-  '',
-  'echo "🎙️ G-Forge Radio Stream Server Setup Starting..."',
-  '',
-  '# Update system',
-  'export DEBIAN_FRONTEND=noninteractive',
-  'apt-get update',
-  'apt-get upgrade -y',
-  '',
-  '# Pre-configure icecast2 to avoid interactive prompts',
-  'echo "icecast2 icecast2/icecast-setup boolean false" | debconf-set-selections',
-  '',
-  '# Install basic dependencies',
-  'apt-get install -y \\',
-  '  icecast2 \\',
-  '  liquidsoap \\',
-  '  nginx \\',
-  '  curl \\',
-  '  unzip \\',
-  '  ffmpeg',
-  '',
-  '# Install AWS CLI v2 (Ubuntu 24.04 compatible)',
-  'echo "📦 Installing AWS CLI v2..."',
-  'cd /tmp',
-  'curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"',
-  'unzip -q awscliv2.zip',
-  'sudo ./aws/install',
-  'rm -rf aws awscliv2.zip',
-  '',
-  '# Install SSM Agent via snap',
-  'echo "📦 Installing SSM Agent..."',
-  'snap install amazon-ssm-agent --classic',
-  'systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service',
-  'systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service',
-  '',
-  '# Configure Icecast',
-  'cat > /etc/icecast2/icecast.xml << "ICECAST_EOF"',
-  '<icecast>',
-  '  <location>Europe/Amsterdam</location>',
-  '  <admin>admin@g-forge.com</admin>',
-  '  <limits>',
-  '    <clients>100</clients>',
-  '    <sources>5</sources>',
-  '    <queue-size>524288</queue-size>',
-  '  </limits>',
-  '  <authentication>',
-  '    <source-password>gforge2024radio</source-password>',
-  '    <admin-password>gforge2024admin</admin-password>',
-  '  </authentication>',
-  '  <hostname>radio.g-forge.com</hostname>',
-  '  <listen-socket>',
-  '    <port>8000</port>',
-  '  </listen-socket>',
-  '  <paths>',
-  '    <basedir>/usr/share/icecast2</basedir>',
-  '    <logdir>/var/log/icecast2</logdir>',
-  '    <webroot>/usr/share/icecast2/web</webroot>',
-  '    <adminroot>/usr/share/icecast2/admin</adminroot>',
-  '    <alias source="/" dest="/status.xsl"/>',
-  '  </paths>',
-  '</icecast>',
-  'ICECAST_EOF',
-  '',
-  '# Enable Icecast',
-  'sed -i "s/ENABLE=false/ENABLE=true/" /etc/default/icecast2',
-  '',
-  '# Configure Liquidsoap (SQS-based)',
-  'mkdir -p /opt/radio /var/log/liquidsoap',
-  '',
-  '# Get SQS queue URL from CloudFormation export',
-  'echo "📥 Getting SQS queue URL..."',
-  'QUEUE_URL=$(/usr/local/bin/aws cloudformation list-exports --query "Exports[?Name==\'TrackQueueUrl\'].Value" --output text)',
-  'echo "$QUEUE_URL" > /opt/radio/queue-url.txt',
-  'echo "✅ Queue URL saved: $QUEUE_URL"',
-  '',
-  'cat > /opt/radio/radio.liq << \'LIQUIDSOAP_EOF\'',
-  '# G-Forge Radio - SQS Queue Based',
-  'set("log.file.path", "/var/log/liquidsoap/radio.log")',
-  'set("log.level", 3)',
-  '',
-  'queue_url_file = "/opt/radio/queue-url.txt"',
-  'queue_url = ref("")',
-  '',
-  '# Load queue URL',
-  'def load_queue_url() =',
-  '  if file.exists(queue_url_file) then',
-  '    lines = file.lines(queue_url_file)',
-  '    if list.length(lines) > 0 then',
-  '      queue_url := list.hd(default="", lines)',
-  '      log("Queue URL: #{!queue_url}")',
-  '    end',
-  '  end',
-  'end',
-  '',
-  'load_queue_url()',
-  '',
-  '# Parse track URL from SQS message',
-  'def parse_track_url(json_str) =',
-  '  if string.contains(substring="fileUrl", json_str) then',
-  '    start_pos = string.index(substring="\\"fileUrl\\":\\"", json_str)',
-  '    if start_pos >= 0 then',
-  '      url_start = start_pos + 11',
-  '      url_part = string.sub(json_str, start=url_start)',
-  '      url_end = string.index(substring="\\"", url_part)',
-  '      if url_end > 0 then',
-  '        string.sub(url_part, start=0, length=url_end)',
-  '      else',
-  '        ""',
-  '      end',
-  '    else',
-  '      ""',
-  '    end',
-  '  else',
-  '    ""',
-  '  end',
-  'end',
-  '',
-  '# Get next track from SQS',
-  'def get_next_track() =',
-  '  log("Polling SQS...")',
-  '  cmd = "/usr/local/bin/aws sqs receive-message --queue-url \'#{!queue_url}\' --max-number-of-messages 1 --wait-time-seconds 20 --output json 2>&1"',
-  '  result = process.read(cmd)',
-  '  ',
-  '  track_url = parse_track_url(result)',
-  '  ',
-  '  if track_url != "" then',
-  '    log("Playing: #{track_url}")',
-  '    ',
-  '    # Extract receipt handle and delete message',
-  '    handle_start = string.index(substring="\\"ReceiptHandle\\":\\"", result)',
-  '    if handle_start >= 0 then',
-  '      handle_part = string.sub(result, start=handle_start + 17)',
-  '      handle_end = string.index(substring="\\"", handle_part)',
-  '      if handle_end > 0 then',
-  '        receipt = string.sub(handle_part, start=0, length=handle_end)',
-  '        del_cmd = "/usr/local/bin/aws sqs delete-message --queue-url \'#{!queue_url}\' --receipt-handle \'#{receipt}\'"',
-  '        ignore(process.read(del_cmd))',
-  '      end',
-  '    end',
-  '    ',
-  '    [request.create(track_url)]',
-  '  else',
-  '    []',
-  '  end',
-  'end',
-  '',
-  '# Dynamic request source',
-  'radio = request.dynamic(get_next_track)',
-  '',
-  '# Crossfade',
-  'radio = crossfade(start_next=3., fade_in=2., fade_out=2., radio)',
-  '',
-  '# Fallback to silence',
-  'radio = fallback(track_sensitive=false, [radio, blank()])',
-  'radio = normalize(radio)',
-  '',
-  'output.icecast(',
-  '  %mp3(bitrate=192),',
-  '  host="localhost",',
-  '  port=8000,',
-  '  password="gforge2024radio",',
-  '  mount="/stream.mp3",',
-  '  name="G-Forge Radio - SQS",',
-  '  radio',
-  ')',
-  'LIQUIDSOAP_EOF',
-  '',
-  '# Create systemd service',
-  'cat > /etc/systemd/system/liquidsoap-radio.service << "SERVICE_EOF"',
-  '[Unit]',
-  'Description=Liquidsoap Radio Stream',
-  'After=network.target icecast2.service',
-  'Requires=icecast2.service',
-  '',
-  '[Service]',
-  'Type=simple',
-  'User=root',
-  'ExecStart=/usr/bin/liquidsoap /opt/radio/radio.liq',
-  'Restart=always',
-  'RestartSec=10',
-  '',
-  '[Install]',
-  'WantedBy=multi-user.target',
-  'SERVICE_EOF',
-  '',
-  '# Start services',
-  'systemctl daemon-reload',
-  'systemctl enable icecast2',
-  'systemctl start icecast2',
-  'systemctl enable liquidsoap-radio',
-  'systemctl start liquidsoap-radio',
-  '',
-  '# Download Splash FM player from S3',
-  'echo "📥 Downloading Splash FM player..."',
-  'mkdir -p /var/www/radio',
-  '/usr/local/bin/aws s3 cp s3://radio-playlists-035636364722/player-homepage-v2.html /var/www/radio/index.html',
-  '',
-  '# Configure nginx with Splash FM player',
-  'cat > /etc/nginx/sites-available/radio << "NGINX_EOF"',
-  'server {',
-  '  listen 80;',
-  '  server_name _;',
-  '',
-  '  # Serve Splash FM player on root',
-  '  location = / {',
-  '    root /var/www/radio;',
-  '    index index.html;',
-  '    try_files /index.html =404;',
-  '  }',
-  '',
-  '  # Proxy stream to Icecast',
-  '  location /stream.mp3 {',
-  '    proxy_pass http://localhost:8000/stream.mp3;',
-  '    proxy_set_header Host $host;',
-  '    proxy_buffering off;',
-  '    add_header Cache-Control "no-cache, no-store, must-revalidate";',
-  '  }',
-  '',
-  '  # Proxy admin interface to Icecast',
-  '  location /admin/ {',
-  '    proxy_pass http://localhost:8000/admin/;',
-  '    proxy_set_header Host $host;',
-  '  }',
-  '',
-  '  # Proxy status page to Icecast',
-  '  location /status-json.xsl {',
-  '    proxy_pass http://localhost:8000/status-json.xsl;',
-  '    proxy_set_header Host $host;',
-  '  }',
-  '}',
-  'NGINX_EOF',
-  '',
-  'ln -sf /etc/nginx/sites-available/radio /etc/nginx/sites-enabled/',
-  'rm -f /etc/nginx/sites-enabled/default',
-  'systemctl restart nginx',
-  '',
-  '# Health check script',
-  'cat > /opt/radio/healthcheck.sh << "HEALTH_EOF"',
-  '#!/bin/bash',
-  'curl -f http://localhost:8000/status-json.xsl > /dev/null 2>&1',
-  'if [ $? -ne 0 ]; then',
-  '  systemctl restart icecast2',
-  '  systemctl restart liquidsoap-radio',
-  'fi',
-  'HEALTH_EOF',
-  'chmod +x /opt/radio/healthcheck.sh',
-  '',
-  '# Add healthcheck cron',
-  'echo "*/5 * * * * /opt/radio/healthcheck.sh >> /var/log/radio-health.log 2>&1" | crontab -',
-  '',
-  'echo "✅ Radio stream server setup complete!"'
-)
-
-// EC2 Instance
-const streamInstance = new ec2.Instance(streamPlaylistLambda.stack, 'StreamServer', {
-  vpc,
-  vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
-  instanceType: ec2.InstanceType.of(
-    ec2.InstanceClass.T3,
-    ec2.InstanceSize.SMALL
-  ),
-  machineImage: ec2.MachineImage.fromSsmParameter(
-    '/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id',
-    { os: ec2.OperatingSystemType.LINUX }
-  ),
-  securityGroup: streamSG,
-  role: ec2Role,
-  userData,
-  userDataCausesReplacement: true,
-  requireImdsv2: true,
-  blockDevices: [
-    {
-      deviceName: '/dev/sda1',
-      volume: ec2.BlockDeviceVolume.ebs(20, {
-        volumeType: ec2.EbsDeviceVolumeType.GP3
-      })
-    }
-  ]
-})
-
-// Elastic IP for fixed stream URL
-const eip = new ec2.CfnEIP(streamPlaylistLambda.stack, 'StreamServerEIP', {
-  instanceId: streamInstance.instanceId,
-  tags: [
-    {
-      key: 'Name',
-      value: 'G-Forge-Radio-Stream-EIP'
-    }
-  ]
-})
-
-// Outputs
-new CfnOutput(streamPlaylistLambda.stack, 'StreamServerPublicIP', {
-  value: eip.ref,
-  description: 'Elastic IP of stream server (fixed)',
-  exportName: 'StreamServerPublicIP',
-})
-
-new CfnOutput(streamPlaylistLambda.stack, 'StreamURL', {
-  value: `http://${eip.ref}:8000/stream.mp3`,
-  description: 'Radio stream URL',
-  exportName: 'StreamURL',
-})
-
-new CfnOutput(streamPlaylistLambda.stack, 'IcecastAdminURL', {
-  value: `http://${eip.ref}:8000/admin/`,
-  description: 'Icecast admin interface',
-  exportName: 'IcecastAdminURL',
-})
-
-new CfnOutput(streamPlaylistLambda.stack, 'PlaylistBucketName', {
-  value: playlistBucket.bucketName,
-  description: 'S3 bucket for playlists',
-  exportName: 'PlaylistBucketName',
-})
-
-// NOTE: Removed TrackQueueUrl output - using M3U files now
-
-new CfnOutput(streamPlaylistLambda.stack, 'StreamServerInstanceId', {
-  value: streamInstance.instanceId,
-  description: 'EC2 instance ID for stream server',
-  exportName: 'StreamServerInstanceId',
-})
+console.log('📦 EC2 configuration stored in Parameter Store')
+console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
 
 // =============================================================================
 // Get Cover URL Lambda - Public endpoint for player page
@@ -1404,7 +1088,6 @@ const coverUrlFunctionUrl = getCoverUrlLambda.addFunctionUrl({
 new CfnOutput(backend.getCoverUrl.resources.lambda.stack, 'CoverUrlFunctionUrl', {
   value: coverUrlFunctionUrl.url,
   description: 'Public URL for getting cover art signed URLs',
-  exportName: 'CoverUrlFunctionUrl',
 })
 
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')

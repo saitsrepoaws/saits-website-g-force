@@ -1,0 +1,61 @@
+# =============================================================================
+# G-FORGE RADIO - REGRESSION TESTS
+# =============================================================================
+#
+# Full test suite (2-5 minutes)
+# Pass rate required: >= 85% (40/48 tests)
+#
+# =============================================================================
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - npm install -g pnpm@10.19.0
+      
+  pre_build:
+    commands:
+      - echo "🔬 Running Regression Tests..."
+      - pnpm install --frozen-lockfile
+      
+  build:
+    commands:
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo "🧪 REGRESSION TEST SUITE - Full Coverage"
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      - echo ""
+      
+      # Run regression tests
+      - pnpm run test:regression || exit 1
+      
+      - echo ""
+      - echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      
+  post_build:
+    commands:
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then
+          echo "✅ REGRESSION TESTS PASSED"
+          echo "Pass rate: >= 85%"
+        else
+          echo "❌ REGRESSION TESTS FAILED"
+          echo "Blocking deployment"
+          exit 1
+        fi
+
+reports:
+  regression_test_report:
+    files:
+      - 'test-results/regression/*.xml'
+    file-format: 'JUNITXML'
+  coverage_report:
+    files:
+      - 'coverage/clover.xml'
+    file-format: 'CLOVERXML'
+
+cache:
+  paths:
+    - 'node_modules/**/*'

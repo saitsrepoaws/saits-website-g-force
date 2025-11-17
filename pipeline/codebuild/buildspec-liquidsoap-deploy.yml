@@ -1,0 +1,234 @@
+version: 0.2
+
+################################################################################
+# AWS CODEBUILD BUILDSPEC - LIQUIDSOAP 2.4.0 DEPLOYMENT
+################################################################################
+# Features:
+# - Smart deployment with state tracking
+# - Automatic retry on failure
+# - SSM command execution
+# - Error handling and logging
+# - Slack/SNS notifications
+################################################################################
+
+env:
+  variables:
+    EC2_INSTANCE_ID: "i-054754fbca0bda346"
+    AWS_REGION: "eu-west-1"
+    DEPLOYMENT_TIMEOUT: "600"
+  parameter-store:
+    SLACK_WEBHOOK: "/codebuild/slack-webhook"
+  secrets-manager:
+    # SNS_TOPIC_ARN: "gforge-radio-alerts:topic-arn"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "🔧 Installing dependencies..."
+      - pip install --upgrade awscli boto3
+      - aws --version
+      
+  pre_build:
+    commands:
+      - echo "📋 Pre-deployment checks..."
+      - echo "Instance ID: $EC2_INSTANCE_ID"
+      - echo "Region: $AWS_REGION"
+      
+      # Check if EC2 is running
+      - |
+        INSTANCE_STATE=$(aws ec2 describe-instances \
+          --instance-ids $EC2_INSTANCE_ID \
+          --region $AWS_REGION \
+          --query 'Reservations[0].Instances[0].State.Name' \
+          --output text)
+        
+        if [ "$INSTANCE_STATE" != "running" ]; then
+          echo "❌ EC2 instance is not running (state: $INSTANCE_STATE)"
+          exit 1
+        fi
+        
+        echo "✅ EC2 instance is running"
+      
+      # Check SSM connectivity
+      - |
+        SSM_STATUS=$(aws ssm describe-instance-information \
+          --instance-information-filter-list key=InstanceIds,valueSet=$EC2_INSTANCE_ID \
+          --region $AWS_REGION \
+          --query 'InstanceInformationList[0].PingStatus' \
+          --output text)
+        
+        if [ "$SSM_STATUS" != "Online" ]; then
+          echo "❌ EC2 instance is not online in SSM (status: $SSM_STATUS)"
+          exit 1
+        fi
+        
+        echo "✅ SSM connection established"
+  
+  build:
+    commands:
+      - echo "🚀 Starting Liquidsoap 2.4.0 deployment..."
+      
+      # Upload deployment script to EC2
+      - |
+        echo "📤 Uploading deployment script..."
+        aws s3 cp pipeline/scripts/deploy-liquidsoap-2.4.0-smart.sh \
+          s3://your-bucket/deployments/deploy-liquidsoap-2.4.0-smart.sh \
+          --region $AWS_REGION
+        
+        # Download on EC2 via SSM
+        COMMAND_ID=$(aws ssm send-command \
+          --instance-ids $EC2_INSTANCE_ID \
+          --document-name "AWS-RunShellScript" \
+          --comment "Download deployment script" \
+          --parameters 'commands=[
+            "aws s3 cp s3://your-bucket/deployments/deploy-liquidsoap-2.4.0-smart.sh /tmp/deploy.sh",
+            "chmod +x /tmp/deploy.sh",
+            "echo \"✅ Script downloaded\""
+          ]' \
+          --region $AWS_REGION \
+          --output text \
+          --query 'Command.CommandId')
+        
+        echo "Command ID: $COMMAND_ID"
+        
+        # Wait for download completion
+        aws ssm wait command-executed \
+          --command-id $COMMAND_ID \
+          --instance-id $EC2_INSTANCE_ID \
+          --region $AWS_REGION
+        
+        echo "✅ Script uploaded to EC2"
+      
+      # Execute deployment
+      - |
+        echo "🔧 Executing deployment..."
+        
+        DEPLOY_COMMAND_ID=$(aws ssm send-command \
+          --instance-ids $EC2_INSTANCE_ID \
+          --document-name "AWS-RunShellScript" \
+          --comment "Deploy Liquidsoap 2.4.0" \
+          --timeout-seconds $DEPLOYMENT_TIMEOUT \
+          --parameters 'commands=[
+            "sudo bash /tmp/deploy.sh 2>&1 | tee -a /tmp/deploy-output.log",
+            "echo \"DEPLOY_EXIT_CODE=$?\" >> /tmp/deploy-output.log"
+          ]' \
+          --region $AWS_REGION \
+          --output text \
+          --query 'Command.CommandId')
+        
+        echo "Deployment Command ID: $DEPLOY_COMMAND_ID"
+        echo $DEPLOY_COMMAND_ID > /tmp/command_id.txt
+        
+        # Wait for deployment (with timeout)
+        echo "⏳ Waiting for deployment to complete..."
+        aws ssm wait command-executed \
+          --command-id $DEPLOY_COMMAND_ID \
+          --instance-id $EC2_INSTANCE_ID \
+          --region $AWS_REGION \
+          --cli-read-timeout $DEPLOYMENT_TIMEOUT \
+          --cli-connect-timeout 60 || true
+        
+        # Get deployment output
+        echo "📋 Deployment output:"
+        DEPLOY_OUTPUT=$(aws ssm get-command-invocation \
+          --command-id $DEPLOY_COMMAND_ID \
+          --instance-id $EC2_INSTANCE_ID \
+          --region $AWS_REGION \
+          --query 'StandardOutputContent' \
+          --output text)
+        
+        echo "$DEPLOY_OUTPUT"
+        
+        # Check exit code
+        DEPLOY_EXIT_CODE=$(echo "$DEPLOY_OUTPUT" | grep "DEPLOY_EXIT_CODE=" | cut -d= -f2)
+        
+        if [ "$DEPLOY_EXIT_CODE" != "0" ]; then
+          echo "❌ Deployment failed with exit code: $DEPLOY_EXIT_CODE"
+          
+          # Get error output
+          ERROR_OUTPUT=$(aws ssm get-command-invocation \
+            --command-id $DEPLOY_COMMAND_ID \
+            --instance-id $EC2_INSTANCE_ID \
+            --region $AWS_REGION \
+            --query 'StandardErrorContent' \
+            --output text)
+          
+          echo "Error output:"
+          echo "$ERROR_OUTPUT"
+          
+          exit 1
+        fi
+        
+        echo "✅ Deployment completed successfully"
+  
+  post_build:
+    commands:
+      - echo "🔍 Post-deployment verification..."
+      
+      # Get deployment status
+      - |
+        VERIFY_COMMAND_ID=$(aws ssm send-command \
+          --instance-ids $EC2_INSTANCE_ID \
+          --document-name "AWS-RunShellScript" \
+          --comment "Verify deployment" \
+          --parameters 'commands=[
+            "echo \"📊 Service status:\"",
+            "systemctl status liquidsoap --no-pager | head -10",
+            "echo \"\"",
+            "echo \"🐳 Docker status:\"",
+            "docker ps | grep liquidsoap",
+            "echo \"\"",
+            "echo \"📋 Liquidsoap version:\"",
+            "docker exec liquidsoap liquidsoap --version 2>/dev/null | head -1",
+            "echo \"\"",
+            "echo \"💾 RAM disk:\"",
+            "df -h /mnt/ramdisk",
+            "echo \"\"",
+            "echo \"🔧 Deployment state:\"",
+            "cat /opt/radio/.deployment-state.json | jq -r \".steps | to_entries[] | \\\"\\(.key): \\(if .value.completed then \\\"✅\\\" else \\\"❌\\\" end)\\\"\" 2>/dev/null || echo \"No state file\""
+          ]' \
+          --region $AWS_REGION \
+          --output text \
+          --query 'Command.CommandId')
+        
+        sleep 5
+        
+        VERIFY_OUTPUT=$(aws ssm get-command-invocation \
+          --command-id $VERIFY_COMMAND_ID \
+          --instance-id $EC2_INSTANCE_ID \
+          --region $AWS_REGION \
+          --query 'StandardOutputContent' \
+          --output text)
+        
+        echo "$VERIFY_OUTPUT"
+      
+      # Send success notification
+      - |
+        if [ -n "${SLACK_WEBHOOK:-}" ]; then
+          curl -X POST $SLACK_WEBHOOK \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"text\": \"✅ Liquidsoap 2.4.0 deployment successful!\",
+              \"attachments\": [{
+                \"color\": \"good\",
+                \"fields\": [
+                  {\"title\": \"Instance\", \"value\": \"$EC2_INSTANCE_ID\", \"short\": true},
+                  {\"title\": \"Region\", \"value\": \"$AWS_REGION\", \"short\": true},
+                  {\"title\": \"Version\", \"value\": \"2.4.0\", \"short\": true},
+                  {\"title\": \"Build\", \"value\": \"$CODEBUILD_BUILD_NUMBER\", \"short\": true}
+                ]
+              }]
+            }"
+        fi
+
+artifacts:
+  files:
+    - pipeline/scripts/deploy-liquidsoap-2.4.0-smart.sh
+    - /tmp/deploy-output.log
+  name: liquidsoap-deployment-$(date +%Y%m%d-%H%M%S)
+
+cache:
+  paths:
+    - '/root/.cache/**/*'

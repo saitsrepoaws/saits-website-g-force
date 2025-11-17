@@ -1,0 +1,570 @@
+// Audio Metadata Lambda - Extracts metadata and updates DynamoDB
+import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb'
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda'
+import { parseFile } from 'music-metadata'
+import { Readable } from 'stream'
+import * as fs from 'fs'
+import * as path from 'path'
+import * as os from 'os'
+import * as crypto from 'crypto'
+
+const s3Client = new S3Client({})
+const dynamoClient = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+const lambdaClient = new LambdaClient({})
+
+interface AudioMetadata {
+  // File Info
+  duration: number
+  fileSize: number
+  format: string
+  bitrate: number
+  sampleRate: number
+  channels: number
+  codec: string
+  
+  // ID3 Tags
+  artist?: string
+  title?: string
+  album?: string
+  year?: number
+  genre?: string
+  
+  // Audio Features (from Lambda 2)
+  bpm?: number
+  key?: string | null
+  energy?: number | null
+  danceability?: number | null
+  valence?: number | null
+  
+  // Cover Art
+  coverArtUrl?: string
+  
+  // Technical
+  checksum: string
+  analyzedAt: string
+}
+
+export const handler = async (event: any) => {
+  console.log('Event:', JSON.stringify(event, null, 2))
+  
+  // Handle S3 event structure
+  const record = event.Records?.[0]
+  if (!record) {
+    throw new Error('No S3 record found in event')
+  }
+  
+  const s3Key = record.s3?.object?.key
+  const bucketName = record.s3?.bucket?.name
+  
+  if (!s3Key) {
+    throw new Error('Missing s3Key in S3 event')
+  }
+  
+  console.log(`Processing file: ${s3Key} from bucket: ${bucketName}`)
+  
+  try {
+    // Download file from S3 to /tmp
+    const localPath = await downloadFromS3(s3Key, bucketName)
+    
+    // Extract metadata with cover art upload
+    const metadata = await extractMetadata(localPath, bucketName)
+    
+    // Cleanup
+    fs.unlinkSync(localPath)
+    
+    console.log('Metadata extraction successful:', metadata)
+    
+    // Update track in DynamoDB with extracted metadata
+    let trackId: string | null = null
+    try {
+      trackId = await updateTrackInDatabase(s3Key, metadata)
+      console.log('Track updated in database successfully')
+    } catch (error) {
+      console.error('Failed to update track in database:', error)
+      // Don't fail the whole Lambda if DB update fails
+    }
+    
+    // Invoke Lambda 3 (waveform generator) asynchronously
+    try {
+      await invokeLambda3(event)
+      console.log('Lambda 3 (waveform) invoked successfully')
+    } catch (error) {
+      console.error('Failed to invoke Lambda 3:', error)
+      // Don't fail if waveform generation fails
+    }
+    
+    // Invoke Lambda 5 (audio analyzer) for BPM and Key detection
+    if (trackId) {
+      try {
+        await invokeLambda5(trackId, s3Key, bucketName)
+        console.log('Lambda 5 (audio analyzer) invoked successfully')
+      } catch (error) {
+        console.error('Failed to invoke Lambda 5:', error)
+        // Don't fail if analysis fails
+      }
+    } else {
+      console.log('No trackId found, skipping Lambda 5 invocation')
+    }
+    
+    return {
+      s3Key,
+      bucketName,
+      metadata,
+      status: 'success'
+    }
+    
+  } catch (error: any) {
+    console.error('Metadata extraction failed:', error)
+    return {
+      s3Key,
+      error: error.message,
+      status: 'failed'
+    }
+  }
+}
+
+async function downloadFromS3(s3Key: string, bucketName?: string): Promise<string> {
+  const bucket = bucketName || process.env.STORAGE_BUCKET_NAME
+  
+  if (!bucket) {
+    throw new Error('STORAGE_BUCKET_NAME not set')
+  }
+  
+  console.log(`Downloading ${s3Key} from bucket ${bucket}`)
+  
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: s3Key,
+  })
+  
+  const response = await s3Client.send(command)
+  
+  if (!response.Body) {
+    throw new Error('Empty response body from S3')
+  }
+  
+  // Save to /tmp
+  const fileName = path.basename(s3Key)
+  const localPath = path.join(os.tmpdir(), fileName)
+  
+  const stream = response.Body as Readable
+  const writeStream = fs.createWriteStream(localPath)
+  
+  await new Promise<void>((resolve, reject) => {
+    stream.pipe(writeStream)
+    stream.on('error', reject)
+    writeStream.on('finish', () => resolve())
+    writeStream.on('error', reject)
+  })
+  
+  console.log(`Downloaded to ${localPath}`)
+  return localPath
+}
+
+async function extractMetadata(filePath: string, bucketName?: string): Promise<AudioMetadata> {
+  console.log(`Extracting metadata from ${filePath}`)
+  
+  // Use music-metadata to parse audio file
+  const metadata = await parseFile(filePath)
+  
+  // Get file stats
+  const stats = fs.statSync(filePath)
+  
+  // Calculate MD5 checksum
+  const fileBuffer = fs.readFileSync(filePath)
+  const hash = crypto.createHash('md5')
+  hash.update(fileBuffer)
+  const checksum = hash.digest('hex')
+  
+  // Extract BPM from multiple sources
+  let bpm: number = 0
+  
+  // 1. Check ID3 tags (most reliable)
+  if (metadata.common.bpm) {
+    bpm = metadata.common.bpm
+    console.log(`BPM found in ID3 tags: ${bpm}`)
+  }
+  
+  // 2. Check comments for BPM
+  if (!bpm) {
+    const comment = metadata.common.comment?.[0]?.text || ''
+    const bpmFromComment = extractBPMFromText(comment)
+    if (bpmFromComment) {
+      bpm = bpmFromComment
+      console.log(`BPM found in comments: ${bpm}`)
+    }
+  }
+  
+  // 3. Check title/filename for BPM patterns
+  if (!bpm) {
+    const title = metadata.common.title || ''
+    const bpmFromTitle = extractBPMFromText(title)
+    if (bpmFromTitle) {
+      bpm = bpmFromTitle
+      console.log(`BPM found in title: ${bpm}`)
+    }
+  }
+  
+  // 4. Fallback: try audio analysis (currently placeholder)
+  if (!bpm) {
+    try {
+      bpm = await detectBPM(filePath)
+      if (bpm) {
+        console.log(`BPM detected from audio analysis: ${bpm}`)
+      }
+    } catch (error) {
+      console.log('BPM detection failed:', error)
+    }
+  }
+  
+  if (!bpm) {
+    console.log('⚠️ BPM not found in tags or filename')
+  }
+  
+  // Estimate energy based on bitrate (higher bitrate = potentially more energy)
+  const bitrate = metadata.format.bitrate || 0
+  const energy = bitrate > 0 ? Math.min(bitrate / 320000, 1.0) : null
+  
+  // Detect musical key (placeholder - needs advanced analysis)
+  const key = detectKey(metadata)
+  
+  // Estimate danceability (for electronic music, assume high if BPM is in dance range)
+  let danceability: number | null = null
+  if (bpm && bpm >= 120 && bpm <= 140) {
+    danceability = 0.85 // High danceability for typical techno/house BPM
+  } else if (bpm) {
+    danceability = 0.6
+  }
+  
+  // Estimate valence (musical positiveness) based on genre
+  const valence = estimateValence(metadata.common.genre?.[0])
+  
+  // Extract and upload cover art if available
+  let coverArtUrl: string | undefined
+  if (metadata.common.picture && metadata.common.picture.length > 0) {
+    const picture = metadata.common.picture[0]
+    const bucket = bucketName || process.env.STORAGE_BUCKET_NAME
+    
+    if (bucket) {
+      // Generate unique filename for cover art
+      const coverFileName = `${checksum}.${picture.format || 'jpg'}`
+      const coverKey = `public/covers/${coverFileName}`
+      
+      try {
+        // Upload cover art to S3
+        await s3Client.send(new PutObjectCommand({
+          Bucket: bucket,
+          Key: coverKey,
+          Body: picture.data,
+          ContentType: `image/${picture.format || 'jpeg'}`,
+        }))
+        
+        coverArtUrl = coverKey
+        console.log(`Uploaded cover art to ${coverKey}`)
+      } catch (error) {
+        console.error('Failed to upload cover art:', error)
+      }
+    }
+  }
+  
+  const result: AudioMetadata = {
+    // File Info
+    duration: Math.round(metadata.format.duration || 0), // Round to whole seconds for GraphQL Int type
+    fileSize: stats.size,
+    format: metadata.format.container || 'unknown',
+    bitrate,
+    sampleRate: metadata.format.sampleRate || 0,
+    channels: metadata.format.numberOfChannels || 0,
+    codec: metadata.format.codec || 'unknown',
+    
+    // ID3 Tags
+    artist: metadata.common.artist,
+    title: metadata.common.title,
+    album: metadata.common.album,
+    year: metadata.common.year,
+    genre: metadata.common.genre?.[0],
+    
+    // Audio Features
+    bpm,
+    key,
+    energy,
+    danceability,
+    valence,
+    
+    // Cover Art
+    coverArtUrl,
+    
+    // Technical
+    checksum: `md5:${checksum}`,
+    analyzedAt: new Date().toISOString(),
+  }
+  
+  console.log('Extracted metadata with features:', result)
+  return result
+}
+
+async function updateTrackInDatabase(s3Key: string, metadata: AudioMetadata): Promise<string | null> {
+  const tableName = process.env.TRACK_TABLE_NAME
+  
+  if (!tableName) {
+    throw new Error('TRACK_TABLE_NAME environment variable not set')
+  }
+  
+  console.log(`Finding track with fileUrl containing: ${s3Key}`)
+  
+  // Find track by fileUrl (contains s3Key)
+  const scanResult = await dynamoClient.send(new ScanCommand({
+    TableName: tableName,
+    FilterExpression: 'contains(fileUrl, :s3Key)',
+    ExpressionAttributeValues: {
+      ':s3Key': s3Key,
+    },
+  }))
+  
+  if (!scanResult.Items || scanResult.Items.length === 0) {
+    console.log('No track found with matching fileUrl')
+    return null
+  }
+  
+  const track = scanResult.Items[0]
+  const trackId = track.id as string
+  console.log(`Found track: ${trackId} - ${track.title}`)
+  
+  // Update track with metadata
+  await dynamoClient.send(new UpdateCommand({
+    TableName: tableName,
+    Key: { id: track.id },
+    UpdateExpression: 'SET bpm = :bpm, #key = :key, energy = :energy, danceability = :danceability, valence = :valence, coverArtUrl = :coverArtUrl, #dur = :duration, genre = :genre, #yr = :year',
+    ExpressionAttributeNames: {
+      '#dur': 'duration', // 'duration' is a reserved word
+      '#key': 'key', // 'key' is a reserved word
+      '#yr': 'year', // 'year' is a reserved word
+    },
+    ExpressionAttributeValues: {
+      ':bpm': metadata.bpm || null,
+      ':key': metadata.key || null,
+      ':energy': metadata.energy || null,
+      ':danceability': metadata.danceability || null,
+      ':valence': metadata.valence || null,
+      ':coverArtUrl': metadata.coverArtUrl || null,
+      ':duration': metadata.duration || null,
+      ':genre': metadata.genre || null,
+      ':year': metadata.year || null,
+    },
+  }))
+  
+  console.log('Track updated with audio features')
+  return trackId
+}
+
+async function detectBPM(filePath: string): Promise<number> {
+  console.log('Starting BPM detection...')
+  
+  // For now, return 0 - will be extracted from metadata or filename
+  // Real-time audio analysis requires audio decoding which is heavy for Lambda
+  // Most DJ software tags BPM in metadata anyway
+  
+  return 0
+}
+
+/**
+ * Extract BPM from filename or text
+ * Looks for patterns like "128 BPM", "128bpm", "-128-", etc.
+ */
+function extractBPMFromText(text: string): number | null {
+  if (!text) return null
+  
+  // Common BPM patterns in filenames
+  const patterns = [
+    /(\d{2,3})\s*bpm/i,           // "128 BPM" or "128bpm"
+    /bpm\s*(\d{2,3})/i,           // "BPM 128"
+    /[-_\s](\d{2,3})[-_\s]/,      // "-128-" or "_128_"
+    /\[(\d{2,3})\]/,              // "[128]"
+    /\((\d{2,3})\)/,              // "(128)"
+  ]
+  
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match) {
+      const bpm = parseInt(match[1])
+      // Validate BPM range (60-200 is reasonable)
+      if (bpm >= 60 && bpm <= 200) {
+        return bpm
+      }
+    }
+  }
+  
+  return null
+}
+
+function detectKey(metadata: any): string | null {
+  // 1. Check if key is in ID3 tags (TKEY frame)
+  if (metadata.common.key) {
+    const key = normalizeKey(metadata.common.key)
+    console.log(`Key found in ID3 tags: ${key}`)
+    return key
+  }
+  
+  // 2. Check in comments/description for key notation
+  const comment = metadata.common.comment?.[0]?.text || ''
+  const keyMatch = comment.match(/\b([A-G][#b]?m?)\b/i)
+  if (keyMatch) {
+    const key = normalizeKey(keyMatch[1])
+    console.log(`Key found in comments: ${key}`)
+    return key
+  }
+  
+  // 3. Check filename for key patterns
+  const title = metadata.common.title || ''
+  const keyInTitle = extractKeyFromText(title)
+  if (keyInTitle) {
+    console.log(`Key found in title: ${keyInTitle}`)
+    return keyInTitle
+  }
+  
+  console.log('Key detection: not found in tags or filename')
+  return null
+}
+
+/**
+ * Normalize key notation to consistent format
+ * Input: "Cm", "c-minor", "C Minor", "8A" (Camelot)
+ * Output: "C", "Cm", "C#", "D#/Eb", etc.
+ */
+function normalizeKey(key: string): string {
+  if (!key) return ''
+  
+  const keyStr = key.trim()
+  
+  // Camelot notation (1A-12A for minor, 1B-12B for major)
+  const camelotMatch = keyStr.match(/^(\d+)([AB])$/i)
+  if (camelotMatch) {
+    const num = parseInt(camelotMatch[1])
+    const type = camelotMatch[2].toUpperCase()
+    return camelotToKey(num, type)
+  }
+  
+  // Standard notation: C, Cm, C#, C# Minor, etc.
+  const stdMatch = keyStr.match(/^([A-G][#b]?)\s*(m|min|minor)?/i)
+  if (stdMatch) {
+    const root = stdMatch[1].toUpperCase()
+    const isMinor = stdMatch[2] ? 'm' : ''
+    
+    // Convert flats to sharps for consistency (with both notations)
+    const normalized = root
+      .replace('DB', 'C#/Db')
+      .replace('EB', 'D#/Eb')
+      .replace('GB', 'F#/Gb')
+      .replace('AB', 'G#/Ab')
+      .replace('BB', 'A#/Bb')
+    
+    return normalized + isMinor
+  }
+  
+  return keyStr
+}
+
+/**
+ * Convert Camelot wheel notation to standard key
+ */
+function camelotToKey(num: number, type: string): string {
+  const majorKeys = ['', 'B', 'F#/Gb', 'C#/Db', 'G#/Ab', 'D#/Eb', 'A#/Bb', 'F', 'C', 'G', 'D', 'A', 'E']
+  const minorKeys = ['', 'G#/Abm', 'D#/Ebm', 'A#/Bbm', 'Fm', 'Cm', 'Gm', 'Dm', 'Am', 'Em', 'Bm', 'F#/Gbm', 'C#/Dbm']
+  
+  if (type === 'B') {
+    return majorKeys[num] || ''
+  } else {
+    return minorKeys[num] || ''
+  }
+}
+
+/**
+ * Extract key from text (title, filename, etc.)
+ * Looks for patterns like "Track Name (Am)" or "Track Name - Cm"
+ */
+function extractKeyFromText(text: string): string | null {
+  if (!text) return null
+  
+  // Match patterns: (Am), [Cm], - D#m, etc.
+  const patterns = [
+    /[\(\[]([A-G][#b]?m?)[\)\]]/i,  // (Am) or [Cm]
+    /\s-\s([A-G][#b]?m?)\b/i,         // - Am
+    /\s([A-G][#b]?m?)\s*$/i,          // Am at end
+  ]
+  
+  for (const pattern of patterns) {
+    const match = text.match(pattern)
+    if (match) {
+      return normalizeKey(match[1])
+    }
+  }
+  
+  return null
+}
+
+function estimateValence(genre?: string): number | null {
+  if (!genre) return null
+  
+  // Estimate valence (positiveness) based on genre
+  const genreLower = genre.toLowerCase()
+  
+  if (genreLower.includes('techno') || genreLower.includes('dark')) {
+    return 0.3 // Dark/serious music
+  } else if (genreLower.includes('house') || genreLower.includes('disco')) {
+    return 0.7 // Uplifting music
+  } else if (genreLower.includes('trance') || genreLower.includes('progressive')) {
+    return 0.6 // Moderate positiveness
+  }
+  
+  return 0.5 // Neutral
+}
+
+async function invokeLambda3(event: any) {
+  const waveformFunctionName = process.env.WAVEFORM_LAMBDA_NAME
+  
+  if (!waveformFunctionName) {
+    console.log('WAVEFORM_LAMBDA_NAME not set, skipping waveform generation')
+    return
+  }
+  
+  console.log(`Invoking Lambda 3: ${waveformFunctionName}`)
+  
+  // Invoke asynchronously (Event type) - don't wait for response
+  const command = new InvokeCommand({
+    FunctionName: waveformFunctionName,
+    InvocationType: 'Event', // Async invocation
+    Payload: JSON.stringify(event), // Pass same S3 event
+  })
+  
+  await lambdaClient.send(command)
+  console.log('Lambda 3 invocation request sent (async)')
+}
+
+async function invokeLambda5(trackId: string, s3Key: string, bucket: string) {
+  const analyzerFunctionName = process.env.AUDIO_ANALYZER_LAMBDA_NAME
+  
+  if (!analyzerFunctionName) {
+    console.log('AUDIO_ANALYZER_LAMBDA_NAME not set, skipping audio analysis')
+    return
+  }
+  
+  console.log(`Invoking Lambda 5: ${analyzerFunctionName}`)
+  
+  // Invoke asynchronously for BPM and Key detection
+  const payload = {
+    trackId,
+    s3Key,
+    bucket,
+  }
+  
+  const command = new InvokeCommand({
+    FunctionName: analyzerFunctionName,
+    InvocationType: 'Event', // Async invocation
+    Payload: JSON.stringify(payload),
+  })
+  
+  await lambdaClient.send(command)
+  console.log('Lambda 5 invocation request sent (async)')
+}

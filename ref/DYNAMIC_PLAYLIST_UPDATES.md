@@ -83,7 +83,7 @@ Het systeem is aangepast van **vaste 5-minuten intervals** naar **dynamische tra
   playlistUpdateFallbackInterval: 300,   // Default: 5 min
   
   // Stream server config
-  streamServerUrl: 'http://46.137.184.91:8000',
+  streamServerUrl: 'http://79.125.44.178:8000',
   streamMountPoint: '/stream.mp3'
 }
 ```
@@ -123,7 +123,7 @@ Het systeem is aangepast van **vaste 5-minuten intervals** naar **dynamische tra
 **Trigger**: EventBridge elke minuut (AWS minimum)
 
 **Functionaliteit**:
-1. Fetch Icecast status via `http://46.137.184.91:8000/status-json.xsl`
+1. Fetch Icecast status via `http://79.125.44.178:8000/status-json.xsl`
 2. Parse current track metadata
 3. Load settings from DynamoDB
 4. Check PlayerState:
@@ -193,7 +193,7 @@ STREAM_PLAYLIST_UPDATER_FUNCTION=streamPlaylistUpdater-xxx
    - Default: 5 min
 
 4. **Stream Server Config**
-   - URL: `http://46.137.184.91:8000`
+   - URL: `http://79.125.44.178:8000`
    - Mount: `/stream.mp3`
 
 **Features**:
@@ -236,7 +236,7 @@ Of via AWS Console → DynamoDB → StreamSettings → Create Item:
   "playlistUpdateTriggerSeconds": 60,
   "playlistUpdateMinTrackDuration": 60,
   "playlistUpdateFallbackInterval": 300,
-  "streamServerUrl": "http://46.137.184.91:8000",
+  "streamServerUrl": "http://79.125.44.178:8000",
   "streamMountPoint": "/stream.mp3"
 }
 ```

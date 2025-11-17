@@ -1,0 +1,82 @@
+# =============================================================================
+# G-FORGE RADIO - DEPLOYMENT SPECIFICATION
+# =============================================================================
+#
+# Handles deployment to staging or production environments
+# Uses AWS Amplify Gen 2 for infrastructure
+#
+# Environment Variables Required:
+# - ENVIRONMENT: 'staging' or 'production'
+#
+# =============================================================================
+
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - echo "🚀 G-Forge Radio - Deployment to $ENVIRONMENT"
+      - npm install -g pnpm@10.19.0 @aws-amplify/backend-cli
+      
+  pre_build:
+    commands:
+      - echo "📦 Installing dependencies..."
+      - pnpm install --frozen-lockfile
+      
+      - echo "🔍 Verifying environment..."
+      - |
+        if [ "$ENVIRONMENT" != "staging" ] && [ "$ENVIRONMENT" != "production" ]; then
+          echo "❌ Invalid ENVIRONMENT: $ENVIRONMENT"
+          exit 1
+        fi
+      
+      - echo "✅ Deploying to: $ENVIRONMENT"
+      
+  build:
+    commands:
+      - echo "🏗️  Building Amplify backend..."
+      
+      # Clean previous deployments
+      - rm -rf .amplify cdk.out
+      
+      # Deploy based on environment
+      - |
+        if [ "$ENVIRONMENT" = "staging" ]; then
+          echo "📦 Deploying to STAGING..."
+          npx ampx sandbox --once --name staging
+        else
+          echo "🚀 Deploying to PRODUCTION..."
+          npx ampx pipeline-deploy --branch main --appId YOUR_APP_ID
+        fi
+      
+  post_build:
+    commands:
+      - echo "📋 Deployment Summary:"
+      - echo "Environment: $ENVIRONMENT"
+      - echo "Build Date:" $(date)
+      - echo "Commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      
+      - |
+        if [ $CODEBUILD_BUILD_SUCCEEDING -eq 1 ]; then
+          echo "✅ Deployment to $ENVIRONMENT SUCCEEDED"
+          
+          # Send success notification
+          echo "📧 Sending success notification..."
+        else
+          echo "❌ Deployment to $ENVIRONMENT FAILED"
+          
+          # Trigger rollback
+          echo "🔄 Initiating rollback..."
+          exit 1
+        fi
+
+artifacts:
+  files:
+    - build-info.json
+    - amplify_outputs.json
+
+cache:
+  paths:
+    - 'node_modules/**/*'

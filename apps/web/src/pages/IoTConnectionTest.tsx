@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { CONNECTION_STATE_CHANGE } from '@aws-amplify/pubsub'
 import { Hub } from 'aws-amplify/utils'
 import * as pubsubService from '../services/pubsub'
@@ -10,6 +10,7 @@ export default function IoTConnectionTest() {
   const [publishCount, setPublishCount] = useState(0)
   const [receivedCount, setReceivedCount] = useState(0)
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const subscriptionRef = useRef<{ unsubscribe: () => void } | null>(null)
 
   // Listen for connection state changes
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function IoTConnectionTest() {
       
       if (subscription) {
         // Store subscription for cleanup
-        window.testSubscription = subscription
+        subscriptionRef.current = subscription
       }
     } catch (error: any) {
       addLog(`❌ Subscribe failed: ${error.message}`)

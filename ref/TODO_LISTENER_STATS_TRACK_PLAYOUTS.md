@@ -33,7 +33,7 @@ Weten **hoeveel luisteraars** we hebben en **welke tracks er uitgezonden zijn** 
 ```
 Access Log: /var/log/icecast2/access.log
 Format: 
-46.137.184.91 - - [14/Nov/2025:13:30:00 +0100] "GET /stream.mp3 HTTP/1.1" 200 4567890
+79.125.44.178 - - [14/Nov/2025:13:30:00 +0100] "GET /stream.mp3 HTTP/1.1" 200 4567890
 ```
 
 **B. Liquidsoap Metadata** (Track info)
@@ -218,7 +218,7 @@ Calculate: disconnect_time - connect_time
 IP - - [timestamp] "GET /stream.mp3 HTTP/1.1" status bytes "referer" "user-agent"
 
 Example:
-46.137.184.91 - - [14/Nov/2025:13:30:00 +0100] "GET /stream.mp3 HTTP/1.1" 200 4567890 "-" "VLC/3.0.16"
+79.125.44.178 - - [14/Nov/2025:13:30:00 +0100] "GET /stream.mp3 HTTP/1.1" 200 4567890 "-" "VLC/3.0.16"
 ```
 
 **Liquidsoap Log Format:**

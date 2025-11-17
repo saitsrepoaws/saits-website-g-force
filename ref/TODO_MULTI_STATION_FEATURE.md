@@ -434,7 +434,7 @@ const defaultStation = await createStation({
   name: "SplashFM",
   slug: "splashfm",
   cognito_group: "splashfm",
-  stream_url: "http://46.137.184.91:8000/stream.mp3"
+  stream_url: "http://79.125.44.178:8000/stream.mp3"
 })
 ```
 

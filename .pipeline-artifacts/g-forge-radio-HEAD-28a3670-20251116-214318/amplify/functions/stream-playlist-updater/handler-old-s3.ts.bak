@@ -1,0 +1,469 @@
+/**
+ * Stream Playlist Updater Lambda
+ * 
+ * Runs every 5 minutes via EventBridge
+ * Updates the M3U playlist in S3 based on current schedule
+ * Liquidsoap automatically reloads the playlist
+ * 
+ * NOW WITH SMART CROSSFADE:
+ * - Analyzes track transitions (BPM, Key, Energy)
+ * - Generates optimal crossfade config
+ * - Uploads Liquidsoap config to S3
+ */
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient, GetCommand, QueryCommand, ScanCommand } from '@aws-sdk/lib-dynamodb'
+import { analyzeTransition, generateLiquidsoapCrossfade, type CrossfadeSettings, type Track as AnalysisTrack } from './utils/crossfade-analysis.js'
+
+const s3 = new S3Client({})
+const dynamodb = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+
+const PLAYLIST_BUCKET = process.env.PLAYLIST_BUCKET || ''
+const STORAGE_BUCKET = process.env.STORAGE_BUCKET || ''
+const SCHEDULE_TABLE = process.env.SCHEDULE_TABLE || ''
+const PLAYLIST_TABLE = process.env.PLAYLIST_TABLE || ''
+const TRACK_TABLE = process.env.TRACK_TABLE || ''
+const SETTINGS_TABLE = process.env.SETTINGS_TABLE || ''
+
+interface Track {
+  trackId: string
+  trackTitle: string
+  trackDuration: number
+  fileUrl: string
+  
+  // Audio features for smart crossfade
+  bpm?: number
+  key?: string
+  energy?: number
+  artist?: string
+  title?: string
+}
+
+/**
+ * Get current active schedule slot
+ */
+async function getCurrentScheduleSlot() {
+  const now = new Date()
+  const dayOfWeek = now.getDay() // 0=Sunday, 1=Monday, ..., 6=Saturday
+  const currentTime = now.toTimeString().slice(0, 5) // HH:MM
+  
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  console.log(`📅 Current: ${dayNames[dayOfWeek]} ${currentTime} (dayOfWeek=${dayOfWeek})`)
+
+  try {
+    // APPROACH: Scan table and filter by time + day
+    // This handles both:
+    // - Entries with dayOfWeek set (specific days)
+    // - Entries with dayOfWeek=null (every day)
+    const result = await dynamodb.send(new ScanCommand({
+      TableName: SCHEDULE_TABLE,
+      FilterExpression: 'isActive = :active',
+      ExpressionAttributeValues: {
+        ':active': true
+      }
+    }))
+
+    if (!result.Items || result.Items.length === 0) {
+      console.log('⚠️ No schedule entries found in table')
+      return null
+    }
+    
+    console.log(`📋 Found ${result.Items.length} total schedule entries`)
+    
+    // Filter entries that match current day OR are null (= every day)
+    const todaySlots = result.Items.filter((item: any) => {
+      // null/undefined dayOfWeek means "every day"
+      if (item.dayOfWeek === null || item.dayOfWeek === undefined) {
+        return true
+      }
+      // Match specific day
+      return item.dayOfWeek === dayOfWeek
+    })
+    
+    console.log(`📋 Found ${todaySlots.length} slots for ${dayNames[dayOfWeek]}`)
+    
+    if (todaySlots.length === 0) {
+      console.log('⚠️ No schedule slots found for today')
+      return null
+    }
+
+    // Find slot where currentTime is between startTime and endTime
+    // Sort slots by startTime to find the current slot
+    todaySlots.sort((a: any, b: any) => a.startTime.localeCompare(b.startTime))
+    
+    // Find the active slot: latest start time that's <= current time
+    let activeSlot = null
+    for (const slot of todaySlots) {
+      if (slot.startTime <= currentTime) {
+        // Check if there's an endTime and we're past it
+        if (slot.endTime && currentTime >= slot.endTime) {
+          continue // This slot has ended
+        }
+        activeSlot = slot
+      } else {
+        break // Slots are sorted, no need to check further
+      }
+    }
+
+    if (activeSlot) {
+      console.log(`✅ Active slot: ${activeSlot.startTime}-${activeSlot.endTime}, Playlist: ${activeSlot.playlistId}`)
+    } else {
+      console.log('⚠️ No active slot for current time')
+    }
+
+    return activeSlot || null
+  } catch (error) {
+    console.error('❌ Error getting schedule:', error)
+    return null
+  }
+}
+
+/**
+ * Get playlist with tracks
+ */
+async function getPlaylist(playlistId: string) {
+  try {
+    const result = await dynamodb.send(new GetCommand({
+      TableName: PLAYLIST_TABLE,
+      Key: { id: playlistId }
+    }))
+
+    if (!result.Item) {
+      console.error(`❌ Playlist ${playlistId} not found`)
+      return null
+    }
+
+    console.log(`✅ Found playlist: ${result.Item.name}`)
+    return result.Item
+  } catch (error) {
+    console.error('❌ Error getting playlist:', error)
+    return null
+  }
+}
+
+/**
+ * Load full track data for playlist tracks
+ */
+async function loadTracksData(playlistTracks: Track[]) {
+  const tracks: any[] = []
+  
+  // Limit to first 50 tracks for stream
+  const tracksToLoad = playlistTracks.slice(0, 50)
+  console.log(`📝 Loading ${tracksToLoad.length} tracks`)
+
+  for (const playlistTrack of tracksToLoad) {
+    try {
+      const trackId = playlistTrack.trackId
+
+      if (!trackId) {
+        console.warn('⚠️ Skipping track without ID')
+        continue
+      }
+
+      const result = await dynamodb.send(new GetCommand({
+        TableName: TRACK_TABLE,
+        Key: { id: trackId }
+      }))
+
+      if (result.Item) {
+        tracks.push(result.Item)
+      } else {
+        console.warn(`⚠️ Track ${trackId} not found in database`)
+      }
+    } catch (error) {
+      console.error(`❌ Error loading track:`, error)
+    }
+  }
+
+  console.log(`✅ Loaded ${tracks.length} tracks`)
+  return tracks
+}
+
+/**
+ * Generate M3U playlist with S3 paths
+ * EC2 can read S3 files directly via AWS CLI
+ */
+function generateM3UPlaylist(tracks: any[]): string {
+  const lines = ['#EXTM3U']
+  
+  for (const track of tracks) {
+    // EXTINF line with duration and title
+    const duration = Math.floor(track.trackDuration || 0)
+    const title = `${track.artist || 'Unknown'} - ${track.title || 'Unknown'}`
+    lines.push(`#EXTINF:${duration},${title}`)
+    
+    // S3 path - Liquidsoap can read via AWS CLI on EC2
+    const fileUrl = track.fileUrl.startsWith('s3://') 
+      ? track.fileUrl 
+      : (track.fileUrl.startsWith('http') 
+        ? track.fileUrl 
+        : `s3://${STORAGE_BUCKET}/${track.fileUrl}`)
+    
+    lines.push(fileUrl)
+  }
+  
+  return lines.join('\n')
+}
+
+/**
+ * Upload playlist to S3
+ */
+async function uploadPlaylistToS3(playlistContent: string) {
+  try {
+    await s3.send(new PutObjectCommand({
+      Bucket: PLAYLIST_BUCKET,
+      Key: 'current-playlist.m3u',
+      Body: playlistContent,
+      ContentType: 'audio/x-mpegurl',
+      CacheControl: 'no-cache'
+    }))
+
+    console.log('✅ Main playlist uploaded to S3')
+    return true
+  } catch (error) {
+    console.error('❌ Error uploading main playlist:', error)
+    return false
+  }
+}
+
+/**
+ * Load crossfade settings from DynamoDB
+ */
+async function loadCrossfadeSettings(): Promise<CrossfadeSettings> {
+  try {
+    const result = await dynamodb.send(new GetCommand({
+      TableName: SETTINGS_TABLE,
+      Key: { settingKey: 'playlist_update_timing' }
+    }))
+
+    if (result.Item) {
+      return {
+        crossfadeEnabled: result.Item.crossfadeEnabled ?? true,
+        crossfadeStartNext: result.Item.crossfadeStartNext || 3.0,
+        crossfadeFadeIn: result.Item.crossfadeFadeIn || 2.0,
+        crossfadeFadeOut: result.Item.crossfadeFadeOut || 2.0,
+        crossfadeNormalize: result.Item.crossfadeNormalize ?? true,
+        crossfadeConservative: result.Item.crossfadeConservative ?? false,
+        
+        smartCrossfadeEnabled: result.Item.smartCrossfadeEnabled ?? false,
+        smartCrossfadeBpmTolerance: result.Item.smartCrossfadeBpmTolerance || 5,
+        smartCrossfadeAutoAdjust: result.Item.smartCrossfadeAutoAdjust ?? true,
+        
+        harmonicMixingEnabled: result.Item.harmonicMixingEnabled ?? false,
+        harmonicMixingStrict: result.Item.harmonicMixingStrict ?? false,
+        harmonicMixingBoost: result.Item.harmonicMixingBoost || 1.0,
+        
+        energyMatchingEnabled: result.Item.energyMatchingEnabled ?? false,
+        energyMatchingTolerance: result.Item.energyMatchingTolerance || 0.2,
+        energyMatchingSmoothTransitions: result.Item.energyMatchingSmoothTransitions ?? true
+      }
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not load crossfade settings, using defaults:', error)
+  }
+
+  // Default settings (basic crossfade only)
+  return {
+    crossfadeEnabled: true,
+    crossfadeStartNext: 3.0,
+    crossfadeFadeIn: 2.0,
+    crossfadeFadeOut: 2.0,
+    crossfadeNormalize: true,
+    crossfadeConservative: false,
+    
+    smartCrossfadeEnabled: false,
+    smartCrossfadeBpmTolerance: 5,
+    smartCrossfadeAutoAdjust: true,
+    
+    harmonicMixingEnabled: false,
+    harmonicMixingStrict: false,
+    harmonicMixingBoost: 1.0,
+    
+    energyMatchingEnabled: false,
+    energyMatchingTolerance: 0.2,
+    energyMatchingSmoothTransitions: true
+  }
+}
+
+/**
+ * Upload Liquidsoap config to S3
+ */
+async function uploadLiquidsoapConfig(config: string): Promise<boolean> {
+  try {
+    await s3.send(new PutObjectCommand({
+      Bucket: PLAYLIST_BUCKET,
+      Key: 'liquidsoap-crossfade.liq',
+      Body: config,
+      ContentType: 'text/plain'
+    }))
+    
+    console.log('✅ Liquidsoap config uploaded')
+    return true
+  } catch (error) {
+    console.error('❌ Failed to upload Liquidsoap config:', error)
+    return false
+  }
+}
+
+/**
+ * Main handler
+ */
+export const handler = async (event: any) => {
+  console.log('🎵 Stream Playlist Updater started')
+  console.log('Event:', JSON.stringify(event, null, 2))
+
+  try {
+    // 1. Get current schedule slot
+    const slot = await getCurrentScheduleSlot()
+    
+    if (!slot) {
+      console.log('⏸️ No active schedule, keeping previous playlist')
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ message: 'No active schedule' })
+      }
+    }
+
+    // 2. Get playlist
+    const playlist = await getPlaylist(slot.playlistId)
+    
+    if (!playlist) {
+      console.error('❌ Failed to get playlist')
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: 'Playlist not found' })
+      }
+    }
+
+    // 3. Parse tracks
+    const parsedTracks = typeof playlist.tracks === 'string'
+      ? JSON.parse(playlist.tracks)
+      : playlist.tracks
+
+    console.log(`📋 Playlist has ${parsedTracks.length} tracks`)
+
+    // 4. Load full track data
+    const tracks = await loadTracksData(parsedTracks)
+
+    if (tracks.length === 0) {
+      console.error('❌ No tracks loaded')
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: 'No tracks found' })
+      }
+    }
+
+    // 5. Generate M3U playlist with direct audio paths
+    const m3uContent = generateM3UPlaylist(tracks)
+    console.log('📝 M3U playlist generated with direct local paths')
+    console.log('Preview:', m3uContent.split('\n').slice(0, 8).join('\n'))
+
+    // 6. Upload playlist to S3
+    const uploaded = await uploadPlaylistToS3(m3uContent)
+
+    if (!uploaded) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Failed to upload main playlist' })
+      }
+    }
+
+    // 7. Load crossfade settings and analyze transitions
+    const crossfadeSettings = await loadCrossfadeSettings()
+    console.log('⚙️ Crossfade settings loaded:', {
+      enabled: crossfadeSettings.crossfadeEnabled,
+      preset: crossfadeSettings.crossfadeStartNext ? `${crossfadeSettings.crossfadeStartNext}s/${crossfadeSettings.crossfadeFadeIn}s/${crossfadeSettings.crossfadeFadeOut}s` : 'default',
+      smart: crossfadeSettings.smartCrossfadeEnabled
+    })
+
+    let crossfadeConfig = ''
+    if (crossfadeSettings.crossfadeEnabled && tracks.length > 1) {
+      // Analyze first transition as sample (could analyze all for playlist quality report)
+      const firstTrack: AnalysisTrack = {
+        id: tracks[0].trackId,
+        title: tracks[0].title || tracks[0].trackTitle,
+        artist: tracks[0].artist || 'Unknown',
+        bpm: tracks[0].bpm,
+        key: tracks[0].key,
+        energy: tracks[0].energy,
+        duration: tracks[0].trackDuration
+      }
+      
+      const secondTrack: AnalysisTrack = {
+        id: tracks[1].trackId,
+        title: tracks[1].title || tracks[1].trackTitle,
+        artist: tracks[1].artist || 'Unknown',
+        bpm: tracks[1].bpm,
+        key: tracks[1].key,
+        energy: tracks[1].energy,
+        duration: tracks[1].trackDuration
+      }
+
+      const analysis = analyzeTransition(firstTrack, secondTrack, crossfadeSettings)
+      
+      console.log('🎚️ Crossfade analysis:', {
+        bpmScore: analysis.bpmScore.toFixed(2),
+        keyScore: analysis.keyScore.toFixed(2),
+        energyScore: analysis.energyScore.toFixed(2),
+        overall: analysis.overallScore.toFixed(2),
+        quality: analysis.quality,
+        recommended: analysis.recommendedCrossfade
+      })
+
+      if (analysis.warnings.length > 0) {
+        console.log('⚠️ Transition warnings:', analysis.warnings)
+      }
+
+      // Generate Liquidsoap config with analyzed values
+      crossfadeConfig = generateLiquidsoapCrossfade(
+        analysis.recommendedCrossfade.startNext,
+        analysis.recommendedCrossfade.fadeIn,
+        analysis.recommendedCrossfade.fadeOut,
+        crossfadeSettings.crossfadeNormalize
+      )
+
+      // Upload config to S3
+      await uploadLiquidsoapConfig(crossfadeConfig)
+    } else if (crossfadeSettings.crossfadeEnabled) {
+      // Use basic settings without smart analysis
+      crossfadeConfig = generateLiquidsoapCrossfade(
+        crossfadeSettings.crossfadeStartNext,
+        crossfadeSettings.crossfadeFadeIn,
+        crossfadeSettings.crossfadeFadeOut,
+        crossfadeSettings.crossfadeNormalize
+      )
+      
+      await uploadLiquidsoapConfig(crossfadeConfig)
+      console.log('🎚️ Basic crossfade config uploaded (no smart analysis)')
+    } else {
+      console.log('ℹ️ Crossfade disabled in settings')
+    }
+
+    console.log('✅ Stream playlist updated successfully!')
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        success: true,
+        playlistId: slot.playlistId,
+        tracksCount: tracks.length,
+        slot: {
+          day: slot.dayOfWeek,
+          time: `${slot.startTime}-${slot.endTime}`
+        },
+        crossfade: crossfadeSettings.crossfadeEnabled ? {
+          enabled: true,
+          configUploaded: true
+        } : { enabled: false }
+      })
+    }
+  } catch (error) {
+    console.error('❌ Error updating stream playlist:', error)
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    }
+  }
+}
