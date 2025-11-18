@@ -203,12 +203,166 @@
         ]
        }
       }
+     ],
+     "QueueConfigurations": [
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".mp3"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".wav"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".flac"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".m4a"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".aac"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Events": [
+        "s3:ObjectCreated:*"
+       ],
+       "Filter": {
+        "Key": {
+         "FilterRules": [
+          {
+           "Name": "suffix",
+           "Value": ".ogg"
+          },
+          {
+           "Name": "prefix",
+           "Value": "public/audio/bulk/"
+          }
+         ]
+        }
+       },
+       "QueueArn": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      }
      ]
     },
     "Managed": true,
     "SkipDestinationValidation": false
    },
    "DependsOn": [
+    "BulkAudioUploadQueuePolicyD6C03DE5",
+    "BulkAudioUploadQueue045CF81F",
     "gforgeIotStorageBucketAllowBucketNotificationsToamplifygforgeiotgerardsandbox28f2e0c620storageaudiometadatalambda47FFBE222FBA0F43",
     "gforgeIotStorageBucketPolicy6EAA3612"
    ],
@@ -1148,6 +1302,363 @@
     "aws:asset:property": "Code"
    }
   },
+  "bulktrackprocessorlambdaServiceRole2529C850": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "bulk-track-processor"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/ServiceRole/Resource"
+   }
+  },
+  "bulktrackprocessorlambdaServiceRoleDefaultPolicy2672ADEE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:ChangeMessageVisibility",
+        "sqs:GetQueueUrl",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "gforgeIotStorageBucketEED00516",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging",
+        "s3:Abort*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "gforgeIotStorageBucketEED00516",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": "s3:DeleteObject*",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "gforgeIotStorageBucketEED00516",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:GetItem",
+        "dynamodb:Scan",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:CopyObject",
+        "s3:PutObjectStorageClass"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "gforgeIotStorageBucketEED00516",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "audiometadatalambdaA2764F23",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "audiometadatalambdaA2764F23",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "bulktrackprocessorlambdaServiceRoleDefaultPolicy2672ADEE",
+    "Roles": [
+     {
+      "Ref": "bulktrackprocessorlambdaServiceRole2529C850"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "bulktrackprocessorlambda2FCBECD9": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Architectures": [
+     "x86_64"
+    ],
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "3bb1b62aec78e16e27afa3f695649ff001d3d2b4a176b3b45e0f4e7ae8c1150f.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AMPLIFY_SSM_ENV_CONFIG": "{}",
+      "TRACK_TABLE_NAME": {
+       "Fn::Select": [
+        1,
+        {
+         "Fn::Split": [
+          "/",
+          {
+           "Fn::Select": [
+            5,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      "STORAGE_BUCKET": {
+       "Ref": "gforgeIotStorageBucketEED00516"
+      },
+      "AUDIO_METADATA_LAMBDA": {
+       "Ref": "audiometadatalambdaA2764F23"
+      }
+     }
+    },
+    "EphemeralStorage": {
+     "Size": 512
+    },
+    "Handler": "index.handler",
+    "MemorySize": 2048,
+    "Role": {
+     "Fn::GetAtt": [
+      "bulktrackprocessorlambdaServiceRole2529C850",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "bulk-track-processor"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "Timeout": 300
+   },
+   "DependsOn": [
+    "bulktrackprocessorlambdaServiceRoleDefaultPolicy2672ADEE",
+    "bulktrackprocessorlambdaServiceRole2529C850"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/Resource",
+    "aws:asset:path": "asset.3bb1b62aec78e16e27afa3f695649ff001d3d2b4a176b3b45e0f4e7ae8c1150f",
+    "aws:asset:is-bundled": true,
+    "aws:asset:property": "Code"
+   }
+  },
+  "bulktrackprocessorlambdaSqsEventSourceamplifygforgeiotgerardsandbox28f2e0c620storageBulkAudioUploadQueue807C25E9F8467ED4": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 10,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "BulkAudioUploadQueue045CF81F",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "bulktrackprocessorlambda2FCBECD9"
+    },
+    "FunctionResponseTypes": [
+     "ReportBatchItemFailures"
+    ],
+    "MaximumBatchingWindowInSeconds": 5,
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "amplify:friendly-name",
+      "Value": "bulk-track-processor"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/SqsEventSource:amplifygforgeiotgerardsandbox28f2e0c620storageBulkAudioUploadQueue807C25E9/Resource"
+   }
+  },
   "AudioAnalyzerDockerLambdaServiceRole96C96C6C": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -1472,6 +1983,188 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource"
    }
   },
+  "BulkUploadDLQC1413D30": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "g-forge-radio-bulk-upload-dlq",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkUploadDLQ/Resource"
+   }
+  },
+  "BulkAudioUploadQueue045CF81F": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "g-forge-radio-bulk-upload-queue",
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "BulkUploadDLQC1413D30",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "VisibilityTimeout": 360
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkAudioUploadQueue/Resource"
+   }
+  },
+  "BulkAudioUploadQueuePolicyD6C03DE5": {
+   "Type": "AWS::SQS::QueuePolicy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:SendMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl"
+       ],
+       "Condition": {
+        "ArnLike": {
+         "aws:SourceArn": {
+          "Fn::GetAtt": [
+           "gforgeIotStorageBucketEED00516",
+           "Arn"
+          ]
+         }
+        }
+       },
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "s3.amazonaws.com"
+       },
+       "Resource": {
+        "Fn::GetAtt": [
+         "BulkAudioUploadQueue045CF81F",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Queues": [
+     {
+      "Ref": "BulkAudioUploadQueue045CF81F"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkAudioUploadQueue/Policy/Resource"
+   }
+  },
+  "BulkUploadQueueUrl9BF5D057": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "SQS Queue URL for bulk audio uploads",
+    "Name": "/gforge-radio/bulk-upload/queue-url",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "BulkAudioUploadQueue045CF81F"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkUploadQueueUrl/Resource"
+   }
+  },
+  "BulkUploadQueueArn92D7A5BA": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "SQS Queue ARN for bulk audio uploads",
+    "Name": "/gforge-radio/bulk-upload/queue-arn",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Fn::GetAtt": [
+      "BulkAudioUploadQueue045CF81F",
+      "Arn"
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkUploadQueueArn/Resource"
+   }
+  },
+  "BulkUploadPrefixC9E21D87": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "S3 prefix for bulk audio uploads",
+    "Name": "/gforge-radio/bulk-upload/s3-prefix",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": "public/audio/bulk/"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkUploadPrefix/Resource"
+   }
+  },
+  "BulkProcessorLambda4CEEE012": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "Lambda function name for bulk track processing",
+    "Name": "/gforge-radio/bulk-upload/lambda-name",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "bulktrackprocessorlambda2FCBECD9"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/BulkProcessorLambda/Resource"
+   }
+  },
   "AudioCachePolicy1975B062": {
    "Type": "AWS::CloudFront::CachePolicy",
    "Properties": {
@@ -1577,7 +2270,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/12P0W7CMAxFv4X34LHyBaNo0h7GqvIBKKSmM22SKnZAqOq/T6EFqj3deyxf+TqDLFvBaqGvvDRVs2zpCP0OWbDaizaN0lc+9LyGfhNNg6Lyk5vcKIVvydxe44lH2GjGQbXaHisNfX5yBQZLzORdSnxGZyT5rTcNhi+ra3zMBsVsod9LIFcXOmiLgiGlnjAo0hb6V4PJlb7FhEkf1w/OV3hm2N3leZjXB82MwvCRRKEJUGLnmcSHW6qvTOtjdQreCfS5Nr/4ujfHLbEEOkaZfpvzMKg8snhbIvsYzNhu5r9115Gr/20VwV+ownCvce+3F12nvXn2J0oXZVDpQTjz2yXLIHuH1eLMRMsQnZBFKEf9Aw4Y07LvAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/21Q0W7CMAz8Ft6Dx8oXjLJJexjr2g9AITVdaJN0sQNCVf99Slugk/aSu3N8ydkJJMkKVgt5oaUq62WjD9DtkBjLgqWqhbzQvqM1dJugamSRHu3ERshco9X1UZ70KDaSsBeNNIdSQpcebYbeaCLtbHS8Bas48tczWi5c8Ao/ZNtqW8Xrf6pbp2r070ZWeDP3gshAV7DXtsqklwYZffTfRS+0NNA9ok4sdw1GGfEWc29diSeC3QD3hLTeSyJkgpcIApWHHFtHmp2/xjkF/RB0XwHD8OZIhvPx70z2QjUulEfvLEOXSvU965vLrSb2+hB4Wtpc971IA7EzOdKwp2GaGb9v809X5t1Zl+iH2MM8Bcsq9s29n4HbwL2IC4ETPZ2TBJJnWC1OpPXSB8vaIOQj/gJBaUsOSAIAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/CDKMetadata/Default"
@@ -1751,6 +2444,11 @@
   "amplifygforgeiotgerardsandbox28f2e0c620storagewaveformgeneratorlambda458DEFE1Ref": {
    "Value": {
     "Ref": "waveformgeneratorlambdaD07307E8"
+   }
+  },
+  "amplifygforgeiotgerardsandbox28f2e0c620storagebulktrackprocessorlambda84AAC2B4Ref": {
+   "Value": {
+    "Ref": "bulktrackprocessorlambda2FCBECD9"
    }
   },
   "amplifygforgeiotgerardsandbox28f2e0c620storagegforgeIotStorageBucket22D38476Arn": {

@@ -30,6 +30,7 @@ export const bulkTrackProcessor = defineFunction({
   runtime: 20,
   timeoutSeconds: 300, // 5 minutes for batch processing
   memoryMB: 2048, // More memory for batch processing
+  resourceGroupName: 'storage', // Assign to storage stack to avoid circular dependency
   environment: {
     // Will be set in backend.ts:
     // TRACK_TABLE_NAME

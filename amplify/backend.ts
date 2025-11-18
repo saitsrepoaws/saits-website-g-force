@@ -204,11 +204,12 @@ backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableNam
 backend.playlistGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 backend.playlistGenerator.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
 
-// Add S3 notification to trigger Lambda on audio file uploads (UI uploads)
+// Add S3 notification to trigger Lambda on audio file uploads (UI uploads only, not bulk)
+// UI uploads go to public/audio/ui/ to avoid overlap with bulk uploads (public/audio/bulk/)
 storageBucket.addEventNotification(
   EventType.OBJECT_CREATED,
   new LambdaDestination(metadataLambda),
-  { prefix: 'public/audio/' }
+  { prefix: 'public/audio/ui/' }
 )
 
 // =============================================================================

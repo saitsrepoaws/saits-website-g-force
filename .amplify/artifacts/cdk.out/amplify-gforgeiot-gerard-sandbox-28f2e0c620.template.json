@@ -261,6 +261,13 @@
         "Outputs.amplifygforgeiotgerardsandbox28f2e0c620functionplayerconnecthandlerlambda67B2E1D7Ref"
        ]
       },
+      "\",\"",
+      {
+       "Fn::GetAtt": [
+        "storage0EC3F24A",
+        "Outputs.amplifygforgeiotgerardsandbox28f2e0c620storagebulktrackprocessorlambda84AAC2B4Ref"
+       ]
+      },
       "\"]"
      ]
     ]
@@ -471,7 +478,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/0b546047f3da66cfc8ea22514e5a980d6fef7d9df2e23aa5545e042f1c568fd7.json"
+       "/a8bcc304729a57ef965f93b972dad68615b5115feb3b8f1b71b4ea62843e54cb.json"
       ]
      ]
     }
@@ -533,7 +540,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/cec9fef7f10953a0b09f4471ec5f6fccdc7287b4a52c812b03fd9b09810a1580.json"
+       "/3e7ff715848b4f6ced0b1d50f2a8c7ec99523eee08b531f246e54d312dc50fa0.json"
       ]
      ]
     }

@@ -45,7 +45,8 @@ export async function uploadAudioFile(
   // Generate unique filename
   const timestamp = Date.now()
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-  const key = `audio/${timestamp}-${sanitizedName}`
+  // UI uploads go to audio/ui/ (bulk uploads use audio/bulk/)
+  const key = `audio/ui/${timestamp}-${sanitizedName}`
 
   try {
     // Upload file with progress tracking
@@ -154,12 +155,12 @@ export async function deleteFile(key: string): Promise<void> {
 }
 
 /**
- * List all audio files
+ * List all audio files (UI uploads only)
  */
 export async function listAudioFiles(): Promise<string[]> {
   try {
     const result = await list({
-      prefix: 'audio/',
+      prefix: 'audio/ui/',
     })
     return result.items.map((item) => item.key)
   } catch (error) {
