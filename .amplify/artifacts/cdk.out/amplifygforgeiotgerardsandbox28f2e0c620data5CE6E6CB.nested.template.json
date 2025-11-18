@@ -305,7 +305,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1794957187
+    "Expires": 1794999934
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -2763,11 +2763,11 @@
     ]
    }
   },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
    "Value": {
     "Fn::GetAtt": [
-     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
-     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+     "amplifyDataGraphQLAPI42A6FA33",
+     "Arn"
     ]
    }
   },
@@ -2779,19 +2779,19 @@
     ]
    }
   },
+  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistNestedStackPlaylistNestedStackResourceF2FCDC09Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "amplifyDataPlaylistNestedStackPlaylistNestedStackResource77C61E8A",
+     "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataPlaylistPlaylistTableBA136449TableArn"
+    ]
+   }
+  },
   "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResourceD32191F3Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn": {
    "Value": {
     "Fn::GetAtt": [
      "amplifyDataStreamSettingsNestedStackStreamSettingsNestedStackResource5343AC44",
      "Outputs.amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataStreamSettingsStreamSettingsTableA0BC8FB7TableArn"
-    ]
-   }
-  },
-  "amplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataGraphQLAPIA71C850DArn": {
-   "Value": {
-    "Fn::GetAtt": [
-     "amplifyDataGraphQLAPI42A6FA33",
-     "Arn"
     ]
    }
   },

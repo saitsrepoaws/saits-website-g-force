@@ -19,7 +19,6 @@
 import { Stack, StackProps, CfnOutput, Duration, Tags } from 'aws-cdk-lib'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import * as iam from 'aws-cdk-lib/aws-iam'
-import * as ssm from 'aws-cdk-lib/aws-ssm'
 import { Construct } from 'constructs'
 
 export interface StreamServerStackProps extends StackProps {
@@ -233,25 +232,10 @@ export class StreamServerStack extends Stack {
     })
 
     // ============================================================================
-    // SSM PARAMETERS - Store EC2 configuration
+    // SSM PARAMETERS - Managed by parent stack via createEC2Parameters()
     // ============================================================================
-    new ssm.StringParameter(this, 'EC2InstanceIdParam', {
-      parameterName: '/gforge-radio/ec2/instance-id',
-      stringValue: this.instance.instanceId,
-      description: 'G-Forge Radio EC2 Instance ID'
-    })
-
-    new ssm.StringParameter(this, 'EC2ElasticIPParam', {
-      parameterName: '/gforge-radio/ec2/elastic-ip',
-      stringValue: this.elasticIp.ref,
-      description: 'G-Forge Radio EC2 Elastic IP'
-    })
-
-    new ssm.StringParameter(this, 'EC2RegionParam', {
-      parameterName: '/gforge-radio/ec2/region',
-      stringValue: props.region,
-      description: 'G-Forge Radio EC2 Region'
-    })
+    // Note: Parameters are created in backend.ts after EC2 instance is deployed
+    // This avoids conflicts with existing parameter store entries
 
     // ============================================================================
     // OUTPUTS

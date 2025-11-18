@@ -1019,7 +1019,16 @@ const streamServerStack = new StreamServerStack(
   }
 )
 
+// Create EC2 parameters in Parameter Store (using existing function)
+const ec2Config = createEC2Parameters(storageStack, {
+  instanceId: streamServerStack.instance.instanceId,
+  publicIp: streamServerStack.elasticIp.ref,
+  elasticIp: streamServerStack.elasticIp.ref,
+  region: 'eu-west-1'
+})
+
 console.log('📦 EC2 Stream Server Stack created')
+console.log('📦 EC2 configuration stored in Parameter Store')
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap + IoT) via Pipeline')
 console.log('✅ All software installed via CodeDeploy (no UserData!)')
 

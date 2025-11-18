@@ -1,0 +1,477 @@
+{
+ "Resources": {
+  "StreamServerSG59B4944A": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "G-Forge Radio Stream Server Security Group",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "SSH access",
+      "FromPort": 22,
+      "IpProtocol": "tcp",
+      "ToPort": 22
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTP access",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTPS access",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Icecast streaming",
+      "FromPort": 8000,
+      "IpProtocol": "tcp",
+      "ToPort": 8000
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ],
+    "VpcId": "vpc-0226cf594769d09b2"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerSG/Resource"
+   }
+  },
+  "StreamServerRole6A0ED596": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ec2.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Description": "G-Forge Radio Stream Server Role",
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/AmazonSSMManagedInstanceCore"
+       ]
+      ]
+     },
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/CloudWatchAgentServerPolicy"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerRole/Resource"
+   }
+  },
+  "StreamServerRoleDefaultPolicy19BCE421": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject",
+        "s3:ListBucket"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:s3:::amplify-*",
+        "arn:aws:s3:::amplify-*/*",
+        "arn:aws:s3:::g-forge-radio-*",
+        "arn:aws:s3:::g-forge-radio-*/*"
+       ],
+       "Sid": "S3StorageBucketAccess"
+      },
+      {
+       "Action": [
+        "iot:Connect",
+        "iot:Publish",
+        "iot:Subscribe",
+        "iot:Receive"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:iot:eu-west-1:035636364722:topic/radio/queue/*",
+        "arn:aws:iot:eu-west-1:035636364722:topic/radio/stream/*",
+        "arn:aws:iot:eu-west-1:035636364722:topic/radio/control/*",
+        "arn:aws:iot:eu-west-1:035636364722:topic/radio/response/*",
+        "arn:aws:iot:eu-west-1:035636364722:client/*",
+        "arn:aws:iot:eu-west-1:035636364722:topicfilter/radio/*"
+       ],
+       "Sid": "IoTQueueAndMetadata"
+      },
+      {
+       "Action": [
+        "iot:UpdateThingShadow",
+        "iot:GetThingShadow"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:iot:eu-west-1:035636364722:thing/splash-fm-radio",
+       "Sid": "IoTDeviceShadow"
+      },
+      {
+       "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParametersByPath"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:ssm:eu-west-1:035636364722:parameter/gforge-radio/*",
+       "Sid": "SSMParameterStoreRead"
+      },
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:logs:eu-west-1:035636364722:log-group:/g-forge-radio/*",
+        "arn:aws:logs:eu-west-1:035636364722:log-group:/g-forge-radio/*:*"
+       ],
+       "Sid": "CloudWatchLogsCustom"
+      },
+      {
+       "Action": [
+        "ec2:DescribeVolumes",
+        "ec2:DescribeTags",
+        "ec2:DescribeInstances",
+        "ec2:DescribeAddresses"
+       ],
+       "Effect": "Allow",
+       "Resource": "*",
+       "Sid": "EC2MetadataAccess"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "StreamServerRoleDefaultPolicy19BCE421",
+    "Roles": [
+     {
+      "Ref": "StreamServerRole6A0ED596"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerRole/DefaultPolicy/Resource"
+   }
+  },
+  "StreamServerInstanceInstanceProfileE275E479": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "Roles": [
+     {
+      "Ref": "StreamServerRole6A0ED596"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerInstance/InstanceProfile"
+   }
+  },
+  "StreamServerInstanceD5AB331D": {
+   "Type": "AWS::EC2::Instance",
+   "Properties": {
+    "AvailabilityZone": "eu-west-1a",
+    "BlockDeviceMappings": [
+     {
+      "DeviceName": "/dev/sda1",
+      "Ebs": {
+       "DeleteOnTermination": true,
+       "VolumeSize": 20,
+       "VolumeType": "gp3"
+      }
+     }
+    ],
+    "IamInstanceProfile": {
+     "Ref": "StreamServerInstanceInstanceProfileE275E479"
+    },
+    "ImageId": "ami-0651fd5b99debb0f4",
+    "InstanceType": "t3.small",
+    "KeyName": "g-forge-radio",
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "StreamServerSG59B4944A",
+       "GroupId"
+      ]
+     }
+    ],
+    "SubnetId": "subnet-0cdb078c275014e24",
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "Application",
+      "Value": "g-forge-radio"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     },
+     {
+      "Key": "DeploymentGroup",
+      "Value": "radio-production"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "G-Forge-Radio-Stream-Server"
+     }
+    ],
+    "UserData": {
+     "Fn::Base64": "#!/bin/bash"
+    }
+   },
+   "DependsOn": [
+    "StreamServerRoleDefaultPolicy19BCE421",
+    "StreamServerRole6A0ED596"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerInstance/Resource"
+   }
+  },
+  "StreamServerEIP": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "InstanceId": {
+     "Ref": "StreamServerInstanceD5AB331D"
+    },
+    "Tags": [
+     {
+      "Key": "amplify:deployment-type",
+      "Value": "sandbox"
+     },
+     {
+      "Key": "created-by",
+      "Value": "amplify"
+     },
+     {
+      "Key": "Name",
+      "Value": "G-Forge-Radio-Stream-Server-EIP"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerEIP"
+   }
+  },
+  "EC2InstanceIdParam87BBC28E": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "G-Forge Radio EC2 Instance ID",
+    "Name": "/gforge-radio/ec2/instance-id",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "StreamServerInstanceD5AB331D"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2InstanceIdParam/Resource"
+   }
+  },
+  "EC2ElasticIPParam92F04B85": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "G-Forge Radio EC2 Elastic IP",
+    "Name": "/gforge-radio/ec2/elastic-ip",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "StreamServerEIP"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2ElasticIPParam/Resource"
+   }
+  },
+  "EC2RegionParam1F051BE8": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "G-Forge Radio EC2 Region",
+    "Name": "/gforge-radio/ec2/region",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": "eu-west-1"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2RegionParam/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WOXQqDMBCEz+J73NpcoZTiU0UPUNK4lrUxkfxUJOTuJRZp+zTzzTAwHDivoCrE4krZP0tFd4idF/LJWnQmWIlMLO4WUXKIHcpgya8Xa8LMToP+D2rtvNASc/Prz3WTGIkJYmvUlmzaGEVyzfh1+6yxZiCFiTk35UOW9KMRVkzo0W6THVLKeA1+Dj4xbXqE0R1enAM/QlWMjqi0QXuaENqPvgFkSYOs9QAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "InstanceId": {
+   "Description": "EC2 Instance ID",
+   "Value": {
+    "Ref": "StreamServerInstanceD5AB331D"
+   },
+   "Export": {
+    "Name": "GForgeRadioInstanceId"
+   }
+  },
+  "ElasticIP": {
+   "Description": "Elastic IP Address",
+   "Value": {
+    "Ref": "StreamServerEIP"
+   },
+   "Export": {
+    "Name": "GForgeRadioElasticIP"
+   }
+  },
+  "SecurityGroupId": {
+   "Description": "Security Group ID",
+   "Value": {
+    "Fn::GetAtt": [
+     "StreamServerSG59B4944A",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "GForgeRadioSecurityGroupId"
+   }
+  },
+  "IAMRoleArn": {
+   "Description": "IAM Role ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "StreamServerRole6A0ED596",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "GForgeRadioIAMRoleArn"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
