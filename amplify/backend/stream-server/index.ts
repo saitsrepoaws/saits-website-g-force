@@ -207,10 +207,8 @@ export class StreamServerStack extends Stack {
           deleteOnTermination: true
         })
       }],
-      // SSH Key (optional - we use SSM)
-      keyName: 'g-forge-radio', // Create this key manually if needed
+      // NO SSH Key - we use SSM Session Manager for remote access
       // NO UserData - all installation via CodeDeploy!
-      // userDataCausesReplacement: false
     })
 
     // Tags for CodeDeploy
