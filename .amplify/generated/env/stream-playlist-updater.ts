@@ -88,5 +88,5 @@ type AmplifyBackendEnvVars = {
   PLAYLIST_BUCKET: string;
   STORAGE_BUCKET: string;
   SETTINGS_TABLE: string;
-  EC2_INSTANCE_ID: string;
+  EC2_PARAM_PREFIX: string;
 };

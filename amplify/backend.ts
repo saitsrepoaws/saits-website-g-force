@@ -18,13 +18,14 @@ import { streamMonitor } from './functions/stream-monitor/resource'
 import { trackCompletionHandler } from './functions/track-completion-handler/resource'
 // import { listenerTracker } from './functions/listener-tracker/resource' // DISABLED: esbuild bundling issue
 import { getCoverUrl } from './functions/get-cover-url/resource'
-import { trackQueueManager } from './functions/track-queue-manager/resource'
+// import { trackQueueManager } from './functions/track-queue-manager/resource' // REMOVED: Migrated to IoT Queue
 import { genreMerger } from './functions/genre-merger/resource'
 import { playerConnectHandler } from './functions/player-connect-handler/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
 import { createEC2Parameters, grantEC2ParameterAccess } from './backend/ec2-config'
+import { StreamServerStack } from './backend/stream-server/index.js'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
 import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
@@ -42,7 +43,7 @@ import * as iot from 'aws-cdk-lib/aws-iot'
 import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
-import * as sqs from 'aws-cdk-lib/aws-sqs'
+// import * as sqs from 'aws-cdk-lib/aws-sqs' // REMOVED: Migrated to IoT Queue
 import * as sns from 'aws-cdk-lib/aws-sns'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
@@ -72,7 +73,7 @@ export const backend = defineBackend({
   trackCompletionHandler,
   // listenerTracker, // DISABLED: esbuild bundling issue
   getCoverUrl,
-  trackQueueManager,
+  // trackQueueManager, // REMOVED: Migrated to IoT Queue
   genreMerger,
   playerConnectHandler
 })
@@ -919,64 +920,13 @@ trackCompletionLambda.addPermission('AllowIoTInvoke', {
 console.log('✅ Track completion handler configured with IoT trigger')
 
 // ============================================
-// 🎵 TRACK QUEUE MANAGER - Hybrid SQS Streaming
+// 🎵 TRACK QUEUE - IoT-Based Streaming
 // ============================================
-const trackQueueManagerLambda = backend.trackQueueManager.resources.lambda
-const storageStack = backend.storage.resources.bucket.stack
+// REMOVED: SQS FIFO queue - migrated to IoT Queue
+// Now using: Lambda → IoT (radio/queue/tracks) → iot-queue-listener.sh → Liquidsoap
+// See: docs/IOT_QUEUE_ARCHITECTURE.md
 
-// Create SQS FIFO Queue in storage stack (has no dependency on data)
-const trackStreamQueue = new sqs.Queue(storageStack, 'RadioTrackStreamQueue', {
-  queueName: 'radio-track-stream-queue-v2.fifo',
-  fifo: true,
-  contentBasedDeduplication: false, // We provide deduplication IDs
-  visibilityTimeout: Duration.seconds(300), // 5 minutes (track duration)
-  retentionPeriod: Duration.days(1),
-  receiveMessageWaitTime: Duration.seconds(20), // Long polling
-})
-
-console.log('✅ SQS FIFO queue created for track streaming')
-
-// Grant Lambda permissions
-trackTable.grantReadData(trackQueueManagerLambda)
-playlistTable.grantReadData(trackQueueManagerLambda)
-scheduleTable.grantReadData(trackQueueManagerLambda)
-streamSettingsTable.grantReadWriteData(trackQueueManagerLambda)
-trackStreamQueue.grantSendMessages(trackQueueManagerLambda)
-trackStreamQueue.grantConsumeMessages(trackQueueManagerLambda)
-
-// Add environment variables
-backend.trackQueueManager.addEnvironment('QUEUE_URL', trackStreamQueue.queueUrl)
-backend.trackQueueManager.addEnvironment('SCHEDULE_TABLE', scheduleTable.tableName)
-backend.trackQueueManager.addEnvironment('PLAYLIST_TABLE', playlistTable.tableName)
-backend.trackQueueManager.addEnvironment('TRACK_TABLE', trackTable.tableName)
-backend.trackQueueManager.addEnvironment('SETTINGS_TABLE', streamSettingsTable.tableName)
-backend.trackQueueManager.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
-
-// EventBridge rule - Run hourly to initialize queue (in storage stack)
-const trackQueueInitRule = new events.Rule(
-  storageStack,
-  'TrackQueueInitRule',
-  {
-    ruleName: 'TrackQueueInitHourly-v2',
-    description: 'Initializes track queue with 2 tracks at top of each hour (v2)',
-    schedule: events.Schedule.cron({ minute: '0' }), // Every hour at :00
-  }
-)
-
-trackQueueInitRule.addTarget(new targets.LambdaFunction(trackQueueManagerLambda))
-
-// Output SQS queue URL (in storage stack)
-new CfnOutput(storageStack, 'TrackStreamQueueUrl', {
-  value: trackStreamQueue.queueUrl,
-  description: 'SQS FIFO Queue URL for track streaming',
-})
-
-new CfnOutput(storageStack, 'TrackStreamQueueArn', {
-  value: trackStreamQueue.queueArn,
-  description: 'SQS FIFO Queue ARN for EC2 permissions',
-})
-
-console.log('✅ Track queue manager configured with hourly trigger')
+console.log('✅ IoT queue architecture enabled (SQS removed)')
 
 // ============================================
 // 🎨 GENRE MERGER - Library Management
@@ -1033,33 +983,46 @@ listenerTrackerRule.addTarget(new targets.LambdaFunction(listenerTrackerLambda))
 console.log('✅ Listener tracker configured')
 
 // =============================================================================
-// 🎙️ EC2 CONFIGURATION - Parameter Store
+// 🎙️ EC2 STREAM SERVER STACK - Complete Pipeline Deployment
 // =============================================================================
 // 
-// ⚠️ NOTE: EC2 instance is MANUALLY MANAGED (not via CloudFormation)
-// Current IP: 79.125.44.178
-// Instance ID: i-021451e919d39c898
-// Services: Icecast, Liquidsoap, Nginx
-// Status: ✅ RUNNING
+// FRESH DEPLOYMENT VIA PIPELINE:
+// - EC2 instance created by CloudFormation
+// - Software installed via CodeDeploy (NO UserData!)
+// - All scripts in pipeline/ami/ and scripts/deploy/
+// - IoT queue listener installed automatically
+// - Tags for CodeDeploy deployment group
 // 
-// Configuration stored in AWS Systems Manager Parameter Store:
-// - /gforge-radio/ec2/instance-id
-// - /gforge-radio/ec2/public-ip
-// - /gforge-radio/ec2/region
+// Services installed via CodeDeploy:
+// - Liquidsoap (streaming engine)
+// - Icecast (HTTP streaming server)
+// - Nginx (reverse proxy)
+// - Docker (containerization)
+// - IoT queue listener (MQTT subscriber)
 // 
-// Lambda functions read from Parameter Store (no hardcoded values!)
 // =============================================================================
 
-// Create EC2 configuration in Parameter Store
-const ec2Config = createEC2Parameters(storageStack, {
-  instanceId: 'i-054754fbca0bda346',  // SplashFM-StreamServer-Restored
-  publicIp: '54.171.0.54',            // Elastic IP (fixed!)
-  elasticIp: '54.171.0.54',           // Elastic IP allocation
-  region: 'eu-west-1'                 // Region
-})
+// Get storage stack and bucket name
+const storageStack = backend.storage.resources.bucket.stack
+const storageBucketName = backend.storage.resources.bucket.bucketName
 
-console.log('📦 EC2 configuration stored in Parameter Store')
-console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
+// Create EC2 Stream Server Stack
+const streamServerStack = new StreamServerStack(
+  storageStack,
+  'StreamServerStack',
+  {
+    storageBucketName,
+    region: 'eu-west-1',
+    env: {
+      account: process.env.CDK_DEFAULT_ACCOUNT,
+      region: 'eu-west-1'
+    }
+  }
+)
+
+console.log('📦 EC2 Stream Server Stack created')
+console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap + IoT) via Pipeline')
+console.log('✅ All software installed via CodeDeploy (no UserData!)')
 
 // =============================================================================
 // Get Cover URL Lambda - Public endpoint for player page
