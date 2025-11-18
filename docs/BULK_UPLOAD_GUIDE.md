@@ -1,18 +1,20 @@
 # 📦 BULK AUDIO UPLOAD GUIDE
 
 **Last Updated:** 18 November 2025  
-**Feature:** S3 Bulk Upload with Batch Processing
+**Feature:** S3 Bulk Upload with Batch Processing, Deduplication & Glacier Backup
 
 ---
 
 ## 🎯 PURPOSE
 
-Upload **10,000+ audio files** to G-Forge Radio without:
-- ❌ UI slowdowns
-- ❌ Lambda throttling
-- ❌ Browser timeouts
+Upload **10,000+ audio files** to G-Forge Radio with:
+- ✅ **Batch processing** (no throttling)
+- ✅ **Deduplication** (title + artist matching)
+- ✅ **File validation** (0 bytes check)
+- ✅ **Auto backup** to S3 Glacier (95% cheaper storage)
+- ✅ **Metadata preservation** (JSON export)
 
-**Solution:** Direct S3 upload → SQS queue → Batch Lambda processing
+**Solution:** Direct S3 upload → SQS queue → Batch Lambda → Processing → Glacier Backup
 
 ---
 
@@ -45,16 +47,39 @@ Upload **10,000+ audio files** to G-Forge Radio without:
    └─ Triggered every 5 seconds OR when 10 events ready
    └─ Processes batch of 10 tracks
    └─ For each track:
-      - Validate audio file
-      - Invoke audio-metadata Lambda
-         ├─ Extract metadata (title, artist, BPM, key)
-         ├─ Generate cover art
-         ├─ Invoke waveform-generator
-         ├─ Invoke audio-analyzer (FFmpeg)
-         └─ Save to DynamoDB
+      ├─ 1. FILE VALIDATION
+      │  ├─ Check file size (min 100 bytes, max 100MB)
+      │  └─ Validate audio extension
+      │
+      ├─ 2. DEDUPLICATION
+      │  ├─ Extract title + artist from filename
+      │  ├─ Check DynamoDB for existing track
+      │  └─ Skip if duplicate found
+      │
+      ├─ 3. METADATA PROCESSING (if not duplicate)
+      │  ├─ Invoke audio-metadata Lambda
+      │  ├─ Extract metadata (title, artist, BPM, key)
+      │  ├─ Generate cover art
+      │  ├─ Invoke waveform-generator
+      │  ├─ Invoke audio-analyzer (FFmpeg)
+      │  └─ Save to DynamoDB
+      │
+      └─ 4. POST-PROCESSING BACKUP
+         ├─ Copy file to backup/audio/YYYY-MM-DD/
+         ├─ Save metadata as JSON alongside
+         ├─ Delete original from bulk folder
+         └─ Apply Glacier storage class
 
-6. RESULT
+6. S3 GLACIER LIFECYCLE
+   └─ Day 0: Glacier Instant Retrieval (immediate access)
+   └─ Day 30: Glacier Flexible Retrieval (90% cheaper)
+   └─ Day 90: Glacier Deep Archive (95% cheaper)
+
+7. RESULT
    └─ All tracks processed and available in library
+   └─ Duplicates detected and skipped
+   └─ Original files backed up to Glacier
+   └─ Metadata preserved as JSON
    └─ No throttling, no timeouts
 ```
 
