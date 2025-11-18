@@ -23,8 +23,8 @@ import * as ssm from 'aws-cdk-lib/aws-ssm'
 import { Construct } from 'constructs'
 
 export interface StreamServerStackProps extends StackProps {
-  storageBucketName: string
   region: string
+  accountId: string
 }
 
 export class StreamServerStack extends Stack {
@@ -91,7 +91,7 @@ export class StreamServerStack extends Stack {
       ]
     })
 
-    // S3 - Read access to storage bucket
+    // S3 - Read access to storage buckets (amplify-* pattern)
     this.role.addToPolicy(new iam.PolicyStatement({
       sid: 'S3StorageBucketAccess',
       effect: iam.Effect.ALLOW,
@@ -100,8 +100,10 @@ export class StreamServerStack extends Stack {
         's3:ListBucket'
       ],
       resources: [
-        `arn:aws:s3:::${props.storageBucketName}`,
-        `arn:aws:s3:::${props.storageBucketName}/*`
+        `arn:aws:s3:::amplify-*`,
+        `arn:aws:s3:::amplify-*/*`,
+        `arn:aws:s3:::g-forge-radio-*`,
+        `arn:aws:s3:::g-forge-radio-*/*`
       ]
     }))
 

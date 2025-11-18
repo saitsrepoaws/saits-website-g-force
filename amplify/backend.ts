@@ -1002,17 +1002,16 @@ console.log('✅ Listener tracker configured')
 // 
 // =============================================================================
 
-// Get storage stack and bucket name
+// Get storage stack
 const storageStack = backend.storage.resources.bucket.stack
-const storageBucketName = backend.storage.resources.bucket.bucketName
 
-// Create EC2 Stream Server Stack
+// Create EC2 Stream Server Stack (as independent stack to avoid cross-stack issues)
 const streamServerStack = new StreamServerStack(
   storageStack,
   'StreamServerStack',
   {
-    storageBucketName,
     region: 'eu-west-1',
+    accountId: process.env.CDK_DEFAULT_ACCOUNT || '',
     env: {
       account: process.env.CDK_DEFAULT_ACCOUNT,
       region: 'eu-west-1'
