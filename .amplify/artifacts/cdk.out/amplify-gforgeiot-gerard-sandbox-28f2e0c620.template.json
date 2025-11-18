@@ -374,7 +374,7 @@
       {
        "Ref": "AWS::Region"
       },
-      "\\\",\\\"paths\\\":{\\\"public/audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/waveforms/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]}}}\"]"
+      "\\\",\\\"paths\\\":{\\\"public/audio/ui/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/audio/bulk/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"backup/audio/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\"],\\\"guest\\\":[]},\\\"public/covers/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]},\\\"public/waveforms/*\\\":{\\\"authenticated\\\":[\\\"get\\\",\\\"list\\\",\\\"write\\\",\\\"delete\\\"],\\\"guest\\\":[\\\"get\\\",\\\"list\\\"]}}}\"]"
      ]
     ]
    }
@@ -478,7 +478,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/a8bcc304729a57ef965f93b972dad68615b5115feb3b8f1b71b4ea62843e54cb.json"
+       "/90984abb0c81bce3f791b2fa27f5543256dd2b87cb1d003d7b033c08e17e4721.json"
       ]
      ]
     }
@@ -540,7 +540,7 @@
        {
         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
        },
-       "/3e7ff715848b4f6ced0b1d50f2a8c7ec99523eee08b531f246e54d312dc50fa0.json"
+       "/bc322bf44e52cf858ddd8eaa635af8a7de52680c3dd75c79ae50bf4f2d37039e.json"
       ]
      ]
     }

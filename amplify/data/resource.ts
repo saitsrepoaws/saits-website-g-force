@@ -309,6 +309,9 @@ const schema = a.schema({
       skipCount: a.integer().default(0), // Times track was skipped
       popularityScore: a.float(), // Calculated score based on plays/listeners
     })
+    .secondaryIndexes((index) => [
+      index('artist').sortKeys(['title']).queryField('listTracksByArtist') // GSI for deduplication
+    ])
     .authorization((allow) => [
       allow.authenticated(),
       allow.publicApiKey().to(['read']) // Allow public read for player page

@@ -1965,7 +1965,7 @@
         "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-dmnly9ayjibv",
         "aws_region": "eu-west-1",
         "paths": {
-          "public/audio/*": {
+          "public/audio/ui/*": {
             "authenticated": [
               "get",
               "list",
@@ -1976,6 +1976,25 @@
               "get",
               "list"
             ]
+          },
+          "public/audio/bulk/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
+          },
+          "backup/audio/*": {
+            "authenticated": [
+              "get",
+              "list"
+            ],
+            "guest": []
           },
           "public/covers/*": {
             "authenticated": [

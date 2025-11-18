@@ -191,7 +191,7 @@
          "FilterRules": [
           {
            "Name": "prefix",
-           "Value": "public/audio/"
+           "Value": "public/audio/ui/"
           }
          ]
         }
@@ -515,7 +515,35 @@
              "Arn"
             ]
            },
-           "/public/audio/*"
+           "/public/audio/ui/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/audio/bulk/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/backup/audio/*"
           ]
          ]
         },
@@ -554,8 +582,12 @@
        "Condition": {
         "StringLike": {
          "s3:prefix": [
-          "public/audio/*",
-          "public/audio/",
+          "public/audio/ui/*",
+          "public/audio/ui/",
+          "public/audio/bulk/*",
+          "public/audio/bulk/",
+          "backup/audio/*",
+          "backup/audio/",
           "public/covers/*",
           "public/covers/",
           "public/waveforms/*",
@@ -585,7 +617,21 @@
              "Arn"
             ]
            },
-           "/public/audio/*"
+           "/public/audio/ui/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/audio/bulk/*"
           ]
          ]
         },
@@ -633,7 +679,21 @@
              "Arn"
             ]
            },
-           "/public/audio/*"
+           "/public/audio/ui/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/audio/bulk/*"
           ]
          ]
         },
@@ -702,7 +762,21 @@
              "Arn"
             ]
            },
-           "/public/audio/*"
+           "/public/audio/ui/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "gforgeIotStorageBucketEED00516",
+             "Arn"
+            ]
+           },
+           "/public/audio/bulk/*"
           ]
          ]
         },
@@ -741,8 +815,10 @@
        "Condition": {
         "StringLike": {
          "s3:prefix": [
-          "public/audio/*",
-          "public/audio/",
+          "public/audio/ui/*",
+          "public/audio/ui/",
+          "public/audio/bulk/*",
+          "public/audio/bulk/",
           "public/covers/*",
           "public/covers/",
           "public/waveforms/*",
