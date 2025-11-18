@@ -21,6 +21,7 @@ import { getCoverUrl } from './functions/get-cover-url/resource'
 // import { trackQueueManager } from './functions/track-queue-manager/resource' // REMOVED: Migrated to IoT Queue
 import { genreMerger } from './functions/genre-merger/resource'
 import { playerConnectHandler } from './functions/player-connect-handler/resource'
+import { bulkTrackProcessor } from './functions/bulk-track-processor/resource'
 // stateMachineTrigger will be created directly in custom stack to avoid circular dependency
 // Container-based Lambda - imported separately
 // import { audioAnalyzer } from './functions/audio-analyzer/resource'
@@ -28,7 +29,7 @@ import { createEC2Parameters, grantEC2ParameterAccess } from './backend/ec2-conf
 import { StreamServerStack } from './backend/stream-server/index.js'
 import { Policy, PolicyStatement, Effect, ServicePrincipal } from 'aws-cdk-lib/aws-iam'
 import { EventType } from 'aws-cdk-lib/aws-s3'
-import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications'
+import { LambdaDestination, SqsDestination } from 'aws-cdk-lib/aws-s3-notifications'
 import { DockerImageFunction, DockerImageCode, Architecture, Runtime, FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { Duration, CfnOutput } from 'aws-cdk-lib'
@@ -43,8 +44,10 @@ import * as iot from 'aws-cdk-lib/aws-iot'
 import * as events from 'aws-cdk-lib/aws-events'
 import * as targets from 'aws-cdk-lib/aws-events-targets'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
-// import * as sqs from 'aws-cdk-lib/aws-sqs' // REMOVED: Migrated to IoT Queue
+import * as sqs from 'aws-cdk-lib/aws-sqs' // For bulk upload queue
 import * as sns from 'aws-cdk-lib/aws-sns'
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources'
+import * as ssm from 'aws-cdk-lib/aws-ssm'
 import { readFileSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join} from 'path'
@@ -75,7 +78,8 @@ export const backend = defineBackend({
   getCoverUrl,
   // trackQueueManager, // REMOVED: Migrated to IoT Queue
   genreMerger,
-  playerConnectHandler
+  playerConnectHandler,
+  bulkTrackProcessor
 })
 
 // Configure Lambdas to trigger on S3 uploads
@@ -200,12 +204,147 @@ backend.waveformGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableNam
 backend.playlistGenerator.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 backend.playlistGenerator.addEnvironment('PLAYLIST_TABLE_NAME', playlistTable.tableName)
 
-// Add S3 notification to trigger Lambda on audio file uploads
+// Add S3 notification to trigger Lambda on audio file uploads (UI uploads)
 storageBucket.addEventNotification(
   EventType.OBJECT_CREATED,
   new LambdaDestination(metadataLambda),
   { prefix: 'public/audio/' }
 )
+
+// =============================================================================
+// 📦 BULK UPLOAD QUEUE - S3 Bulk Uploads → SQS → Batch Lambda
+// =============================================================================
+// Purpose: Handle bulk audio file uploads (10,000+ tracks)
+// Flow: 
+//   1. Direct S3 upload (aws s3 sync) → S3 event
+//   2. S3 event → SQS queue (buffers events)
+//   3. Lambda triggered with batch of 10 events
+//   4. Lambda invokes audio-metadata for each track
+//
+// Benefits:
+//   - No throttling (batch processing)
+//   - Fault tolerance (DLQ for failures)
+//   - Cost efficient (batch processing)
+//
+const bulkUploadQueue = new sqs.Queue(backend.storage.resources.bucket.stack, 'BulkAudioUploadQueue', {
+  queueName: 'g-forge-radio-bulk-upload-queue',
+  visibilityTimeout: Duration.seconds(360), // 6 minutes (Lambda timeout + buffer)
+  retentionPeriod: Duration.days(14), // Keep failed messages for 14 days
+  deadLetterQueue: {
+    queue: new sqs.Queue(backend.storage.resources.bucket.stack, 'BulkUploadDLQ', {
+      queueName: 'g-forge-radio-bulk-upload-dlq',
+      retentionPeriod: Duration.days(14)
+    }),
+    maxReceiveCount: 3 // Retry 3 times before moving to DLQ
+  }
+})
+
+// Add S3 notification to send events to SQS (for bulk uploads via CLI/SDK)
+// Filter: Only audio files (.mp3, .wav, .flac, .m4a, .aac, .ogg)
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.mp3'
+  }
+)
+
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.wav'
+  }
+)
+
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.flac'
+  }
+)
+
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.m4a'
+  }
+)
+
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.aac'
+  }
+)
+
+storageBucket.addEventNotification(
+  EventType.OBJECT_CREATED,
+  new SqsDestination(bulkUploadQueue),
+  { 
+    prefix: 'public/audio/bulk/',
+    suffix: '.ogg'
+  }
+)
+
+// Configure Lambda to consume from SQS with batch size of 10
+const bulkProcessorLambda = backend.bulkTrackProcessor.resources.lambda
+bulkProcessorLambda.addEventSource(new SqsEventSource(bulkUploadQueue, {
+  batchSize: 10, // Process 10 tracks per invocation
+  maxBatchingWindow: Duration.seconds(5), // Wait max 5 seconds to collect batch
+  reportBatchItemFailures: true // Enable partial batch failures
+}))
+
+// Grant permissions
+storageBucket.grantRead(bulkProcessorLambda)
+trackTable.grantReadWriteData(bulkProcessorLambda)
+
+// Environment variables for bulk processor
+backend.bulkTrackProcessor.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
+backend.bulkTrackProcessor.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
+backend.bulkTrackProcessor.addEnvironment('AUDIO_METADATA_LAMBDA', metadataLambda.functionName)
+
+// Grant permission to invoke audio-metadata Lambda
+metadataLambda.grantInvoke(bulkProcessorLambda)
+
+// Store bulk upload config in Parameter Store
+new ssm.StringParameter(backend.storage.resources.bucket.stack, 'BulkUploadQueueUrl', {
+  parameterName: '/gforge-radio/bulk-upload/queue-url',
+  stringValue: bulkUploadQueue.queueUrl,
+  description: 'SQS Queue URL for bulk audio uploads'
+})
+
+new ssm.StringParameter(backend.storage.resources.bucket.stack, 'BulkUploadQueueArn', {
+  parameterName: '/gforge-radio/bulk-upload/queue-arn',
+  stringValue: bulkUploadQueue.queueArn,
+  description: 'SQS Queue ARN for bulk audio uploads'
+})
+
+new ssm.StringParameter(backend.storage.resources.bucket.stack, 'BulkUploadPrefix', {
+  parameterName: '/gforge-radio/bulk-upload/s3-prefix',
+  stringValue: 'public/audio/bulk/',
+  description: 'S3 prefix for bulk audio uploads'
+})
+
+new ssm.StringParameter(backend.storage.resources.bucket.stack, 'BulkProcessorLambda', {
+  parameterName: '/gforge-radio/bulk-upload/lambda-name',
+  stringValue: bulkProcessorLambda.functionName,
+  description: 'Lambda function name for bulk track processing'
+})
+
+console.log('📦 Bulk upload queue configured')
+console.log('   Queue: g-forge-radio-bulk-upload-queue')
+console.log('   Batch size: 10 tracks per invocation')
+console.log('   Upload to: s3://BUCKET/public/audio/bulk/')
+console.log('   Supported: .mp3, .wav, .flac, .m4a, .aac, .ogg')
 
 // Add IoT policy to BOTH authenticated AND unauthenticated roles for PubSub access
 // Open policy for development - see /docs/IOT_TOPICS_SPECIFICATION.md for production policy
