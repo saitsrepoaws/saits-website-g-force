@@ -1,16 +1,16 @@
 {
   "version": "48.0.0",
   "files": {
-    "c7e9512a6db70b9f23d922357ee33fb2e5290fb0e487492dabe1776be8b04e11": {
+    "db02cf6e05effe6943b1c8caf6f639ea004c348e2ee2adae2fcea3d43ba6ed75": {
       "displayName": "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4 Template",
       "source": {
         "path": "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.template.json",
         "packaging": "file"
       },
       "destinations": {
-        "035636364722-eu-west-1-b8c1c1be": {
+        "035636364722-eu-west-1-3d20fd51": {
           "bucketName": "cdk-hnb659fds-assets-035636364722-eu-west-1",
-          "objectKey": "c7e9512a6db70b9f23d922357ee33fb2e5290fb0e487492dabe1776be8b04e11.json",
+          "objectKey": "db02cf6e05effe6943b1c8caf6f639ea004c348e2ee2adae2fcea3d43ba6ed75.json",
           "region": "eu-west-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-file-publishing-role-035636364722-eu-west-1"
         }

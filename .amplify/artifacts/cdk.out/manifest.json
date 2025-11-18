@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-deploy-role-035636364722-eu-west-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-cfn-exec-role-035636364722-eu-west-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-035636364722-eu-west-1/c7e9512a6db70b9f23d922357ee33fb2e5290fb0e487492dabe1776be8b04e11.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-035636364722-eu-west-1/db02cf6e05effe6943b1c8caf6f639ea004c348e2ee2adae2fcea3d43ba6ed75.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -87,24 +87,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "StreamServerEIP"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2InstanceIdParam/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "EC2InstanceIdParam87BBC28E"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2ElasticIPParam/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "EC2ElasticIPParam92F04B85"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2RegionParam/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "EC2RegionParam1F051BE8"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/InstanceId": [
@@ -173,7 +155,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d20d151f598a0a523e321d194dd8e740cb348e97210b58eb24d38c6ae7673431.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/466409ea376174ef7228f5137ba08fa6a461640f8fc2e517fbc4f89cebd644dd.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [

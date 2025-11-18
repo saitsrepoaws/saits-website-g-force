@@ -250,7 +250,6 @@
     },
     "ImageId": "ami-0651fd5b99debb0f4",
     "InstanceType": "t3.small",
-    "KeyName": "g-forge-radio",
     "SecurityGroupIds": [
      {
       "Fn::GetAtt": [
@@ -328,68 +327,10 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerEIP"
    }
   },
-  "EC2InstanceIdParam87BBC28E": {
-   "Type": "AWS::SSM::Parameter",
-   "Properties": {
-    "Description": "G-Forge Radio EC2 Instance ID",
-    "Name": "/gforge-radio/ec2/instance-id",
-    "Tags": {
-     "amplify:deployment-type": "sandbox",
-     "created-by": "amplify"
-    },
-    "Type": "String",
-    "Value": {
-     "Ref": "StreamServerInstanceD5AB331D"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2InstanceIdParam/Resource"
-   }
-  },
-  "EC2ElasticIPParam92F04B85": {
-   "Type": "AWS::SSM::Parameter",
-   "Properties": {
-    "Description": "G-Forge Radio EC2 Elastic IP",
-    "Name": "/gforge-radio/ec2/elastic-ip",
-    "Tags": {
-     "amplify:deployment-type": "sandbox",
-     "created-by": "amplify"
-    },
-    "Type": "String",
-    "Value": {
-     "Ref": "StreamServerEIP"
-    }
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2ElasticIPParam/Resource"
-   }
-  },
-  "EC2RegionParam1F051BE8": {
-   "Type": "AWS::SSM::Parameter",
-   "Properties": {
-    "Description": "G-Forge Radio EC2 Region",
-    "Name": "/gforge-radio/ec2/region",
-    "Tags": {
-     "amplify:deployment-type": "sandbox",
-     "created-by": "amplify"
-    },
-    "Type": "String",
-    "Value": "eu-west-1"
-   },
-   "UpdateReplacePolicy": "Delete",
-   "DeletionPolicy": "Delete",
-   "Metadata": {
-    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/EC2RegionParam/Resource"
-   }
-  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WOXQqDMBCEz+J73NpcoZTiU0UPUNK4lrUxkfxUJOTuJRZp+zTzzTAwHDivoCrE4krZP0tFd4idF/LJWnQmWIlMLO4WUXKIHcpgya8Xa8LMToP+D2rtvNASc/Prz3WTGIkJYmvUlmzaGEVyzfh1+6yxZiCFiTk35UOW9KMRVkzo0W6THVLKeA1+Dj4xbXqE0R1enAM/QlWMjqi0QXuaENqPvgFkSYOs9QAAAA=="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/1WLXQ6CMBCEz8J7WXGvYIzhSQIHMLUsyUJpTX8kpOndDRijPs0332QQECuoCrn4UvVTqfkOqQtSTaIlb6NTJOTib4kUQupIRcdhvTgbH+I0mH9RGx+kUbQtv3yumyxYzpBaq3ezZ2M1q3WrX/rcGmcH1pTzJq8xPGLIwtieYPSHJyLgEapi9MyliybwTNC+8wWei3Kw0gAAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/CDKMetadata/Default"
