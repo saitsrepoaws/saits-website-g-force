@@ -20,7 +20,9 @@
     "typecheck": "tsc -v && turbo run typecheck",
     "sync-config": "./scripts/sync-amplify-config.sh",
     "sandbox": "npx ampx sandbox && npm run sync-config",
-    "deploy:fresh": "npx ampx sandbox --once && npm run sync-config"
+    "sandbox:ec2": "DEPLOY_EC2=true npx ampx sandbox && npm run sync-config",
+    "deploy:fresh": "npx ampx sandbox --once && npm run sync-config",
+    "deploy:ec2": "DEPLOY_EC2=true npx ampx sandbox --once && npm run sync-config"
   },
   "keywords": [],
   "author": "",

@@ -1,139 +1,6 @@
 {
   "version": "48.0.0",
   "artifacts": {
-    "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.assets": {
-      "type": "cdk:asset-manifest",
-      "properties": {
-        "file": "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.assets.json",
-        "requiresBootstrapStackVersion": 6,
-        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
-      }
-    },
-    "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4": {
-      "type": "aws:cloudformation:stack",
-      "environment": "aws://035636364722/eu-west-1",
-      "properties": {
-        "templateFile": "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.template.json",
-        "terminationProtection": false,
-        "tags": {
-          "amplify:deployment-type": "sandbox",
-          "created-by": "amplify"
-        },
-        "validateOnSynth": false,
-        "assumeRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-deploy-role-035636364722-eu-west-1",
-        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-cfn-exec-role-035636364722-eu-west-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-035636364722-eu-west-1/db02cf6e05effe6943b1c8caf6f639ea004c348e2ee2adae2fcea3d43ba6ed75.json",
-        "requiresBootstrapStackVersion": 6,
-        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
-        "additionalDependencies": [
-          "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.assets"
-        ],
-        "lookupRole": {
-          "arn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-lookup-role-035636364722-eu-west-1",
-          "requiresBootstrapStackVersion": 8,
-          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
-        }
-      },
-      "dependencies": [
-        "amplifygforgeiotgerardsandbox28f2e0c620storageStreamServerStack99F743E4.assets"
-      ],
-      "metadata": {
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack": [
-          {
-            "type": "aws:cdk:stack-tags",
-            "data": [
-              {
-                "Key": "amplify:deployment-type",
-                "Value": "sandbox"
-              },
-              {
-                "Key": "created-by",
-                "Value": "amplify"
-              }
-            ]
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerSG/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerSG59B4944A"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerRole/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerRole6A0ED596"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerRole/DefaultPolicy/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerRoleDefaultPolicy19BCE421"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerInstance/InstanceProfile": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerInstanceInstanceProfileE275E479"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerInstance/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerInstanceD5AB331D"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/StreamServerEIP": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "StreamServerEIP"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/InstanceId": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "InstanceId"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/ElasticIP": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ElasticIP"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/SecurityGroupId": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "SecurityGroupId"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/IAMRoleArn": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "IAMRoleArn"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/CDKMetadata/Default": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CDKMetadata"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/BootstrapVersion": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BootstrapVersion"
-          }
-        ],
-        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack/CheckBootstrapVersion": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CheckBootstrapVersion"
-          }
-        ]
-      },
-      "displayName": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StreamServerStack"
-    },
     "amplify-gforgeiot-gerard-sandbox-28f2e0c620.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
@@ -155,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4141250aae1e39eb255c14e0a007da112bdf68ef0214c076cb9b9a0c02b46e4d.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f3b9be984b61b4cd779f5250cb343de61d44db7a2f66295f9b5e8f5f278f0e50.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [

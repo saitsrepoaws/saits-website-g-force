@@ -1181,30 +1181,57 @@ console.log('✅ Listener tracker configured')
 // Get storage stack
 const storageStack = backend.storage.resources.bucket.stack
 
-// Create EC2 Stream Server Stack (as independent stack to avoid cross-stack issues)
-const streamServerStack = new StreamServerStack(
-  storageStack,
-  'StreamServerStack',
-  {
-    region: 'eu-west-1',
-    accountId: process.env.CDK_DEFAULT_ACCOUNT || '',
-    env: {
-      account: process.env.CDK_DEFAULT_ACCOUNT,
-      region: 'eu-west-1'
+// =============================================================================
+// EC2 Stream Server Stack - OPTIONAL DEPLOYMENT
+// =============================================================================
+// Feature flag: Set DEPLOY_EC2=true to enable EC2 streaming server
+// Default: EC2 is NOT deployed (faster sandbox, lower costs)
+// 
+// Enable EC2 deployment:
+//   export DEPLOY_EC2=true && npm run sandbox
+//
+// Benefits of optional EC2:
+// - Faster sandbox deployment (no EC2 provisioning)
+// - Lower costs during development (no EC2 running)
+// - Flexible: Deploy EC2 only when needed for streaming
+// - Lambda functions work independently (read from Parameter Store)
+// =============================================================================
+
+const DEPLOY_EC2 = process.env.DEPLOY_EC2 === 'true'
+
+if (DEPLOY_EC2) {
+  console.log('🚀 EC2 Stream Server: ENABLED')
+  console.log('📦 Deploying EC2 instance with Icecast + Liquidsoap...')
+  
+  const streamServerStack = new StreamServerStack(
+    storageStack,
+    'StreamServerStack',
+    {
+      region: 'eu-west-1',
+      accountId: process.env.CDK_DEFAULT_ACCOUNT || '',
+      env: {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: 'eu-west-1'
+      }
     }
-  }
-)
+  )
 
-// NOTE: EC2 configuration parameters are NOT created here to avoid cross-stack references
-// Instead, Lambdas will discover EC2 instance using CloudFormation exports:
-// - GForgeRadioInstanceId
-// - GForgeRadioElasticIP  
-// Or via EC2 API calls using tags (Application=g-forge-radio)
+  // NOTE: EC2 configuration parameters are NOT created here to avoid cross-stack references
+  // Instead, Lambdas will discover EC2 instance using CloudFormation exports:
+  // - GForgeRadioInstanceId
+  // - GForgeRadioElasticIP  
+  // Or via EC2 API calls using tags (Application=g-forge-radio)
 
-console.log('📦 EC2 Stream Server Stack created')
-console.log('📦 EC2 info available via CloudFormation exports')
-console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap + IoT) via Pipeline')
-console.log('✅ All software installed via CodeDeploy (no UserData!)')
+  console.log('✅ EC2 Stream Server Stack created')
+  console.log('📦 EC2 info available via CloudFormation exports')
+  console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap + IoT) via Pipeline')
+  console.log('✅ All software installed via CodeDeploy (no UserData!)')
+} else {
+  console.log('⏭️  EC2 Stream Server: DISABLED (feature flag not set)')
+  console.log('💡 To enable: export DEPLOY_EC2=true && npm run sandbox')
+  console.log('📦 Deploying serverless components only (Lambda, S3, DynamoDB)')
+  console.log('✅ Lambda functions will work with existing EC2 (via Parameter Store)')
+}
 
 // =============================================================================
 // Get Cover URL Lambda - Public endpoint for player page
