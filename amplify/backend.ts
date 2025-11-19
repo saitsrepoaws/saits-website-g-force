@@ -322,6 +322,17 @@ bulkProcessorLambda.addToRolePolicy(new PolicyStatement({
   ]
 }))
 
+// Add explicit GSI query permission for deduplication
+bulkProcessorLambda.addToRolePolicy(new PolicyStatement({
+  effect: Effect.ALLOW,
+  actions: [
+    'dynamodb:Query'
+  ],
+  resources: [
+    `${trackTable.tableArn}/index/*`
+  ]
+}))
+
 // Environment variables for bulk processor
 backend.bulkTrackProcessor.addEnvironment('TRACK_TABLE_NAME', trackTable.tableName)
 backend.bulkTrackProcessor.addEnvironment('STORAGE_BUCKET', storageBucket.bucketName)
