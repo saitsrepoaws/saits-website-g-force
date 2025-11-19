@@ -159,13 +159,41 @@ async function processTrack(key: string, size: number): Promise<ProcessingResult
 
     console.log(`   ✅ No duplicate found`)
 
-    // 5. Invoke audio-metadata Lambda for full processing
+    // 5. Create basic track record in DynamoDB
+    // This allows audio-metadata Lambda to find and update the track
+    const now = new Date().toISOString()
+    const fileUrl = `https://${STORAGE_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+    
+    const trackRecord = {
+      id: trackId,
+      title,
+      artist,
+      fileUrl,
+      fileSize: size,
+      format: key.split('.').pop()?.toUpperCase() || 'UNKNOWN',
+      addedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      trackType: 'music',
+      __typename: 'Track'
+    }
+    
+    console.log(`   💾 Creating track record in DynamoDB...`)
+    
+    await dynamoClient.send(new PutCommand({
+      TableName: TRACK_TABLE,
+      Item: trackRecord
+    }))
+    
+    console.log(`   ✅ Track created with ID: ${trackId}`)
+
+    // 6. Invoke audio-metadata Lambda for full processing
     // This Lambda will handle:
     // - Metadata extraction
     // - Cover art generation
     // - Invoking waveform-generator
     // - Invoking audio-analyzer
-    // - Saving to DynamoDB
+    // - Updating track in DynamoDB
     const payload = {
       Records: [{
         s3: {
@@ -186,24 +214,9 @@ async function processTrack(key: string, size: number): Promise<ProcessingResult
     if (response.StatusCode === 202) {
       console.log(`   ✅ Successfully queued for processing`)
       
-      // 6. Post-processing: Move to backup after successful processing
+      // 7. Post-processing: Move to backup after successful processing
       // Note: This happens async, actual metadata will be added by audio-metadata Lambda
       console.log(`   📦 Scheduling backup after processing...`)
-      
-      // We'll create a basic metadata record now, full metadata added later
-      const basicMetadata = {
-        id: trackId,
-        title,
-        artist,
-        filename,
-        size,
-        originalKey: key,
-        processedAt: new Date().toISOString(),
-        status: 'processing'
-      }
-      
-      // Schedule backup (will happen after metadata extraction)
-      // For now, just log - actual backup happens in audio-metadata Lambda
       console.log(`   ℹ️  Backup will occur after metadata extraction`)
       
       return { success: true, key }

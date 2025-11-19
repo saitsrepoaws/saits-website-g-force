@@ -1569,6 +1569,21 @@
        }
       },
       {
+       "Action": "dynamodb:Query",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Ref": "referencetoamplifygforgeiotgerardsandbox28f2e0c620dataNestedStackdataNestedStackResource3F58B078Outputsamplifygforgeiotgerardsandbox28f2e0c620dataamplifyDataTrackNestedStackTrackNestedStackResource6459E384OutputsamplifygforgeiotgerardsandboF4A337E7"
+          },
+          "/index/*"
+         ]
+        ]
+       }
+      },
+      {
        "Action": "lambda:InvokeFunction",
        "Effect": "Allow",
        "Resource": [
