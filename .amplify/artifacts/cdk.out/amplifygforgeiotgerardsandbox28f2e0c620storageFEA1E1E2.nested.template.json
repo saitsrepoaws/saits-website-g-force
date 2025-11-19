@@ -1635,7 +1635,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "33e0dc0819d49d8eea06cf6fb061cd2cb9eab9c808664b148563edf1a08d1cbe.zip"
+     "S3Key": "9471e8a54a1ed6d1437113df900f33a9f288d235b29d436298b0cc9320d77a2a.zip"
     },
     "Environment": {
      "Variables": {
@@ -1707,7 +1707,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/Resource",
-    "aws:asset:path": "asset.33e0dc0819d49d8eea06cf6fb061cd2cb9eab9c808664b148563edf1a08d1cbe",
+    "aws:asset:path": "asset.9471e8a54a1ed6d1437113df900f33a9f288d235b29d436298b0cc9320d77a2a",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
