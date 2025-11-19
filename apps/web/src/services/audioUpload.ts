@@ -30,6 +30,12 @@ export interface UploadResult {
   format: string
 }
 
+export interface AudioFile {
+  key: string
+  size?: number
+  lastModified?: Date
+}
+
 /**
  * Upload audio file to S3
  */
@@ -45,8 +51,10 @@ export async function uploadAudioFile(
   // Generate unique filename
   const timestamp = Date.now()
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-  // UI uploads go to audio/ui/ (bulk uploads use audio/bulk/)
-  const key = `audio/ui/${timestamp}-${sanitizedName}`
+  // UI uploads now go to audio/bulk/ for unified processing!
+  // S3 trigger → SQS → Lambda → metadata extraction → DynamoDB
+  // Same pipeline as CLI bulk uploads!
+  const key = `audio/bulk/${timestamp}-${sanitizedName}`
 
   try {
     // Upload file with progress tracking
@@ -157,15 +165,25 @@ export async function deleteFile(key: string): Promise<void> {
 /**
  * List all audio files (UI uploads only)
  */
-export async function listAudioFiles(): Promise<string[]> {
+export async function listAudioFiles(): Promise<AudioFile[]> {
   try {
+    // List from bulk/ folder (unified pipeline)
+    // All uploads (UI + CLI) now go through same processing
     const result = await list({
-      prefix: 'audio/ui/',
+      path: 'audio/bulk/',
+      options: {
+        listAll: true,
+      },
     })
-    return result.items.map((item) => item.key)
+
+    return result.items.map((item) => ({
+      key: item.path,
+      size: item.size,
+      lastModified: item.lastModified,
+    }))
   } catch (error) {
-    console.error('List files failed:', error)
-    return []
+    console.error('Failed to list audio files:', error)
+    throw new Error(`Failed to list audio files: ${error}`)
   }
 }
 

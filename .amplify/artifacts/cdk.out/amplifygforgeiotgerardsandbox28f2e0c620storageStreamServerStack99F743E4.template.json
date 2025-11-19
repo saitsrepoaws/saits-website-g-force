@@ -51,7 +51,7 @@
       "Value": "amplify"
      }
     ],
-    "VpcId": "vpc-12345"
+    "VpcId": "vpc-0226cf594769d09b2"
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -234,7 +234,7 @@
   "StreamServerInstanceD5AB331D": {
    "Type": "AWS::EC2::Instance",
    "Properties": {
-    "AvailabilityZone": "dummy1a",
+    "AvailabilityZone": "eu-west-1a",
     "BlockDeviceMappings": [
      {
       "DeviceName": "/dev/sda1",
@@ -248,7 +248,7 @@
     "IamInstanceProfile": {
      "Ref": "StreamServerInstanceInstanceProfileE275E479"
     },
-    "ImageId": "ami-1234",
+    "ImageId": "ami-0651fd5b99debb0f4",
     "InstanceType": "t3.small",
     "SecurityGroupIds": [
      {
@@ -258,7 +258,7 @@
       ]
      }
     ],
-    "SubnetId": "p-12345",
+    "SubnetId": "subnet-0cdb078c275014e24",
     "Tags": [
      {
       "Key": "amplify:deployment-type",

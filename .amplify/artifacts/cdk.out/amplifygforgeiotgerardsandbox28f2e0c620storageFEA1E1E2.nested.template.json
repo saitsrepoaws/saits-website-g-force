@@ -1635,7 +1635,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "9471e8a54a1ed6d1437113df900f33a9f288d235b29d436298b0cc9320d77a2a.zip"
+     "S3Key": "75efc536136da486c44cffdb3c6248b6055dafc14c29e59536d56f9c11e61786.zip"
     },
     "Environment": {
      "Variables": {
@@ -1707,7 +1707,7 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/bulk-track-processor-lambda/Resource",
-    "aws:asset:path": "asset.9471e8a54a1ed6d1437113df900f33a9f288d235b29d436298b0cc9320d77a2a",
+    "aws:asset:path": "asset.75efc536136da486c44cffdb3c6248b6055dafc14c29e59536d56f9c11e61786",
     "aws:asset:is-bundled": true,
     "aws:asset:property": "Code"
    }
@@ -2356,6 +2356,26 @@
    "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageDistribution/Resource"
+   }
+  },
+  "StorageBucketName0024C8C3": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "S3 Storage Bucket Name",
+    "Name": "/gforce-radio/storage/bucket-name",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "gforgeIotStorageBucketEED00516"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/storage/StorageBucketName/Resource"
    }
   },
   "CDKMetadata": {

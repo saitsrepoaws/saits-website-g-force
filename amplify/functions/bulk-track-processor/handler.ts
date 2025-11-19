@@ -162,7 +162,9 @@ async function processTrack(key: string, size: number): Promise<ProcessingResult
     // 5. Create basic track record in DynamoDB
     // This allows audio-metadata Lambda to find and update the track
     const now = new Date().toISOString()
-    const fileUrl = `https://${STORAGE_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+    // Store S3 path only (not full URL) for consistent playback
+    // Player will generate presigned URLs at runtime using getUrl()
+    const fileUrl = key // e.g. "public/audio/bulk/Artist-Title.mp3"
     
     const trackRecord = {
       id: trackId,
