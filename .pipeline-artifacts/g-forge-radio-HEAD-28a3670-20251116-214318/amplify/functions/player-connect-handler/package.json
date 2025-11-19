@@ -1,8 +1,0 @@
-{
-  "name": "player-connect-handler",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "@aws-sdk/client-iot-data-plane": "^3.0.0"
-  }
-}

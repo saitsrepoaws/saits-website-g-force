@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "build:stateless": "./scripts/build-with-params.sh && turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "test:smoke": "./tests/scripts/run-smoke-tests.sh",
@@ -18,7 +19,8 @@
     "format": "prettier -w .",
     "typecheck": "tsc -v && turbo run typecheck",
     "sync-config": "./scripts/sync-amplify-config.sh",
-    "sandbox": "npx ampx sandbox && npm run sync-config"
+    "sandbox": "npx ampx sandbox && npm run sync-config",
+    "deploy:fresh": "npx ampx sandbox --once && npm run sync-config"
   },
   "keywords": [],
   "author": "",

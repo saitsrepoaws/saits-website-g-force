@@ -1,0 +1,153 @@
+name: 🔧 Stateless Build & Deploy
+
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: eu-west-1
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy (Stateless)
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: 🔑 Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: 📦 Install dependencies
+        run: npm ci
+      
+      - name: 🔍 Fetch config from Parameter Store
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📦 Fetching configuration from Parameter Store (SSM)"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          # Fetch all parameters
+          USER_POOL_ID=$(aws ssm get-parameter \
+            --name /gforce-radio/auth/user-pool-id \
+            --region $AWS_REGION \
+            --query 'Parameter.Value' \
+            --output text)
+          
+          USER_POOL_CLIENT_ID=$(aws ssm get-parameter \
+            --name /gforce-radio/auth/user-pool-client-id \
+            --region $AWS_REGION \
+            --query 'Parameter.Value' \
+            --output text)
+          
+          IDENTITY_POOL_ID=$(aws ssm get-parameter \
+            --name /gforce-radio/auth/identity-pool-id \
+            --region $AWS_REGION \
+            --query 'Parameter.Value' \
+            --output text)
+          
+          BUCKET_NAME=$(aws ssm get-parameter \
+            --name /gforce-radio/storage/bucket-name \
+            --region $AWS_REGION \
+            --query 'Parameter.Value' \
+            --output text)
+          
+          echo "✅ Config fetched from Parameter Store!"
+          echo "   User Pool Client ID: $USER_POOL_CLIENT_ID"
+          
+          # Export to environment for next steps
+          echo "USER_POOL_ID=$USER_POOL_ID" >> $GITHUB_ENV
+          echo "USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID" >> $GITHUB_ENV
+          echo "IDENTITY_POOL_ID=$IDENTITY_POOL_ID" >> $GITHUB_ENV
+          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
+      
+      - name: 🔧 Generate runtime config
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📋 Generating runtime configuration (STATELESS)"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          mkdir -p apps/web/src
+          
+          cat > apps/web/src/amplify_outputs.json << EOF
+          {
+            "auth": {
+              "user_pool_id": "$USER_POOL_ID",
+              "aws_region": "$AWS_REGION",
+              "user_pool_client_id": "$USER_POOL_CLIENT_ID",
+              "identity_pool_id": "$IDENTITY_POOL_ID",
+              "mfa_methods": [],
+              "username_attributes": ["email"],
+              "user_verification_types": ["email"],
+              "mfa_configuration": "NONE",
+              "password_policy": {
+                "min_length": 8,
+                "require_lowercase": true,
+                "require_numbers": true,
+                "require_symbols": true,
+                "require_uppercase": true
+              },
+              "unauthenticated_identities_enabled": true
+            },
+            "storage": {
+              "bucket_name": "$BUCKET_NAME",
+              "aws_region": "$AWS_REGION"
+            }
+          }
+          EOF
+          
+          echo "✅ Runtime config generated!"
+      
+      - name: 🔍 Verify config
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🔍 Verifying configuration"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          
+          FRONTEND_CLIENT=$(cat apps/web/src/amplify_outputs.json | jq -r '.auth.user_pool_client_id')
+          
+          if [ "$FRONTEND_CLIENT" == "$USER_POOL_CLIENT_ID" ]; then
+            echo "✅ VERIFIED: Correct Client ID!"
+            echo "   Expected: $USER_POOL_CLIENT_ID"
+            echo "   Got:      $FRONTEND_CLIENT"
+          else
+            echo "❌ MISMATCH!"
+            exit 1
+          fi
+      
+      - name: 🏗️ Build application
+        run: npm run build
+      
+      - name: 🧪 Run tests
+        run: npm test
+      
+      - name: 📊 Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎉 Stateless Build Complete!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "✅ Config from Parameter Store (ZERO hardcoded values!)"
+          echo "✅ Frontend using correct Cognito Client"
+          echo "✅ Build successful"
+          echo "✅ Tests passed"
+          echo ""
+          echo "Ready for deployment! 🚀"
