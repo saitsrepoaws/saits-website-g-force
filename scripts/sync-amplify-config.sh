@@ -107,6 +107,12 @@ if [ -f "amplify_outputs.json" ]; then
      .auth.user_pool_client_id = $client_id | 
      .auth.identity_pool_id = $identity_pool' \
     > apps/web/src/amplify_outputs.json
+  
+  # ALSO copy to public folder (app loads from there!)
+  cp amplify_outputs.json apps/web/public/amplify_outputs.json
+  
+  echo "   ✓ Copied to apps/web/src/amplify_outputs.json"
+  echo "   ✓ Copied to apps/web/public/amplify_outputs.json"
 else
   # Create minimal config if no base file exists
   cat > apps/web/src/amplify_outputs.json << EOF
@@ -124,9 +130,15 @@ else
   }
 }
 EOF
+  
+  # Copy to public as well
+  cp apps/web/src/amplify_outputs.json apps/web/public/amplify_outputs.json
+  
+  echo "   ✓ Created in apps/web/src/"
+  echo "   ✓ Copied to apps/web/public/"
 fi
 
-echo -e "${GREEN}✅ Config synced successfully!${NC}"
+echo -e "${GREEN}✅ Config synced to both src/ and public/!${NC}"
 echo ""
 
 ###############################################################################
