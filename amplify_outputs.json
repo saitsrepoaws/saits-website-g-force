@@ -1791,6 +1791,17 @@
               "properties": {}
             },
             {
+              "type": "key",
+              "properties": {
+                "name": "tracksByArtistAndTitle",
+                "queryField": "listTracksByArtist",
+                "fields": [
+                  "artist",
+                  "title"
+                ]
+              }
+            },
+            {
               "type": "auth",
               "properties": {
                 "rules": [

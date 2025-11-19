@@ -280,9 +280,8 @@ async function checkDuplicate(title: string, artist: string): Promise<boolean> {
     
     const result = await dynamoClient.send(new QueryCommand({
       TableName: TRACK_TABLE,
-      IndexName: 'byArtist', // Assuming this GSI exists
-      KeyConditionExpression: 'artist = :artist',
-      FilterExpression: 'title = :title',
+      IndexName: 'tracksByArtistAndTitle', // GSI: artist (HASH) + title (RANGE)
+      KeyConditionExpression: 'artist = :artist AND title = :title',
       ExpressionAttributeValues: {
         ':artist': artist,
         ':title': title

@@ -155,7 +155,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/582ee78e5e6c85b2fad46dd93a704140d4eb8891ee132e7b75caec5dba3e6658.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/cc2aeb66ed02e020d4d19e4c89c5c0eab81a94ecf21d0babe6643094aa09468d.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -6448,6 +6448,46 @@
           {
             "type": "graphqltransformer:resourceName",
             "data": "Subscription.onDeleteTrack"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTracksByArtistauth0Function/QuerylistTracksByArtistauth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistTracksByArtistauth0FunctionQuerylistTracksByArtistauth0FunctionAppSyncFunction5C9329F2"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistTracksByArtistauth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QuerylistTracksByArtistpostAuth0Function/QuerylistTracksByArtistpostAuth0Function.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistTracksByArtistpostAuth0FunctionQuerylistTracksByArtistpostAuth0FunctionAppSyncFunctionEAC1C619"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QuerylistTracksByArtistpostAuth0Function"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/QueryListTracksByArtistDataResolverFn/QueryListTracksByArtistDataResolverFn.AppSyncFunction": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QueryListTracksByArtistDataResolverFnQueryListTracksByArtistDataResolverFnAppSyncFunctionD38D8C4F"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "QueryListTracksByArtistDataResolverFn"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/queryListTracksByArtistResolver": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "QuerylistTracksByArtistResolver"
+          },
+          {
+            "type": "graphqltransformer:resourceName",
+            "data": "Query.listTracksByArtist"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/data/amplifyData/Track/CDKMetadata/Default": [
