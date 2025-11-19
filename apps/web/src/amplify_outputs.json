@@ -1,9 +1,9 @@
 {
   "auth": {
-    "user_pool_id": "eu-west-1_Nnhnf56NW",
+    "user_pool_id": "eu-west-1_nsJLnXcvd",
     "aws_region": "eu-west-1",
-    "user_pool_client_id": "1romorvipedqlkllcmhesg51pp",
-    "identity_pool_id": "eu-west-1:345056ed-fefd-4ab5-97c6-a7b5ec4073ea",
+    "user_pool_client_id": "2o4tjlh9bp8vtg0kv8i483k20n",
+    "identity_pool_id": "eu-west-1:341940a0-9146-4773-b816-4877ff32b02d",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
@@ -26,9 +26,9 @@
     "unauthenticated_identities_enabled": true
   },
   "data": {
-    "url": "https://4ggwfzt6kjbpzmsrrpy2qbdlyu.appsync-api.eu-west-1.amazonaws.com/graphql",
+    "url": "https://vvulpln6e5g5xco43w57sund2q.appsync-api.eu-west-1.amazonaws.com/graphql",
     "aws_region": "eu-west-1",
-    "api_key": "da2-7yy66o5a5fbmnd2olqtdco5yf4",
+    "api_key": "da2-jx6ufwjhlzc3hhno5jtdxfbnv4",
     "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
       "API_KEY",
@@ -1791,6 +1791,17 @@
               "properties": {}
             },
             {
+              "type": "key",
+              "properties": {
+                "name": "tracksByArtistAndTitle",
+                "queryField": "listTracksByArtist",
+                "fields": [
+                  "artist",
+                  "title"
+                ]
+              }
+            },
+            {
               "type": "auth",
               "properties": {
                 "rules": [
@@ -1958,14 +1969,14 @@
   },
   "storage": {
     "aws_region": "eu-west-1",
-    "bucket_name": "amplify-gforgeiot-gerard3-gforgeiotstoragebucketee-fxgmhj4ywudz",
+    "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-dmnly9ayjibv",
     "buckets": [
       {
         "name": "gforgeIotStorage",
-        "bucket_name": "amplify-gforgeiot-gerard3-gforgeiotstoragebucketee-fxgmhj4ywudz",
+        "bucket_name": "amplify-gforgeiot-gerard--gforgeiotstoragebucketee-dmnly9ayjibv",
         "aws_region": "eu-west-1",
         "paths": {
-          "public/audio/*": {
+          "public/audio/ui/*": {
             "authenticated": [
               "get",
               "list",
@@ -1976,6 +1987,25 @@
               "get",
               "list"
             ]
+          },
+          "public/audio/bulk/*": {
+            "authenticated": [
+              "get",
+              "list",
+              "write",
+              "delete"
+            ],
+            "guest": [
+              "get",
+              "list"
+            ]
+          },
+          "backup/audio/*": {
+            "authenticated": [
+              "get",
+              "list"
+            ],
+            "guest": []
           },
           "public/covers/*": {
             "authenticated": [

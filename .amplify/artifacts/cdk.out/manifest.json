@@ -22,7 +22,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-deploy-role-035636364722-eu-west-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-cfn-exec-role-035636364722-eu-west-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-035636364722-eu-west-1/db02cf6e05effe6943b1c8caf6f639ea004c348e2ee2adae2fcea3d43ba6ed75.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-035636364722-eu-west-1/143f08da619609714e09b5e00d622083f53be4f697230c36260a3b3238d38f8c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -155,7 +155,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/edf286b07927008d1679a3adccf9146a4e92a3789c47fb51678825a961c10094.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/34392240c34ad8d7704ec2a7a8f8c94543615b8796a9e128df970a94ec033ed3.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -250,6 +250,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "IotPubSubPolicyUnauth333DCE7E"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/UserPoolId/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId86CD4426"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/UserPoolClientId/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId7B9A01E7"
+          }
+        ],
+        "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IdentityPoolId/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IdentityPoolId577C8687"
           }
         ],
         "/amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default": [
@@ -8396,5 +8414,44 @@
       }
     }
   },
+  "missing": [
+    {
+      "key": "vpc-provider:account=035636364722:filter.isDefault=true:region=eu-west-1:returnAsymmetricSubnets=true",
+      "provider": "vpc-provider",
+      "props": {
+        "account": "035636364722",
+        "region": "eu-west-1",
+        "filter": {
+          "isDefault": "true"
+        },
+        "returnAsymmetricSubnets": true,
+        "lookupRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-lookup-role-035636364722-eu-west-1"
+      }
+    },
+    {
+      "key": "ami:account=035636364722:filters.image-type.0=machine:filters.name.0=ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*:filters.state.0=available:owners.0=099720109477:region=eu-west-1",
+      "provider": "ami",
+      "props": {
+        "dummyValue": "ami-1234",
+        "account": "035636364722",
+        "region": "eu-west-1",
+        "owners": [
+          "099720109477"
+        ],
+        "filters": {
+          "name": [
+            "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+          ],
+          "state": [
+            "available"
+          ],
+          "image-type": [
+            "machine"
+          ]
+        },
+        "lookupRoleArn": "arn:${AWS::Partition}:iam::035636364722:role/cdk-hnb659fds-lookup-role-035636364722-eu-west-1"
+      }
+    }
+  ],
   "minimumCliVersion": "2.1030.0"
 }

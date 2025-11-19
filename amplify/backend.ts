@@ -1235,5 +1235,31 @@ new CfnOutput(backend.getCoverUrl.resources.lambda.stack, 'CoverUrlFunctionUrl',
   description: 'Public URL for getting cover art signed URLs',
 })
 
+// Store Auth configuration in Parameter Store for reliable deployments
+new ssm.StringParameter(backend.auth.resources.userPool.stack, 'UserPoolId', {
+  parameterName: '/gforce-radio/auth/user-pool-id',
+  stringValue: backend.auth.resources.userPool.userPoolId,
+  description: 'Cognito User Pool ID'
+})
+
+new ssm.StringParameter(backend.auth.resources.userPool.stack, 'UserPoolClientId', {
+  parameterName: '/gforce-radio/auth/user-pool-client-id',
+  stringValue: backend.auth.resources.userPoolClient.userPoolClientId,
+  description: 'Cognito User Pool Client ID'
+})
+
+new ssm.StringParameter(backend.auth.resources.userPool.stack, 'IdentityPoolId', {
+  parameterName: '/gforce-radio/auth/identity-pool-id',
+  stringValue: backend.auth.resources.cfnResources.cfnIdentityPool.ref,
+  description: 'Cognito Identity Pool ID'
+})
+
+new ssm.StringParameter(backend.storage.resources.bucket.stack, 'StorageBucketName', {
+  parameterName: '/gforce-radio/storage/bucket-name',
+  stringValue: backend.storage.resources.bucket.bucketName,
+  description: 'S3 Storage Bucket Name'
+})
+
 console.log('🎙️ Stream Server (EC2 + Icecast + Liquidsoap) configured with Elastic IP')
 console.log('📋 Stream Playlist Updater Lambda deployed with EventBridge (rate: 1 minute)')
+console.log('📦 Auth & API configuration stored in Parameter Store')

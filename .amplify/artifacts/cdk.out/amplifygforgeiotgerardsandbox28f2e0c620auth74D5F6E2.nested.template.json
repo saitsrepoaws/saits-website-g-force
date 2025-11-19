@@ -475,10 +475,70 @@
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IotPubSubPolicyUnauth/Resource"
    }
   },
+  "UserPoolId86CD4426": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "Cognito User Pool ID",
+    "Name": "/gforce-radio/auth/user-pool-id",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "amplifyAuthUserPool4BA7F805"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/UserPoolId/Resource"
+   }
+  },
+  "UserPoolClientId7B9A01E7": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "Cognito User Pool Client ID",
+    "Name": "/gforce-radio/auth/user-pool-client-id",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "amplifyAuthUserPoolAppClient2626C6F8"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/UserPoolClientId/Resource"
+   }
+  },
+  "IdentityPoolId577C8687": {
+   "Type": "AWS::SSM::Parameter",
+   "Properties": {
+    "Description": "Cognito Identity Pool ID",
+    "Name": "/gforce-radio/auth/identity-pool-id",
+    "Tags": {
+     "amplify:deployment-type": "sandbox",
+     "created-by": "amplify"
+    },
+    "Type": "String",
+    "Value": {
+     "Ref": "amplifyAuthIdentityPool3FDE84CC"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/IdentityPoolId/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02LTQ6CMBCFz8K+jNgbGFZulGBcm1pGHSitoYOENL27AYKyet/7kyBlBlmiBp/qqkkN3SGc0DNWF1a6EWrwt6Dd0xI7CFePXeGcEfnD/niF3BBa3lb/5FihZeJxPW996QwemJV+tWg5ClIthCmchrMWzpAeJ7tQjKJE7/pOz5tzz++eo7CuQqj97iMlyD1kSe2J0q63TC1CuegXM8s83PIAAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02MSw7CMAxEz8I+NSU3QKzYQFXEGoXUgCEfFLsgFOXuqEUFVvNmxh4NWtdQz8yTK9vdKkdHyBtkwW4nxt6UefIh23gOJBHynjE1MTq1OoUvT7ByhEH+q1+y7jAIyWt6/vdtdLgUMfbiMUhRZDzkIRwOR22iI/sa7IeKYvaQd5IonBuTjEfBNPaTKUW1yLFPdpzZ9nLvpagQO4Qrzx9ag15APbsyUZX6IOQR2o++AadJRnQVAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "amplify-gforgeiot-gerard-sandbox-28f2e0c620/auth/CDKMetadata/Default"

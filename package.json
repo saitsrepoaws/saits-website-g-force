@@ -16,7 +16,9 @@
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
     "format": "prettier -w .",
-    "typecheck": "tsc -v && turbo run typecheck"
+    "typecheck": "tsc -v && turbo run typecheck",
+    "sync-config": "./scripts/sync-amplify-config.sh",
+    "sandbox": "npx ampx sandbox && npm run sync-config"
   },
   "keywords": [],
   "author": "",
