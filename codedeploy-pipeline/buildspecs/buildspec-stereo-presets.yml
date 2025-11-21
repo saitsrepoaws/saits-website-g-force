@@ -1,0 +1,34 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Building Stereo Tool preset deployment artifact"
+
+  pre_build:
+    commands:
+      - echo "Validating .sts preset files"
+      - |
+        if [ ! -d stereo-presets-deploy/presets ]; then
+          echo "stereo-presets-deploy/presets directory is missing"
+          exit 1
+        fi
+      - |
+        set -e
+        shopt -s nullglob
+        presets=(stereo-presets-deploy/presets/*.sts)
+        if [ ${#presets[@]} -eq 0 ]; then
+          echo "No .sts preset files found in stereo-presets-deploy/presets"
+          exit 1
+        fi
+        echo "Found ${#presets[@]} preset file(s)"
+
+  build:
+    commands:
+      - echo "Packaging presets and appspec for CodeDeploy"
+      - mkdir -p dist
+      - zip -r dist/stereo-presets.zip stereo-presets-deploy/*
+
+artifacts:
+  files:
+    - dist/stereo-presets.zip

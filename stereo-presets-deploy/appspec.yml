@@ -1,0 +1,22 @@
+version: 0.0
+os: linux
+
+files:
+  - source: presets/
+    destination: /data/stereotool/
+
+hooks:
+  BeforeInstall:
+    - location: scripts/backup-presets.sh
+      timeout: 300
+      runas: root
+
+  ApplicationStart:
+    - location: scripts/reload-liquidsoap.sh
+      timeout: 300
+      runas: root
+
+  ValidateService:
+    - location: scripts/validate-presets-deployment.sh
+      timeout: 600
+      runas: root
